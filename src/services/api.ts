@@ -4,7 +4,7 @@ import { request } from 'umi';
 
 /** 邮箱登录接口 POST /accounts/email/login */
 export async function emailLogin(body: API.EmailLoginParams, options?: { [key: string]: any }) {
-  return request<API.GeneralResponse<CurrentUser>>('/accounts/email/login', {
+  return request<API.GeneralResponse<{user: API.CurrentUser}>>('/accounts/email/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -19,7 +19,7 @@ export async function emailGetVerificationCode(
   body: API.VerificationCodeParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.LoginResult>('/accounts/email/verification-code', {
+  return request('/accounts/email/verification-code', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export async function emailGetVerificationCode(
 }
 
 /** 获取当前的用户 GET /users/me */
-export async function currentUser(options?: { [key: string]: any }) {
+export async function queryCurrentUser(options?: { [key: string]: any }) {
   return request<{
     data: API.CurrentUser;
   }>('/users/me', {
@@ -39,10 +39,20 @@ export async function currentUser(options?: { [key: string]: any }) {
   });
 }
 
-/** 退出登录接口 POST /api/login/outLogin */
+/** 退出登录接口 DELETE /accounts/tokens */
 export async function outLogin(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/login/outLogin', {
-    method: 'POST',
+  return request<Record<string, any>>('/accounts/tokens', {
+    method: 'DELETE',
+    ...(options || {}),
+  });
+}
+
+/** 刷新 Tokens 接口 PATCH /accounts/tokens */
+export async function refreshTokens(options?: { [key: string]: any }) {
+  return request<{
+    data: API.CurrentUser;
+  }>('/accounts/tokens', {
+    method: 'PATCH',
     ...(options || {}),
   });
 }

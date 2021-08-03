@@ -19,38 +19,65 @@
     ],
   },
   {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
-  },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
+    path: '/content',
+    name: '内容后台',
+    icon: 'edit',
     routes: [
       {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        icon: 'smile',
-        component: './Welcome',
+        path: '/content/inbox',
+        name: '消息',
+        component: './content/Inbox',
       },
       {
-        component: './404',
+        path: '/content/posted-content',
+        name: '已发布内容',
+        component: './content/PostedContent',
       },
     ],
   },
   {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
+    path: '/site',
+    name: '站点信息设置',
+    component: './Site',
+    icon: 'setting',
+  },
+  {
+    path: '/publish',
+    name: '发布设置',
+    icon: 'branches',
+    routes: [
+      {
+        path: '/publish/domain-setting',
+        name: '域名配置',
+        component: './publish/DomainSetting',
+      },
+      {
+        path: '/publish/store-setting',
+        name: '存储配置',
+        component: './publish/StoreSetting',
+      }
+    ]
+  },
+  {
+    path: '/account',
+    name: '账号设置',
+    icon: 'user',
+    routes: [
+      {
+        path: '/account/source',
+        name: '内容源绑定',
+        component: './account/Source',
+      },
+      {
+        path: '/account/invitation',
+        name: '邀请码管理',
+        component: './account/Invitation',
+      }
+    ]
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/content/inbox',
   },
   {
     component: './404',
