@@ -24,9 +24,9 @@
     icon: 'edit',
     routes: [
       {
-        path: '/content/inbox',
-        name: '消息',
-        component: './content/Inbox',
+        path: '/content/sync-center',
+        name: '同步中心',
+        component: './content/SyncCenter',
       },
       {
         path: '/content/posted-content',
@@ -77,7 +77,7 @@
   },
   {
     path: '/',
-    redirect: '/content/inbox',
+    redirect: '/content/sync-center',
   },
   {
     component: './404',

@@ -41,7 +41,7 @@ const columns: ProColumns<HexoPostsInfo>[] = [
               ? baseUrl + record.cover
               : record.cover
           } />
-          : 'No Cover Available'}
+          : '无封面图'}
       </Space>
     ),
   },
