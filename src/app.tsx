@@ -68,16 +68,18 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       }
 
       // 如果没有个人站点，重定向到 MetaNetwork
-      if (!initialState?.hasSite && ![loginPath, '/'].includes(location.pathname)) {
+      /*
+      if (initialState?.currentUser && !initialState?.hasSite) {
         setTimeout(() => {
           // @ts-ignore
-          // window.location = 'https://www.meta-network.io/';
+          window.location = 'https://www.meta-network.io/';
         }, 5000);
         notification.error({
           message: '还未创建站点！',
           description: '您的 MetaSpace 还未创建完成，将返回 MetaNetwork 完成创建',
         });
       }
+       */
     },
     links: [
       // TODO: next change these links

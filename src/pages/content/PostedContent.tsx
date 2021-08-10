@@ -1,8 +1,9 @@
 import { useRef } from 'react';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
-import { Tag, Space } from 'antd';
+import { Image, Tag, Space } from 'antd';
+import { PageContainer } from '@ant-design/pro-layout';
 import request from 'umi-request';
+import ProTable from '@ant-design/pro-table';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
 
 type HexoPostsInfo = {
   cover: string | null;
@@ -36,11 +37,12 @@ const columns: ProColumns<HexoPostsInfo>[] = [
     render: (_, record) => (
       <Space>
         {record.cover
-          ? <img height={50} width={100} src={
-            record.cover.startsWith('/')
+          ? <Image
+            width={100}
+            src={record.cover.startsWith('/')
               ? baseUrl + record.cover
-              : record.cover
-          } />
+              : record.cover}
+          />
           : '无封面图'}
       </Space>
     ),
@@ -138,36 +140,41 @@ const columns: ProColumns<HexoPostsInfo>[] = [
 export default () => {
   const actionRef = useRef<ActionType>();
   return (
-    <ProTable<HexoPostsInfo>
-      columns={columns}
-      actionRef={actionRef}
-      dataSource={response.data}
-      rowKey={(record, index) => index!.toString()}
-      search={{
-        labelWidth: 'auto',
-      }}
-      form={{
-        // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return {
-              ...values,
-              created_at: [values.startTime, values.endTime],
-            };
-          }
-          return values;
-        },
-      }}
-      pagination={{
-        total: response.total,
-        pageSize: response.pageSize,
-      }}
-      expandable={{
-        expandedRowRender: (record: HexoPostsInfo) => <p dangerouslySetInnerHTML={{ __html: record.content }}/>,
-      }}
-      dateFormatter="string"
-      headerTitle="已发布内容"
-      options={false}
-    />
+    <PageContainer
+      breadcrumb={{}}
+      title="已发布内容"
+      content="已发布的文章列表可以在这里查看"
+    >
+        <ProTable<HexoPostsInfo>
+          columns={columns}
+          actionRef={actionRef}
+          dataSource={response.data}
+          rowKey={(record, index) => index!.toString()}
+          search={{
+            labelWidth: 'auto',
+          }}
+          form={{
+            // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
+            syncToUrl: (values, type) => {
+              if (type === 'get') {
+                return {
+                  ...values,
+                  created_at: [values.startTime, values.endTime],
+                };
+              }
+              return values;
+            },
+          }}
+          pagination={{
+            total: response.total,
+            pageSize: response.pageSize,
+          }}
+          expandable={{
+            expandedRowRender: (record: HexoPostsInfo) => <p dangerouslySetInnerHTML={{ __html: record.content }}/>,
+          }}
+          dateFormatter="string"
+          options={false}
+        />
+    </PageContainer>
   );
 };

@@ -1,5 +1,6 @@
+import { PageContainer } from '@ant-design/pro-layout';
 import request from 'umi-request';
-import { Button, Space, Tag } from 'antd';
+import { Image, Button, Space, Tag } from 'antd';
 import { useState, useCallback } from 'react';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns } from '@ant-design/pro-table';
@@ -15,6 +16,12 @@ type HexoPostsInfo = {
   updated: string;
 };
 
+enum LoadingStates {
+  Pending,
+  Publishing,
+  Discarding,
+}
+
 type RequestResponse = {
   total: number;
   pageSize: number;
@@ -26,13 +33,15 @@ const baseUrl = 'https://metaspace.federarks.xyz';
 const response = await request<RequestResponse>(`${baseUrl}/api/posts.json`);
 
 export default () => {
-  const [loadings, setLoadings] = useState(Array(response.data.length).fill(false));
+  const [loadings, setLoadings] = useState(Array(response.data.length).fill(LoadingStates.Pending));
 
-  const setLoading = useCallback((index, value: boolean) => {
-    const newLoadings = [...loadings];
-    newLoadings[index] = value;
-    setLoadings(newLoadings);
-  }, [loadings]);
+  const setLoading = useCallback((index, value: LoadingStates) => {
+    setLoadings((prevLoadings: LoadingStates[]) => {
+      const newLoadings = [...prevLoadings]
+      newLoadings[index] = value;
+      return newLoadings;
+    });
+  }, []);
 
   const columns: ProColumns<HexoPostsInfo>[] = [
     {
@@ -42,11 +51,12 @@ export default () => {
       render: (_, record) => (
         <Space>
           {record.cover
-            ? <img height={50} width={100} src={
-              record.cover.startsWith('/')
+            ? <Image
+              width={100}
+              src={record.cover.startsWith('/')
                 ? baseUrl + record.cover
-                : record.cover
-            } />
+                : record.cover}
+            />
             : '无封面图'}
         </Space>
       ),
@@ -139,53 +149,72 @@ export default () => {
       width: 250,
       valueType: 'option',
       render: (_, record, index) => [
-        <Button onClick={() => {
-          setLoading(index, true);
+        <Button
+          onClick={() => {
+          setLoading(index, LoadingStates.Publishing);
           setTimeout(() => {
-            setLoading(index, false);
-          }, 6000);
-        }} loading={loadings[index]} type="primary">发布</Button>,
-        <Button onClick={() => {
-          setLoading(index, true);
-          setTimeout(() => {
-            setLoading(index, false);
-          }, 6000);
-        }} loading={loadings[index]} type="primary" danger>取消发布</Button>
+            setLoading(index, LoadingStates.Pending);
+          }, 3000);
+        }}
+          loading={loadings[index] === LoadingStates.Publishing}
+          disabled={loadings[index] === LoadingStates.Discarding}
+          type="primary">
+          发布
+        </Button>,
+        <Button
+          onClick={() => {
+            setLoading(index, LoadingStates.Discarding);
+            setTimeout(() => {
+              setLoading(index, LoadingStates.Pending);
+            }, 3000);
+          }}
+          loading={loadings[index] === LoadingStates.Discarding}
+          disabled={loadings[index] === LoadingStates.Publishing}
+          type="primary"
+          danger
+        >
+          取消发布
+        </Button>
       ]
     },
   ];
 
 
   return (
-    <ProTable<HexoPostsInfo>
-      columns={columns}
-      dataSource={response.data}
-      rowKey={(record) => record.title}
-      search={{
-        labelWidth: 'auto',
-      }}
-      form={{
-        // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return {
-              ...values,
-              created_at: [values.startTime, values.endTime],
-            };
-          }
-          return values;
-        },
-      }}
-      pagination={{
-        total: response.total,
-        pageSize: response.pageSize,
-      }}
-      expandable={{
-        expandedRowRender: (record: HexoPostsInfo) => <p dangerouslySetInnerHTML={{ __html: record.content }}/>,
-      }}
-      dateFormatter="string"
-      headerTitle="同步中心"
-      options={false}
-    />
+    <PageContainer
+      breadcrumb={{}}
+      title="同步中心"
+      content="在这里来控制发布从其他源获取到的文章列表"
+    >
+      <ProTable<HexoPostsInfo>
+        columns={columns}
+        dataSource={response.data}
+        rowKey={(record) => record.title}
+        search={{
+          labelWidth: 'auto',
+        }}
+        form={{
+          // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
+          syncToUrl: (values, type) => {
+            if (type === 'get') {
+              return {
+                ...values,
+                created_at: [values.startTime, values.endTime],
+              };
+            }
+            return values;
+          },
+        }}
+        pagination={{
+          total: response.total,
+          pageSize: response.pageSize,
+        }}
+        expandable={{
+          expandedRowRender: (record: HexoPostsInfo) => <p dangerouslySetInnerHTML={{ __html: record.content }}/>,
+        }}
+        dateFormatter="string"
+        options={false}
+      />
+    </PageContainer>
   );
 };

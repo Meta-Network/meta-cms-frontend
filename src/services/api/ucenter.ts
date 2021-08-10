@@ -18,7 +18,7 @@ const request = extend({
 
 /** 邮箱登录接口 POST /accounts/email/login */
 export async function emailLogin(body: API.EmailLoginParams, options?: Record<string, any>) {
-  return request<API.GeneralResponse<{user: API.CurrentUser}>>('/accounts/email/login', {
+  return request<API.GeneralResponse<{ user: API.CurrentUser }>>('/accounts/email/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ export async function emailGetVerificationCode(
   body: API.VerificationCodeParams,
   options?: Record<string, any>,
 ) {
-  return request('/accounts/email/verification-code', {
+  return request<API.GeneralResponse<{key: string}>>('/accounts/email/verification-code', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -45,17 +45,39 @@ export async function emailGetVerificationCode(
 
 /** 获取当前的用户 GET /users/me */
 export async function queryCurrentUser(options?: Record<string, any>) {
-  return request<{
-    data: API.CurrentUser;
-  }>('/users/me', {
+  return request<API.GeneralResponse<API.CurrentUser>>('/users/me', {
     method: 'GET',
+    ...(options || {}),
+  });
+}
+
+/** 获取当前用户所有的邀请码 GET /invitations/mine */
+export async function queryInvitations(options?: Record<string, any>) {
+  return request<API.GeneralResponse<API.Invitation[]>>('/invitations/mine', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+/** 更新邀请码的信息 PATCH /invitations/mine */
+export async function updateInvitation(
+  signature: string,
+  body: API.InvitationInfo,
+  options?: Record<string, any>
+) {
+  return request<API.GeneralResponse<API.Invitation>>(`/invitations/${signature}/message`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
     ...(options || {}),
   });
 }
 
 /** 退出登录接口 DELETE /accounts/tokens */
 export async function outLogin(options?: Record<string, any>) {
-  return request<Record<string, any>>('/accounts/tokens', {
+  return request<API.GeneralResponse<null>>('/accounts/tokens', {
     method: 'DELETE',
     ...(options || {}),
   });
@@ -63,9 +85,7 @@ export async function outLogin(options?: Record<string, any>) {
 
 /** 刷新 Tokens 接口 PATCH /accounts/tokens */
 export async function refreshTokens(options?: Record<string, any>) {
-  return request<{
-    data: API.CurrentUser;
-  }>('/accounts/tokens', {
+  return request<API.GeneralResponse<API.CurrentUser>>('/accounts/tokens', {
     method: 'PATCH',
     ...(options || {}),
   });

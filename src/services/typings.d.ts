@@ -23,35 +23,34 @@ declare namespace API {
   };
 
   type EmailLoginParams = {
-    email: string;
+    account: string;
     verifyCode: string;
     hcaptchaToken: string;
+  };
+
+  type InvitationInfo = {
+    sub: string,
+    message: string,
+  };
+
+  type Invitation = {
+    id: number,
+    sub: string,
+    signature: string,
+    salt: string,
+    issuer:  string,
+    message: string,
+    cause: string
+    invitee_user_id: number,
+    inviter_user_id: number,
+    matataki_user_id: number,
+    expired_at: Date,
+    created_at: Date,
+    updated_at: Date,
   };
 
   type PageParams = {
     current?: number;
     pageSize?: number;
-  };
-
-  type NoticeIconList = {
-    data?: NoticeIconItem[];
-    /** 列表的内容总数 */
-    total?: number;
-    success?: boolean;
-  };
-
-  type NoticeIconItemType = 'notification' | 'message' | 'event';
-
-  type NoticeIconItem = {
-    id?: string;
-    extra?: string;
-    key?: string;
-    read?: boolean;
-    avatar?: string;
-    title?: string;
-    status?: string;
-    datetime?: string;
-    description?: string;
-    type?: NoticeIconItemType;
   };
 }

@@ -44,7 +44,7 @@ const Login: React.FC = () => {
       // TODO: only for testing
       // eslint-disable-next-line no-param-reassign
       values.hcaptchaToken = values.hcaptchaToken || 'somethinghere';
-      const result = await emailLogin({ ...values });
+      const result = await emailLogin(values);
       if (result.message === 'ok') {
         message.success(
           intl.formatMessage({
@@ -92,7 +92,7 @@ const Login: React.FC = () => {
           <ProForm
             initialValues={{
               // TODO: remove this line
-              email: 'casimir.crystal.blue@outlook.com',
+              account: 'casimir.crystal.blue@outlook.com',
             }}
             submitter={{
               searchConfig: {
@@ -126,13 +126,13 @@ const Login: React.FC = () => {
             {
               <>
                 <ProFormText
-                  name="email"
+                  name="account"
                   fieldProps={{
                     size: 'large',
                     prefix: <UserOutlined className={styles.prefixIcon} />,
                   }}
                   placeholder={intl.formatMessage({
-                    id: 'pages.login.email.placeholder',
+                    id: 'pages.login.account.placeholder',
                     defaultMessage: '登陆账号的邮箱地址',
                   })}
                   rules={[
@@ -140,7 +140,7 @@ const Login: React.FC = () => {
                       required: true,
                       message: (
                         <FormattedMessage
-                          id="pages.login.email.required"
+                          id="pages.login.account.required"
                           defaultMessage="请输入邮箱地址"
                         />
                       ),
@@ -167,12 +167,12 @@ const Login: React.FC = () => {
                       })}`;
                     }
                     return intl.formatMessage({
-                      id: 'pages.login.email.getVerificationCode',
+                      id: 'pages.login.account.getVerificationCode',
                       defaultMessage: '获取验证码',
                     });
                   }}
                   name="verifyCode"
-                  phoneName="email"
+                  phoneName="account"
                   rules={[
                     {
                       required: true,
@@ -184,12 +184,12 @@ const Login: React.FC = () => {
                       ),
                     },
                   ]}
-                  onGetCaptcha={async (email) => {
-                    const result = await emailGetVerificationCode({ key: email });
+                  onGetCaptcha={async (account) => {
+                    const result = await emailGetVerificationCode({ key: account });
                     if (result === false) {
                       return;
                     }
-                    message.success(`获取验证码成功！请前往邮箱 ${email} 查看`);
+                    message.success(`获取验证码成功！请前往邮箱 ${account} 查看`);
                   }}
                 />
               </>

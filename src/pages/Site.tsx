@@ -8,9 +8,11 @@ import { PageContainer } from '@ant-design/pro-layout';
 
 export default () => {
   return (
-    <PageContainer title="站点信息设置">
+    <PageContainer title="站点信息设置" content="在这里对个人站点的信息进行设置">
       <Card>
         <ProForm
+          name="site-info"
+          initialValues={{ title: 'site title' }}
           onFinish={async (values) => console.log(values)}
         >
           <ProForm.Group>
