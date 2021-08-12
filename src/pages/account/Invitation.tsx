@@ -1,5 +1,6 @@
+import { CopyOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import { List, Badge, Card, Divider, notification, Button } from 'antd';
+import { List, Badge, Card, Divider, notification } from 'antd';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { useRequest } from '@@/plugin-request/request';
 import { queryInvitations, updateInvitation } from '@/services/api/ucenter';
@@ -69,27 +70,32 @@ export default () => {
                     }}
                   >
                     <ProFormText
-                      fieldProps={{ id: `signature_${item.id}`, readOnly: true }}
+                      fieldProps={{
+                        id: `signature_${item.id}`,
+                        readOnly: true,
+                        suffix: isUnused ? (
+                          <a
+                            onClick={() => {
+                              const sigArea = document.querySelector(
+                                `#signature_${item.id}`,
+                              ) as HTMLInputElement;
+                              sigArea?.select();
+                              document.execCommand('copy');
+                              notification.success({ message: '复制成功' });
+                            }}
+                          >
+                            <CopyOutlined />
+                          </a>
+                        ) : (
+                          <CopyOutlined />
+                        ),
+                      }}
                       initialValue={item.signature}
                       label="邀请代码"
                       width="md"
                       name="signature"
                       disabled={!isUnused}
                     />
-                    <Button
-                      onClick={() => {
-                        const sigArea = document.querySelector(
-                          `#signature_${item.id}`,
-                        ) as HTMLInputElement;
-                        sigArea?.select();
-                        document.execCommand('copy');
-                        notification.success({ message: '复制成功' });
-                      }}
-                      type="primary"
-                      disabled={!isUnused}
-                    >
-                      复制
-                    </Button>
                     <Divider />
                     <p>可以在此处编辑信息</p>
                     <ProFormText

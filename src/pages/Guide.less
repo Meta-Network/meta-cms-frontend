@@ -1,0 +1,58 @@
+@import '~antd/es/style/themes/default.less';
+
+:global {
+  .ant-page-header {
+    padding-bottom: 6px;
+  }
+
+  .ant-pro-card-title {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 32px;
+  }
+}
+
+.contentContainer {
+  margin: 6px;
+}
+
+.pageButtons {
+  margin-top: 18px;
+}
+
+.standardList {
+  :global {
+    .ant-card-head {
+      border-bottom: none;
+    }
+    .ant-card-extra {
+      padding: 24px 0;
+    }
+    .ant-list-pagination {
+      margin-top: 24px;
+      text-align: right;
+    }
+  }
+  .listContent {
+    font-size: 0;
+    .listContentItem {
+      display: inline-block;
+      margin-right: 40px;
+      color: @text-color-secondary;
+      font-size: @font-size-base;
+      vertical-align: middle;
+      > span {
+        line-height: 20px;
+      }
+      > p {
+        margin-top: 4px;
+        margin-bottom: 0;
+        line-height: 22px;
+      }
+    }
+  }
+  .extraContentSearch {
+    width: 272px;
+    margin-left: 16px;
+  }
+}

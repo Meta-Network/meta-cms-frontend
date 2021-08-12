@@ -1,0 +1,41 @@
+@import '~antd/es/style/themes/default.less';
+
+.standardList {
+  :global {
+    .ant-card-head {
+      border-bottom: none;
+    }
+    .ant-card-extra {
+      padding: 24px 0;
+    }
+    .ant-card-title {
+      font-size: 30px !important;
+    }
+    .ant-list-pagination {
+      margin-top: 24px;
+      text-align: right;
+    }
+  }
+  .listContent {
+    font-size: 0;
+    .listContentItem {
+      display: inline-block;
+      margin-right: 40px;
+      color: @text-color-secondary;
+      font-size: @font-size-base;
+      vertical-align: middle;
+      > span {
+        line-height: 20px;
+      }
+      > p {
+        margin-top: 4px;
+        margin-bottom: 0;
+        line-height: 22px;
+      }
+    }
+  }
+  .extraContentSearch {
+    width: 272px;
+    margin-left: 16px;
+  }
+}

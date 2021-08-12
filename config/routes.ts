@@ -1,6 +1,6 @@
 ﻿export default [
   {
-    path: '/',
+    path: '/dashboard',
     name: '控制中心',
     component: './Dashboard',
     icon: 'dashboard',
@@ -82,8 +82,12 @@
     ],
   },
   {
+    path: '/guide',
+    component: './Guide',
+  },
+  {
     path: '/',
-    redirect: '/content/sync-center',
+    redirect: '/guide',
   },
   {
     component: './404',

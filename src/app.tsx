@@ -1,5 +1,4 @@
 import { history, Link } from 'umi';
-import { notification } from 'antd';
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { getMyGrid } from './services/api/meta-network';
@@ -83,11 +82,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     },
     links: [
       // TODO: next change these links
-      <Link to="/umi/plugin/openapi" target="_blank">
+      <Link to="https://metaspace.federarks.xyz/" target="_blank">
         <LinkOutlined />
         <span>个人站点</span>
       </Link>,
-      <Link to="/~docs">
+      <Link to="https://meta-network.vercel.app/">
         <BookOutlined />
         <span>Meta Network</span>
       </Link>,

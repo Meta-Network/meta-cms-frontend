@@ -1,6 +1,34 @@
-import { List, Card, Avatar } from 'antd';
-// import styles from './StoreSetting.less';
-import { GridContent } from '@ant-design/pro-layout';
+import { List, Card, Avatar, Tag } from 'antd';
+import styles from './StoreSetting.less';
+
+import { GridContent, PageContainer } from '@ant-design/pro-layout';
+
+const ListContent = ({ status }) => {
+  const AccountStatus = () =>
+    status.account === 1 ? (
+      <Tag color="#87d068">账号已绑定</Tag>
+    ) : (
+      <Tag color="#f50">账号未绑定</Tag>
+    );
+
+  const StoreStatus = () =>
+    status.store === 1 ? <Tag color="#87d068">存储已配置</Tag> : <Tag color="#f50">存储未配置</Tag>;
+
+  return (
+    <div className={styles.listContent}>
+      <div className={styles.listContentItem}>
+        <span>当前状态：</span>
+        <AccountStatus />
+        <StoreStatus />
+      </div>
+      <div className={styles.listContentItem}>
+        <span>当前状态：</span>
+        <AccountStatus />
+        <StoreStatus />
+      </div>
+    </div>
+  );
+};
 
 export default () => {
   const getData = () => [
@@ -17,22 +45,27 @@ export default () => {
   ];
 
   return (
-    <Card>
-      <GridContent>
-        <List
-          itemLayout="horizontal"
-          dataSource={getData()}
-          renderItem={(item) => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={<Avatar src={item.avatar} shape="circle" size={50} />}
-                title={item.title}
-                description={item.description}
-              />
-            </List.Item>
-          )}
-        />
-      </GridContent>
-    </Card>
+    <PageContainer>
+      <div className={styles.standardList}>
+        <Card className={styles.listCard} bordered={false}>
+          <GridContent>
+            <List
+              itemLayout="horizontal"
+              dataSource={getData()}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar src={item.avatar} shape="circle" size={50} />}
+                    title={item.title}
+                    description={item.description}
+                  />
+                  <ListContent status={{ account: 1, store: 0 }} />
+                </List.Item>
+              )}
+            />
+          </GridContent>
+        </Card>
+      </div>
+    </PageContainer>
   );
 };

@@ -1,0 +1,36 @@
+@import '~antd/es/style/themes/default.less';
+
+.displayImage {
+  margin-bottom: 10px;
+}
+
+.cardList {
+  margin-top: 14px;
+  padding: 16px 8px 0;
+  background: @descriptions-bg;
+  border: 1px solid @item-active-bg;
+}
+
+.description {
+  color: @text-color-secondary;
+}
+
+.link {
+  margin-top: 14px;
+  font-weight: 700;
+}
+
+.container > * {
+  background-color: @popover-bg;
+  border-radius: 4px;
+  box-shadow: @shadow-1-down;
+}
+
+@media screen and (max-width: @screen-xs) {
+  .container {
+    width: 100% !important;
+  }
+  .container > * {
+    border-radius: 0 !important;
+  }
+}

@@ -90,10 +90,6 @@ const Login: React.FC = () => {
 
         <div className={styles.main}>
           <ProForm
-            initialValues={{
-              // TODO: remove this line
-              account: 'casimir.crystal.blue@outlook.com',
-            }}
             submitter={{
               searchConfig: {
                 submitText: intl.formatMessage({
@@ -185,10 +181,7 @@ const Login: React.FC = () => {
                     },
                   ]}
                   onGetCaptcha={async (account) => {
-                    const result = await emailGetVerificationCode({ key: account });
-                    if (result === false) {
-                      return;
-                    }
+                    await emailGetVerificationCode({ key: account });
                     message.success(`获取验证码成功！请前往邮箱 ${account} 查看`);
                   }}
                 />
