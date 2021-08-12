@@ -1,5 +1,11 @@
 ﻿export default [
   {
+    path: '/',
+    name: '控制中心',
+    component: './Dashboard',
+    icon: 'dashboard',
+  },
+  {
     path: '/user',
     layout: false,
     routes: [
@@ -55,8 +61,8 @@
         path: '/publish/store-setting',
         name: '存储配置',
         component: './publish/StoreSetting',
-      }
-    ]
+      },
+    ],
   },
   {
     path: '/account',
@@ -72,8 +78,8 @@
         path: '/account/invitation',
         name: '邀请码管理',
         component: './account/Invitation',
-      }
-    ]
+      },
+    ],
   },
   {
     path: '/',

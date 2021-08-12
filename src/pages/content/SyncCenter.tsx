@@ -27,17 +27,19 @@ type RequestResponse = {
   pageSize: number;
   pageCount: number;
   data: HexoPostsInfo[];
-}
+};
 
 const baseUrl = 'https://metaspace.federarks.xyz';
 const response = await request<RequestResponse>(`${baseUrl}/api/posts.json`);
 
 export default () => {
-  const [loadings, setLoadings] = useState(Array(response.data.length).fill(LoadingStates.Pending));
+  const [loadings, setLoadings] = useState<LoadingStates[]>(
+    Array(response.data.length).fill(LoadingStates.Pending),
+  );
 
   const setLoading = useCallback((index, value: LoadingStates) => {
     setLoadings((prevLoadings: LoadingStates[]) => {
-      const newLoadings = [...prevLoadings]
+      const newLoadings = [...prevLoadings];
       newLoadings[index] = value;
       return newLoadings;
     });
@@ -50,14 +52,14 @@ export default () => {
       search: false,
       render: (_, record) => (
         <Space>
-          {record.cover
-            ? <Image
+          {record.cover ? (
+            <Image
               width={100}
-              src={record.cover.startsWith('/')
-                ? baseUrl + record.cover
-                : record.cover}
+              src={record.cover.startsWith('/') ? baseUrl + record.cover : record.cover}
             />
-            : '无封面图'}
+          ) : (
+            '无封面图'
+          )}
         </Space>
       ),
     },
@@ -151,14 +153,15 @@ export default () => {
       render: (_, record, index) => [
         <Button
           onClick={() => {
-          setLoading(index, LoadingStates.Publishing);
-          setTimeout(() => {
-            setLoading(index, LoadingStates.Pending);
-          }, 3000);
-        }}
+            setLoading(index, LoadingStates.Publishing);
+            setTimeout(() => {
+              setLoading(index, LoadingStates.Pending);
+            }, 3000);
+          }}
           loading={loadings[index] === LoadingStates.Publishing}
           disabled={loadings[index] === LoadingStates.Discarding}
-          type="primary">
+          type="primary"
+        >
           发布
         </Button>,
         <Button
@@ -174,11 +177,10 @@ export default () => {
           danger
         >
           取消发布
-        </Button>
-      ]
+        </Button>,
+      ],
     },
   ];
-
 
   return (
     <PageContainer
@@ -210,7 +212,9 @@ export default () => {
           pageSize: response.pageSize,
         }}
         expandable={{
-          expandedRowRender: (record: HexoPostsInfo) => <p dangerouslySetInnerHTML={{ __html: record.content }}/>,
+          expandedRowRender: (record: HexoPostsInfo) => (
+            <p dangerouslySetInnerHTML={{ __html: record.content }} />
+          ),
         }}
         dateFormatter="string"
         options={false}
