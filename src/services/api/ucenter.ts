@@ -16,6 +16,61 @@ const request = extend({
   },
 });
 
+export async function webauthnLogin(body: any, options?: Record<string, any>) {
+  return request<API.GeneralResponse<{ user: API.CurrentUser }>>('/accounts/webauthn/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function webauthnSignup(body: any, signature: string, options?: Record<string, any>) {
+  return request<API.GeneralResponse<{ user: API.CurrentUser }>>(
+    `/accounts/webauthn/signup/${signature}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    },
+  );
+}
+
+/** 获取 WebAuthN 验证码 POST /accounts/webauthn/verification-code */
+export async function webauthnGetAssertion(
+  body: API.VerificationCodeParams,
+  options?: Record<string, any>,
+) {
+  return request<API.GeneralResponse<any>>('/accounts/webauthn/generate-assertion', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: { key: body },
+    ...(options || {}),
+  });
+}
+
+/** 获取 WebAuthN 验证码 POST /accounts/webauthn/verification-code */
+export async function webauthnGetAttestation(
+  body: API.VerificationCodeParams,
+  options?: Record<string, any>,
+) {
+  return request<API.GeneralResponse<any>>('/accounts/webauthn/generate-attestation', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: { key: body },
+    ...(options || {}),
+  });
+}
+
 /** 邮箱登录接口 POST /accounts/email/login */
 export async function emailLogin(body: API.EmailLoginParams, options?: Record<string, any>) {
   return request<API.GeneralResponse<{ user: API.CurrentUser }>>('/accounts/email/login', {
@@ -33,7 +88,7 @@ export async function emailGetVerificationCode(
   body: API.VerificationCodeParams,
   options?: Record<string, any>,
 ) {
-  return request<API.GeneralResponse<{key: string}>>('/accounts/email/verification-code', {
+  return request<API.GeneralResponse<{ key: string }>>('/accounts/email/verification-code', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -63,7 +118,7 @@ export async function queryInvitations(options?: Record<string, any>) {
 export async function updateInvitation(
   signature: string,
   body: API.InvitationInfo,
-  options?: Record<string, any>
+  options?: Record<string, any>,
 ) {
   return request<API.GeneralResponse<API.Invitation>>(`/invitations/${signature}/message`, {
     method: 'PATCH',
