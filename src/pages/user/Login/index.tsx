@@ -49,7 +49,9 @@ const Login: React.FC = () => {
     try {
       // 登录
       const options = await webauthnGetAssertion(values.account);
+      console.log(options);
       const assertion = await startAssertion(options.data);
+      console.log(assertion);
 
       const result = await webauthnLogin({ account: values.account, credential: assertion });
       if (result.message === 'ok') {
