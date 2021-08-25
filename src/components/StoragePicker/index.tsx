@@ -23,7 +23,7 @@ export default () => {
 
   const handleSelectStore = async (name: API.StoreProvider) => {
     setSelectedStoreName(name);
-    window.localStorage.setItem(API.Storage.StoreSetting, name);
+    window.localStorage.setItem('storeSetting', name);
 
     setModalVisible(true);
   };

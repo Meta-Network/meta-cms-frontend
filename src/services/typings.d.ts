@@ -77,9 +77,4 @@ declare namespace API {
   };
 
   type StoreProvider = 'GitHub' | 'Gitee';
-
-  enum Storage {
-    ThemeSetting = 'themeSetting',
-    StoreSetting = 'storeSetting',
-  }
 }

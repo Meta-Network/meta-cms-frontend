@@ -32,14 +32,14 @@ const themes: API.SiteTheme[] = [
 ];
 
 export default () => {
-  const savedTheme = JSON.parse(window.localStorage.getItem(API.Storage.ThemeSetting) || '{}');
+  const savedTheme = JSON.parse(window.localStorage.getItem('themeSetting') || '{}');
   const [selectedThemeName, setSelectedThemeName] = useState(savedTheme.name || '');
 
   useEffect(() => {
     if (selectedThemeName) {
       message.success(`选择了主题 ${selectedThemeName}`);
       window.localStorage.setItem(
-        API.Storage.ThemeSetting,
+        'themeSetting',
         JSON.stringify(themes.find((theme) => theme.name === selectedThemeName)),
       );
     }
