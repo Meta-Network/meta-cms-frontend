@@ -1,12 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
 import { ArrowRightOutlined, CheckOutlined } from '@ant-design/icons';
-import { Typography, Image, Card, List } from 'antd';
-import React from 'react';
+import { Typography, Image, Card, List, message } from 'antd';
+import { useEffect, useState } from 'react';
 import styles from './index.less';
 
-const { Paragraph, Title } = Typography;
+const { Paragraph } = Typography;
 
-const themes = [
+const themes: API.SiteTheme[] = [
   {
     name: 'Aero-Dual',
     description:
@@ -31,98 +31,59 @@ const themes = [
   },
 ];
 
-export class TabsCard extends React.Component {
-  themesName = themes.map((theme) => theme.name);
-  tabList = this.themesName.map((name) => ({ key: name, tab: name }));
+export default () => {
+  const savedTheme = JSON.parse(window.localStorage.getItem(API.Storage.ThemeSetting) || '{}');
+  const [selectedThemeName, setSelectedThemeName] = useState(savedTheme.name || '');
 
-  state = {
-    tab: this.themesName[0],
-    theme: themes[0],
-  };
+  useEffect(() => {
+    if (selectedThemeName) {
+      message.success(`选择了主题 ${selectedThemeName}`);
+      window.localStorage.setItem(
+        API.Storage.ThemeSetting,
+        JSON.stringify(themes.find((theme) => theme.name === selectedThemeName)),
+      );
+    }
+  }, [selectedThemeName]);
 
-  onTabChange = (key: string) => {
-    this.setState({ tab: key, theme: themes.find((theme) => theme.name === key) });
-  };
-
-  render() {
-    return (
-      <Card
-        style={{ width: '100%' }}
-        tabList={this.tabList}
-        activeTabKey={this.state.tab}
-        onTabChange={(key) => {
-          this.onTabChange(key);
+  return (
+    <div className={styles.cardList}>
+      <List
+        rowKey="name"
+        grid={{
+          column: 4,
+          gutter: 16,
         }}
-      >
-        <Image
-          className={styles.displayImage}
-          src={this.state.theme.image}
-          width={400}
-          height={260}
-        />
-        <Title level={3}>h3. Ant Design</Title>
-        <h1>{this.state.theme.name}</h1>
-        <p>{this.state.theme.description}</p>
-
-        <p>
-          因为用到了标签页的形式，这边的空位会很大。
-          <br />
-          可以给用户描述许多东西。
-          <br />
-          <br />
-          比如这里继续写很长的介绍……
-        </p>
-        <a className={styles.link} href={this.state.theme.link}>
-          站点效果预览
-        </a>
-      </Card>
-    );
-  }
-}
-
-class ListCard extends React.Component {
-  render() {
-    return (
-      <div className={styles.cardList}>
-        <List
-          rowKey="name"
-          grid={{
-            column: 4,
-            gutter: 16,
-          }}
-          dataSource={themes}
-          renderItem={(item) => (
-            <List.Item key={item.name}>
-              <Card
-                hoverable
-                bordered
-                cover={<Image src={item.image} />}
-                className={styles.card}
-                actions={[
-                  <a target="_blank" href={item.link}>
-                    <ArrowRightOutlined /> 预览
-                  </a>,
-                  <span>
-                    <CheckOutlined key="check" /> 选用
-                  </span>,
-                ]}
-              >
-                <Card.Meta
-                  title={item.name}
-                  description={
-                    <Paragraph className={styles.description} ellipsis={{ rows: 2 }}>
-                      {item.description}
-                    </Paragraph>
-                  }
-                />
-              </Card>
-            </List.Item>
-          )}
-        />
-      </div>
-    );
-  }
-}
-
-// export default TabsCard;
-export default ListCard;
+        dataSource={themes}
+        renderItem={(item) => (
+          <List.Item key={item.name}>
+            <Card
+              hoverable
+              bordered
+              bodyStyle={{ padding: 16 }}
+              cover={<Image src={item.image} />}
+              className={selectedThemeName === item.name ? styles.selectedTheme : ''}
+              actions={[
+                <a target="_blank" href={item.link}>
+                  <ArrowRightOutlined /> 预览
+                </a>,
+                <span onClick={() => setSelectedThemeName(item.name)} className="clickable">
+                  <CheckOutlined key="check" />
+                  选用
+                </span>,
+              ]}
+            >
+              <Card.Meta
+                title={item.name}
+                description={
+                  <Paragraph className={styles.description} ellipsis={{ rows: 2 }}>
+                    {item.description}
+                  </Paragraph>
+                }
+              />
+            </Card>
+          </List.Item>
+        )}
+      />
+    </div>
+  );
+};

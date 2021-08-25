@@ -70,6 +70,11 @@
     icon: 'user',
     routes: [
       {
+        path: '/account/information',
+        name: '个人信息',
+        component: './account/Information',
+      },
+      {
         path: '/account/source',
         name: '内容源绑定',
         component: './account/Source',
@@ -83,7 +88,7 @@
   },
   {
     path: '/guide',
-    component: './Guide',
+    component: './guide',
   },
   {
     path: '/',

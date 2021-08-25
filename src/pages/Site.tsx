@@ -1,8 +1,4 @@
-import ProForm, {
-  ProFormText,
-  ProFormUploadButton,
-  ProFormTextArea,
-} from '@ant-design/pro-form';
+import ProForm, { ProFormText, ProFormUploadButton, ProFormTextArea } from '@ant-design/pro-form';
 import { Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 
@@ -16,12 +12,7 @@ export default () => {
           onFinish={async (values) => console.log(values)}
         >
           <ProForm.Group>
-            <ProFormText
-              width="md"
-              name="title"
-              label="标题"
-              placeholder="你的 Meta Space 标题"
-            />
+            <ProFormText width="md" name="title" label="标题" placeholder="你的 Meta Space 标题" />
             <ProFormText
               width="md"
               name="subtitle"
@@ -42,22 +33,17 @@ export default () => {
               width="xl"
               name="description"
               label="描述"
-              placeholder="你的 Meta Space 描述" />
+              placeholder="你的 Meta Space 描述"
+            />
           </ProForm.Group>
           <ProForm.Group>
-            <ProFormText
-              name="seo"
-              label="SEO 信息"
-            />
-            <ProFormText
-              name="timezone"
-              label="时区设置"
-            />
+            <ProFormText name="seo" label="SEO 信息" />
+            <ProFormText name="timezone" label="时区设置" />
           </ProForm.Group>
           <ProFormUploadButton
             extra="支持扩展名：.jpg .png"
-            label="Meta Space 的 Logo"
-            name="file"
+            label="Meta Space 的网站图标"
+            name="favicon"
             title="上传Logo"
           />
         </ProForm>

@@ -6,25 +6,15 @@
 
 .cardList {
   margin-top: 14px;
-  padding: 16px 8px 0;
-  background: @descriptions-bg;
-  border: 1px solid @item-active-bg;
+  padding: 22px 8px 0;
+  //background: @descriptions-bg;
+  //border: 1px solid @item-active-bg;
 }
 
-.clickable {
-  &:hover {
-    color: #1890ff;
-  }
-}
-
-.selectedTheme {
-  border-color: transparent;
-  box-shadow: 0 1px 2px -2px rgb(~'0 0 0 / 16%'), 0 3px 6px 0 rgb(~'0 0 0 / 12%'),
-    0 5px 12px 4px rgb(~'0 0 0 / 9%');
+.card {
   :global {
-    .clickable {
-      color: #1890ff;
-      font-weight: bold;
+    .ant-card-body {
+      padding: 16px;
     }
   }
 }

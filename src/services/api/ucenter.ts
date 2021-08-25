@@ -145,3 +145,28 @@ export async function refreshTokens(options?: Record<string, any>) {
     ...(options || {}),
   });
 }
+
+/** 请求 Social Auth 链接接口 POST /social-auth/{platform}/authorize-request */
+export async function requestSocialAuth(
+  platform: string,
+  redirectUrl: string,
+  options?: Record<string, any>,
+) {
+  return request<API.GeneralResponse<string>>(`/social-auth/${platform}/authorize-request`, {
+    data: { redirect_url: redirectUrl },
+    method: 'POST',
+    ...(options || {}),
+  });
+}
+
+/** 更新用户的个人信息 PATCH /users/me */
+export async function updateUserInfo(body: Partial<API.UserInfo>, options?: Record<string, any>) {
+  return request<API.GeneralResponse<API.Invitation>>('/users/me', {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}

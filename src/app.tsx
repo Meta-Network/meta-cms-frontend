@@ -1,4 +1,4 @@
-import { history, Link } from 'umi';
+import { history } from 'umi';
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { getMyGrid } from './services/api/meta-network';
@@ -82,14 +82,14 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     },
     links: [
       // TODO: next change these links
-      <Link to="https://metaspace.federarks.xyz/" target="_blank">
+      <a href="https://metaspace.federarks.xyz/" target="_blank">
         <LinkOutlined />
         <span>个人站点</span>
-      </Link>,
-      <Link to="https://meta-network.vercel.app/">
+      </a>,
+      <a href="https://meta-network.vercel.app/">
         <BookOutlined />
         <span>Meta Network</span>
-      </Link>,
+      </a>,
     ],
     menuHeaderRender: undefined,
     // 自定义 403 页面
