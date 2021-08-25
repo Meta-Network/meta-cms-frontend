@@ -15,18 +15,22 @@ const request = extend({
 });
 
 export async function saveImageCloud(
-  { file, name }: { file: Uint8Array; name: string },
+  { file, name }: { file: string; name: string },
   options?: Record<string, any>,
 ) {
   // TODO: this api only for testing
   return request<API.GeneralResponse<any>>(
-    'https://meta-storage-worker-production.metaio-dev.workers.dev',
+    // 'https://meta-storage-worker-production.metaio-dev.workers.dev',
+    // 'https://meta-storage-worker.metaio-dev.workers.dev',
+    'http://127.0.0.1:8787',
     {
       method: 'POST',
+      mode: 'no-cors',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/octet-stream',
+        'file-name': name,
       },
-      data: { file, name },
+      data: file,
       ...(options || {}),
     },
   );

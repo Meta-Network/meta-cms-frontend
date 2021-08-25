@@ -2,11 +2,21 @@ import { saveImageCloud } from '@/services/api/global';
 import { updateUserInfo } from '@/services/api/ucenter';
 import React, { useState } from 'react';
 import ImgCrop from 'antd-img-crop';
-import styles from './information.less';
+import styles from './Information.less';
 import { useModel } from '@@/plugin-model/useModel';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+
+const convertFileToBase64 = (file: Blob): Promise<any> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => resolve(reader.result));
+    reader.addEventListener('error', (err) => reject(err));
+
+    reader.readAsBinaryString(file);
+  });
 
 const BaseView: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,9 +25,9 @@ const BaseView: React.FC = () => {
 
   const handleChange = async (info: any) => {
     if (info.file.status === 'done') {
-      console.log('file', new Uint8Array(info.file.originFileObj));
+      const file = await convertFileToBase64(info.file.originFileObj);
       const result = await saveImageCloud({
-        file: new Uint8Array(info.file.originFileObj),
+        file,
         name: info.file.name,
       });
       if (result.message === 'ok') {
