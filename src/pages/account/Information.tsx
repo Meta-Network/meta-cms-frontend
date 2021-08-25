@@ -1,5 +1,4 @@
-import { saveImageCloud } from '@/services/api/global';
-import { updateUserInfo } from '@/services/api/ucenter';
+import { updateUserInfo, uploadAvatar } from '@/services/api/ucenter';
 import React, { useState } from 'react';
 import ImgCrop from 'antd-img-crop';
 import styles from './Information.less';
@@ -8,30 +7,31 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
-const convertFileToBase64 = (file: Blob): Promise<any> =>
+const getBinaryFile = (file: Blob): Promise<any> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
-
     reader.addEventListener('load', () => resolve(reader.result));
     reader.addEventListener('error', (err) => reject(err));
-
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
   });
 
 const BaseView: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [newAvatarSrc, setNewAvatarSrc] = useState('');
   const { initialState } = useModel('@@initialState');
+  const [userAvatar, setUserAvatar] = useState(initialState?.currentUser?.avatar);
 
   const handleChange = async (info: any) => {
     if (info.file.status === 'done') {
-      const file = await convertFileToBase64(info.file.originFileObj);
-      const result = await saveImageCloud({
+      const done = message.loading('上传头像中...请稍候', 0);
+      const file = await getBinaryFile(info.file.originFileObj);
+      const result = await uploadAvatar({
         file,
         name: info.file.name,
       });
+      done();
+
       if (result.message === 'ok') {
-        console.log(result.data);
+        message.success('更新头像成功');
+        setUserAvatar(result.data.avatar);
       } else {
         message.success('图像上传失败');
       }
@@ -39,10 +39,6 @@ const BaseView: React.FC = () => {
   };
 
   const handleFinish = async (values: API.UserInfo) => {
-    if (newAvatarSrc !== '') {
-      // eslint-disable-next-line no-param-reassign
-      values.avatar = newAvatarSrc;
-    }
     await updateUserInfo(values);
     message.success('更新基本信息成功');
   };
@@ -111,7 +107,7 @@ const BaseView: React.FC = () => {
           </ProForm>
         </div>
         <div className={styles.right}>
-          <AvatarView avatar={initialState?.currentUser?.avatar || ''} />
+          <AvatarView avatar={userAvatar || ''} />
         </div>
       </div>
     </Card>

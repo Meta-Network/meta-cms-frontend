@@ -170,3 +170,20 @@ export async function updateUserInfo(body: Partial<API.UserInfo>, options?: Reco
     ...(options || {}),
   });
 }
+
+/** 上传并更新用户头像 PUT /users/me/avatar */
+export async function uploadAvatar(
+  { file, name }: { file: string; name: string },
+  options?: Record<string, any>,
+) {
+  return request<API.GeneralResponse<any>>('/users/me/avatar', {
+    method: 'PUT',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      'file-name': name,
+    },
+    data: file,
+    ...(options || {}),
+  });
+}
