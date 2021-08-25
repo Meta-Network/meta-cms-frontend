@@ -14,20 +14,20 @@ const request = extend({
   },
 });
 
-export async function saveImageCloud(image: string, options?: Record<string, any>) {
+export async function saveImageCloud(
+  { file, name }: { file: Uint8Array; name: string },
+  options?: Record<string, any>,
+) {
   // TODO: this api only for testing
-  return request<API.GeneralResponse<{ url: string }>>('https://api.imgbb.com/1/upload', {
-    method: 'POST',
-    params: {
-      key: 'ff13afcc789a0c0e8951e5ac9c7a3e2b',
+  return request<API.GeneralResponse<any>>(
+    'https://meta-storage-worker-production.metaio-dev.workers.dev',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: { file, name },
+      ...(options || {}),
     },
-    referrerPolicy: 'no-referrer',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    data: {
-      image,
-    },
-    ...(options || {}),
-  });
+  );
 }

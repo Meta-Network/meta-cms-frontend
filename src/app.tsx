@@ -1,7 +1,7 @@
 import { history } from 'umi';
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
-import { getMyGrid } from './services/api/meta-network';
+// import { getMyGrid } from './services/api/meta-network';
 import { queryCurrentUser, refreshTokens } from './services/api/ucenter';
 import { PageLoading } from '@ant-design/pro-layout';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
@@ -35,7 +35,7 @@ export async function getInitialState(): Promise<{
     return undefined;
   };
 
-  const hasSite = Boolean((await getMyGrid()).data?.meta_space_site_id);
+  // const hasSite = Boolean((await getMyGrid()).data?.meta_space_site_id);
 
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
@@ -43,7 +43,7 @@ export async function getInitialState(): Promise<{
     return {
       fetchUserInfo,
       currentUser,
-      hasSite,
+      // hasSite,
       settings: {},
     };
   }

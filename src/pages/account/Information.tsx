@@ -8,23 +8,23 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
-const getBase64 = (img: any, callback: any) => {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-
 const BaseView: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [newAvatarSrc, setNewAvatarSrc] = useState('');
   const { initialState } = useModel('@@initialState');
 
-  const handleChange = (info: any) => {
+  const handleChange = async (info: any) => {
     if (info.file.status === 'done') {
-      getBase64(info.file.originFileObj, async (imageUrl: string) => {
-        const base64 = imageUrl.split(',')[1];
-        const result = await saveImageCloud(base64);
-        setNewAvatarSrc(result.data.url);
+      console.log('file', new Uint8Array(info.file.originFileObj));
+      const result = await saveImageCloud({
+        file: new Uint8Array(info.file.originFileObj),
+        name: info.file.name,
       });
+      if (result.message === 'ok') {
+        console.log(result.data);
+      } else {
+        message.success('图像上传失败');
+      }
     }
   };
 
