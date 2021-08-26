@@ -7,6 +7,14 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const dummyRequest = ({ file, onSuccess }) => {
+  setTimeout(() => {
+    onSuccess('ok');
+  }, 0);
+};
+
 const getBinaryFile = (file: Blob): Promise<any> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -19,23 +27,25 @@ const BaseView: React.FC = () => {
   const { initialState } = useModel('@@initialState');
   const [userAvatar, setUserAvatar] = useState(initialState?.currentUser?.avatar);
 
-  const handleChange = async (info: any) => {
-    if (info.file.status === 'done') {
-      const done = message.loading('上传头像中...请稍候', 0);
-      const file = await getBinaryFile(info.file.originFileObj);
-      const result = await uploadAvatar({
-        file,
-        name: info.file.name,
-      });
-      done();
+  const beforeUpload = async (file: File) => {
+    const done = message.loading('上传头像中...请稍候', 0);
+    const binary: ArrayBuffer = await getBinaryFile(file);
 
-      if (result.message === 'ok') {
-        message.success('更新头像成功');
-        setUserAvatar(result.data.avatar);
-      } else {
-        message.success('图像上传失败');
-      }
+    const result = await uploadAvatar({
+      file: binary,
+      name: file.name,
+    });
+    done();
+
+    if (result.message === 'ok') {
+      message.success('更新头像成功');
+      setUserAvatar(result.data.avatar);
+    } else {
+      message.success('图像上传失败');
     }
+
+    // disable auto AJAX uploading
+    return false;
   };
 
   const handleFinish = async (values: API.UserInfo) => {
@@ -50,7 +60,7 @@ const BaseView: React.FC = () => {
         <img src={avatar} alt="avatar" />
       </div>
       <ImgCrop rotate>
-        <Upload onChange={handleChange} showUploadList={false}>
+        <Upload beforeUpload={beforeUpload} showUploadList={false}>
           <div className={styles.button_view}>
             <Button>
               <UploadOutlined />
