@@ -5,14 +5,14 @@ const request = extend({
   prefix: 'https://ucenter-test-api.mttk.net',
   credentials: 'include', // 默认请求是否带上cookie
   errorHandler: (error: any) => {
-    const { response } = error;
+    const { data, response } = error;
     if (!response) {
       notification.error({
         description: '您的网络发生异常，无法连接服务器',
         message: '网络异常',
       });
     }
-    throw error;
+    return data;
   },
 });
 

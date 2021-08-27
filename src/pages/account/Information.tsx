@@ -7,14 +7,6 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const dummyRequest = ({ file, onSuccess }) => {
-  setTimeout(() => {
-    onSuccess('ok');
-  }, 0);
-};
-
 const getBinaryFile = (file: Blob): Promise<any> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -41,7 +33,7 @@ const BaseView: React.FC = () => {
       message.success('更新头像成功');
       setUserAvatar(result.data.avatar);
     } else {
-      message.success('图像上传失败');
+      message.error('图像上传失败');
     }
 
     // disable auto AJAX uploading
@@ -60,7 +52,11 @@ const BaseView: React.FC = () => {
         <img src={avatar} alt="avatar" />
       </div>
       <ImgCrop rotate>
-        <Upload beforeUpload={beforeUpload} showUploadList={false}>
+        <Upload
+          // action="https://meta-storage-koa-gateway-mrwbongev-meta-summer.vercel.app/fleek/storage"
+          beforeUpload={beforeUpload}
+          showUploadList={false}
+        >
           <div className={styles.button_view}>
             <Button>
               <UploadOutlined />
@@ -94,7 +90,7 @@ const BaseView: React.FC = () => {
           >
             <ProFormText
               width="md"
-              name="name"
+              name="nickname"
               label="昵称"
               rules={[
                 {
@@ -104,7 +100,7 @@ const BaseView: React.FC = () => {
               ]}
             />
             <ProFormTextArea
-              name="profile"
+              name="bio"
               label="个人简介"
               rules={[
                 {
