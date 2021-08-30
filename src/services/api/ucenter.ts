@@ -171,17 +171,25 @@ export async function updateUserInfo(body: Partial<API.UserInfo>, options?: Reco
   });
 }
 
+/** 请求存储 token POST /storage/token */
+export async function requestStorageToken(options?: Record<string, any>) {
+  return request<API.GeneralResponse<string>>('/storage/token', {
+    method: 'POST',
+    ...(options || {}),
+  });
+}
+
 /** 上传并更新用户头像 PUT /users/me/avatar */
 export async function uploadAvatar(
-  { file, name }: { file: ArrayBuffer; name: string },
+  { file, token }: { file: File; token: string },
   options?: Record<string, any>,
 ) {
-  return request<API.GeneralResponse<any>>('/users/me/avatar', {
-    method: 'PUT',
-    mode: 'cors',
+  return request<API.GeneralResponse<any>>('https://meta-storage-fleek.vercel.app/', {
+    method: 'POST',
     headers: {
-      'Content-Type': 'application/octet-stream',
-      'file-name': name,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     data: file,
     ...(options || {}),

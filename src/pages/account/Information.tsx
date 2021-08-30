@@ -1,43 +1,45 @@
-import { updateUserInfo, uploadAvatar } from '@/services/api/ucenter';
-import React, { useState } from 'react';
+import { requestStorageToken, updateUserInfo } from '@/services/api/ucenter';
+import React, { useEffect, useState } from 'react';
 import ImgCrop from 'antd-img-crop';
 import styles from './Information.less';
 import { useModel } from '@@/plugin-model/useModel';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-
-const getBinaryFile = (file: Blob): Promise<any> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => resolve(reader.result));
-    reader.addEventListener('error', (err) => reject(err));
-    reader.readAsArrayBuffer(file);
-  });
+import { uploadAvatar } from '@/services/api/global';
 
 const BaseView: React.FC = () => {
   const { initialState } = useModel('@@initialState');
   const [userAvatar, setUserAvatar] = useState(initialState?.currentUser?.avatar);
 
-  const beforeUpload = async (file: File) => {
-    const done = message.loading('上传头像中...请稍候', 0);
-    const binary: ArrayBuffer = await getBinaryFile(file);
+  useEffect(() => {
+    updateUserInfo({ avatar: userAvatar }).then(() => '');
+  }, [userAvatar]);
 
-    const result = await uploadAvatar({
-      file: binary,
-      name: file.name,
-    });
+  const beforeUpload = async ({ file }: { file: File }): Promise<void> => {
+    const done = message.loading('上传头像中...请稍候', 0);
+    const tokenRequest = await requestStorageToken();
+    const token = tokenRequest.data;
+
+    if (!token) {
+      if (tokenRequest.statusCode === 401) {
+        message.error('图像上传失败，请重新登录。');
+      }
+      message.error('图像上传失败。内部错误或无网络。');
+    }
+
+    const form = new FormData();
+    form.append('file', file);
+
+    const result = await uploadAvatar(form, token);
     done();
 
-    if (result.message === 'ok') {
+    if (result.statusCode === 201) {
       message.success('更新头像成功');
-      setUserAvatar(result.data.avatar);
+      setUserAvatar(result.data.publicUrl);
     } else {
       message.error('图像上传失败');
     }
-
-    // disable auto AJAX uploading
-    return false;
   };
 
   const handleFinish = async (values: API.UserInfo) => {
@@ -45,18 +47,15 @@ const BaseView: React.FC = () => {
     message.success('更新基本信息成功');
   };
 
-  const AvatarView = ({ avatar }: { avatar: string }) => (
+  const AvatarView = ({ currentAvatar }: { currentAvatar: string }) => (
     <>
       <div className={styles.avatar_title}>头像</div>
       <div className={styles.avatar}>
-        <img src={avatar} alt="avatar" />
+        <img src={currentAvatar} alt="avatar" />
       </div>
       <ImgCrop rotate>
-        <Upload
-          // action="https://meta-storage-koa-gateway-mrwbongev-meta-summer.vercel.app/fleek/storage"
-          beforeUpload={beforeUpload}
-          showUploadList={false}
-        >
+        {/* @ts-ignore */}
+        <Upload customRequest={beforeUpload} showUploadList={false}>
           <div className={styles.button_view}>
             <Button>
               <UploadOutlined />
@@ -113,7 +112,7 @@ const BaseView: React.FC = () => {
           </ProForm>
         </div>
         <div className={styles.right}>
-          <AvatarView avatar={userAvatar || ''} />
+          <AvatarView currentAvatar={userAvatar || ''} />
         </div>
       </div>
     </Card>

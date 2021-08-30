@@ -3,7 +3,7 @@ import styles from './StoreSetting.less';
 
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 
-const ListContent = ({ status }) => {
+const ListContent = ({ status }: { status: any }) => {
   const AccountStatus = () =>
     status.account === 1 ? (
       <Tag color="#87d068">账号已绑定</Tag>
@@ -53,14 +53,16 @@ export default () => {
               itemLayout="horizontal"
               dataSource={getData()}
               renderItem={(item) => (
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={<Avatar src={item.avatar} shape="circle" size={50} />}
-                    title={item.title}
-                    description={item.description}
-                  />
-                  <ListContent status={{ account: 1, store: 0 }} />
-                </List.Item>
+                <Card>
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<Avatar src={item.avatar} shape="circle" size={50} />}
+                      title={item.title}
+                      description={item.description}
+                    />
+                    <ListContent status={{ account: 1, store: 0 }} />
+                  </List.Item>
+                </Card>
               )}
             />
           </GridContent>
