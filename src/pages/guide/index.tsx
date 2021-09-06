@@ -1,37 +1,74 @@
-// noinspection NonAsciiCharacters
-
-import CDNSetting from '@/components/Guide/CDNSetting';
-import PublisherSetting from '@/components/Guide/PublisherSetting';
-import { useEffect, useState } from 'react';
-import { Steps, Button, Space } from 'antd';
-import { PageContainer } from '@ant-design/pro-layout';
 import ProCard from '@ant-design/pro-card';
-import Welcome from '@/components/Guide/Welcome';
+import { useEffect, useMemo, useState } from 'react';
+import { Steps, Affix, Card } from 'antd';
+import { PageContainer } from '@ant-design/pro-layout';
+import Deploy from '@/components/Guide/Deploy';
+import CDNSetting from '@/components/Guide/CDNSetting';
 import SiteSetting from '@/components/Guide/SiteSetting';
 import ThemeSetting from '@/components/Guide/ThemeSetting';
 import StorageSetting from '@/components/Guide/StorageSetting';
+import PublisherSetting from '@/components/Guide/PublisherSetting';
+import AnchoredTitle from '@/components/AnchoredTitle';
 import styles from './index.less';
 
 const { Step } = Steps;
 
 export default () => {
-  const components = {
-    欢迎: <Welcome />,
-    选择主题: <ThemeSetting />,
-    填写站点信息: <SiteSetting />,
-    进行存储配置: <StorageSetting />,
-    进行发布配置: <PublisherSetting />,
-    站点访问加速: <CDNSetting />,
-    完成: null,
-  };
-  const steps = Object.keys(components);
+  const steps = useMemo<{ name: string; component: JSX.Element }[]>(
+    () => [
+      {
+        name: '选择主题',
+        component: <ThemeSetting />,
+      },
+      {
+        name: '填写站点信息',
+        component: <SiteSetting />,
+      },
+      {
+        name: '进行存储配置',
+        component: <StorageSetting />,
+      },
+      {
+        name: '进行发布配置',
+        component: <PublisherSetting />,
+      },
+      {
+        name: '站点访问加速',
+        component: <CDNSetting />,
+      },
+      {
+        name: '部署',
+        component: <Deploy />,
+      },
+    ],
+    [],
+  );
 
-  // first time get local storage saved step
-  const [current, setCurrent] = useState(parseInt(window.localStorage.getItem('step') || '0', 10));
+  // get local storage saved step
+  const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    window.localStorage.setItem('step', current.toString());
-  }, [current]);
+    window.onscroll = () => {
+      let positions = steps.map(
+        (step) => document.getElementById(step.name)!.getBoundingClientRect().top,
+      );
+
+      const currentPosition = window.pageYOffset;
+      positions = positions.map((e) => e + currentPosition);
+
+      const closest = positions.reduce((prev, curr) =>
+        Math.abs(curr - currentPosition) < Math.abs(prev - currentPosition) ? curr : prev,
+      );
+
+      if (Math.abs(currentPosition - closest) < 60) {
+        setCurrent(positions.findIndex((e) => e === closest));
+      }
+    };
+
+    return () => {
+      window.onscroll = null;
+    };
+  }, [steps, setCurrent]);
 
   return (
     <PageContainer
@@ -39,38 +76,29 @@ export default () => {
       content={<p>体验 Meta Network，请从创建一个站点作为开始吧！</p>}
       breadcrumb={{}}
     >
-      <ProCard split="vertical" bordered>
-        <ProCard colSpan={5}>
-          <Steps
-            size="small"
-            direction="vertical"
-            current={current}
-            onChange={(i) => setCurrent(i)}
-          >
-            {steps.map((step) => (
-              <Step key={step} title={step} />
-            ))}
-          </Steps>
-        </ProCard>
-        <ProCard className={styles.contentContainer} title={steps[current]}>
-          {/* render step of component here */}
-          {components[steps[current]]}
-
-          <Space className={styles.pageButtons}>
-            <Button
-              key="next"
-              type="primary"
-              onClick={() => setCurrent(current + 1)}
-              disabled={current === steps.length - 1}
+      <div className={styles.main}>
+        <Affix offsetTop={60}>
+          <Card className={styles.steps}>
+            <Steps size="small" direction="vertical" current={current}>
+              {steps.map((step) => (
+                <Step key={step.name} title={step.name} />
+              ))}
+            </Steps>
+          </Card>
+        </Affix>
+        <ProCard.Group direction="column" className={styles.container}>
+          {steps.map((step) => (
+            <ProCard
+              className={styles.contentCard}
+              key={step.name}
+              title={<AnchoredTitle name={step.name} />}
+              headerBordered
             >
-              下一步
-            </Button>
-            <Button key="pre" onClick={() => setCurrent(current - 1)} disabled={current === 0}>
-              上一步
-            </Button>
-          </Space>
-        </ProCard>
-      </ProCard>
+              {step.component}
+            </ProCard>
+          ))}
+        </ProCard.Group>
+      </div>
     </PageContainer>
   );
 };

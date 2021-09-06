@@ -1,4 +1,4 @@
-// eslint-disable-next-line max-classes-per-file
+import { Storage, StorageKeys } from '@/services/constants';
 import { ArrowRightOutlined, CheckOutlined } from '@ant-design/icons';
 import { Typography, Image, Card, List, message } from 'antd';
 import { useEffect, useState } from 'react';
@@ -6,7 +6,7 @@ import styles from './index.less';
 
 const { Paragraph } = Typography;
 
-const themes: API.SiteTheme[] = [
+const themes: GLOBAL.SiteTheme[] = [
   {
     name: 'Aero-Dual',
     description:
@@ -17,7 +17,7 @@ const themes: API.SiteTheme[] = [
   },
   {
     name: 'Toki',
-    description: 'A simple but elegant theme.',
+    description: 'A simple but elegant theme. With pretty style.',
     link: 'https://vevlins.github.io/',
     image:
       'https://d33wubrfki0l68.cloudfront.net/aa0cebcc18c88d90b4aa23a9a35491698f352498/838e9/themes/screenshots/toki.jpg',
@@ -32,18 +32,15 @@ const themes: API.SiteTheme[] = [
 ];
 
 export default () => {
-  const savedTheme = JSON.parse(window.localStorage.getItem('themeSetting') || '{}');
-  const [selectedThemeName, setSelectedThemeName] = useState(savedTheme.name || '');
+  const savedThemeId = JSON.parse(Storage.get(StorageKeys.ThemeSetting) || '{}');
+  const [selectedThemeId, setSelectedThemeId] = useState(savedThemeId || -1);
 
   useEffect(() => {
-    if (selectedThemeName) {
-      message.success(`选择了主题 ${selectedThemeName}`);
-      window.localStorage.setItem(
-        'themeSetting',
-        JSON.stringify(themes.find((theme) => theme.name === selectedThemeName)),
-      );
+    if (selectedThemeId > 0) {
+      message.success(`选择了主题 ${themes[selectedThemeId - 1]?.name}`);
+      Storage.set(StorageKeys.ThemeSetting, selectedThemeId.toString());
     }
-  }, [selectedThemeName]);
+  }, [selectedThemeId]);
 
   return (
     <div className={styles.cardList}>
@@ -54,19 +51,19 @@ export default () => {
           gutter: 16,
         }}
         dataSource={themes}
-        renderItem={(item) => (
+        renderItem={(item, index) => (
           <List.Item key={item.name}>
             <Card
               hoverable
               bordered
               bodyStyle={{ padding: 16 }}
               cover={<Image src={item.image} />}
-              className={selectedThemeName === item.name ? styles.selectedTheme : ''}
+              className={selectedThemeId === index + 1 ? styles.selectedTheme : ''}
               actions={[
                 <a target="_blank" href={item.link}>
                   <ArrowRightOutlined /> 预览
                 </a>,
-                <span onClick={() => setSelectedThemeName(item.name)} className="clickable">
+                <span onClick={() => setSelectedThemeId(index + 1)} className="clickable">
                   <CheckOutlined key="check" />
                   选用
                 </span>,

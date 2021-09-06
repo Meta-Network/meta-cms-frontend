@@ -2,7 +2,7 @@ import { history } from 'umi';
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 // import { getMyGrid } from './services/api/meta-network';
-import { queryCurrentUser, refreshTokens } from './services/api/ucenter';
+import { queryCurrentUser, refreshTokens } from './services/api/meta-ucenter';
 import { PageLoading } from '@ant-design/pro-layout';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from 'umi';
@@ -20,9 +20,9 @@ export const initialStateConfig = {
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.CurrentUser;
+  currentUser?: GLOBAL.CurrentUser;
   hasSite?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {

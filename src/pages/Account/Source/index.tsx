@@ -1,47 +1,70 @@
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { Button, List, Tag } from 'antd';
 import { Fragment } from 'react';
-import styles from './StoreSetting.less';
+import styles from './index.less';
 
 export default () => {
   const getData = () => [
     {
       title: [
-        'GitHub',
+        'Matataki',
         <Tag className="status" color="red">
           未绑定
         </Tag>,
       ],
-      description: '世界上最大的代码存放网站和开源社区',
+      description: '每一篇自由的创作都应该被永远记录',
       actions: [<Button type="primary">绑定</Button>],
       avatar: (
         <img
           className="icon"
-          src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-          alt="github icon"
+          src="https://cdn.frontenduse.top/prod/img/dapp_list_matataki.8bac289.png"
+          alt="matataki icon"
         />
       ),
     },
     {
       title: [
-        'Gitee',
+        'Matataki',
         <Tag className="status" color="blue">
           已绑定
         </Tag>,
       ],
+      description: '每一篇自由的创作都应该被永远记录',
       actions: [<Button type="primary">开启同步</Button>, <Button danger>解绑</Button>],
-      description: '提供中国本土化的代码仓库托管服务',
       avatar: (
         <img
           className="icon"
-          src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/9357cf7a0529738c587b"
-          alt="gitee icon"
+          src="https://cdn.frontenduse.top/prod/img/dapp_list_matataki.8bac289.png"
+          alt="matataki icon"
+        />
+      ),
+    },
+
+    {
+      title: [
+        'Matataki',
+        <Tag className="status" color="green">
+          同步中
+        </Tag>,
+      ],
+      description: '每一篇自由的创作都应该被永远记录',
+      actions: [<Button>关闭同步</Button>, <Button danger>解绑</Button>],
+      avatar: (
+        <img
+          className="icon"
+          src="https://cdn.frontenduse.top/prod/img/dapp_list_matataki.8bac289.png"
+          alt="matataki icon"
         />
       ),
     },
   ];
+
   return (
-    <PageContainer title="存储配置" content={<p>你可以在此配置站点存储源。</p>} breadcrumb={{}}>
+    <PageContainer
+      title="内容源绑定"
+      content={<p>你可以在此将其他平台的文章同步至你的个人站点。</p>}
+      breadcrumb={{}}
+    >
       <GridContent>
         <div className={styles.main}>
           <Fragment>

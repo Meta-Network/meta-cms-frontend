@@ -1,9 +1,9 @@
 import { Alert } from 'antd';
 import styles from './styles.less';
+import { StorageKeys, Storage } from '@/services/constants';
 
 const SelectedStore = () => {
-  // const store = window.localStorage.getItem(API.Storage.ThemeSetting);
-  const store = window.localStorage.getItem('storeSetting');
+  const store = Storage.get(StorageKeys.StoreSetting);
   return (
     <span>
       当前选择的存储服务：<strong>{store || '还未选择存储'}</strong>

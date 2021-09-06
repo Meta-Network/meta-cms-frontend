@@ -1,19 +1,29 @@
 import { message } from 'antd';
 import ProCard from '@ant-design/pro-card';
-import ProForm, { ProFormText, ProFormTextArea, ProFormUploadButton } from '@ant-design/pro-form';
 import { useModel } from '@@/plugin-model/useModel';
+import { StorageKeys, Storage } from '@/services/constants';
+import ProForm, {
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea,
+  ProFormUploadButton,
+} from '@ant-design/pro-form';
 import styles from './styles.less';
 
 export default () => {
   const { initialState } = useModel('@@initialState');
-  let author = '';
+  const author = initialState?.currentUser?.nickname || '';
 
-  if (initialState && initialState.currentUser) {
-    author = initialState.currentUser.nickname;
-  }
+  const editing = JSON.parse(Storage.get(StorageKeys.SiteInfo) || '{}');
+  const initialValues = {
+    language: 'zh',
+    timezone: 'UTC+8',
+    author,
+    ...editing,
+  };
 
-  const handleFinishing = async (values: API.SiteInfo) => {
-    window.localStorage.setItem('siteInfo', JSON.stringify(values));
+  const handleFinishing = async (values: GLOBAL.SiteInfo) => {
+    Storage.set(StorageKeys.SiteInfo, JSON.stringify(values));
     message.success('成功保存站点信息设置。');
   };
 
@@ -28,41 +38,74 @@ export default () => {
         <ProForm
           style={{ width: 500 }}
           name="site-info"
-          initialValues={{
-            title: 'site title',
-            timezone: 'UTC+8',
-            language: 'zh-CN',
-            author,
-          }}
+          initialValues={initialValues}
           onFinish={handleFinishing}
+          requiredMark="optional"
         >
-          <ProFormText width="md" name="title" label="标题" placeholder="你的 Meta Space 标题" />
+          <ProFormText
+            width="md"
+            name="title"
+            label="标题"
+            placeholder="你的 Meta Space 标题"
+            rules={[{ required: true }]}
+          />
           <ProFormText
             width="md"
             name="subtitle"
             label="副标题"
             placeholder="你的 Meta Space 副标题"
+            rules={[{ required: true }]}
           />
           <ProFormText
             width="md"
             name="author"
             label="作者"
             placeholder="作为 Meta Space 拥有者的名称"
+            rules={[{ required: true }]}
           />
           <ProFormTextArea
             width="md"
             name="description"
             label="描述"
             placeholder="你的 Meta Space 描述"
+            rules={[{ required: true }]}
           />
-          <ProFormText width="md" name="keywords" label="设置关键字" />
-          <ProFormText width="md" name="language" label="语言" placeholder="Meta Space 语言设置" />
-          <ProFormText width="md" name="timezone" label="时区" placeholder="Meta Space 时区设置" />
+          <ProFormSelect
+            mode="tags"
+            width="md"
+            name="keywords"
+            fieldProps={{
+              open: false,
+            }}
+            label="关键字"
+            extra="其他人在搜索这些关键字时会更容易找到你的站点"
+            rules={[{ required: true }]}
+          />
+          <ProFormSelect
+            width="md"
+            name="language"
+            label="语言"
+            rules={[{ required: true, message: '请选择您的站点语言' }]}
+            valueEnum={{
+              zh: '中文',
+              en: 'English',
+              jp: '日本語',
+              es: 'Español',
+            }}
+          />
+          <ProFormText
+            width="md"
+            name="timezone"
+            label="时区"
+            placeholder="Meta Space 时区设置"
+            rules={[{ required: true }]}
+          />
           <ProFormUploadButton
-            extra="支持扩展名：.jpg .png"
-            label="Meta Space 的网站图标"
+            extra=".ico格式，展示在标签页上，可用工具从图片生成"
+            label="网站图标"
             name="favicon"
-            title="上传Favicon"
+            title="上传站点图标"
+            rules={[{ required: true, message: '请上传一个站点图标' }]}
           />
         </ProForm>
       </ProCard>

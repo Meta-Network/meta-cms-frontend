@@ -3,7 +3,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { List, Badge, Card, Divider, notification } from 'antd';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { useRequest } from '@@/plugin-request/request';
-import { queryInvitations, updateInvitation } from '@/services/api/ucenter';
+import { queryInvitations, updateInvitation } from '@/services/api/meta-ucenter';
 
 export default () => {
   const { data, loading } = useRequest(() => {
@@ -55,7 +55,7 @@ export default () => {
                       const body = {
                         sub: values.sub,
                         message: values.message,
-                      } as API.InvitationInfo;
+                      } as GLOBAL.InvitationInfo;
                       const result = await updateInvitation(item.signature, body);
                       if (result.message === 'ok') {
                         notification.success({

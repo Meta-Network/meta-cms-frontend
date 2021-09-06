@@ -1,7 +1,25 @@
 // @ts-ignore
 /* eslint-disable */
 
-declare namespace API {
+declare namespace CMS {
+  type PostSiteInfo = {
+    title: string;
+    subtitle: string;
+    description: string;
+    author: string;
+    keywords: string[];
+    favicon: string;
+  };
+
+  type PostSiteConfig = {
+    language: string;
+    timezone: string;
+    templateId: number;
+    domain: string;
+  };
+}
+
+declare namespace GLOBAL {
   type GeneralResponse<T> = {
     statusCode: number;
     message: string;
@@ -71,9 +89,15 @@ declare namespace API {
     title: string;
     subtitle: string;
     author: string;
+    language: string;
     description: string;
     keywords: string;
     favicon: string;
+  };
+
+  type LogMessagesTemplate = {
+    message: string;
+    state: 'info' | 'error' | 'success' | 'null';
   };
 
   type StoreProvider = 'GitHub' | 'Gitee';

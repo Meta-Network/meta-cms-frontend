@@ -15,8 +15,8 @@ const request = extend({
 });
 
 /** 上传并更新用户头像 PUT /users/me/avatar */
-export async function uploadAvatar(file: FormData, token: string, options?: Record<string, any>) {
-  return request<API.GeneralResponse<any>>(
+export async function uploadAvatar(file: FormData, token: string) {
+  return request<GLOBAL.GeneralResponse<any>>(
     'https://meta-storage-koa-gateway.vercel.app/fleek/storage',
     {
       method: 'POST',
@@ -24,7 +24,6 @@ export async function uploadAvatar(file: FormData, token: string, options?: Reco
         Authorization: `Bearer ${token}`,
       },
       data: file,
-      ...(options || {}),
     },
   );
 }

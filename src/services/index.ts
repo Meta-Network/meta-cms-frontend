@@ -2,7 +2,7 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
-import * as api from './api/ucenter';
+import * as api from './api/meta-ucenter';
 export default {
   api,
 };

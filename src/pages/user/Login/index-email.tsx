@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
-import { emailLogin, emailGetVerificationCode } from '@/services/api/ucenter';
+import { emailLogin, emailGetVerificationCode } from '@/services/api/meta-ucenter';
 
 import styles from './index.less';
 
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
 
   const intl = useIntl();
 
-  const setUserInfo = async (user: API.UserResponse) => {
+  const setUserInfo = async (user: GLOBAL.UserResponse) => {
     const userInfo = user;
     if (userInfo) {
       await setInitialState((s) => ({
@@ -37,7 +37,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (values: API.EmailLoginParams) => {
+  const handleSubmit = async (values: GLOBAL.EmailLoginParams) => {
     setSubmitting(true);
     try {
       // 登录
@@ -107,7 +107,7 @@ const Login: React.FC = () => {
               },
             }}
             onFinish={async (values) => {
-              await handleSubmit(values as API.EmailLoginParams);
+              await handleSubmit(values as GLOBAL.EmailLoginParams);
             }}
           >
             {/* eslint-disable-next-line no-restricted-globals */}

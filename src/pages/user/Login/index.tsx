@@ -10,7 +10,7 @@ import {
   webauthnGetAttestation,
   webauthnLogin,
   webauthnSignup,
-} from '@/services/api/ucenter';
+} from '@/services/api/meta-ucenter';
 
 import styles from './index.less';
 
@@ -34,7 +34,7 @@ const Login: React.FC = () => {
 
   const intl = useIntl();
 
-  const setUserInfo = async (user: API.UserResponse) => {
+  const setUserInfo = async (user: GLOBAL.UserResponse) => {
     const userInfo = user;
     if (userInfo) {
       await setInitialState((s) => ({
@@ -129,7 +129,7 @@ const Login: React.FC = () => {
           },
         }}
         onFinish={async (values) => {
-          await handleSignup(values as API.EmailLoginParams);
+          await handleSignup(values as GLOBAL.EmailLoginParams);
         }}
       >
         {/* eslint-disable-next-line no-restricted-globals */}
@@ -216,7 +216,7 @@ const Login: React.FC = () => {
           },
         }}
         onFinish={async (values) => {
-          await handleLogin(values as API.EmailLoginParams);
+          await handleLogin(values as GLOBAL.EmailLoginParams);
         }}
       >
         {/* eslint-disable-next-line no-restricted-globals */}

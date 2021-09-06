@@ -1,8 +1,8 @@
 ﻿export default [
   {
-    path: '/dashboard',
-    name: '控制中心',
-    component: './Dashboard',
+    path: '/guide',
+    component: './Guide',
+    name: '创建站点',
     icon: 'dashboard',
   },
   {
@@ -85,10 +85,6 @@
         component: './account/Invitation',
       },
     ],
-  },
-  {
-    path: '/guide',
-    component: './guide',
   },
   {
     path: '/',

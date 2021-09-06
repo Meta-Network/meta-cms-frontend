@@ -1,6 +1,10 @@
-@import '../../../node_modules/antd/es/style/themes/default.less';
+@import '~antd/es/style/themes/default.less';
 
 :global {
+  a:hover {
+    color: #40a9ff;
+  }
+
   .ant-page-header {
     padding-bottom: 6px;
   }
@@ -12,47 +16,23 @@
   }
 }
 
-.contentContainer {
-  margin: 6px;
+.main {
+  display: flex;
 }
 
-.pageButtons {
-  margin-top: 18px;
+.steps {
+  flex: 1;
+  border-radius: 4px;
 }
 
-.standardList {
-  :global {
-    .ant-card-head {
-      border-bottom: none;
-    }
-    .ant-card-extra {
-      padding: 24px 0;
-    }
-    .ant-list-pagination {
-      margin-top: 24px;
-      text-align: right;
-    }
-  }
-  .listContent {
-    font-size: 0;
-    .listContentItem {
-      display: inline-block;
-      margin-right: 40px;
-      color: @text-color-secondary;
-      font-size: @font-size-base;
-      vertical-align: middle;
-      > span {
-        line-height: 20px;
-      }
-      > p {
-        margin-top: 4px;
-        margin-bottom: 0;
-        line-height: 22px;
-      }
-    }
-  }
-  .extraContentSearch {
-    width: 272px;
-    margin-left: 16px;
-  }
+.container {
+  flex: 1;
+  background: @layout-body-background;
+}
+
+.contentCard {
+  margin: 0 10px 20px;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: @shadow-1-down;
 }

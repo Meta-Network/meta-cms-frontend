@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
+import { Card, List, Avatar, message } from 'antd';
+import { Storage, StorageKeys } from '@/services/constants';
+import { getSocialAuthToken } from '@/services/api/meta-ucenter';
 import PlatformModal from '@/components/StoragePicker/PlatformModal';
-import { Card, List, Avatar } from 'antd';
-import { useState } from 'react';
 import styles from './index.less';
 
 const storage = [
@@ -18,12 +20,29 @@ const storage = [
 
 export default () => {
   const visibleState = useState(false);
+  const confirmedState = useState(Storage.get('storeSetting'));
+
   const [, setModalVisible] = visibleState;
+  const [storageConfirmed, setStorageConfirmed] = confirmedState;
   const [selectedStoreName, setSelectedStoreName] = useState('');
 
-  const handleSelectStore = async (name: API.StoreProvider) => {
+  useEffect(() => {
+    if (storageConfirmed) {
+      getSocialAuthToken(storageConfirmed.toLowerCase()).then((request) => {
+        if (request.message === 'ok') {
+          Storage.set(StorageKeys.StoreSetting, storageConfirmed);
+          message.success(`已成功选择仓储为 ${storageConfirmed}`);
+        } else {
+          setStorageConfirmed('');
+          Storage.delete(StorageKeys.StoreSetting);
+          message.error('存储仓库选择失败。原因：未获取到校验结果(token)');
+        }
+      });
+    }
+  }, [setStorageConfirmed, storageConfirmed]);
+
+  const handleSelectStore = async (name: GLOBAL.StoreProvider) => {
     setSelectedStoreName(name);
-    window.localStorage.setItem('storeSetting', name);
 
     setModalVisible(true);
   };
@@ -40,7 +59,7 @@ export default () => {
         renderItem={(item) => (
           <List.Item key={item.name}>
             <Card
-              onClick={() => handleSelectStore(item.name as API.StoreProvider)}
+              onClick={() => handleSelectStore(item.name as GLOBAL.StoreProvider)}
               hoverable
               bordered
               className={styles.card}
@@ -54,7 +73,15 @@ export default () => {
           </List.Item>
         )}
       />
-      <PlatformModal name={selectedStoreName as API.StoreProvider} visibleState={visibleState} />
+      <p>
+        当前仓储： <strong>{storageConfirmed || '未选择'}</strong>
+      </p>
+
+      <PlatformModal
+        visibleState={visibleState}
+        confirmedState={confirmedState}
+        name={selectedStoreName as GLOBAL.StoreProvider}
+      />
     </div>
   );
 };

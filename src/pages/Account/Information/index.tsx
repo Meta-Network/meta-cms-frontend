@@ -1,12 +1,12 @@
-import { requestStorageToken, updateUserInfo } from '@/services/api/ucenter';
-import React, { useEffect, useState } from 'react';
+import styles from './index.less';
 import ImgCrop from 'antd-img-crop';
-import styles from './Information.less';
-import { useModel } from '@@/plugin-model/useModel';
+import React, { useEffect, useState } from 'react';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
-import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import { useModel } from '@@/plugin-model/useModel';
 import { uploadAvatar } from '@/services/api/global';
+import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import { requestStorageToken, updateUserInfo } from '@/services/api/meta-ucenter';
 
 const BaseView: React.FC = () => {
   const { initialState } = useModel('@@initialState');
@@ -42,7 +42,7 @@ const BaseView: React.FC = () => {
     }
   };
 
-  const handleFinish = async (values: API.UserInfo) => {
+  const handleFinish = async (values: GLOBAL.UserInfo) => {
     await updateUserInfo(values);
     message.success('更新基本信息成功');
   };
