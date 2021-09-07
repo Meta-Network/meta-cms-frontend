@@ -9,7 +9,7 @@ import SiteSetting from '@/components/Guide/SiteSetting';
 import ThemeSetting from '@/components/Guide/ThemeSetting';
 import StorageSetting from '@/components/Guide/StorageSetting';
 import PublisherSetting from '@/components/Guide/PublisherSetting';
-import styles from './index.less';
+import styles from './Guide.less';
 
 const { Step } = Steps;
 
