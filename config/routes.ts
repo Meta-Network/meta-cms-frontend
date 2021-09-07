@@ -1,7 +1,7 @@
 ﻿export default [
   {
     path: '/guide',
-    component: './Guide',
+    component: './Guide/index.tsx',
     name: '创建站点',
     icon: 'dashboard',
   },
