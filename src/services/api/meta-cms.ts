@@ -2,7 +2,7 @@ import { notification } from 'antd';
 import { extend } from 'umi-request';
 
 const request = extend({
-  prefix: 'https://meta-cms-api-dev.mttk.net/',
+  prefix: 'https://meta-cms-api-dev.mttk.net',
   credentials: 'include', // 默认请求是否带上cookie
   errorHandler: (error: any) => {
     const { data, response } = error;

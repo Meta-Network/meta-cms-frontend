@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { postSiteConfig, postSiteInfo } from '@/services/api/meta-cms';
-import { Button, Tag } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
 import { Storage, StorageKeys, StorageNames } from '@/services/constants';
+import { postSiteConfig, postSiteInfo } from '@/services/api/meta-cms';
+import { useCallback, useEffect, useState } from 'react';
 import validator from '@/components/Guide/Deploy/validator';
+import { Button, Tag } from 'antd';
 import styles from '../styles.less';
 
 enum Stages {
@@ -105,7 +105,6 @@ export default () => {
       keywords: siteForm.keywords,
       favicon: 'https://github.com/favicon.ico', // TODO: change this
     });
-    console.log(submitSiteInfo);
 
     if (submitSiteInfo.message === 'ok') {
       processingCopy.push({ message: '提交站点信息成功。', state: 'success' });
@@ -124,7 +123,6 @@ export default () => {
       // templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
       // domain: '',
     });
-    console.log(submitSiteConfig);
 
     if (submitSiteConfig.message === 'ok') {
       processingCopy.push({ message: '提交站点配置成功。', state: 'success' });
@@ -158,7 +156,6 @@ export default () => {
       keywords: siteForm.keywords,
       favicon: 'https://github.com/favicon.ico', // TODO: change this
     });
-    console.log(submitSiteInfo);
 
     if (submitSiteInfo.message === 'ok') {
       processingCopy.push({ message: '提交站点信息成功。', state: 'success' });
@@ -177,7 +174,6 @@ export default () => {
       // templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
       // domain: '',
     });
-    console.log(submitSiteConfig);
 
     if (submitSiteConfig.message === 'ok') {
       processingCopy.push({ message: '提交站点配置成功。', state: 'success' });

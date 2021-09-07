@@ -4,11 +4,11 @@ import { Steps, Affix, Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import Deploy from '@/components/Guide/Deploy';
 import CDNSetting from '@/components/Guide/CDNSetting';
+import AnchoredTitle from '@/components/AnchoredTitle';
 import SiteSetting from '@/components/Guide/SiteSetting';
 import ThemeSetting from '@/components/Guide/ThemeSetting';
 import StorageSetting from '@/components/Guide/StorageSetting';
 import PublisherSetting from '@/components/Guide/PublisherSetting';
-import AnchoredTitle from '@/components/AnchoredTitle';
 import styles from './index.less';
 
 const { Step } = Steps;
