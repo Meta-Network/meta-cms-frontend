@@ -1,8 +1,6 @@
-// @ts-ignore
-/* eslint-disable */
-
 declare namespace CMS {
   type PostSiteInfo = {
+    userId: number;
     title: string;
     subtitle: string;
     description: string;

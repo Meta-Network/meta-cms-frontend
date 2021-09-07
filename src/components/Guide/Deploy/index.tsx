@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Storage, StorageKeys, StorageNames } from '@/services/constants';
 import { postSiteConfig, postSiteInfo } from '@/services/api/meta-cms';
+import { useModel } from '@@/plugin-model/useModel';
 import { useCallback, useEffect, useState } from 'react';
 import validator from '@/components/Guide/Deploy/validator';
 import { Button, Tag } from 'antd';
@@ -21,7 +22,7 @@ const getStorages = () =>
     value: key ? Storage.get(key) : key,
   }));
 
-const generateTaggedInfo = (info: GLOBAL.LogMessagesTemplate) => {
+const generateTaggedInfo = (info: GLOBAL.LogMessagesTemplate, index: number) => {
   let color: string;
 
   switch (info.state) {
@@ -38,23 +39,34 @@ const generateTaggedInfo = (info: GLOBAL.LogMessagesTemplate) => {
       color = '';
   }
 
-  return color ? (
-    <p>
-      <Tag color={color}>{info.state}</Tag>
-      {info.message}
+  return (
+    <p key={info.message + index}>
+      {color ? (
+        <>
+          <Tag key={info.state + index} color={color}>
+            {info.state}
+          </Tag>
+          {info.message}
+        </>
+      ) : (
+        info.message
+      )}
     </p>
-  ) : (
-    info.message
   );
 };
 
 export default () => {
+  const { initialState } = useModel('@@initialState');
   const [currentStage, setCurrentStage] = useState<Stages>(Stages.pending);
   const [stageCompleted, setStageCompleted] = useState(false);
   const [onError, setOnError] = useState<boolean | string>(false);
   const [processing, setProcessing] = useState<GLOBAL.LogMessagesTemplate[]>([
     { message: '准备开始...', state: 'info' },
   ]);
+
+  const updateProcessing = (info: GLOBAL.LogMessagesTemplate) => {
+    setProcessing((prev) => [...prev, info]);
+  };
 
   const validating = useCallback(() => {
     // doesn't action when onError isn't false
@@ -67,25 +79,22 @@ export default () => {
     );
 
     const validated = validation.every((e) => e === null);
-    const processingCopy = [...processing];
 
     if (validated) {
-      processingCopy.push({ message: '校验设置成功。', state: 'success' });
+      updateProcessing({ message: '校验设置成功。', state: 'success' });
       setStageCompleted(true);
     } else {
-      processingCopy.push({
+      updateProcessing({
         message: '校验设置失败。请检查以下您没有配置的设置。',
         state: 'error',
       });
       validation
         .filter((e) => e)
         .forEach((e) => {
-          processingCopy.push({ message: e as string, state: 'error' });
+          updateProcessing({ message: e as string, state: 'error' });
         });
       setOnError(true);
     }
-
-    setProcessing(processingCopy);
   }, [onError]);
 
   const submitting = useCallback(async () => {
@@ -96,8 +105,8 @@ export default () => {
 
     const siteForm = JSON.parse(Storage.get(StorageKeys.SiteInfo) as string);
 
-    const processingCopy = [...processing];
     const submitSiteInfo = await postSiteInfo({
+      userId: initialState?.currentUser?.id as number,
       title: siteForm.title,
       subtitle: siteForm.subtitle,
       description: siteForm.description,
@@ -106,10 +115,10 @@ export default () => {
       favicon: 'https://github.com/favicon.ico', // TODO: change this
     });
 
-    if (submitSiteInfo.message === 'ok') {
-      processingCopy.push({ message: '提交站点信息成功。', state: 'success' });
+    if (submitSiteInfo.message === 'Ok') {
+      updateProcessing({ message: '提交站点信息成功。', state: 'success' });
     } else {
-      processingCopy.push({
+      updateProcessing({
         message: `提交站点信息失败，原因：${submitSiteInfo.message}`,
         state: 'error',
       });
@@ -118,16 +127,16 @@ export default () => {
     }
 
     const submitSiteConfig = await postSiteConfig({
-      // language: siteForm.language,
-      // timezone: siteForm.timezone,
-      // templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
-      // domain: '',
+      language: siteForm.language,
+      timezone: siteForm.timezone,
+      templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
+      domain: 'https://pages.github.com/',
     });
 
-    if (submitSiteConfig.message === 'ok') {
-      processingCopy.push({ message: '提交站点配置成功。', state: 'success' });
+    if (submitSiteConfig.message === 'Ok') {
+      updateProcessing({ message: '提交站点配置成功。', state: 'success' });
     } else {
-      processingCopy.push({
+      updateProcessing({
         message: `提交站点配置失败，原因：${submitSiteConfig.message}`,
         state: 'error',
       });
@@ -135,60 +144,10 @@ export default () => {
       return;
     }
 
-    setProcessing(processingCopy);
     setStageCompleted(true);
   }, [onError]);
 
-  const deploying = useCallback(async () => {
-    // doesn't action when onError isn't false
-    if (onError) {
-      return;
-    }
-
-    const siteForm = JSON.parse(Storage.get(StorageKeys.SiteInfo) as string);
-
-    const processingCopy = [...processing];
-    const submitSiteInfo = await postSiteInfo({
-      title: siteForm.title,
-      subtitle: siteForm.subtitle,
-      description: siteForm.description,
-      author: siteForm.author,
-      keywords: siteForm.keywords,
-      favicon: 'https://github.com/favicon.ico', // TODO: change this
-    });
-
-    if (submitSiteInfo.message === 'ok') {
-      processingCopy.push({ message: '提交站点信息成功。', state: 'success' });
-    } else {
-      processingCopy.push({
-        message: `提交站点信息失败，原因：${submitSiteInfo.message}`,
-        state: 'error',
-      });
-      setOnError(true);
-      return;
-    }
-
-    const submitSiteConfig = await postSiteConfig({
-      // language: siteForm.language,
-      // timezone: siteForm.timezone,
-      // templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
-      // domain: '',
-    });
-
-    if (submitSiteConfig.message === 'ok') {
-      processingCopy.push({ message: '提交站点配置成功。', state: 'success' });
-    } else {
-      processingCopy.push({
-        message: `提交站点配置失败，原因：${submitSiteConfig.message}`,
-        state: 'error',
-      });
-      setOnError(true);
-      return;
-    }
-
-    setProcessing(processingCopy);
-    setStageCompleted(true);
-  }, [onError]);
+  const deploying = useCallback(async () => {}, [onError]);
 
   // after the current stage work is done, continue to the next stage
   useEffect(() => {
@@ -224,9 +183,7 @@ export default () => {
   useEffect(() => {
     if (onError) {
       setCurrentStage(Stages.pending);
-      const processingCopy = [...processing];
-      processingCopy.push({ message: '准备开始...', state: 'info' });
-      setProcessing(processingCopy);
+      updateProcessing({ message: '准备开始...', state: 'info' });
     }
   }, [onError]);
 

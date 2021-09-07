@@ -88,7 +88,7 @@
   },
   {
     path: '/',
-    redirect: './Guide',
+    redirect: '/guide',
   },
   {
     component: './404',

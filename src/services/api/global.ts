@@ -3,6 +3,8 @@ import { extend } from 'umi-request';
 
 const request = extend({
   errorHandler: (error: any) => {
+    // eslint-disable-next-line no-console
+    console.log(error.data);
     const { data, response } = error;
     if (!response) {
       notification.error({
