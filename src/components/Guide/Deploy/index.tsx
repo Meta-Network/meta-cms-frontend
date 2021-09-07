@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { postSiteConfig, postSiteInfo } from '@/services/api/meta-cms';
 import { Button, Tag } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
@@ -141,6 +141,59 @@ export default () => {
     setStageCompleted(true);
   }, [onError]);
 
+  const deploying = useCallback(async () => {
+    // doesn't action when onError isn't false
+    if (onError) {
+      return;
+    }
+
+    const siteForm = JSON.parse(Storage.get(StorageKeys.SiteInfo) as string);
+
+    const processingCopy = [...processing];
+    const submitSiteInfo = await postSiteInfo({
+      title: siteForm.title,
+      subtitle: siteForm.subtitle,
+      description: siteForm.description,
+      author: siteForm.author,
+      keywords: siteForm.keywords,
+      favicon: 'https://github.com/favicon.ico', // TODO: change this
+    });
+    console.log(submitSiteInfo);
+
+    if (submitSiteInfo.message === 'ok') {
+      processingCopy.push({ message: '提交站点信息成功。', state: 'success' });
+    } else {
+      processingCopy.push({
+        message: `提交站点信息失败，原因：${submitSiteInfo.message}`,
+        state: 'error',
+      });
+      setOnError(true);
+      return;
+    }
+
+    const submitSiteConfig = await postSiteConfig({
+      // language: siteForm.language,
+      // timezone: siteForm.timezone,
+      // templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
+      // domain: '',
+    });
+    console.log(submitSiteConfig);
+
+    if (submitSiteConfig.message === 'ok') {
+      processingCopy.push({ message: '提交站点配置成功。', state: 'success' });
+    } else {
+      processingCopy.push({
+        message: `提交站点配置失败，原因：${submitSiteConfig.message}`,
+        state: 'error',
+      });
+      setOnError(true);
+      return;
+    }
+
+    setProcessing(processingCopy);
+    setStageCompleted(true);
+  }, [onError]);
+
   // after the current stage work is done, continue to the next stage
   useEffect(() => {
     if (stageCompleted) {
@@ -148,6 +201,7 @@ export default () => {
       setCurrentStage(currentStage + 1);
     }
   }, [currentStage, stageCompleted]);
+
   // handle stage changes
   useEffect(() => {
     switch (currentStage) {
@@ -161,10 +215,14 @@ export default () => {
         submitting();
         break;
       }
+      case Stages.deploying: {
+        deploying();
+        break;
+      }
       default:
         break;
     }
-  }, [currentStage, validating]);
+  }, [currentStage, validating, deploying]);
 
   // when facing into error, prepare for next run
   useEffect(() => {

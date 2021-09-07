@@ -5,6 +5,7 @@ type ValueOf<T> = T[keyof T];
 const validator = (key: ValueOf<StorageKeys>, values: any) => {
   switch (key) {
     case StorageKeys.SiteInfo: {
+      if (!values) return false;
       const keys: (keyof GLOBAL.SiteInfo)[] = [
         'title',
         'subtitle',
