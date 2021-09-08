@@ -1,6 +1,14 @@
-import { StorageKeys } from '@/services/constants';
+import { Storage, StorageKeys, StorageNames } from '@/services/constants';
 
 type ValueOf<T> = T[keyof T];
+
+const getStorages = () =>
+  // [ {name, key, value: 'valueHere'}, ... ]
+  Object.entries(StorageNames).map(([name, key]) => ({
+    name,
+    key,
+    value: key ? Storage.get(key) : key,
+  }));
 
 const validator = (key: ValueOf<StorageKeys>, values: any) => {
   switch (key) {
@@ -31,4 +39,30 @@ const validator = (key: ValueOf<StorageKeys>, values: any) => {
   }
 };
 
-export default validator;
+export default ({ setStageCompleted, onError, setOnError, updateProcessing }: any) => {
+  if (onError) {
+    return;
+  }
+
+  const validation = getStorages().map(({ name, key, value }) =>
+    !validator(key || '', value) ? `${name}：未完成` : null,
+  );
+
+  const validated = validation.every((e) => e === null);
+
+  if (validated) {
+    updateProcessing({ message: '校验设置成功。', state: 'success' });
+    setStageCompleted(true);
+  } else {
+    updateProcessing({
+      message: '校验设置失败。请检查以下您没有配置的设置。',
+      state: 'error',
+    });
+    validation
+      .filter((e) => e)
+      .forEach((e) => {
+        updateProcessing({ message: e as string, state: 'error' });
+      });
+    setOnError(true);
+  }
+};

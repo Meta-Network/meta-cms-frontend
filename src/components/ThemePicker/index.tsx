@@ -8,7 +8,7 @@ const { Paragraph } = Typography;
 
 const themes: GLOBAL.SiteTheme[] = [
   {
-    name: 'Aero-Dual',
+    templateName: 'Aero-Dual',
     description:
       'Minimal and responsive. Easy/automatic switch of dark and light theme style by simple configuration.',
     link: 'https://levblanc.github.io/',
@@ -16,14 +16,14 @@ const themes: GLOBAL.SiteTheme[] = [
       'https://d33wubrfki0l68.cloudfront.net/26525034c74d75b36c025d70e9c9a898bc7db183/74e9f/themes/screenshots/aero-dual.jpg',
   },
   {
-    name: 'Toki',
+    templateName: 'Toki',
     description: 'A simple but elegant theme. With pretty style.',
     link: 'https://vevlins.github.io/',
     image:
       'https://d33wubrfki0l68.cloudfront.net/aa0cebcc18c88d90b4aa23a9a35491698f352498/838e9/themes/screenshots/toki.jpg',
   },
   {
-    name: 'Cupertino',
+    templateName: 'Cupertino',
     description: 'The Hexo Blog Theme Cupertino.',
     link: 'https://mrwillcom.vercel.app/',
     image:
@@ -37,7 +37,7 @@ export default () => {
 
   useEffect(() => {
     if (selectedThemeId > 0) {
-      message.success(`选择了主题 ${themes[selectedThemeId - 1]?.name}`);
+      message.success(`选择了主题 ${themes[selectedThemeId - 1]?.templateName}`);
       Storage.set(StorageKeys.ThemeSetting, selectedThemeId.toString());
     }
   }, [selectedThemeId]);
@@ -52,7 +52,7 @@ export default () => {
         }}
         dataSource={themes}
         renderItem={(item, index) => (
-          <List.Item key={item.name}>
+          <List.Item key={item.templateName}>
             <Card
               hoverable
               bordered
@@ -70,7 +70,7 @@ export default () => {
               ]}
             >
               <Card.Meta
-                title={item.name}
+                title={item.templateName}
                 description={
                   <Paragraph className={styles.description} ellipsis={{ rows: 2 }}>
                     {item.description}

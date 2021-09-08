@@ -15,6 +15,19 @@ declare namespace CMS {
     templateId: number;
     domain: string;
   };
+
+  type ThemeTemplatesResponse = {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    templateName: string;
+    templateType: string;
+    repoUrl: string;
+    branchName: string;
+    themeName: string;
+    previewImage: string;
+    previewSite: string;
+  };
 }
 
 declare namespace GLOBAL {
@@ -77,7 +90,7 @@ declare namespace GLOBAL {
   };
 
   type SiteTheme = {
-    name: string;
+    templateName: string;
     description: string;
     link: string;
     image: string;

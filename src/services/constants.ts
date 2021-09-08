@@ -1,3 +1,10 @@
+export enum DeployStages {
+  pending,
+  validating,
+  submitting,
+  deploying,
+}
+
 export enum StorageKeys {
   SiteInfo = 'siteInfo',
   StoreSetting = 'storeSetting',

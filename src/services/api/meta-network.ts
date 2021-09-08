@@ -2,7 +2,7 @@
 import { extend } from 'umi-request';
 
 const request = extend({
-  prefix: 'https://meta-network-api.testenv.mttk.net/',
+  prefix: META_NETWORK_API || 'https://meta-network-api.testenv.mttk.net/',
 });
 
 // 获取当前用户的地块 GET /hex-grids/mine

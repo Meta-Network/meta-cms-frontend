@@ -81,7 +81,7 @@ export default () => {
           <Card className={styles.steps}>
             <Steps size="small" direction="vertical" current={current}>
               {steps.map((step) => (
-                <Step key={step.name} title={step.name} />
+                <Step status="wait" key={step.name} title={step.name} />
               ))}
             </Steps>
           </Card>

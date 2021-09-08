@@ -9,6 +9,11 @@ export default defineConfig({
   dva: {
     hmr: true,
   },
+  define: {
+    META_UCENTER_API: process.env.META_UCENTER_API,
+    META_CMS_API: process.env.META_CMS_API,
+    META_NETWORK_API: process.env.META_NETWORK_API,
+  },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
     locale: true,

@@ -2,7 +2,7 @@ import { notification } from 'antd';
 import { extend } from 'umi-request';
 
 const request = extend({
-  prefix: 'https://meta-cms-api-dev.mttk.net',
+  prefix: META_CMS_API || 'https://meta-cms-api-dev.mttk.net',
   credentials: 'include', // 默认请求是否带上cookie
   errorHandler: (error: any) => {
     // eslint-disable-next-line no-console
@@ -17,6 +17,17 @@ const request = extend({
     return data;
   },
 });
+
+/** 获取主题模板 GET /theme/template */
+export async function getThemeTemplates(type: 'HEXO' | 'ALL') {
+  return request<GLOBAL.GeneralResponse<CMS.ThemeTemplatesResponse>>('/theme/template', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params: { type },
+  });
+}
 
 /** 提交新的站点信息 POST /site/info */
 export async function postSiteInfo(body: CMS.PostSiteInfo) {

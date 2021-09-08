@@ -1,7 +1,6 @@
 module.exports = {
   globals: {
     page: true,
-    REACT_APP_ENV: true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {

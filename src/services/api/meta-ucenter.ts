@@ -2,7 +2,7 @@ import { notification } from 'antd';
 import { extend } from 'umi-request';
 
 const request = extend({
-  prefix: 'https://ucenter-test-api.mttk.net',
+  prefix: META_UCENTER_API || 'https://ucenter-test-api.mttk.net',
   credentials: 'include', // 默认请求是否带上cookie
   errorHandler: (error: any) => {
     // eslint-disable-next-line no-console
