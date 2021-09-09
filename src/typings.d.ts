@@ -19,4 +19,5 @@ declare module 'bizcharts-plugin-slider';
 
 declare const META_UCENTER_API: string;
 declare const META_CMS_API: string;
+declare const META_STORAGE_API: string;
 declare const META_NETWORK_API: string;

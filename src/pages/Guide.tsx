@@ -1,7 +1,9 @@
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { useModel } from 'umi';
 import ProCard from '@ant-design/pro-card';
-import { useEffect, useMemo, useState } from 'react';
-import { Steps, Affix, Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
+import { Affix, Steps, Card } from 'antd';
+import { useEffect, useMemo } from 'react';
 import Deploy from '@/components/Guide/Deploy';
 import CDNSetting from '@/components/Guide/CDNSetting';
 import AnchoredTitle from '@/components/AnchoredTitle';
@@ -43,9 +45,7 @@ export default () => {
     ],
     [],
   );
-
-  // get local storage saved step
-  const [current, setCurrent] = useState(0);
+  const { current, setCurrent, stepStatus } = useModel('steps');
 
   useEffect(() => {
     window.onscroll = () => {
@@ -80,8 +80,13 @@ export default () => {
         <Affix offsetTop={60}>
           <Card className={styles.steps}>
             <Steps size="small" direction="vertical" current={current}>
-              {steps.map((step) => (
-                <Step status="wait" key={step.name} title={step.name} />
+              {steps.map((step, index) => (
+                <Step
+                  icon={stepStatus[index] === 'error' && <ExclamationCircleOutlined />}
+                  status={stepStatus[index]}
+                  key={step.name}
+                  title={step.name}
+                />
               ))}
             </Steps>
           </Card>
@@ -97,6 +102,13 @@ export default () => {
               {step.component}
             </ProCard>
           ))}
+          {/* place isn't fulfilled, so I'm using a placeholder here */}
+          <ProCard
+            style={{ opacity: 0, height: '360px' }}
+            className={styles.contentCard}
+            key="placeholder"
+            headerBordered
+          />
         </ProCard.Group>
       </div>
     </PageContainer>

@@ -20,7 +20,7 @@ const request = extend({
 
 /** 获取主题模板 GET /theme/template */
 export async function getThemeTemplates(type: 'HEXO' | 'ALL') {
-  return request<GLOBAL.GeneralResponse<CMS.ThemeTemplatesResponse>>('/theme/template', {
+  return request<GLOBAL.GeneralResponse<CMS.ThemeTemplatesResponse[]>>('/templates', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

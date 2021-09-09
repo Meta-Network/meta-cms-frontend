@@ -1,3 +1,4 @@
+import { getGithubUsername } from '@/services/api/global';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
 import { Storage, StorageKeys } from '@/services/constants';
@@ -20,7 +21,7 @@ const storage = [
 
 export default () => {
   const visibleState = useState(false);
-  const confirmedState = useState(Storage.get('storeSetting'));
+  const confirmedState = useState<string>(JSON.parse(Storage.get('storeSetting') || '{}').storage);
 
   const [, setModalVisible] = visibleState;
   const [storageConfirmed, setStorageConfirmed] = confirmedState;
@@ -28,22 +29,44 @@ export default () => {
 
   useEffect(() => {
     if (storageConfirmed) {
-      getSocialAuthToken(storageConfirmed.toLowerCase()).then((request) => {
-        if (request.message === 'ok') {
-          Storage.set(StorageKeys.StoreSetting, storageConfirmed);
-          message.success(`已成功选择仓储为 ${storageConfirmed}`);
-        } else {
+      getSocialAuthToken(storageConfirmed.toLowerCase())
+        .then((request) => {
+          if (request.message === 'ok') {
+            const { token } = request.data;
+            switch (storageConfirmed) {
+              case 'GitHub': {
+                getGithubUsername(token).then((username) => {
+                  if (!username) {
+                    throw new Error('未成功获取到用户名');
+                  }
+                  Storage.set(
+                    StorageKeys.StoreSetting,
+                    JSON.stringify({ storage: storageConfirmed, username }),
+                  );
+                  message.success(`已成功选择仓储为 ${storageConfirmed}`);
+                });
+                break;
+              }
+              // TODO: add 'Gitee'
+              default: {
+                throw new Error('未知的仓储');
+              }
+            }
+          } else {
+            throw new Error('未获取到校验结果(token)');
+          }
+        })
+        .catch((error) => {
           setStorageConfirmed('');
           Storage.delete(StorageKeys.StoreSetting);
-          message.error('存储仓库选择失败。原因：未获取到校验结果(token)');
-        }
-      });
+          // TODO: show message and hide 'Error:' prefix
+          message.error(`存储仓库选择失败。原因：${error}`);
+        });
     }
   }, [setStorageConfirmed, storageConfirmed]);
 
   const handleSelectStore = async (name: GLOBAL.StoreProvider) => {
     setSelectedStoreName(name);
-
     setModalVisible(true);
   };
 

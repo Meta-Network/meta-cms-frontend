@@ -3,7 +3,7 @@ import { DeployStages } from '@/services/constants';
 import { useModel } from '@@/plugin-model/useModel';
 import { useCallback, useEffect } from 'react';
 import { Button, Card } from 'antd';
-import validating from './validator';
+import { validating } from './validator';
 import submitting from './submitter';
 import generateTaggedInfo from './generateTaggedInfo';
 import styles from './index.less';
@@ -19,7 +19,7 @@ export default () => {
     setOnError,
     processing,
     updateProcessing,
-  } = useModel('guideStatus');
+  } = useModel('guideStatus') as any;
 
   // after the current stage work is done, continue to the next stage
   useEffect(() => {
@@ -39,7 +39,6 @@ export default () => {
       case DeployStages.validating: {
         validating({
           setStageCompleted,
-          onError,
           setOnError,
           updateProcessing,
         });
@@ -48,7 +47,6 @@ export default () => {
       case DeployStages.submitting: {
         submitting({
           initialState,
-          onError,
           setOnError,
           setStageCompleted,
           updateProcessing,

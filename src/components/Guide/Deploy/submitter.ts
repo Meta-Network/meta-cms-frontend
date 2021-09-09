@@ -1,18 +1,7 @@
 import { postSiteConfig, postSiteInfo } from '@/services/api/meta-cms';
 import { Storage, StorageKeys } from '@/services/constants';
 
-export default async ({
-  initialState,
-  onError,
-  setOnError,
-  setStageCompleted,
-  updateProcessing,
-}: any) => {
-  // doesn't action when onError isn't false
-  if (onError) {
-    return;
-  }
-
+export default async ({ initialState, setOnError, setStageCompleted, updateProcessing }: any) => {
   const siteForm = JSON.parse(Storage.get(StorageKeys.SiteInfo) as string);
 
   const submitSiteInfo = await postSiteInfo({
@@ -48,6 +37,24 @@ export default async ({
   } else {
     updateProcessing({
       message: `提交站点配置失败，原因：${submitSiteConfig.message}`,
+      state: 'error',
+    });
+    setOnError(true);
+    return;
+  }
+
+  const submitStorageConfig = await postSiteConfig({
+    language: siteForm.language,
+    timezone: siteForm.timezone,
+    templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
+    domain: 'https://pages.github.com/',
+  });
+
+  if (submitStorageConfig.message === 'Ok') {
+    updateProcessing({ message: '提交与存储相关配置失败。', state: 'success' });
+  } else {
+    updateProcessing({
+      message: `提交与存储相关配置失败，原因：${submitSiteConfig.message}`,
       state: 'error',
     });
     setOnError(true);

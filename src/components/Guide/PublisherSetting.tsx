@@ -1,15 +1,5 @@
 import { Alert } from 'antd';
 import styles from './styles.less';
-import { StorageKeys, Storage } from '@/services/constants';
-
-const SelectedStore = () => {
-  const store = Storage.get(StorageKeys.StoreSetting);
-  return (
-    <span>
-      当前选择的存储服务：<strong>{store || '还未选择存储'}</strong>
-    </span>
-  );
-};
 
 export default () => (
   <div className={styles.container}>
@@ -29,7 +19,7 @@ export default () => (
             <br />
             后期我们会加入高级设置，以供修改此配置。
             <br />
-            <SelectedStore />
+            {/* <SelectedStore /> */}
           </span>
         }
         type="success"

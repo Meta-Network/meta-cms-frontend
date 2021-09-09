@@ -3,8 +3,8 @@ import { DeployStages } from '@/services/constants';
 
 export default () => {
   const [onError, setOnError] = useState<boolean | string>(false);
-  const [currentStage, setCurrentStage] = useState<DeployStages>(DeployStages.pending);
   const [stageCompleted, setStageCompleted] = useState(false);
+  const [currentStage, setCurrentStage] = useState<DeployStages>(DeployStages.pending);
   const [processing, setProcessing] = useState<GLOBAL.LogMessagesTemplate[]>([
     { message: '准备开始...', state: 'info' },
   ]);

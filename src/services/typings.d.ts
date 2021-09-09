@@ -16,12 +16,22 @@ declare namespace CMS {
     domain: string;
   };
 
+  type PostStorageGithub = {
+    userName: string;
+    repoName: string;
+    branchName: string;
+    lastCommitHash?: string;
+    dataType: 'HEXO';
+    useGitProvider: boolean;
+  };
+
   type ThemeTemplatesResponse = {
     id: number;
     createdAt: Date;
     updatedAt: Date;
     templateName: string;
     templateType: string;
+    templateDescription: string;
     repoUrl: string;
     branchName: string;
     themeName: string;
@@ -89,13 +99,6 @@ declare namespace GLOBAL {
     pageSize?: number;
   };
 
-  type SiteTheme = {
-    templateName: string;
-    description: string;
-    link: string;
-    image: string;
-  };
-
   type SiteInfo = {
     title: string;
     subtitle: string;
@@ -109,6 +112,11 @@ declare namespace GLOBAL {
   type LogMessagesTemplate = {
     message: string;
     state: 'info' | 'error' | 'success' | 'null';
+  };
+
+  type StorageSetting = {
+    storage: string;
+    username: string;
   };
 
   type StoreProvider = 'GitHub' | 'Gitee';

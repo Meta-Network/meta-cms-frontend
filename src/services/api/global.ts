@@ -16,10 +16,23 @@ const request = extend({
   },
 });
 
-/** 上传并更新用户头像 PUT /users/me/avatar */
+/** 获取 GitHub 用户名 */
+export async function getGithubUsername(token: string): Promise<string> {
+  const res = await request<any>('https://api.github.com/user', {
+    method: 'GET',
+    headers: {
+      Authorization: `token ${token}`,
+    },
+  });
+
+  // just return the username as result
+  return res.login;
+}
+
+/** 上传并更新用户头像 */
 export async function uploadAvatar(file: FormData, token: string) {
   return request<GLOBAL.GeneralResponse<any>>(
-    'https://meta-storage-koa-gateway.vercel.app/fleek/storage',
+    META_STORAGE_API || 'https://meta-storage-koa-gateway.vercel.app/fleek/storage',
     {
       method: 'POST',
       headers: {

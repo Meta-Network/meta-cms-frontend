@@ -1,19 +1,15 @@
-import { Storage, StorageKeys, StorageNames } from '@/services/constants';
+import { StorageKeys, Storages } from '@/services/constants';
 
 type ValueOf<T> = T[keyof T];
 
-const getStorages = () =>
-  // [ {name, key, value: 'valueHere'}, ... ]
-  Object.entries(StorageNames).map(([name, key]) => ({
-    name,
-    key,
-    value: key ? Storage.get(key) : key,
-  }));
+export const validator = (key: ValueOf<StorageKeys>, values: any) => {
+  // only if key is not empty and no values return false
+  // otherwise (whether there's value exist, or key is just empty)
+  // gives true (controlled by case down blow)
+  if (!values && key !== '') return false;
 
-const validator = (key: ValueOf<StorageKeys>, values: any) => {
   switch (key) {
     case StorageKeys.SiteInfo: {
-      if (!values) return false;
       const keys: (keyof GLOBAL.SiteInfo)[] = [
         'title',
         'subtitle',
@@ -29,24 +25,26 @@ const validator = (key: ValueOf<StorageKeys>, values: any) => {
       return JSON.parse(values) > 0;
     }
     case StorageKeys.StoreSetting: {
+      const { storage, username } = JSON.parse(values || '{}');
       const providers: GLOBAL.StoreProvider[] = ['GitHub', 'Gitee'];
-      return providers.includes(values);
+      return providers.includes(storage) && username;
     }
-    case '':
+    case '': {
       return true;
+    }
     default:
       return false;
   }
 };
 
-export default ({ setStageCompleted, onError, setOnError, updateProcessing }: any) => {
-  if (onError) {
-    return;
-  }
+export const validating = ({ setStageCompleted, setOnError, updateProcessing }: any) => {
+  const validation = Storages.map(({ name, key, value }) => {
+    if (name !== '部署') {
+      return !validator(key || '', value) ? `${name}：未完成` : null;
+    }
 
-  const validation = getStorages().map(({ name, key, value }) =>
-    !validator(key || '', value) ? `${name}：未完成` : null,
-  );
+    return null;
+  });
 
   const validated = validation.every((e) => e === null);
 

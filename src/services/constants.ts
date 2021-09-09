@@ -5,21 +5,6 @@ export enum DeployStages {
   deploying,
 }
 
-export enum StorageKeys {
-  SiteInfo = 'siteInfo',
-  StoreSetting = 'storeSetting',
-  ThemeSetting = 'themeSetting',
-}
-
-export enum StorageNames {
-  选择主题 = 'themeSetting',
-  填写站点信息 = 'siteInfo',
-  进行存储配置 = 'storeSetting',
-  进行发布配置 = '',
-  站点访问加速 = '',
-  部署 = '',
-}
-
 export class Storage {
   static get(target: string) {
     return window.localStorage.getItem(target);
@@ -33,3 +18,54 @@ export class Storage {
     return window.localStorage.removeItem(target);
   }
 }
+
+export enum StorageKeys {
+  SiteInfo = 'siteInfo',
+  StoreSetting = 'storeSetting',
+  ThemeSetting = 'themeSetting',
+}
+
+export const Storages = [
+  {
+    name: '选择主题',
+    key: 'themeSetting',
+    get value() {
+      return Storage.get(this.key);
+    },
+  },
+  {
+    name: '填写站点信息',
+    key: 'siteInfo',
+    get value() {
+      return Storage.get(this.key);
+    },
+  },
+  {
+    name: '进行存储配置',
+    key: 'storeSetting',
+    get value() {
+      return Storage.get(this.key);
+    },
+  },
+  {
+    name: '进行发布配置',
+    key: '',
+    get value() {
+      return Storage.get(this.key);
+    },
+  },
+  {
+    name: '站点访问加速',
+    key: '',
+    get value() {
+      return Storage.get(this.key);
+    },
+  },
+  {
+    name: '部署',
+    key: 'hasSite',
+    get value() {
+      return Storage.get(this.key);
+    },
+  },
+];
