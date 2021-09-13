@@ -1,0 +1,76 @@
+import { useModel } from '@@/plugin-model/useModel';
+import { useEffect, useState } from 'react';
+import { getGithubReposName } from '@/services/api/global';
+import StoragePicker from '@/components/StoragePicker';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
+import { Divider, message } from 'antd';
+import styles from './styles.less';
+
+export default () => {
+  const [userRepos, setUserRepos] = useState<string[]>([]);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const { storeSetting, setStoreSetting } = useModel('storage');
+
+  useEffect(() => {
+    if (storeSetting.username) {
+      getGithubReposName().then((result) => {
+        setUserRepos(result.map((name) => name.toLowerCase()));
+      });
+    }
+  }, [storeSetting]);
+
+  const updateRepoSettings = async (values: { repoName: string }) => {
+    const repo = values.repoName;
+    setStoreSetting((prev) => ({ ...prev, repo }));
+    message.success(`已提交仓库名为 ${repo}`);
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.info}>
+        <p>在这里可以配置一个存储位置以保存您的站点。</p>
+        <p>您的站点代码会全部托管到该平台，我们只会帮您创建和修改。</p>
+      </div>
+      <StoragePicker />
+
+      <Divider />
+
+      <p>之后，请在下方输入一个仓库名称。将会以此名称为您创建一个仓库保存源码。</p>
+      <ProForm
+        style={{ width: 500 }}
+        name="site-info"
+        initialValues={{ repoName: 'meta-space' }}
+        onFinish={updateRepoSettings}
+        requiredMark="optional"
+      >
+        <ProFormText
+          width="md"
+          name="repoName"
+          placeholder="请输入创建的仓库名称"
+          validateStatus={isSuccess ? 'success' : undefined}
+          help={isSuccess ? '此仓库名可用！' : undefined}
+          rules={[
+            {
+              validator: (_, value) => {
+                if (!userRepos) {
+                  setIsSuccess(false);
+                  return Promise.reject(new Error('未成功加载 token。请先选择一个仓储。'));
+                }
+                if (!value) {
+                  setIsSuccess(false);
+                  return Promise.reject(new Error('仓库名不能为空。'));
+                }
+                if (userRepos?.includes(value.toLowerCase())) {
+                  setIsSuccess(false);
+                  return Promise.reject(new Error('此仓库名已存在，请选择一个未被占用的仓库名。'));
+                }
+                setIsSuccess(true);
+                return Promise.resolve();
+              },
+            },
+          ]}
+        />
+      </ProForm>
+    </div>
+  );
+};

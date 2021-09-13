@@ -10,6 +10,7 @@ import styles from './index.less';
 
 export default () => {
   const { initialState } = useModel('@@initialState');
+  const { siteSetting, themeSetting } = useModel('storage');
   const {
     currentStage,
     setCurrentStage,
@@ -47,6 +48,8 @@ export default () => {
       case DeployStages.submitting: {
         submitting({
           initialState,
+          siteSetting,
+          themeSetting,
           setOnError,
           setStageCompleted,
           updateProcessing,

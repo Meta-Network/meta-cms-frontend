@@ -1,8 +1,7 @@
 import { getGithubUsername } from '@/services/api/global';
+import { useModel } from '@@/plugin-model/useModel';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
-import { Storage, StorageKeys } from '@/services/constants';
-import { getSocialAuthToken } from '@/services/api/meta-ucenter';
 import PlatformModal from '@/components/StoragePicker/PlatformModal';
 import styles from './index.less';
 
@@ -20,50 +19,41 @@ const storage = [
 ];
 
 export default () => {
+  const { storeSetting, setStoreSetting } = useModel('storage');
   const visibleState = useState(false);
-  const confirmedState = useState<string>(JSON.parse(Storage.get('storeSetting') || '{}').storage);
-
   const [, setModalVisible] = visibleState;
-  const [storageConfirmed, setStorageConfirmed] = confirmedState;
+
+  const confirmedState = useState<string>(storeSetting.storage);
+  const [storeConfirmed, setStoreConfirmed] = confirmedState;
+
   const [selectedStoreName, setSelectedStoreName] = useState('');
 
   useEffect(() => {
-    if (storageConfirmed) {
-      getSocialAuthToken(storageConfirmed.toLowerCase())
-        .then((request) => {
-          if (request.message === 'ok') {
-            const { token } = request.data;
-            switch (storageConfirmed) {
-              case 'GitHub': {
-                getGithubUsername(token).then((username) => {
-                  if (!username) {
-                    throw new Error('未成功获取到用户名');
-                  }
-                  Storage.set(
-                    StorageKeys.StoreSetting,
-                    JSON.stringify({ storage: storageConfirmed, username }),
-                  );
-                  message.success(`已成功选择仓储为 ${storageConfirmed}`);
-                });
-                break;
-              }
-              // TODO: add 'Gitee'
-              default: {
-                throw new Error('未知的仓储');
-              }
+    const validating = async () => {
+      if (storeConfirmed) {
+        switch (storeConfirmed) {
+          case 'GitHub': {
+            const username: string = await getGithubUsername();
+            if (!username) {
+              throw new Error('未成功获取到用户名');
             }
-          } else {
-            throw new Error('未获取到校验结果(token)');
+            setStoreSetting({ storage: storeConfirmed, username });
+            message.success(`已成功选择仓储为 ${storeConfirmed}`);
+            break;
           }
-        })
-        .catch((error) => {
-          setStorageConfirmed('');
-          Storage.delete(StorageKeys.StoreSetting);
-          // TODO: show message and hide 'Error:' prefix
-          message.error(`存储仓库选择失败。原因：${error}`);
-        });
-    }
-  }, [setStorageConfirmed, storageConfirmed]);
+          // TODO: add 'Gitee'
+          default: {
+            throw new Error('未知的仓储');
+          }
+        }
+      }
+    };
+    validating().catch((error) => {
+      setStoreConfirmed('');
+      setStoreSetting({ storage: '', username: '' });
+      message.error(`存储仓库选择失败。原因：${error}`);
+    });
+  }, [setStoreConfirmed, setStoreSetting, storeConfirmed]);
 
   const handleSelectStore = async (name: GLOBAL.StoreProvider) => {
     setSelectedStoreName(name);
@@ -97,7 +87,7 @@ export default () => {
         )}
       />
       <p>
-        当前仓储： <strong>{storageConfirmed || '未选择'}</strong>
+        当前仓储： <strong>{storeConfirmed || '未选择'}</strong>
       </p>
 
       <PlatformModal

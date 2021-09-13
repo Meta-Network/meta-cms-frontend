@@ -99,7 +99,7 @@ declare namespace GLOBAL {
     pageSize?: number;
   };
 
-  type SiteInfo = {
+  type SiteSetting = {
     title: string;
     subtitle: string;
     author: string;
@@ -114,9 +114,10 @@ declare namespace GLOBAL {
     state: 'info' | 'error' | 'success' | 'null';
   };
 
-  type StorageSetting = {
+  type StoreSetting = {
     storage: string;
     username: string;
+    repo?: string;
   };
 
   type StoreProvider = 'GitHub' | 'Gitee';

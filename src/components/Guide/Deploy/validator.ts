@@ -2,6 +2,7 @@ import { StorageKeys, Storages } from '@/services/constants';
 
 type ValueOf<T> = T[keyof T];
 
+// TODO: to
 export const validator = (key: ValueOf<StorageKeys>, values: any) => {
   // only if key is not empty and no values return false
   // otherwise (whether there's value exist, or key is just empty)
@@ -9,8 +10,8 @@ export const validator = (key: ValueOf<StorageKeys>, values: any) => {
   if (!values && key !== '') return false;
 
   switch (key) {
-    case StorageKeys.SiteInfo: {
-      const keys: (keyof GLOBAL.SiteInfo)[] = [
+    case StorageKeys.SiteSetting: {
+      const keys: (keyof GLOBAL.SiteSetting)[] = [
         'title',
         'subtitle',
         'author',
@@ -42,7 +43,6 @@ export const validating = ({ setStageCompleted, setOnError, updateProcessing }: 
     if (name !== '部署') {
       return !validator(key || '', value) ? `${name}：未完成` : null;
     }
-
     return null;
   });
 

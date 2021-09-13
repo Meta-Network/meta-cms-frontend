@@ -1,29 +1,35 @@
 import { message } from 'antd';
 import ProCard from '@ant-design/pro-card';
 import { useModel } from '@@/plugin-model/useModel';
-import { StorageKeys, Storage } from '@/services/constants';
 import ProForm, {
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
   ProFormUploadButton,
 } from '@ant-design/pro-form';
+import React from 'react';
 import styles from './styles.less';
 
 export default () => {
   const { initialState } = useModel('@@initialState');
-  const author = initialState?.currentUser?.nickname || '';
+  const {
+    siteSetting,
+    setSiteSetting,
+  }: {
+    siteSetting: Partial<GLOBAL.SiteSetting>;
+    setSiteSetting: React.Dispatch<React.SetStateAction<GLOBAL.SiteSetting>>;
+  } = useModel('storage');
 
-  const editing = JSON.parse(Storage.get(StorageKeys.SiteInfo) || '{}');
+  const author = initialState?.currentUser?.nickname || '';
   const initialValues = {
     language: 'zh',
     timezone: 'UTC+8',
     author,
-    ...editing,
+    ...siteSetting,
   };
 
-  const handleFinishing = async (values: GLOBAL.SiteInfo) => {
-    Storage.set(StorageKeys.SiteInfo, JSON.stringify(values));
+  const handleFinishing = async (values: GLOBAL.SiteSetting) => {
+    setSiteSetting(values);
     message.success('成功保存站点信息设置。');
   };
 

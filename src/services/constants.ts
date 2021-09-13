@@ -20,12 +20,20 @@ export class Storage {
 }
 
 export enum StorageKeys {
-  SiteInfo = 'siteInfo',
+  domainSetting = 'domainSetting',
+  SiteSetting = 'siteSetting',
   StoreSetting = 'storeSetting',
   ThemeSetting = 'themeSetting',
 }
 
 export const Storages = [
+  {
+    name: '设置域名',
+    key: 'domainSetting',
+    get value() {
+      return Storage.get(this.key);
+    },
+  },
   {
     name: '选择主题',
     key: 'themeSetting',

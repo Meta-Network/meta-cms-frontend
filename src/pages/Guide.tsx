@@ -9,7 +9,8 @@ import CDNSetting from '@/components/Guide/CDNSetting';
 import AnchoredTitle from '@/components/AnchoredTitle';
 import SiteSetting from '@/components/Guide/SiteSetting';
 import ThemeSetting from '@/components/Guide/ThemeSetting';
-import StorageSetting from '@/components/Guide/StorageSetting';
+import StoreSetting from '@/components/Guide/StoreSetting';
+import DomainSetting from '@/components/Guide/DomainSetting';
 import PublisherSetting from '@/components/Guide/PublisherSetting';
 import styles from './Guide.less';
 
@@ -18,6 +19,10 @@ const { Step } = Steps;
 export default () => {
   const steps = useMemo<{ name: string; component: JSX.Element }[]>(
     () => [
+      {
+        name: '设置域名',
+        component: <DomainSetting />,
+      },
       {
         name: '选择主题',
         component: <ThemeSetting />,
@@ -28,7 +33,7 @@ export default () => {
       },
       {
         name: '进行存储配置',
-        component: <StorageSetting />,
+        component: <StoreSetting />,
       },
       {
         name: '进行发布配置',

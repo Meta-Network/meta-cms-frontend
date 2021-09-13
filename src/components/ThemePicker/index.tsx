@@ -1,5 +1,5 @@
 import { getThemeTemplates } from '@/services/api/meta-cms';
-import { Storage, StorageKeys } from '@/services/constants';
+import { useModel } from '@@/plugin-model/useModel';
 import { ArrowRightOutlined, CheckOutlined } from '@ant-design/icons';
 import { Typography, Image, Card, List, message } from 'antd';
 import { useEffect, useState } from 'react';
@@ -8,8 +8,7 @@ import styles from './index.less';
 const { Paragraph } = Typography;
 
 export default () => {
-  const savedThemeId = JSON.parse(Storage.get(StorageKeys.ThemeSetting) || '{}');
-  const [selectedThemeId, setSelectedThemeId] = useState(savedThemeId || -1);
+  const { themeSetting, setThemeSetting } = useModel('storage');
   const [themes, setThemes] = useState<CMS.ThemeTemplatesResponse[]>([]);
 
   useEffect(() => {
@@ -19,12 +18,11 @@ export default () => {
   }, []);
 
   useEffect(() => {
-    if (themes.length && selectedThemeId > 0) {
+    if (themes.length && themeSetting > 0) {
       // noinspection JSIgnoredPromiseFromCall
-      message.success(`选择了主题 ${themes[selectedThemeId - 1]?.templateName}`);
-      Storage.set(StorageKeys.ThemeSetting, selectedThemeId.toString());
+      message.success(`选择了主题 ${themes[themeSetting - 1]?.templateName}`);
     }
-  }, [themes, selectedThemeId]); /* eslint-disable-line react-hooks/exhaustive-deps */
+  }, [themes, themeSetting]); /* eslint-disable-line react-hooks/exhaustive-deps */
 
   return (
     <div className={styles.cardList}>
@@ -43,12 +41,12 @@ export default () => {
               bordered
               bodyStyle={{ padding: 16 }}
               cover={<Image src={item.previewImage} />}
-              className={selectedThemeId === index + 1 ? styles.selectedTheme : ''}
+              className={themeSetting === index + 1 ? styles.selectedTheme : ''}
               actions={[
                 <a target="_blank" href={item.previewSite}>
                   <ArrowRightOutlined /> 预览
                 </a>,
-                <span onClick={() => setSelectedThemeId(index + 1)} className="clickable">
+                <span onClick={() => setThemeSetting(index + 1)} className="clickable">
                   <CheckOutlined key="check" />
                   选用
                 </span>,

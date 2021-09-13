@@ -1,16 +1,20 @@
 import { postSiteConfig, postSiteInfo } from '@/services/api/meta-cms';
-import { Storage, StorageKeys } from '@/services/constants';
 
-export default async ({ initialState, setOnError, setStageCompleted, updateProcessing }: any) => {
-  const siteForm = JSON.parse(Storage.get(StorageKeys.SiteInfo) as string);
-
+export default async ({
+  initialState,
+  siteSetting,
+  themeSetting,
+  setOnError,
+  setStageCompleted,
+  updateProcessing,
+}: any) => {
   const submitSiteInfo = await postSiteInfo({
     userId: initialState?.currentUser?.id as number,
-    title: siteForm.title,
-    subtitle: siteForm.subtitle,
-    description: siteForm.description,
-    author: siteForm.author,
-    keywords: siteForm.keywords,
+    title: siteSetting.title,
+    subtitle: siteSetting.subtitle,
+    description: siteSetting.description,
+    author: siteSetting.author,
+    keywords: siteSetting.keywords,
     favicon: 'https://github.com/favicon.ico', // TODO: change this
   });
 
@@ -26,9 +30,9 @@ export default async ({ initialState, setOnError, setStageCompleted, updateProce
   }
 
   const submitSiteConfig = await postSiteConfig({
-    language: siteForm.language,
-    timezone: siteForm.timezone,
-    templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
+    language: siteSetting.language,
+    timezone: siteSetting.timezone,
+    templateId: themeSetting,
     domain: 'https://pages.github.com/',
   });
 
@@ -43,10 +47,11 @@ export default async ({ initialState, setOnError, setStageCompleted, updateProce
     return;
   }
 
+  // TODO: finish this
   const submitStorageConfig = await postSiteConfig({
-    language: siteForm.language,
-    timezone: siteForm.timezone,
-    templateId: parseInt(Storage.get(StorageKeys.ThemeSetting) as string, 10),
+    language: siteSetting.language,
+    timezone: siteSetting.timezone,
+    templateId: themeSetting,
     domain: 'https://pages.github.com/',
   });
 
