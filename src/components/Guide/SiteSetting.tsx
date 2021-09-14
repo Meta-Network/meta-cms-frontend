@@ -1,13 +1,11 @@
-import { message } from 'antd';
+import React, { useState } from 'react';
+import { message, Upload } from 'antd';
 import ProCard from '@ant-design/pro-card';
 import { useModel } from '@@/plugin-model/useModel';
-import ProForm, {
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  ProFormUploadButton,
-} from '@ant-design/pro-form';
-import React from 'react';
+import { uploadAvatar } from '@/services/api/global';
+import { requestStorageToken } from '@/services/api/meta-ucenter';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import ProForm, { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import styles from './styles.less';
 
 export default () => {
@@ -20,6 +18,9 @@ export default () => {
     setSiteSetting: React.Dispatch<React.SetStateAction<GLOBAL.SiteSetting>>;
   } = useModel('storage');
 
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string>(siteSetting.favicon || '');
+
   const author = initialState?.currentUser?.nickname || '';
   const initialValues = {
     language: 'zh',
@@ -28,10 +29,46 @@ export default () => {
     ...siteSetting,
   };
 
+  const customRequest = async ({ file }: { file: File }): Promise<void> => {
+    const done = message.loading('文件上传中...请稍候', 0);
+    setUploading(true);
+    const tokenRequest = await requestStorageToken();
+    const token = tokenRequest.data;
+
+    if (!token) {
+      if (tokenRequest.statusCode === 401) {
+        message.error('图像上传失败，请重新登录。');
+      }
+      message.error('图像上传失败。内部错误或无网络。');
+    }
+
+    const form = new FormData();
+    form.append('file', file);
+
+    const result = await uploadAvatar(form, token);
+    done();
+
+    if (result.statusCode === 201) {
+      setImageUrl(result.data.publicUrl);
+      message.success('上传成功，请提交您的站点信息设置。');
+    } else {
+      message.error('图像上传失败。');
+    }
+    setUploading(false);
+  };
+
   const handleFinishing = async (values: GLOBAL.SiteSetting) => {
+    values.favicon = imageUrl; // eslint-disable-line no-param-reassign
     setSiteSetting(values);
     message.success('成功保存站点信息设置。');
   };
+
+  const uploadButton = (
+    <div>
+      {uploading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
 
   return (
     <div className={styles.container}>
@@ -106,13 +143,25 @@ export default () => {
             placeholder="Meta Space 时区设置"
             rules={[{ required: true }]}
           />
-          <ProFormUploadButton
-            extra=".ico格式，展示在标签页上，可用工具从图片生成"
-            label="网站图标"
+          <ProForm.Item
             name="favicon"
-            title="上传站点图标"
+            label="网站图标"
+            extra=".ico格式，展示在标签页上，可用工具从图片生成"
             rules={[{ required: true, message: '请上传一个站点图标' }]}
-          />
+          >
+            <Upload
+              title="上传站点图标"
+              listType="picture-card"
+              customRequest={customRequest}
+              showUploadList={false}
+            >
+              {imageUrl ? (
+                <img src={imageUrl} alt="favicon preview" style={{ width: '80%', height: '80%' }} />
+              ) : (
+                uploadButton
+              )}
+            </Upload>
+          </ProForm.Item>
         </ProForm>
       </ProCard>
     </div>

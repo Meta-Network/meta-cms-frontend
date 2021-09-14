@@ -1,5 +1,4 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import request from 'umi-request';
 import { Image, Button, Space, Tag } from 'antd';
 import { useState, useCallback } from 'react';
 import ProTable from '@ant-design/pro-table';
@@ -22,16 +21,6 @@ enum LoadingStates {
   Discarding,
 }
 
-type RequestResponse = {
-  total: number;
-  pageSize: number;
-  pageCount: number;
-  data: HexoPostsInfo[];
-};
-
-const baseUrl = 'https://metaspace.federarks.xyz';
-const response = await request<RequestResponse>(`${baseUrl}/api/posts.json`);
-
 export default () => {
   const [loadings, setLoadings] = useState<LoadingStates[]>(
     Array(response.data.length).fill(LoadingStates.Pending),
@@ -51,16 +40,7 @@ export default () => {
       title: '封面图片',
       search: false,
       render: (_, record) => (
-        <Space>
-          {record.cover ? (
-            <Image
-              width={100}
-              src={record.cover.startsWith('/') ? baseUrl + record.cover : record.cover}
-            />
-          ) : (
-            '无封面图'
-          )}
-        </Space>
+        <Space>{record.cover ? <Image width={100} src={record.cover} /> : '无封面图'}</Space>
       ),
     },
     {
@@ -190,7 +170,28 @@ export default () => {
     >
       <ProTable<HexoPostsInfo>
         columns={columns}
-        dataSource={response.data}
+        request={async (
+          // 第一个参数 params 查询表单和 params 参数的结合
+          // 第一个参数中一定会有 pageSize 和  current ，这两个参数是 antd 的规范
+          params,
+          sort,
+          filter,
+        ) => {
+          // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
+          // 如果需要转化参数可以在这里进行修改
+          const msg = await myQuery({
+            page: params.current,
+            pageSize: params.pageSize,
+          });
+          return {
+            data: msg.result,
+            // success 请返回 true，
+            // 不然 table 会停止解析数据，即使有数据
+            success: boolean,
+            // 不传会使用 data 的长度，如果是分页一定要传
+            total: number,
+          };
+        }}
         rowKey={(record) => record.title}
         search={{
           labelWidth: 'auto',
@@ -207,10 +208,7 @@ export default () => {
             return values;
           },
         }}
-        pagination={{
-          total: response.total,
-          pageSize: response.pageSize,
-        }}
+        pagination={{}}
         expandable={{
           expandedRowRender: (record: HexoPostsInfo) => (
             <p dangerouslySetInnerHTML={{ __html: record.content }} />

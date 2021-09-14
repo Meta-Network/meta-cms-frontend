@@ -16,7 +16,7 @@ const BaseView: React.FC = () => {
     updateUserInfo({ avatar: userAvatar }).then(() => '');
   }, [userAvatar]);
 
-  const beforeUpload = async ({ file }: { file: File }): Promise<void> => {
+  const customRequest = async ({ file }: { file: File }): Promise<void> => {
     const done = message.loading('上传头像中...请稍候', 0);
     const tokenRequest = await requestStorageToken();
     const token = tokenRequest.data;
@@ -55,7 +55,7 @@ const BaseView: React.FC = () => {
       </div>
       <ImgCrop rotate>
         {/* @ts-ignore */}
-        <Upload customRequest={beforeUpload} showUploadList={false}>
+        <Upload customRequest={customRequest} showUploadList={false}>
           <div className={styles.button_view}>
             <Button>
               <UploadOutlined />

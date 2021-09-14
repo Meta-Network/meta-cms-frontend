@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { UserOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
 import { startAssertion, startAttestation } from '@simplewebauthn/browser';

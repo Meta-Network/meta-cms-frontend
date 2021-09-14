@@ -52,3 +52,14 @@ export async function isDomainForbidden(domain: string) {
     data: { domain },
   });
 }
+
+/** 获取待同步的文章列表 POST /site/info */
+export async function fetchPostsPendingSync() {
+  return mockRequest<GLOBAL.GeneralResponse<any>>('/site/info', {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
