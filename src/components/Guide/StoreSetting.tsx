@@ -1,7 +1,7 @@
 import { useModel } from '@@/plugin-model/useModel';
 import { useEffect, useState } from 'react';
 import { getGithubReposName } from '@/services/api/global';
-import StoragePicker from '@/components/StoragePicker';
+import StoragePicker from '@/components/StorePicker';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
 import styles from './styles.less';

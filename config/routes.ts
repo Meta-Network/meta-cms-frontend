@@ -87,6 +87,11 @@
     ],
   },
   {
+    path: '/result/store-setting-success',
+    hideInMenu: true,
+    component: './result/StoreSettingSuccess',
+  },
+  {
     path: '/',
     redirect: '/guide',
   },

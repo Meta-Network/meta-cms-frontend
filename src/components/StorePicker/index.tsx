@@ -2,7 +2,7 @@ import { getGithubUsername } from '@/services/api/global';
 import { useModel } from '@@/plugin-model/useModel';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
-import PlatformModal from '@/components/StoragePicker/PlatformModal';
+import PlatformModal from '@/components/StorePicker/PlatformModal';
 import styles from './index.less';
 
 const storage = [

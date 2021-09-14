@@ -15,7 +15,10 @@ export default ({
   const [, setConfirmed] = confirmedState;
 
   const handleRequest = async () => {
-    const request = await requestSocialAuth(name.toLowerCase(), window.location.href);
+    const request = await requestSocialAuth(
+      name.toLowerCase(),
+      `${window.location.origin}/result/store-setting-success`,
+    );
     window.open(request.data, '_blank');
   };
 

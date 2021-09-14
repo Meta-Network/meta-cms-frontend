@@ -152,6 +152,8 @@ export default () => {
             <Upload
               title="上传站点图标"
               listType="picture-card"
+              /*
+              // @ts-ignore */
               customRequest={customRequest}
               showUploadList={false}
             >
