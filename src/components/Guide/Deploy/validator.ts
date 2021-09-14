@@ -8,6 +8,7 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
   // otherwise (whether there's value exist, or key is just empty)
   // gives true (controlled by case down blow)
   if (!values && key !== '') return false;
+  console.log(key);
 
   switch (key) {
     case StorageKeys.DomainSetting: {

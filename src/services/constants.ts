@@ -43,7 +43,7 @@ export const Storages = [
   },
   {
     name: '填写站点信息',
-    key: 'siteInfo',
+    key: 'siteSetting',
     get value() {
       return Storage.get(this.key);
     },
