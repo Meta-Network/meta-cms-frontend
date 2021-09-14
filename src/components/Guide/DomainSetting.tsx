@@ -1,17 +1,18 @@
+import { isDomainForbidden } from '@/services/api/meta-cms';
 import { useModel } from '@@/plugin-model/useModel';
-import { useEffect, useState } from 'react';
-import { getGithubReposName } from '@/services/api/global';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { message } from 'antd';
+import { useState } from 'react';
 import styles from './styles.less';
 
 export default () => {
-  const { storeSetting, setStoreSetting } = useModel('storage');
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const { domainSetting, setDomainSetting } = useModel('storage');
 
-  const updateRepoSettings = async (values: { repoName: string }) => {
-    const repo = values.repoName;
-    setStoreSetting((prev) => ({ ...prev, repo }));
-    message.success(`已提交仓库名为 ${repo}`);
+  const updateDomainSettings = async (values: { domain: string }) => {
+    const { domain } = values;
+    setDomainSetting(domain);
+    message.success('已成功更新域名。');
   };
 
   return (
@@ -23,8 +24,8 @@ export default () => {
       <ProForm
         style={{ width: 500 }}
         name="site-info"
-        initialValues={{ repoName: 'meta-space' }}
-        onFinish={updateRepoSettings}
+        initialValues={{ domain: domainSetting }}
+        onFinish={updateDomainSettings}
         requiredMark="optional"
       >
         <ProFormText
@@ -34,28 +35,25 @@ export default () => {
           }}
           name="domain"
           placeholder="输入前缀域名"
-          // validateStatus={isSuccess ? 'success' : undefined}
-          // help={isSuccess ? '此仓库名可用！' : undefined}
-          // rules={[
-          //   {
-          //     validator: (_, value) => {
-          //       if (!userRepos) {
-          //         setIsSuccess(false);
-          //         return Promise.reject(new Error('未成功加载 token。请先选择一个仓储。'));
-          //       }
-          //       if (!value) {
-          //         setIsSuccess(false);
-          //         return Promise.reject(new Error('仓库名不能为空。'));
-          //       }
-          //       if (userRepos?.includes(value.toLowerCase())) {
-          //         setIsSuccess(false);
-          //         return Promise.reject(new Error('此仓库名已存在，请选择一个未被占用的仓库名。'));
-          //       }
-          //       setIsSuccess(true);
-          //       return Promise.resolve();
-          //     },
-          //   },
-          // ]}
+          validateStatus={isSuccess ? 'success' : undefined}
+          help={isSuccess ? '此域名可用！' : undefined}
+          rules={[
+            {
+              validator: async (_, value) => {
+                if (!value) {
+                  setIsSuccess(false);
+                  return Promise.reject(new Error('域名不能为空。'));
+                }
+                const isForbidden = await isDomainForbidden(value);
+                if (isForbidden) {
+                  setIsSuccess(false);
+                  return Promise.reject(new Error('此域名被禁用或已存在，请另选一个。'));
+                }
+                setIsSuccess(true);
+                return Promise.resolve();
+              },
+            },
+          ]}
         />
       </ProForm>
     </div>

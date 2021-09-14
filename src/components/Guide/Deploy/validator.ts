@@ -1,15 +1,18 @@
+import { isDomainForbidden } from '@/services/api/meta-cms';
 import { StorageKeys, Storages } from '@/services/constants';
 
 type ValueOf<T> = T[keyof T];
 
-// TODO: to
-export const validator = (key: ValueOf<StorageKeys>, values: any) => {
+export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
   // only if key is not empty and no values return false
   // otherwise (whether there's value exist, or key is just empty)
   // gives true (controlled by case down blow)
   if (!values && key !== '') return false;
 
   switch (key) {
+    case StorageKeys.DomainSetting: {
+      return !(await isDomainForbidden(JSON.parse(values)));
+    }
     case StorageKeys.SiteSetting: {
       const keys: (keyof GLOBAL.SiteSetting)[] = [
         'title',
@@ -20,7 +23,7 @@ export const validator = (key: ValueOf<StorageKeys>, values: any) => {
         'keywords',
         'favicon',
       ];
-      return keys.every((setting) => JSON.parse(values)[setting]);
+      return keys.every((setting) => JSON.parse(values || '{}')[setting]);
     }
     case StorageKeys.ThemeSetting: {
       return JSON.parse(values) > 0;
@@ -38,13 +41,16 @@ export const validator = (key: ValueOf<StorageKeys>, values: any) => {
   }
 };
 
-export const validating = ({ setStageCompleted, setOnError, updateProcessing }: any) => {
-  const validation = Storages.map(({ name, key, value }) => {
-    if (name !== '部署') {
-      return !validator(key || '', value) ? `${name}：未完成` : null;
-    }
-    return null;
-  });
+export const validating = async ({ setStageCompleted, setOnError, updateProcessing }: any) => {
+  const validation = await Promise.all(
+    Storages.map(async ({ name, key, value }) => {
+      if (name !== '部署') {
+        const isSuccess = await validator(key || '', value);
+        return isSuccess ? null : `${name}：未完成`;
+      }
+      return null;
+    }),
+  );
 
   const validated = validation.every((e) => e === null);
 

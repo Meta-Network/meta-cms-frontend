@@ -1,9 +1,18 @@
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { Button, List, Tag } from 'antd';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import styles from './index.less';
 
+const status = {
+  matataki: {
+    isBind: false,
+    isSyncing: false,
+  },
+};
+
 export default () => {
+  const [sourceStatus, setSourceStatus] = useState<any>(status);
+
   const getData = () => [
     {
       title: [

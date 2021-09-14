@@ -18,7 +18,7 @@ export default () => {
   }, []);
 
   useEffect(() => {
-    if (themes.length && themeSetting > 0) {
+    if (themes?.length && themeSetting > 0) {
       // noinspection JSIgnoredPromiseFromCall
       message.success(`选择了主题 ${themes[themeSetting - 1]?.templateName}`);
     }
@@ -32,7 +32,7 @@ export default () => {
           column: 4,
           gutter: 16,
         }}
-        loading={!themes.length}
+        loading={!themes?.length}
         dataSource={themes}
         renderItem={(item, index) => (
           <List.Item key={item.templateName}>

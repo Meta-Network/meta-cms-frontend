@@ -29,7 +29,7 @@ export default () => {
           已绑定
         </Tag>,
       ],
-      actions: [<Button type="primary">开启同步</Button>, <Button danger>解绑</Button>],
+      actions: [<Button danger>解绑</Button>],
       description: '提供中国本土化的代码仓库托管服务',
       avatar: (
         <img

@@ -20,7 +20,7 @@ export class Storage {
 }
 
 export enum StorageKeys {
-  domainSetting = 'domainSetting',
+  DomainSetting = 'domainSetting',
   SiteSetting = 'siteSetting',
   StoreSetting = 'storeSetting',
   ThemeSetting = 'themeSetting',

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 
 export default () => {
   const [themeSetting, setThemeSetting] = useState<number>(
-    parseInt(window.localStorage.getItem('themeSetting') || '-1', 10),
+    JSON.parse(window.localStorage.getItem('themeSetting') || '-1'),
   );
-  const [domainSetting, setDomainSetting] = useState<string>(
-    window.localStorage.getItem('domainSetting') || '',
+  const [domainSetting, setDomainSetting] = useState<string | undefined>(
+    JSON.parse(window.localStorage.getItem('domainSetting') || ''),
   );
   const [storeSetting, setStoreSetting] = useState<GLOBAL.StoreSetting>(
     JSON.parse(window.localStorage.getItem('storeSetting') || '{}'),

@@ -1,21 +1,12 @@
-import { notification } from 'antd';
-import { extend } from 'umi-request';
+import { extendWithErrorHandler } from '@/services/api/base-request';
 
-const request = extend({
+const mockRequest = extendWithErrorHandler({
+  prefix: '/api',
+});
+
+const request = extendWithErrorHandler({
   prefix: META_CMS_API || 'https://meta-cms-api-dev.mttk.net',
   credentials: 'include', // 默认请求是否带上cookie
-  errorHandler: (error: any) => {
-    // eslint-disable-next-line no-console
-    console.log(error.data);
-    const { data, response } = error;
-    if (!response) {
-      notification.error({
-        description: '您的网络发生异常，无法连接服务器',
-        message: '网络异常',
-      });
-    }
-    return data;
-  },
 });
 
 /** 获取主题模板 GET /theme/template */
@@ -48,5 +39,16 @@ export async function postSiteConfig(body: CMS.PostSiteConfig) {
       'Content-Type': 'application/json',
     },
     data: body,
+  });
+}
+
+/** 验证域名可用性 POST /domain/validate */
+export async function isDomainForbidden(domain: string) {
+  return mockRequest<GLOBAL.GeneralResponse<any>>('/domain/validate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: { domain },
   });
 }

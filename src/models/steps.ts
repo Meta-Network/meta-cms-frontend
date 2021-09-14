@@ -16,15 +16,18 @@ export default () => {
   const lastCurrent = usePrevious(current);
 
   useEffect(() => {
-    setStepStatus((prev) => {
-      const copy = prev.slice();
-      const lastIndex = lastCurrent;
-      const storage = Storages[lastIndex];
+    const lastIndex = lastCurrent;
+    const storage = Storages[lastIndex];
 
-      copy[lastIndex] = validator(storage.key, storage.value) ? 'finish' : 'error';
-      copy[current] = 'process';
+    validator(storage.key, storage.value).then((isSuccess: boolean) => {
+      setStepStatus((prev) => {
+        const copy = prev.slice();
 
-      return copy;
+        copy[lastIndex] = isSuccess ? 'finish' : 'error';
+        copy[current] = 'process';
+
+        return copy;
+      });
     });
   }, [current, lastCurrent]);
 
