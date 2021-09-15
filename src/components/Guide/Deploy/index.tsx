@@ -9,8 +9,7 @@ import generateTaggedInfo from './generateTaggedInfo';
 import styles from './index.less';
 
 export default () => {
-  const { initialState } = useModel('@@initialState');
-  const { siteSetting, themeSetting } = useModel('storage');
+  const { siteSetting, storeSetting, themeSetting, domainSetting } = useModel('storage');
   const {
     currentStage,
     setCurrentStage,
@@ -47,9 +46,10 @@ export default () => {
       }
       case DeployStages.submitting: {
         submitting({
-          initialState,
           siteSetting,
           themeSetting,
+          storeSetting,
+          domainSetting,
           setOnError,
           setStageCompleted,
           updateProcessing,

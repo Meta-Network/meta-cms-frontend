@@ -1,18 +1,25 @@
-import { PageContainer } from '@ant-design/pro-layout';
-import { Image, Button, Space, Tag } from 'antd';
-import { useState, useCallback } from 'react';
+import {
+  ignorePendingPost,
+  publishPendingPost,
+  fetchPostsPendingSync,
+} from '@/services/api/meta-cms';
+import { EllipsisOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
-import type { ProColumns } from '@ant-design/pro-table';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import styles from './SyncCenter.less';
 
 type HexoPostsInfo = {
+  id: number;
   cover: string | null;
   title: string;
-  content: string;
-  keywords: string;
-  tags: { name: string; path: string }[];
-  categories: { name: string; path: string }[];
-  date: string;
-  updated: string;
+  summary: string;
+  tags: string[];
+  category: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 enum LoadingStates {
@@ -22,9 +29,14 @@ enum LoadingStates {
 }
 
 export default () => {
-  const [loadings, setLoadings] = useState<LoadingStates[]>(
-    Array(response.data.length).fill(LoadingStates.Pending),
-  );
+  const [itemsNumbers, setItemsNumbers] = useState<number>(0);
+  const [loadings, setLoadings] = useState<LoadingStates[]>([]);
+
+  const ref = useRef<ActionType>();
+
+  useEffect(() => {
+    setLoadings(Array(itemsNumbers).fill(LoadingStates.Pending));
+  }, [itemsNumbers]);
 
   const setLoading = useCallback((index, value: LoadingStates) => {
     setLoadings((prevLoadings: LoadingStates[]) => {
@@ -53,16 +65,14 @@ export default () => {
     },
     {
       title: '分类',
-      dataIndex: 'categories',
+      dataIndex: 'category',
       filters: true,
       onFilter: true,
       render: (_, record) => (
         <Space>
-          {record.categories.map(({ name, path }) => (
-            <Tag color="yellow" key={`${name}_cate`}>
-              <a href={path}>{name}</a>
-            </Tag>
-          ))}
+          <Tag color="green" key={`${record.category}_cate`}>
+            {record.category}
+          </Tag>
         </Space>
       ),
     },
@@ -72,26 +82,38 @@ export default () => {
       filters: true,
       onFilter: true,
       render: (_, record) => (
-        <Space>
-          {record.tags.map(({ name, path }) => (
-            <Tag color="blue" key={`${name}_tag`}>
-              <a href={path}>{name}</a>
-            </Tag>
-          ))}
-        </Space>
+        <Dropdown
+          key="menu_tags"
+          trigger={['click', 'hover']}
+          overlay={
+            <Menu>
+              {record.tags.map((name) => (
+                <Menu.Item key={`${name}_menu`}>
+                  <Tag color="blue" key={`${name}_tag`}>
+                    {name}
+                  </Tag>
+                </Menu.Item>
+              ))}
+            </Menu>
+          }
+        >
+          <Button key="tags_list" type="dashed" style={{ padding: '0 8px' }}>
+            标签列表
+          </Button>
+        </Dropdown>
       ),
     },
     {
       title: '创建时间',
       key: 'showTime',
-      dataIndex: 'date',
+      dataIndex: 'createdAt',
       valueType: 'date',
       sorter: true,
       hideInSearch: true,
     },
     {
       title: '创建时间',
-      dataIndex: 'date',
+      dataIndex: 'createdAt',
       valueType: 'dateRange',
       hideInTable: true,
       search: {
@@ -106,14 +128,14 @@ export default () => {
     {
       title: '更新时间',
       key: 'showTime',
-      dataIndex: 'updated',
+      dataIndex: 'updatedAt',
       valueType: 'date',
       sorter: true,
       hideInSearch: true,
     },
     {
       title: '更新时间',
-      dataIndex: 'updated',
+      dataIndex: 'updatedAt',
       valueType: 'dateRange',
       hideInTable: true,
       search: {
@@ -128,15 +150,15 @@ export default () => {
     {
       title: '操作',
       key: 'option',
-      width: 250,
+      width: 210,
       valueType: 'option',
       render: (_, record, index) => [
         <Button
-          onClick={() => {
+          onClick={async () => {
             setLoading(index, LoadingStates.Publishing);
-            setTimeout(() => {
-              setLoading(index, LoadingStates.Pending);
-            }, 3000);
+            await publishPendingPost(record.id);
+            await ref.current?.reload();
+            message.success('已成功发布此文章');
           }}
           loading={loadings[index] === LoadingStates.Publishing}
           disabled={loadings[index] === LoadingStates.Discarding}
@@ -145,11 +167,11 @@ export default () => {
           发布
         </Button>,
         <Button
-          onClick={() => {
+          onClick={async () => {
             setLoading(index, LoadingStates.Discarding);
-            setTimeout(() => {
-              setLoading(index, LoadingStates.Pending);
-            }, 3000);
+            await ignorePendingPost(record.id);
+            await ref.current?.reload();
+            message.success('成功取消发布此文章');
           }}
           loading={loadings[index] === LoadingStates.Discarding}
           disabled={loadings[index] === LoadingStates.Publishing}
@@ -164,35 +186,55 @@ export default () => {
 
   return (
     <PageContainer
+      className={styles.container}
       breadcrumb={{}}
+      content={[
+        <span>在这里来控制发布从其他源获取到的文章列表</span>,
+        <div className={styles.syncButtons}>
+          <Button key="sync-button" style={{ marginRight: 10 }} type="primary">
+            立即同步
+          </Button>
+          <Dropdown
+            key="dropdown"
+            trigger={['click']}
+            overlay={
+              <Menu>
+                <Menu.Item key="1">下拉菜单</Menu.Item>
+                <Menu.Item key="2">下拉菜单2</Menu.Item>
+                <Menu.Item key="3">下拉菜单3</Menu.Item>
+              </Menu>
+            }
+          >
+            <Button key="4" style={{ padding: '0 8px' }}>
+              <EllipsisOutlined />
+            </Button>
+          </Dropdown>
+        </div>,
+      ]}
       title="同步中心"
-      content="在这里来控制发布从其他源获取到的文章列表"
     >
       <ProTable<HexoPostsInfo>
+        actionRef={ref}
         columns={columns}
         request={async (
           // 第一个参数 params 查询表单和 params 参数的结合
           // 第一个参数中一定会有 pageSize 和  current ，这两个参数是 antd 的规范
           params,
-          sort,
-          filter,
         ) => {
+          const request = await fetchPostsPendingSync();
+          setItemsNumbers(request.data.items.length);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
-          const msg = await myQuery({
-            page: params.current,
-            pageSize: params.pageSize,
-          });
           return {
-            data: msg.result,
+            data: request.data.items,
             // success 请返回 true，
             // 不然 table 会停止解析数据，即使有数据
-            success: boolean,
+            success: true,
             // 不传会使用 data 的长度，如果是分页一定要传
-            total: number,
+            total: 10,
           };
         }}
-        rowKey={(record) => record.title}
+        rowKey={(record) => record.id}
         search={{
           labelWidth: 'auto',
         }}
@@ -211,7 +253,7 @@ export default () => {
         pagination={{}}
         expandable={{
           expandedRowRender: (record: HexoPostsInfo) => (
-            <p dangerouslySetInnerHTML={{ __html: record.content }} />
+            <p dangerouslySetInnerHTML={{ __html: record.summary }} />
           ),
         }}
         dateFormatter="string"

@@ -1,6 +1,5 @@
 declare namespace CMS {
   type PostSiteInfo = {
-    userId: number;
     title: string;
     subtitle: string;
     description: string;
@@ -14,9 +13,10 @@ declare namespace CMS {
     timezone: string;
     templateId: number;
     domain: string;
+    subdomain: string;
   };
 
-  type PostStorageGithub = {
+  type PostNewStorageSetting = {
     userName: string;
     repoName: string;
     branchName: string;

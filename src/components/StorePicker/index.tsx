@@ -31,6 +31,8 @@ export default () => {
   useEffect(() => {
     const validating = async () => {
       if (storeConfirmed) {
+        if (storeSetting.storage && storeSetting.username) return;
+
         switch (storeConfirmed) {
           case 'GitHub': {
             const username: string = await getGithubUsername();
@@ -53,6 +55,7 @@ export default () => {
       setStoreSetting({ storage: '', username: '' });
       message.error(`存储仓库选择失败。原因：${error}`);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setStoreConfirmed, setStoreSetting, storeConfirmed]);
 
   const handleSelectStore = async (name: GLOBAL.StoreProvider) => {
