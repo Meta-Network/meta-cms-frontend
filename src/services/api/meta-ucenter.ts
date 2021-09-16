@@ -1,21 +1,12 @@
-import { notification } from 'antd';
-import { extend } from 'umi-request';
+import { extendWithErrorHandler } from '@/services/api/base-request';
 
-const request = extend({
+const mockRequest = extendWithErrorHandler({
+  prefix: '/api',
+});
+
+const request = extendWithErrorHandler({
   prefix: META_UCENTER_API || 'https://ucenter-test-api.mttk.net',
   credentials: 'include', // 默认请求是否带上cookie
-  errorHandler: (error: any) => {
-    // eslint-disable-next-line no-console
-    console.log(error.data);
-    const { data, response } = error;
-    if (!response) {
-      notification.error({
-        description: '您的网络发生异常，无法连接服务器',
-        message: '网络异常',
-      });
-    }
-    return data;
-  },
 });
 
 export async function webauthnLogin(body: any) {
@@ -154,5 +145,22 @@ export async function updateUserInfo(body: Partial<GLOBAL.UserInfo>) {
 export async function requestStorageToken() {
   return request<GLOBAL.GeneralResponse<string>>('/storage/token', {
     method: 'POST',
+  });
+}
+
+// TODO: Does not exist, ONLY FOR MOCK
+/** 绑定一个内容源平台的 token POST /social-auth/{platform}/token */
+export async function bindSourcePlatform(platform: string) {
+  return mockRequest<GLOBAL.GeneralResponse<string>>(`/social-auth/${platform}/token`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+}
+
+/** 解绑一个内容源平台的 token DELETE /social-auth/{platform}/token */
+export async function unbindSourcePlatform(platform: string) {
+  return mockRequest<GLOBAL.GeneralResponse<string>>(`/social-auth/${platform}/token`, {
+    method: 'DELETE',
+    credentials: 'include',
   });
 }

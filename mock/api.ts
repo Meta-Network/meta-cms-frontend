@@ -1,6 +1,21 @@
 import { Request, Response } from 'express';
 
 const finishedPosts: number[] = [];
+const sourcePlatforms = [{ platform: 'matataki', active: false }];
+
+const finishPost = (req: Request, res: Response) => {
+  const id = parseInt(req.params[0], 10);
+  finishedPosts.push(id);
+  setTimeout(
+    () =>
+      res.send({
+        statusCode: 200,
+        message: 'Ok',
+        data: {},
+      }),
+    2000,
+  );
+};
 
 const posts = [
   {
@@ -143,6 +158,9 @@ const posts = [
 ];
 
 export default {
+  'GET /api/token': (req: Request, res: Response) => {
+    res.send({ data: sourcePlatforms });
+  },
   'GET /api/post': (req: Request, res: Response) => {
     res.send({
       statusCode: 200,
@@ -165,33 +183,34 @@ export default {
       },
     });
   },
+  'POST /api/sync': (req: Request, res: Response) => {
+    setTimeout(() => {
+      res.send({ statusCode: 200, message: 'Ok' });
+    }, 4000);
+  },
   'POST /api/domain/validate': (req: Request, res: Response) => {
     const domain = req.body.domain;
     const forbiddings = ['matataki', 'meta-network', 'meta-cms'];
     res.send(forbiddings.includes(domain.toLowerCase()));
   },
   'POST /api/post/(.*)/publish': (req: Request, res: Response) => {
-    const id = parseInt(req.params[0], 10);
-    finishedPosts.push(id);
-    setTimeout(() => res.send({
-      statusCode: 200,
-      message: 'Ok',
-      data: {},
-    }), 2000);
+    finishPost(req, res);
   },
   'POST /api/post/(.*)/ignore': (req: Request, res: Response) => {
-    const id = parseInt(req.params[0], 10);
-    finishedPosts.push(id);
-    setTimeout(() => res.send({
-      statusCode: 200,
-      message: 'Ok',
-      data: {},
-    }), 2000);
+    finishPost(req, res);
   },
-  'GET /test': (req: Request, res: Response) => {
-    res.send({
-      data: {finishedPosts, posts:
-      posts.filter((post, index) => !finishedPosts.includes(index))}
-    });
+  'POST /api/social-auth/(.*)/token': (req: Request, res: Response) => {
+    const platform = req.params[0];
+    sourcePlatforms.find((source) => source.platform === platform)!.active = true;
+    setTimeout(() => {
+      res.send({ statusCode: 200, message: 'Ok' });
+    }, 4000);
+  },
+  'DELETE /api/social-auth/(.*)/token': (req: Request, res: Response) => {
+    const platform = req.params[0];
+    sourcePlatforms.find((source) => source.platform === platform)!.active = false;
+    setTimeout(() => {
+      res.send({ statusCode: 200, message: 'Ok' });
+    }, 4000);
   },
 };

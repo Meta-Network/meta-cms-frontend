@@ -1,63 +1,115 @@
+import { getSourceStatus, syncPostsByPlatform } from '@/services/api/meta-cms';
+import { bindSourcePlatform, unbindSourcePlatform } from '@/services/api/meta-ucenter';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
-import { Button, List, Tag } from 'antd';
-import { Fragment, useState } from 'react';
+import { Button, List, message, Tag } from 'antd';
+import { Fragment, useEffect, useState } from 'react';
 import styles from './index.less';
 
-const status = {
+const status: GLOBAL.SourcePlatforms = {
   matataki: {
-    isBind: false,
-    isSyncing: false,
+    name: 'matataki',
+    active: false,
   },
 };
 
 export default () => {
-  const [sourceStatus, setSourceStatus] = useState<any>(status);
+  const [syncLoading, setSyncLoading] = useState<boolean>(false);
+  const [unbindLoading, setUnbindLoading] = useState<boolean>(false);
+  const [sourceStatus, setSourceStatus] = useState<GLOBAL.SourcePlatforms>(status);
 
-  const getData = () => [
-    {
-      title: [
-        'Matataki',
-        <Tag className="status" color="red">
-          未绑定
-        </Tag>,
-      ],
-      description: '每一篇自由的创作都应该被永远记录',
-      actions: [<Button type="primary">绑定</Button>],
-      avatar: (
-        <img
-          className="icon"
-          src="https://cdn.frontenduse.top/prod/img/dapp_list_matataki.8bac289.png"
-          alt="matataki icon"
-        />
+  const actions = {
+    matataki: {
+      sync: (
+        <Button
+          loading={syncLoading}
+          onClick={() => {
+            setSyncLoading(true);
+            const done = message.loading('文章同步中，请稍候…', 0);
+            syncPostsByPlatform('matataki').then((result) => {
+              if (result.statusCode === 200) {
+                message.success('文章同步成功！');
+              } else {
+                message.error('文章同步失败，请重新同步或绑定账号。');
+              }
+
+              done();
+              setSyncLoading(false);
+            });
+          }}
+          type="primary"
+        >
+          立即同步
+        </Button>
+      ),
+      bind: (
+        <Button
+          onClick={() => {
+            bindSourcePlatform('matataki');
+            window.open('https://developer.matataki.io/app/44ba10e59e954bf4/oauth');
+          }}
+          type="primary"
+        >
+          绑定
+        </Button>
+      ),
+      unbind: (
+        <Button
+          loading={unbindLoading}
+          onClick={() => {
+            setUnbindLoading(true);
+            const done = message.loading('解绑中，请稍候…', 0);
+            unbindSourcePlatform('matataki').then((result) => {
+              if (result.statusCode === 200) {
+                message.success('解绑成功。请刷新页面。');
+              } else {
+                message.error('解绑失败，请检查网络或登录状态。');
+              }
+              done();
+              setUnbindLoading(false);
+            });
+          }}
+          type="primary"
+          danger
+        >
+          解绑
+        </Button>
       ),
     },
-    {
-      title: [
-        'Matataki',
-        <Tag className="status" color="blue">
-          已绑定
-        </Tag>,
-      ],
-      description: '每一篇自由的创作都应该被永远记录',
-      actions: [<Button type="primary">开启同步</Button>, <Button danger>解绑</Button>],
-      avatar: (
-        <img
-          className="icon"
-          src="https://cdn.frontenduse.top/prod/img/dapp_list_matataki.8bac289.png"
-          alt="matataki icon"
-        />
-      ),
-    },
+  };
 
+  const getStatus = (platform: GLOBAL.SourcePlatformProperties) =>
+    platform.active ? (
+      <Tag key={`${platform.name}_bind`} className="status" color="blue">
+        已绑定
+      </Tag>
+    ) : (
+      <Tag key={`${platform.name}_not_bind`} className="status" color="red">
+        未绑定
+      </Tag>
+    );
+
+  const getActions = (platform: GLOBAL.SourcePlatformProperties) =>
+    platform.active
+      ? [actions[platform.name].sync, actions[platform.name].unbind]
+      : [actions[platform.name].bind];
+
+  useEffect(() => {
+    getSourceStatus().then((result) => {
+      setSourceStatus((source: GLOBAL.SourcePlatforms) => {
+        const copy = { ...source };
+        result.data.forEach((service: CMS.SourceStatusResponse) => {
+          copy[service.platform].active = service.active;
+        });
+        return copy;
+      });
+    });
+  }, []);
+
+  const sourcePlatforms = [
     {
-      title: [
-        'Matataki',
-        <Tag className="status" color="green">
-          同步中
-        </Tag>,
-      ],
+      title: ['Matataki', getStatus(sourceStatus.matataki)],
       description: '每一篇自由的创作都应该被永远记录',
-      actions: [<Button>关闭同步</Button>, <Button danger>解绑</Button>],
+      actions: getActions(sourceStatus.matataki),
       avatar: (
         <img
           className="icon"
@@ -79,7 +131,7 @@ export default () => {
           <Fragment>
             <List
               itemLayout="horizontal"
-              dataSource={getData()}
+              dataSource={sourcePlatforms}
               renderItem={(item) => (
                 <List.Item actions={item.actions}>
                   <List.Item.Meta

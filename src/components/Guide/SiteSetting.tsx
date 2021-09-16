@@ -145,6 +145,8 @@ export default () => {
           />
           <ProForm.Item
             name="favicon"
+            getValueProps={(value) => [value]}
+            valuePropName={'fileList'}
             label="网站图标"
             extra=".ico格式，展示在标签页上，可用工具从图片生成"
             rules={[{ required: true, message: '请上传一个站点图标' }]}

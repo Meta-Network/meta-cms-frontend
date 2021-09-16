@@ -21,7 +21,7 @@ export async function getThemeTemplates(type: 'HEXO' | 'ALL') {
 }
 
 /** 提交新的站点信息 POST /site/info */
-export async function postSiteInfo(body: CMS.PostSiteInfo) {
+export async function postSiteInfo(body: CMS.SiteInfoRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/info', {
     method: 'POST',
     headers: {
@@ -32,7 +32,7 @@ export async function postSiteInfo(body: CMS.PostSiteInfo) {
 }
 
 /** 提交新的站点设置 POST /site/config */
-export async function postSiteConfig(siteId: number, body: CMS.PostSiteConfig) {
+export async function postSiteConfig(siteId: number, body: CMS.SiteConfigRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/config', {
     params: {
       siteId,
@@ -49,7 +49,7 @@ export async function postSiteConfig(siteId: number, body: CMS.PostSiteConfig) {
 export async function postNewStorageSetting(
   configId: number,
   platform: string,
-  body: CMS.PostNewStorageSetting,
+  body: CMS.NewStorageSettingRequest,
 ) {
   return request<GLOBAL.GeneralResponse<any>>(`/storage/${platform}`, {
     params: {
@@ -71,6 +71,18 @@ export async function isDomainForbidden(domain: string) {
       'Content-Type': 'application/json',
     },
     data: { domain },
+  });
+}
+
+/** 执行同步文章 GET /post */
+export async function syncPostsByPlatform(platform: string) {
+  return mockRequest<GLOBAL.GeneralResponse<any>>('/sync', {
+    credentials: 'include',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: { platform },
   });
 }
 
@@ -101,6 +113,16 @@ export async function ignorePendingPost(postId: number) {
   return mockRequest<GLOBAL.GeneralResponse<any>>(`/post/${postId}/ignore`, {
     credentials: 'include',
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
+/** 获取文章同步源账号的绑定状态 GET /token */
+export async function getSourceStatus() {
+  return mockRequest<GLOBAL.GeneralResponse<CMS.SourceStatusResponse[]>>('/token', {
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },

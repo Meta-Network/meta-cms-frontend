@@ -4,7 +4,7 @@ import ProForm, { ProFormText, ProFormUploadButton, ProFormTextArea } from '@ant
 
 export default () => {
   return (
-    <PageContainer title="站点信息设置" content="在这里对个人站点的信息进行设置">
+    <PageContainer title="站点信息设置" content={<p>在这里对个人站点的信息进行设置</p>}>
       <Card>
         <ProForm
           name="site-info"

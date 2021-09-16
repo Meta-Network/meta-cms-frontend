@@ -1,3 +1,5 @@
 export default () => {
-  window.location.href = 'https://meta-network.vercel.app/oauth/login';
+  window.location.href = `https://meta-network.mttk.net/oauth/login?redirect=${encodeURIComponent(
+    window.location.origin,
+  )}`;
 };

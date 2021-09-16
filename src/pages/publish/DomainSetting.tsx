@@ -9,7 +9,7 @@ export default () => {
     <PageContainer
       breadcrumb={{}}
       title="域名配置"
-      content="可以在此配置你的域名，即别人访问到你的站点的地址"
+      content={<p>可以在此配置你的域名，即别人访问到你的站点的地址</p>}
     >
       <Card>
         <ProForm

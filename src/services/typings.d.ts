@@ -1,28 +1,12 @@
 declare namespace CMS {
-  type PostSiteInfo = {
-    title: string;
-    subtitle: string;
-    description: string;
-    author: string;
-    keywords: string[];
-    favicon: string;
-  };
-
-  type PostSiteConfig = {
-    language: string;
-    timezone: string;
-    templateId: number;
-    domain: string;
-    subdomain: string;
-  };
-
-  type PostNewStorageSetting = {
-    userName: string;
-    repoName: string;
-    branchName: string;
-    lastCommitHash?: string;
-    dataType: 'HEXO';
-    useGitProvider: boolean;
+  type SourceStatusResponse = {
+    id: number;
+    userId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    platform: string;
+    accessToken: string;
+    active: boolean;
   };
 
   type ThemeTemplatesResponse = {
@@ -37,6 +21,32 @@ declare namespace CMS {
     themeName: string;
     previewImage: string;
     previewSite: string;
+  };
+
+  type SiteInfoRequest = {
+    title: string;
+    subtitle: string;
+    description: string;
+    author: string;
+    keywords: string[];
+    favicon: string;
+  };
+
+  type SiteConfigRequest = {
+    language: string;
+    timezone: string;
+    templateId: number;
+    domain: string;
+    subdomain: string;
+  };
+
+  type NewStorageSettingRequest = {
+    userName: string;
+    repoName: string;
+    branchName: string;
+    lastCommitHash?: string;
+    dataType: 'HEXO';
+    useGitProvider: boolean;
   };
 }
 
@@ -118,6 +128,15 @@ declare namespace GLOBAL {
     storage: string;
     username: string;
     repo?: string;
+  };
+
+  type SourcePlatformProperties = {
+    name: string;
+    active: boolean;
+  };
+
+  type SourcePlatforms = {
+    matataki: SourcePlatformProperties;
   };
 
   type StoreProvider = 'GitHub' | 'Gitee';

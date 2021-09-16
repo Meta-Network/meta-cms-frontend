@@ -29,9 +29,9 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
       return JSON.parse(values) > 0;
     }
     case StorageKeys.StoreSetting: {
-      const { storage, username } = JSON.parse(values || '{}');
+      const { storage, username, repo } = JSON.parse(values || '{}');
       const providers: GLOBAL.StoreProvider[] = ['GitHub', 'Gitee'];
-      return providers.includes(storage) && username;
+      return providers.includes(storage) && username && repo;
     }
     case '': {
       return true;

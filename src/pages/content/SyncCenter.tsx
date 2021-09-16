@@ -189,7 +189,7 @@ export default () => {
       className={styles.container}
       breadcrumb={{}}
       content={[
-        <span>在这里来控制发布从其他源获取到的文章列表</span>,
+        <p>在这里来控制发布从其他源获取到的文章列表</p>,
         <div className={styles.syncButtons}>
           <Button key="sync-button" style={{ marginRight: 10 }} type="primary">
             立即同步
@@ -216,11 +216,8 @@ export default () => {
       <ProTable<HexoPostsInfo>
         actionRef={ref}
         columns={columns}
-        request={async (
-          // 第一个参数 params 查询表单和 params 参数的结合
-          // 第一个参数中一定会有 pageSize 和  current ，这两个参数是 antd 的规范
-          params,
-        ) => {
+        request={async () => {
+          // TODO: 分页
           const request = await fetchPostsPendingSync();
           setItemsNumbers(request.data.items.length);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
