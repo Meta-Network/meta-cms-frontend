@@ -65,13 +65,15 @@ export async function postNewStorageSetting(
 
 /** 验证域名可用性 POST /domain/validate */
 export async function isDomainForbidden(domain: string) {
-  return mockRequest<GLOBAL.GeneralResponse<any>>('/domain/validate', {
+  if (!domain) return true;
+  const response = await request<GLOBAL.GeneralResponse<any>>('/domain/validate', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     data: { domain },
   });
+  return response.data.status !== 'AVAILABLE';
 }
 
 /** 执行同步文章 GET /post */

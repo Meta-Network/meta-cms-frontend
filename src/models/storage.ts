@@ -4,8 +4,8 @@ export default () => {
   const [themeSetting, setThemeSetting] = useState<number>(
     JSON.parse(window.localStorage.getItem('themeSetting') || '-1'),
   );
-  const [domainSetting, setDomainSetting] = useState<string | undefined>(
-    JSON.parse(window.localStorage.getItem('domainSetting') || ''),
+  const [domainSetting, setDomainSetting] = useState<string | null>(
+    JSON.parse(window.localStorage.getItem('domainSetting') || 'null'),
   );
   const [storeSetting, setStoreSetting] = useState<GLOBAL.StoreSetting>(
     JSON.parse(window.localStorage.getItem('storeSetting') || '{}'),
