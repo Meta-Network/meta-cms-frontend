@@ -1,5 +1,4 @@
-import { Link } from '@umijs/preset-dumi/lib/theme';
-import { history } from 'umi';
+import { history, Link } from 'umi';
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { queryCurrentUser, refreshTokens } from './services/api/meta-ucenter';

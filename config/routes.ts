@@ -8,8 +8,7 @@
   {
     name: '我的 Meta Space',
     icon: 'link',
-    path: '/my-space',
-    component: './Guide',
+    path: 'https://metaspace.federarks.xyz/',
   },
   {
     path: '/user',
