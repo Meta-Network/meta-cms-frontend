@@ -2,8 +2,14 @@
   {
     path: '/guide',
     component: './Guide',
-    name: '创建站点',
+    name: '创建 Meta Space',
     icon: 'dashboard',
+  },
+  {
+    name: '我的 Meta Space',
+    icon: 'link',
+    path: '/my-space',
+    component: './Guide',
   },
   {
     path: '/user',
@@ -26,7 +32,7 @@
   },
   {
     path: '/content',
-    name: '内容后台',
+    name: '内容',
     icon: 'edit',
     routes: [
       {
@@ -36,52 +42,52 @@
       },
       {
         path: '/content/posted-content',
-        name: '已发布内容',
+        name: '已发布',
         component: './content/PostedContent',
       },
     ],
   },
   {
-    path: '/site',
-    name: '站点信息设置',
-    component: './Site',
-    icon: 'setting',
-  },
-  {
     path: '/publish',
-    name: '发布设置',
+    name: '管理',
     icon: 'branches',
     routes: [
       {
-        path: '/publish/domain-setting',
-        name: '域名配置',
-        component: './publish/DomainSetting',
+        path: '/publish/source',
+        name: '内容源',
+        component: './account/Source',
+      },
+      {
+        path: '/publish/site-setting',
+        name: '信息',
+        component: './Site',
+        icon: 'setting',
       },
       {
         path: '/publish/store-setting',
-        name: '存储配置',
+        name: '存储',
         component: './publish/StoreSetting',
+      },
+      {
+        path: '/publish/domain-setting',
+        name: '域名',
+        component: './publish/DomainSetting',
       },
     ],
   },
   {
     path: '/account',
-    name: '账号设置',
+    name: '账号',
     icon: 'user',
     routes: [
       {
         path: '/account/information',
-        name: '个人信息',
+        name: '设置',
         component: './account/Information',
       },
       {
-        path: '/account/source',
-        name: '内容源绑定',
-        component: './account/Source',
-      },
-      {
         path: '/account/invitation',
-        name: '邀请码管理',
+        name: '邀请码',
         component: './account/Invitation',
       },
     ],

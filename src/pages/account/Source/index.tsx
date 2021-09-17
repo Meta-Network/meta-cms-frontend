@@ -31,7 +31,6 @@ export default () => {
               } else {
                 message.error('文章同步失败，请重新同步或绑定账号。');
               }
-
               done();
               setSyncLoading(false);
             });

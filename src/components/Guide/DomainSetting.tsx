@@ -18,8 +18,8 @@ export default () => {
   return (
     <div className={styles.container}>
       <div className={styles.info}>
-        <p>在此为您的站点选择一个域名，可以在之后被访问到的地址。</p>
-        <p>您可以随后为其配置您的个人域名。</p>
+        <p>先为您的 Meta Space 设置一个易于访问的子域名。</p>
+        <p>未来您将可以使用更加个性化的域名配置。</p>
       </div>
       <ProForm
         style={{ width: 500 }}

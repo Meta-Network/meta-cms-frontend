@@ -35,7 +35,12 @@ export default () => {
 
         switch (storeConfirmed) {
           case 'GitHub': {
-            const username: string = await getGithubUsername();
+            let username: string;
+            try {
+              username = await getGithubUsername();
+            } catch {
+              throw new Error('未获取到 token，请进行授权。');
+            }
             if (!username) {
               throw new Error('未成功获取到用户名');
             }

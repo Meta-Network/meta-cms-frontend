@@ -13,11 +13,15 @@ export default () => {
 
   useEffect(() => {
     if (storeSetting.username) {
-      getGithubReposName().then((result) => {
-        setUserRepos(result.map((name) => name.toLowerCase()));
-      });
+      getGithubReposName()
+        .then((result) => {
+          setUserRepos(result.map((name) => name.toLowerCase()));
+        })
+        .catch(() => {
+          setStoreSetting({ storage: '', username: '' });
+        });
     }
-  }, [storeSetting]);
+  }, [setStoreSetting, storeSetting]);
 
   const updateRepoSettings = async (values: { repoName: string }) => {
     const repo = values.repoName;

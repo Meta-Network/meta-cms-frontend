@@ -4,7 +4,7 @@ import styles from './styles.less';
 export default () => (
   <div className={styles.container}>
     <div className={styles.info}>
-      <p>在此配置您的站点 CDN。</p>
+      <p>在此配置您的 Meta Space CDN。</p>
     </div>
 
     <div>

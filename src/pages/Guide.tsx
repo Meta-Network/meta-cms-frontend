@@ -20,27 +20,27 @@ export default () => {
   const steps = useMemo<{ name: string; component: JSX.Element }[]>(
     () => [
       {
-        name: '设置域名',
+        name: '域名',
         component: <DomainSetting />,
       },
       {
-        name: '选择主题',
+        name: '主题',
         component: <ThemeSetting />,
       },
       {
-        name: '填写站点信息',
+        name: '信息',
         component: <SiteSetting />,
       },
       {
-        name: '进行存储配置',
+        name: '存储',
         component: <StoreSetting />,
       },
       {
-        name: '进行发布配置',
+        name: '发布',
         component: <PublisherSetting />,
       },
       {
-        name: '站点访问加速',
+        name: 'CDN',
         component: <CDNSetting />,
       },
       {
@@ -55,7 +55,7 @@ export default () => {
   useEffect(() => {
     window.onscroll = () => {
       let positions = steps.map(
-        (step) => document.getElementById(step.name)!.getBoundingClientRect().top,
+        (step) => document.getElementById(step.name)?.getBoundingClientRect()?.top || 0,
       );
 
       const currentPosition = window.pageYOffset;
@@ -77,8 +77,13 @@ export default () => {
 
   return (
     <PageContainer
-      title="创建 Meta Space 站点"
-      content={<p>体验 Meta Network，请从创建一个站点作为开始吧！</p>}
+      title="创建 Meta Space"
+      content={[
+        <span>Meta Space 是专属于您个人的数字空间，您有全部的控制权力。</span>,
+        <br />,
+        <span>立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅。</span>,
+        <p />,
+      ]}
       breadcrumb={{}}
     >
       <div className={styles.main}>

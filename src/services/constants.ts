@@ -28,42 +28,42 @@ export enum StorageKeys {
 
 export const Storages = [
   {
-    name: '设置域名',
+    name: '域名',
     key: 'domainSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '选择主题',
+    name: '主题',
     key: 'themeSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '填写站点信息',
+    name: '信息',
     key: 'siteSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '进行存储配置',
+    name: '存储',
     key: 'storeSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '进行发布配置',
+    name: '发布',
     key: '',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '站点访问加速',
+    name: 'CDN',
     key: '',
     get value() {
       return Storage.get(this.key);

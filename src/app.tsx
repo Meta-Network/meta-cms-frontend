@@ -1,10 +1,10 @@
+import { Link } from '@umijs/preset-dumi/lib/theme';
 import { history } from 'umi';
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
-// import { getMyGrid } from './services/api/meta-network';
 import { queryCurrentUser, refreshTokens } from './services/api/meta-ucenter';
 import { PageLoading } from '@ant-design/pro-layout';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import { BookOutlined, ExportOutlined, LinkOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from 'umi';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 
@@ -21,7 +21,6 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: GLOBAL.CurrentUser;
-  hasSite?: boolean;
   fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
@@ -34,8 +33,6 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-
-  // const hasSite = Boolean((await getMyGrid()).data?.meta_space_site_id);
 
   // 如果是登录页面，不执行
   if (history.location.pathname !== loginPath) {
@@ -59,34 +56,35 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     disableContentMargin: false,
     rightContentRender: () => <RightContent />,
     footerRender: () => <Footer />,
+    menuItemRender: (menuItemProps, defaultDom) => {
+      return (
+        <>
+          <Link
+            className={(menuItemProps.name === '我的 Meta Space' && 'my-site-link') || ''}
+            to={menuItemProps.path as string}
+          >
+            {defaultDom}
+          </Link>
+          {menuItemProps.name === '我的 Meta Space' && (
+            <ExportOutlined className="my-site-link-icon" />
+          )}
+        </>
+      );
+    },
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
       if (!initialState?.currentUser && location.pathname !== loginPath) {
         history.push(loginPath);
       }
-
-      // 如果没有个人站点，重定向到 MetaNetwork
-      /*
-      if (initialState?.currentUser && !initialState?.hasSite) {
-        setTimeout(() => {
-          // @ts-ignore
-          window.location = 'https://www.meta-network.io/';
-        }, 5000);
-        notification.error({
-          message: '还未创建站点！',
-          description: '您的 MetaSpace 还未创建完成，将返回 MetaNetwork 完成创建',
-        });
-      }
-       */
     },
     links: [
-      // TODO: next change these links
+      // TODO: change these links
       <a href="https://metaspace.federarks.xyz/" target="_blank">
         <LinkOutlined />
         <span>个人站点</span>
       </a>,
-      <a href="https://meta-network.vercel.app/">
+      <a href="https://meta-network.mttk.net/">
         <BookOutlined />
         <span>Meta Network</span>
       </a>,
