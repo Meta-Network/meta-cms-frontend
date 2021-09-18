@@ -5,11 +5,16 @@ import { useState } from 'react';
 
 export default () => {
   const [isPlatformEditable, setIsPlatformEditable] = useState<boolean>(false);
+
   return (
     <PageContainer
       breadcrumb={{}}
       title="域名配置"
-      content={<p>可以在此配置你的域名，即别人访问到你的站点的地址</p>}
+      content={
+        <div className="text-info">
+          <p>可以在此配置你的域名，即别人访问到你的 Meta Space 的地址。</p>
+        </div>
+      }
     >
       <Card>
         <ProForm

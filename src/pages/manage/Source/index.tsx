@@ -122,7 +122,11 @@ export default () => {
   return (
     <PageContainer
       title="内容源绑定"
-      content={<p>你可以在此将其他平台的文章同步至你的个人站点。</p>}
+      content={
+        <div className="text-info">
+          <p>你可以在此将其他平台的文章同步至你的个人站点。</p>
+        </div>
+      }
       breadcrumb={{}}
     >
       <GridContent>

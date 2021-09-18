@@ -14,7 +14,7 @@ export default () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.info}>
+      <div className="text-info">
         <p>在此管理站点的发布配置。</p>
         <p>即您的站点会以何种形式，发布到何处。</p>
       </div>

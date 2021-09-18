@@ -3,7 +3,7 @@ import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { queryCurrentUser, refreshTokens } from './services/api/meta-ucenter';
 import { PageLoading } from '@ant-design/pro-layout';
-import { BookOutlined, ExportOutlined, LinkOutlined } from '@ant-design/icons';
+import { BookOutlined, ExportOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from 'umi';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 
@@ -53,7 +53,11 @@ export async function getInitialState(): Promise<{
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
     disableContentMargin: false,
-    rightContentRender: () => <RightContent />,
+    siderWidth: 300,
+    layout: 'side',
+    // rightContentRender: () => <RightContent />,
+    headerRender: () => false,
+    headerContentRender: () => false,
     footerRender: () => <Footer />,
     menuItemRender: (menuItemProps, defaultDom) => {
       return (
@@ -78,17 +82,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       }
     },
     links: [
-      // TODO: change these links
-      <a href="https://metaspace.federarks.xyz/" target="_blank">
-        <LinkOutlined />
-        <span>个人站点</span>
-      </a>,
       <a href="https://meta-network.mttk.net/">
         <BookOutlined />
         <span>Meta Network</span>
       </a>,
     ],
-    menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,

@@ -140,7 +140,11 @@ const columns: ProColumns<HexoPostsInfo>[] = [
 export default () => {
   const actionRef = useRef<ActionType>();
   return (
-    <PageContainer breadcrumb={{}} title="已发布内容" content="已发布的文章列表可以在这里查看">
+    <PageContainer
+      breadcrumb={{}}
+      title="已发布内容"
+      content={<p>已发布的文章列表可以在这里查看</p>}
+    >
       {/* <Skeleton loading active> */}
       <ProTable<HexoPostsInfo>
         columns={columns}

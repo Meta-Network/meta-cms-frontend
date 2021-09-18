@@ -6,6 +6,15 @@ body,
   height: 100%;
 }
 
+.text-info {
+  p:not(:last-child) {
+    margin-bottom: 6px;
+  }
+  p:only-child {
+    margin-bottom: 10px;
+  }
+}
+
 .my-site-link-icon {
   float: right;
   padding-top: 13px;
@@ -25,8 +34,59 @@ body,
 .ant-layout {
   min-height: 100vh;
 }
+
 .ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
   left: unset;
+  padding: 20px;
+}
+
+.ant-pro-sider-logo h1,
+.ant-menu-item a:hover,
+.ant-menu-item-selected a,
+.ant-menu-submenu-selected {
+  color: #542EE0 !important;
+}
+
+.ant-pro-sider-logo {
+  padding: 25px 0 25px 10px;
+}
+
+.ant-page-header-heading-title {
+  padding: 24px 0;
+}
+
+.ant-layout-header {
+  display: none;
+}
+
+.ant-pro-card {
+  min-width: 800px;
+  max-width: 800px;
+}
+
+.ant-layout-sider {
+  border: 1px solid #f0f0f0;
+  box-shadow: none !important;
+}
+
+.ant-pro-page-container,
+.ant-pro-card-body,
+.ant-layout {
+  background-color: white;
+}
+
+a:hover {
+  color: #40a9ff;
+}
+
+.ant-page-header {
+  padding-bottom: 6px;
+}
+
+.ant-pro-card-title {
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 32px;
 }
 
 canvas {

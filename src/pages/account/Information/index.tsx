@@ -1,3 +1,4 @@
+import { PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
 import ImgCrop from 'antd-img-crop';
 import React, { useEffect, useState } from 'react';
@@ -68,54 +69,64 @@ const BaseView: React.FC = () => {
   );
 
   return (
-    <Card>
-      <div className={styles.information}>
-        <div className={styles.left}>
-          <ProForm
-            layout="vertical"
-            onFinish={handleFinish}
-            submitter={{
-              resetButtonProps: {
-                style: {
-                  display: 'none',
-                },
-              },
-              submitButtonProps: {
-                children: '更新基本信息',
-              },
-            }}
-            initialValues={{ ...initialState?.currentUser }}
-            hideRequiredMark
-          >
-            <ProFormText
-              width="md"
-              name="nickname"
-              label="昵称"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入您的昵称!',
-                },
-              ]}
-            />
-            <ProFormTextArea
-              name="bio"
-              label="个人简介"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入个人简介!',
-                },
-              ]}
-              placeholder="个人简介"
-            />
-          </ProForm>
+    <PageContainer
+      breadcrumb={{}}
+      title="个人信息"
+      content={
+        <div className="text-info">
+          <p>您可以在这里编辑您的个人信息。</p>
         </div>
-        <div className={styles.right}>
-          <AvatarView currentAvatar={userAvatar || ''} />
+      }
+    >
+      <Card>
+        <div className={styles.information}>
+          <div className={styles.left}>
+            <ProForm
+              layout="vertical"
+              onFinish={handleFinish}
+              submitter={{
+                resetButtonProps: {
+                  style: {
+                    display: 'none',
+                  },
+                },
+                submitButtonProps: {
+                  children: '更新基本信息',
+                },
+              }}
+              initialValues={{ ...initialState?.currentUser }}
+              hideRequiredMark
+            >
+              <ProFormText
+                width="md"
+                name="nickname"
+                label="昵称"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入您的昵称!',
+                  },
+                ]}
+              />
+              <ProFormTextArea
+                name="bio"
+                label="个人简介"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入个人简介!',
+                  },
+                ]}
+                placeholder="个人简介"
+              />
+            </ProForm>
+          </div>
+          <div className={styles.right}>
+            <AvatarView currentAvatar={userAvatar || ''} />
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </PageContainer>
   );
 };
 

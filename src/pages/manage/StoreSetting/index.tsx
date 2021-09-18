@@ -1,7 +1,7 @@
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { Button, List, Tag } from 'antd';
 import { Fragment } from 'react';
-import styles from './StoreSetting.less';
+import styles from './index.less';
 
 export default () => {
   const getData = () => [

@@ -162,7 +162,6 @@ export default () => {
           }}
           loading={loadings[index] === LoadingStates.Publishing}
           disabled={loadings[index] === LoadingStates.Discarding}
-          type="primary"
         >
           发布
         </Button>,
@@ -175,7 +174,6 @@ export default () => {
           }}
           loading={loadings[index] === LoadingStates.Discarding}
           disabled={loadings[index] === LoadingStates.Publishing}
-          type="primary"
           danger
         >
           取消发布
@@ -186,10 +184,11 @@ export default () => {
 
   return (
     <PageContainer
-      className={styles.container}
       breadcrumb={{}}
       content={[
-        <p>在这里来控制发布从其他源获取到的文章列表</p>,
+        <div style={{ paddingTop: '11px', marginBottom: '4px' }}>
+          <p>在这里来控制发布从其他源获取到的文章列表</p>
+        </div>,
         <div className={styles.syncButtons}>
           <Button key="sync-button" style={{ marginRight: 10 }} type="primary">
             立即同步

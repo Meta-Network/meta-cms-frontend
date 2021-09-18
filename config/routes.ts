@@ -6,9 +6,10 @@
     icon: 'dashboard',
   },
   {
+    path: '/my-meta-space',
+    component: './MyMetaSpace',
     name: '我的 Meta Space',
     icon: 'link',
-    path: 'https://metaspace.federarks.xyz/',
   },
   {
     path: '/user',
@@ -47,30 +48,30 @@
     ],
   },
   {
-    path: '/publish',
+    path: '/manage',
     name: '管理',
     icon: 'branches',
     routes: [
       {
-        path: '/publish/source',
+        path: '/manage/source',
         name: '内容源',
-        component: './account/Source',
+        component: './manage/Source',
       },
       {
-        path: '/publish/site-setting',
+        path: '/manage/site-setting',
         name: '信息',
-        component: './Site',
+        component: './manage/Site',
         icon: 'setting',
       },
       {
-        path: '/publish/store-setting',
+        path: '/manage/store-setting',
         name: '存储',
-        component: './publish/StoreSetting',
+        component: './manage/StoreSetting',
       },
       {
-        path: '/publish/domain-setting',
+        path: '/manage/domain-setting',
         name: '域名',
-        component: './publish/DomainSetting',
+        component: './manage/DomainSetting',
       },
     ],
   },

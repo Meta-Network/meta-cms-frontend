@@ -6,20 +6,20 @@ import { useRequest } from '@@/plugin-request/request';
 import { queryInvitations, updateInvitation } from '@/services/api/meta-ucenter';
 
 export default () => {
-  const { data, loading } = useRequest(() => {
-    return queryInvitations({
-      count: 8,
-    });
-  });
+  const { data, loading } = useRequest(() => queryInvitations());
   const list = data || [];
-  const content = (
-    <div>
-      <p>在这里管理你拥有的邀请码。</p>
-      <p>你可以在下方编辑邀请信息，定制发送后对方会接受的信息。</p>
-    </div>
-  );
+
   return (
-    <PageContainer breadcrumb={{}} title="邀请码管理" content={content}>
+    <PageContainer
+      breadcrumb={{}}
+      title="邀请码管理"
+      content={
+        <div className="text-info">
+          <p>在这里管理你拥有的邀请码。</p>
+          <p>你可以在下方编辑邀请信息，定制发送后对方会接受的信息。</p>
+        </div>
+      }
+    >
       <List
         rowKey="id"
         loading={loading}

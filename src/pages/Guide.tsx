@@ -78,12 +78,12 @@ export default () => {
   return (
     <PageContainer
       title="创建 Meta Space"
-      content={[
-        <span>Meta Space 是专属于您个人的数字空间，您有全部的控制权力。</span>,
-        <br />,
-        <span>立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅。</span>,
-        <p />,
-      ]}
+      content={
+        <div className="text-info">
+          <p>Meta Space 是专属于您个人的数字空间，您有全部的控制权力。</p>
+          <p>立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅。</p>
+        </div>
+      }
       breadcrumb={{}}
     >
       <div className={styles.main}>
