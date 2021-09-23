@@ -75,11 +75,6 @@ export default () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.info}>
-        <p>完成设置后，请点击下方的按钮开始部署您的 Meta Space 。</p>
-        <p>你可以在下方看到部署的的进度。</p>
-      </div>
-
       <Card bordered className={styles.processing}>
         {processing.map(generateTaggedInfo)}
       </Card>

@@ -6,6 +6,8 @@ const mockRequest = extendWithErrorHandler({
 
 const request = extendWithErrorHandler({
   prefix: META_CMS_API || 'https://meta-cms-api-dev.mttk.net',
+  // prefix: META_CMS_API || 'http://127.0.0.1:3002',
+
   credentials: 'include', // 默认请求是否带上cookie
 });
 

@@ -5,6 +5,7 @@ import StoragePicker from '@/components/StorePicker';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
 import styles from './styles.less';
+import FormattedInfo from '../FormattedInfo';
 
 export default () => {
   const [userRepos, setUserRepos] = useState<string[]>([]);
@@ -31,15 +32,11 @@ export default () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.info}>
-        <p>在这里可以配置一个存储位置以保存您的站点。</p>
-        <p>您的站点代码会全部托管到该平台，我们只会帮您创建和修改。</p>
-      </div>
       <StoragePicker />
 
       <Divider />
 
-      <p>之后，请在下方输入一个仓库名称。将会以此名称为您创建一个仓库保存源码。</p>
+      <FormattedInfo id="guide.repo.info" />
       <ProForm
         style={{ width: 500 }}
         name="site-info"

@@ -14,8 +14,8 @@ const Settings: LayoutSettings & {
   fixSiderbar: true,
   colorWeak: false,
   pwa: false,
-  title: 'Meta CMS',
-  logo: '/logo.png',
+  title: 'Meta Space Console',
+  logo: '/logo.svg',
   iconfontUrl: '',
 };
 

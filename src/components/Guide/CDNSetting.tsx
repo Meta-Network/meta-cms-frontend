@@ -1,23 +1,28 @@
 import { Alert } from 'antd';
+import { FormattedMessage } from 'umi';
 import styles from './styles.less';
 
 export default () => (
   <div className={styles.container}>
-    <div className={styles.info}>
-      <p>在此配置您的 Meta Space CDN。</p>
-    </div>
-
     <div>
       <Alert
-        message="此功能为预留的高级功能"
+        message={<FormattedMessage id="guide.cdn.message" />}
         description={
-          <span>
-            为了建站流程简单直接，我们暂时对此配置项应用默认配置。
-            <br />
-            后期我们会加入高级设置，以供修改此配置。
-          </span>
+          <FormattedMessage id="guide.cdn.info">
+            {(msg: string) =>
+              msg
+                ?.trim()
+                .split('\n')
+                .map((e, index) => (
+                  <div key={`cdninfo${index + 1}`}>
+                    {e}
+                    <br />
+                  </div>
+                ))
+            }
+          </FormattedMessage>
         }
-        type="info"
+        type="success"
         showIcon
       />
     </div>

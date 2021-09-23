@@ -6,25 +6,26 @@ body,
   height: 100%;
 }
 
-.text-info {
-  p:not(:last-child) {
-    margin-bottom: 6px;
-  }
-  p:only-child {
-    margin-bottom: 10px;
-  }
-}
-
 .my-site-link-icon {
   float: right;
   padding-top: 13px;
   opacity: 0;
-  transition: opacity 0.8s !important;
+  //transition: opacity 0.8s !important;
 }
 
 .my-site-link:hover + .my-site-link-icon,
 .my-site-link-icon:hover {
   opacity: 1;
+}
+
+.header-text-info {
+  p:not(:last-child) {
+    margin-bottom: 6px;
+  }
+}
+
+.ant-pro-card-header-border {
+  padding-bottom: 10px !important;
 }
 
 .colorWeak {
@@ -40,8 +41,49 @@ body,
   padding: 20px;
 }
 
+.ant-menu-submenu-title {
+  margin: 0 !important;
+}
+
+.ant-menu-root .ant-menu-submenu {
+  margin-top: 12px;
+}
+
+.ant-menu-root > .ant-menu-submenu ~ .ant-menu-submenu {
+  margin-top: 0;
+}
+
+.ant-menu-vertical > .ant-menu-item,
+.ant-menu-vertical-left > .ant-menu-item,
+.ant-menu-vertical-right > .ant-menu-item,
+.ant-menu-inline > .ant-menu-item,
+.ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title,
+.ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title,
+.ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title,
+.ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
+  height: 35px !important;
+  margin: 0;
+  line-height: 35px !important;
+}
+
+.ant-menu-vertical .ant-menu-item:not(:last-child),
+.ant-menu-vertical-left .ant-menu-item:not(:last-child),
+.ant-menu-vertical-right .ant-menu-item:not(:last-child),
+.ant-menu-inline .ant-menu-item:not(:last-child) {
+  margin-bottom: 0;
+}
+
+.ant-menu-submenu-open {
+  margin-bottom: 12px;
+}
+
+.ant-menu-submenu-inline .ant-menu-item-only-child {
+  padding-left: 40px !important;
+}
+
 .ant-pro-sider-logo h1,
 .ant-menu-item a:hover,
+.ant-menu-submenu-title:hover,
 .ant-menu-item-selected a,
 .ant-menu-submenu-selected {
   color: #542ee0 !important;
@@ -51,6 +93,18 @@ body,
   padding: 25px 0 25px 10px;
 }
 
+@keyframes rotating {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+.rotating {
+  -webkit-animation: rotating 2s linear infinite;
+}
 .ant-page-header-heading-title {
   padding: 24px 0;
 }
@@ -85,7 +139,7 @@ a:hover {
 
 .ant-pro-card-title {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 20px !important;
   line-height: 32px;
 }
 

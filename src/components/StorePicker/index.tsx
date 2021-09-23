@@ -1,4 +1,5 @@
 import { getGithubUsername } from '@/services/api/global';
+import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { useModel } from '@@/plugin-model/useModel';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
@@ -95,7 +96,8 @@ export default () => {
         )}
       />
       <p>
-        当前仓储： <strong>{storeConfirmed || '未选择'}</strong>
+        <FormattedMessage id="guide.storage.currentStorage" />
+        <strong>{storeConfirmed || '未选择'}</strong>
       </p>
 
       <PlatformModal

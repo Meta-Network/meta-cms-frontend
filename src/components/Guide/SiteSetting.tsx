@@ -62,20 +62,8 @@ export default () => {
     message.success('成功保存站点信息设置。');
   };
 
-  const uploadButton = (
-    <div>
-      {uploading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
-
   return (
     <div className={styles.container}>
-      <div className={styles.info}>
-        <p>为了定制个人站点，您需要为您的 Meta Space 填写下面的信息。</p>
-        <p>数据会同步至 Meta Space，并在您的个人站点展示给访客。</p>
-      </div>
-
       <ProForm
         style={{ width: 500 }}
         name="site-info"
@@ -160,7 +148,10 @@ export default () => {
             {imageUrl ? (
               <img src={imageUrl} alt="favicon preview" style={{ width: '80%', height: '80%' }} />
             ) : (
-              uploadButton
+              <div>
+                {uploading ? <LoadingOutlined /> : <PlusOutlined />}
+                <div style={{ marginTop: 8 }}>Upload</div>
+              </div>
             )}
           </Upload>
         </ProForm.Item>

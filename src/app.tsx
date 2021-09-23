@@ -1,9 +1,8 @@
 import { history, Link } from 'umi';
 import Footer from '@/components/Footer';
-import RightContent from '@/components/RightContent';
 import { queryCurrentUser, refreshTokens } from './services/api/meta-ucenter';
 import { PageLoading } from '@ant-design/pro-layout';
-import { BookOutlined, ExportOutlined } from '@ant-design/icons';
+import { ExportOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from 'umi';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 
@@ -81,12 +80,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push(loginPath);
       }
     },
-    links: [
-      <a href="https://meta-network.mttk.net/">
-        <BookOutlined />
-        <span>Meta Network</span>
-      </a>,
-    ],
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,

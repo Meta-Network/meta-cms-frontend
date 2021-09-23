@@ -1,11 +1,12 @@
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { useModel } from 'umi';
 import ProCard from '@ant-design/pro-card';
-import { PageContainer } from '@ant-design/pro-layout';
 import { Affix, Steps, Card } from 'antd';
+import { FormattedMessage, useModel } from 'umi';
+import { PageContainer } from '@ant-design/pro-layout';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
 import Deploy from '@/components/Guide/Deploy';
 import CDNSetting from '@/components/Guide/CDNSetting';
+import FormattedInfo from '@/components/FormattedInfo';
 import AnchoredTitle from '@/components/AnchoredTitle';
 import SiteSetting from '@/components/Guide/SiteSetting';
 import ThemeSetting from '@/components/Guide/ThemeSetting';
@@ -17,34 +18,41 @@ import styles from './Guide.less';
 const { Step } = Steps;
 
 export default () => {
-  const steps = useMemo<{ name: string; component: JSX.Element }[]>(
+  const steps = useMemo<{ name: string; component: JSX.Element; description?: JSX.Element }[]>(
     () => [
       {
         name: '域名',
+        description: <FormattedInfo id="guide.domain.info" />,
         component: <DomainSetting />,
       },
       {
         name: '主题',
+        description: <FormattedInfo id="guide.theme.info" />,
         component: <ThemeSetting />,
       },
       {
         name: '信息',
+        description: <FormattedInfo id="guide.config.info" />,
         component: <SiteSetting />,
       },
       {
         name: '存储',
+        description: <FormattedInfo id="guide.storage.info" />,
         component: <StoreSetting />,
       },
       {
         name: '发布',
+        description: <FormattedInfo id="guide.publish.info" />,
         component: <PublisherSetting />,
       },
       {
         name: 'CDN',
+        description: <FormattedInfo id="guide.cdn.info" />,
         component: <CDNSetting />,
       },
       {
         name: '部署',
+        description: <FormattedInfo id="guide.deploy.info" />,
         component: <Deploy />,
       },
     ],
@@ -77,13 +85,8 @@ export default () => {
 
   return (
     <PageContainer
-      title="创建 Meta Space"
-      content={
-        <div className="text-info">
-          <p>Meta Space 是专属于您个人的数字空间，您有全部的控制权力。</p>
-          <p>立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅。</p>
-        </div>
-      }
+      title={<FormattedMessage id="guide.intro.title" />}
+      content={<FormattedInfo id="guide.intro.info" customClass="header-text-info" />}
       breadcrumb={{}}
     >
       <div className={styles.main}>
@@ -104,15 +107,20 @@ export default () => {
         <ProCard.Group direction="column" className={styles.container}>
           {steps.map((step) => (
             <ProCard
+              headerBordered
               className={styles.contentCard}
               key={step.name}
-              title={<AnchoredTitle name={step.name} />}
-              headerBordered
+              title={
+                <div>
+                  <AnchoredTitle name={step.name} />
+                  <div className={styles.cardDescription}>{step.description}</div>
+                </div>
+              }
             >
               {step.component}
             </ProCard>
           ))}
-          {/* place isn't fulfilled, so I'm using a placeholder here */}
+          {/* place isn't fulfilled, using a placeholder here */}
           <ProCard
             style={{ opacity: 0, height: '360px' }}
             className={styles.contentCard}

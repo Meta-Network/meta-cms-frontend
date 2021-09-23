@@ -76,21 +76,10 @@
     ],
   },
   {
-    path: '/account',
-    name: '账号',
-    icon: 'user',
-    routes: [
-      {
-        path: '/account/information',
-        name: '设置',
-        component: './account/Information',
-      },
-      {
-        path: '/account/invitation',
-        name: '邀请码',
-        component: './account/Invitation',
-      },
-    ],
+    path: '/invitation',
+    name: '邀请码',
+    icon: 'apartment',
+    component: './Invitation',
   },
   {
     path: '/result/store-setting-success',
