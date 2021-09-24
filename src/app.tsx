@@ -1,10 +1,11 @@
+import { Badge } from 'antd';
 import { history, Link } from 'umi';
 import Footer from '@/components/Footer';
-import { queryCurrentUser, refreshTokens } from './services/api/meta-ucenter';
+import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import { PageLoading } from '@ant-design/pro-layout';
 import { ExportOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from 'umi';
-import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
+import MenuMoreInfo from './components/MenuMoreInfo';
 
 const loginPath = '/user/login';
 
@@ -17,8 +18,8 @@ export const initialStateConfig = {
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<{
-  settings?: Partial<LayoutSettings>;
   currentUser?: GLOBAL.CurrentUser;
+  invitationsCount: number;
   fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
@@ -32,19 +33,23 @@ export async function getInitialState(): Promise<{
     return undefined;
   };
 
-  // 如果是登录页面，不执行
+  const invitationsCountRequest = await queryInvitations();
+  const invitationsCount = invitationsCountRequest?.data?.filter(
+    (e) => e.invitee_user_id === 0,
+  )?.length;
+
   if (history.location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
+
     return {
       fetchUserInfo,
       currentUser,
-      // hasSite,
-      settings: {},
+      invitationsCount,
     };
   }
   return {
     fetchUserInfo,
-    settings: {},
+    invitationsCount,
   };
 }
 
@@ -59,19 +64,33 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     headerContentRender: () => false,
     footerRender: () => <Footer />,
     menuItemRender: (menuItemProps, defaultDom) => {
-      return (
-        <>
-          <Link
-            className={(menuItemProps.name === '我的 Meta Space' && 'my-site-link') || ''}
-            to={menuItemProps.path as string}
-          >
-            {defaultDom}
-          </Link>
-          {menuItemProps.name === '我的 Meta Space' && (
-            <ExportOutlined className="my-site-link-icon" />
-          )}
-        </>
-      );
+      switch (menuItemProps.name) {
+        case '我的 Meta Space': {
+          return (
+            <>
+              <Link className="my-site-link" to={menuItemProps.path as string}>
+                {defaultDom}
+              </Link>
+              <ExportOutlined className="my-site-link-icon" />
+            </>
+          );
+        }
+        case '邀请码': {
+          return (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Link to={menuItemProps.path as string}>{defaultDom}</Link>
+              <Badge
+                showZero
+                style={{ backgroundColor: '#1890ff', marginTop: '7px' }}
+                count={initialState?.invitationsCount || 0}
+              />
+            </div>
+          );
+        }
+        default: {
+          return <Link to={menuItemProps.path as string}>{defaultDom}</Link>;
+        }
+      }
     },
     onPageChange: () => {
       const { location } = history;
@@ -80,8 +99,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push(loginPath);
       }
     },
+    links: [MenuMoreInfo],
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
-    ...initialState?.settings,
   };
 };
