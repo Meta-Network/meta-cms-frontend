@@ -79,7 +79,7 @@ export default () => {
         {processing.map(generateTaggedInfo)}
       </Card>
 
-      {onError && <p>看起来你好像遇到了一个错误。别担心。按照提示来修改配置并重试就好。</p>}
+      {onError && <p>看起来遇到了错误，请按照提示来修改设置并重新提交</p>}
 
       {currentStage === DeployStages.pending && (
         <>

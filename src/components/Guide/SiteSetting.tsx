@@ -106,8 +106,8 @@ export default () => {
           fieldProps={{
             open: false,
           }}
-          label="关键字"
-          extra="其他人在搜索这些关键字时会更容易找到你的站点"
+          label="关键词"
+          extra="其他人在搜索引擎中输入这些关键词会更容易找到你的站点"
           rules={[{ required: true }]}
         />
         <ProFormSelect
@@ -134,7 +134,7 @@ export default () => {
           getValueProps={(value) => [value]}
           valuePropName={'fileList'}
           label="网站图标"
-          extra=".ico格式，展示在标签页上，可用工具从图片生成"
+          extra="可上传.ico .jpg .png 格式图片，展示在页面标签上"
           rules={[{ required: true, message: '请上传一个站点图标' }]}
         >
           <Upload

@@ -26,7 +26,7 @@ const BaseView: React.FC = () => {
       if (tokenRequest.statusCode === 401) {
         message.error('图像上传失败，请重新登录。');
       }
-      message.error('图像上传失败。内部错误或无网络。');
+      message.error('图像上传失败，内部错误或无网络。');
     }
 
     const form = new FormData();
@@ -36,16 +36,16 @@ const BaseView: React.FC = () => {
     done();
 
     if (result.statusCode === 201) {
-      message.success('更新头像成功');
+      message.success('更新头像成功。');
       setUserAvatar(result.data.publicUrl);
     } else {
-      message.error('图像上传失败');
+      message.error('图像上传失败。');
     }
   };
 
   const handleFinish = async (values: GLOBAL.UserInfo) => {
     await updateUserInfo(values);
-    message.success('更新基本信息成功');
+    message.success('更新成功。');
   };
 
   const AvatarView = ({ currentAvatar }: { currentAvatar: string }) => (
