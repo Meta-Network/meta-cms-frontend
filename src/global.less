@@ -1,19 +1,11 @@
 @import '~antd/es/style/themes/default.less';
 
-html,
-body,
-#root {
-  height: 100%;
-}
-
 .my-site-link-icon {
-  float: right;
-  padding-top: 13px;
   opacity: 0;
-  //transition: opacity 0.8s !important;
+  transition: opacity 0.3s;
 }
 
-.my-site-link:hover + .my-site-link-icon,
+.menu-site-card-meta:hover + .my-site-link-icon,
 .my-site-link-icon:hover {
   opacity: 1;
 }
@@ -24,8 +16,153 @@ body,
   }
 }
 
-.ant-pro-card-header-border {
-  padding-bottom: 10px !important;
+.ant-component-modifier() {
+  .menu-extra-cards {
+    .ant-card-body {
+      display: flex;
+      margin: 30px 16px;
+      padding: 0;
+    }
+
+    .menu-extra-icons {
+      margin-left: 10px;
+      line-height: 2;
+    }
+
+    .menu-user-card {
+      width: 260px;
+      border: none;
+    }
+
+    .menu-site-card {
+      width: 260px;
+      border: none;
+    }
+
+    .menu-user-card-meta {
+      line-height: 2;
+    }
+
+    .menu-site-card-meta {
+      line-height: 1;
+    }
+  }
+
+  .ant-pro-card-header-border {
+    padding-bottom: 10px;
+  }
+
+  .ant-pro-sider:not(.ant-layout-sider-collapsed) {
+    left: unset;
+    padding: 20px;
+  }
+
+  .ant-menu-submenu-title {
+    margin: 0;
+  }
+
+  .ant-menu-root .ant-menu-submenu {
+    margin-top: 12px;
+  }
+
+  .ant-menu-root > .ant-menu-submenu ~ .ant-menu-submenu {
+    margin-top: 0;
+  }
+
+  .ant-menu-vertical > .ant-menu-item,
+  .ant-menu-vertical-left > .ant-menu-item,
+  .ant-menu-vertical-right > .ant-menu-item,
+  .ant-menu-inline > .ant-menu-item,
+  .ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title,
+  .ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title,
+  .ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title,
+  .ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
+    height: 35px;
+    margin: 0;
+    line-height: 35px;
+  }
+
+  .ant-menu-vertical .ant-menu-item:not(:last-child),
+  .ant-menu-vertical-left .ant-menu-item:not(:last-child),
+  .ant-menu-vertical-right .ant-menu-item:not(:last-child),
+  .ant-menu-inline .ant-menu-item:not(:last-child) {
+    margin-bottom: 0;
+  }
+
+  .ant-menu-submenu-open {
+    margin-bottom: 12px;
+  }
+
+  .ant-menu-submenu-inline .ant-menu-item-only-child {
+    padding-left: 40px;
+  }
+
+  .ant-pro-sider-logo h1,
+  .ant-menu-item a:hover,
+  .ant-menu-submenu-title:hover,
+  .ant-menu-item-selected a,
+  .ant-menu-submenu-selected {
+    color: #542ee0;
+  }
+
+  // style only for 邀请码管理
+  .ant-menu .ant-menu-item-only-child:last-child {
+    padding-right: 12.4px;
+  }
+
+  .ant-pro-sider-extra {
+    margin: 0;
+    padding: 0;
+  }
+
+  .ant-pro-sider-logo {
+    padding: 25px 0 25px 10px;
+  }
+
+  .ant-page-header-heading-title {
+    padding: 24px 0;
+  }
+
+  .ant-layout-header {
+    display: none;
+  }
+
+  .ant-pro-card {
+    min-width: 800px;
+    max-width: 800px;
+  }
+
+  .ant-layout-sider {
+    border: 1px solid #f0f0f0;
+    box-shadow: none;
+  }
+
+  .ant-pro-page-container,
+  .ant-pro-card-body,
+  .ant-layout {
+    background-color: white;
+  }
+
+  a:hover {
+    color: #40a9ff;
+  }
+
+  .ant-page-header {
+    padding-bottom: 6px;
+  }
+
+  .ant-pro-card-title {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 32px;
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  .ant-component-modifier() !important;
 }
 
 .colorWeak {
@@ -34,68 +171,6 @@ body,
 
 .ant-layout {
   min-height: 100vh;
-}
-
-.ant-pro-sider:not(.ant-layout-sider-collapsed) {
-  left: unset;
-  padding: 20px;
-}
-
-.ant-menu-submenu-title {
-  margin: 0 !important;
-}
-
-.ant-menu-root .ant-menu-submenu {
-  margin-top: 12px;
-}
-
-.ant-menu-root > .ant-menu-submenu ~ .ant-menu-submenu {
-  margin-top: 0;
-}
-
-.ant-menu-vertical > .ant-menu-item,
-.ant-menu-vertical-left > .ant-menu-item,
-.ant-menu-vertical-right > .ant-menu-item,
-.ant-menu-inline > .ant-menu-item,
-.ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title,
-.ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title,
-.ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title,
-.ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
-  height: 35px !important;
-  margin: 0;
-  line-height: 35px !important;
-}
-
-.ant-menu-vertical .ant-menu-item:not(:last-child),
-.ant-menu-vertical-left .ant-menu-item:not(:last-child),
-.ant-menu-vertical-right .ant-menu-item:not(:last-child),
-.ant-menu-inline .ant-menu-item:not(:last-child) {
-  margin-bottom: 0;
-}
-
-.ant-menu-submenu-open {
-  margin-bottom: 12px;
-}
-
-.ant-menu-submenu-inline .ant-menu-item-only-child {
-  padding-left: 40px !important;
-}
-
-.ant-pro-sider-logo h1,
-.ant-menu-item a:hover,
-.ant-menu-submenu-title:hover,
-.ant-menu-item-selected a,
-.ant-menu-submenu-selected {
-  color: #542ee0 !important;
-}
-
-// style only for 邀请码管理
-.ant-menu .ant-menu-item-only-child:last-child {
-  padding-right: 12.4px !important;
-}
-
-.ant-pro-sider-logo {
-  padding: 25px 0 25px 10px !important;
 }
 
 @keyframes rotating {
@@ -109,43 +184,6 @@ body,
 
 .rotating {
   -webkit-animation: rotating 2s linear infinite;
-}
-.ant-page-header-heading-title {
-  padding: 24px 0;
-}
-
-.ant-layout-header {
-  display: none;
-}
-
-.ant-pro-card {
-  min-width: 800px;
-  max-width: 800px;
-}
-
-.ant-layout-sider {
-  border: 1px solid #f0f0f0 !important;
-  box-shadow: none !important;
-}
-
-.ant-pro-page-container,
-.ant-pro-card-body,
-.ant-layout {
-  background-color: white;
-}
-
-a:hover {
-  color: #40a9ff;
-}
-
-.ant-page-header {
-  padding-bottom: 6px;
-}
-
-.ant-pro-card-title {
-  font-weight: 600;
-  font-size: 20px !important;
-  line-height: 32px;
 }
 
 canvas {

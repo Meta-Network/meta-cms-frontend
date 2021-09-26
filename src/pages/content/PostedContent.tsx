@@ -1,30 +1,23 @@
+import { fetchPublishedPosts } from '@/services/api/meta-cms';
 import { useRef } from 'react';
 import { Image, Tag, Space } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
-import request from 'umi-request';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 
 type HexoPostsInfo = {
+  id: number;
   cover: string | null;
   title: string;
-  content: string;
-  keywords: string;
-  tags: { name: string; path: string }[];
-  categories: { name: string; path: string }[];
-  date: string;
-  updated: string;
-};
-
-type RequestResponse = {
-  total: number;
-  pageSize: number;
-  pageCount: number;
-  data: HexoPostsInfo[];
+  summary: string;
+  tags: string[];
+  category: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 const baseUrl = 'https://metaspace.federarks.xyz';
-const response = await request<RequestResponse>(`${baseUrl}/api/posts.json`);
+const response = await fetchPublishedPosts();
 
 const columns: ProColumns<HexoPostsInfo>[] = [
   {
@@ -57,20 +50,16 @@ const columns: ProColumns<HexoPostsInfo>[] = [
   },
   {
     title: '分类',
-    dataIndex: 'categories',
+    dataIndex: 'category',
     filters: true,
     onFilter: true,
     renderFormItem: (_, { defaultRender }) => {
       return defaultRender(_);
     },
     render: (_, record) => (
-      <Space>
-        {record.categories.map(({ name, path }) => (
-          <Tag color="yellow" key={`${name}_cate`}>
-            <a href={path}>{name}</a>
-          </Tag>
-        ))}
-      </Space>
+      <Tag color="yellow" key={`${record.category}_cate`}>
+        {record.category}
+      </Tag>
     ),
   },
   {
@@ -81,15 +70,12 @@ const columns: ProColumns<HexoPostsInfo>[] = [
     renderFormItem: (_, { defaultRender }) => {
       return defaultRender(_);
     },
-    render: (_, record) => (
-      <Space>
-        {record.tags.map(({ name, path }) => (
-          <Tag color="blue" key={`${name}_tag`}>
-            <a href={path}>{name}</a>
-          </Tag>
-        ))}
-      </Space>
-    ),
+    render: (_, record) =>
+      record.tags.map((tag) => (
+        <Tag color="blue" key={`${tag}_tag`}>
+          {tag}
+        </Tag>
+      )),
   },
   {
     title: '创建时间',
@@ -145,11 +131,10 @@ export default () => {
       title="已发布内容"
       content={<p>已发布的文章列表可以在这里查看</p>}
     >
-      {/* <Skeleton loading active> */}
       <ProTable<HexoPostsInfo>
         columns={columns}
         actionRef={actionRef}
-        dataSource={response.data}
+        dataSource={response.data.items}
         rowKey={(record, index) => index!.toString()}
         search={{
           labelWidth: 'auto',
@@ -166,19 +151,18 @@ export default () => {
             return values;
           },
         }}
-        pagination={{
-          total: response.total,
-          pageSize: response.pageSize,
-        }}
+        // pagination={{
+        //   total: response.total,
+        //   pageSize: response.pageSize,
+        // }}
         expandable={{
           expandedRowRender: (record: HexoPostsInfo) => (
-            <p dangerouslySetInnerHTML={{ __html: record.content }} />
+            <p dangerouslySetInnerHTML={{ __html: record.summary }} />
           ),
         }}
         dateFormatter="string"
         options={false}
       />
-      {/* </Skeleton> */}
     </PageContainer>
   );
 };

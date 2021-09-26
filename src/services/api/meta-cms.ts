@@ -75,7 +75,7 @@ export async function isDomainForbidden(domain: string) {
     },
     data: { domain },
   });
-  return response.data.status !== 'AVAILABLE';
+  return response?.data?.status !== 'AVAILABLE';
 }
 
 /** 执行同步文章 GET /post */
@@ -93,6 +93,17 @@ export async function syncPostsByPlatform(platform: string) {
 /** 获取待同步的文章列表 GET /post */
 export async function fetchPostsPendingSync() {
   return mockRequest<GLOBAL.GeneralResponse<any>>('/post', {
+    credentials: 'include',
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
+/** 获取已经同步的文章列表 GET /post */
+export async function fetchPublishedPosts() {
+  return mockRequest<GLOBAL.GeneralResponse<{ items: any }>>('/published-posts', {
     credentials: 'include',
     method: 'GET',
     headers: {

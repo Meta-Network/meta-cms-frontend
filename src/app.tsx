@@ -1,11 +1,14 @@
-import { Badge } from 'antd';
+import { fetchPublishedPosts } from '@/services/api/meta-cms';
+import { Avatar, Card, Dropdown } from 'antd';
 import { history, Link } from 'umi';
 import Footer from '@/components/Footer';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import { PageLoading } from '@ant-design/pro-layout';
-import { ExportOutlined } from '@ant-design/icons';
+import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from 'umi';
 import MenuMoreInfo from './components/MenuMoreInfo';
+import MenuUserInfo from './components/MenuUserInfo';
+import MenuItemWithBadge from './components/MenuItemWithBadge';
 
 const loginPath = '/user/login';
 
@@ -19,8 +22,9 @@ export const initialStateConfig = {
  * */
 export async function getInitialState(): Promise<{
   currentUser?: GLOBAL.CurrentUser;
+  fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
   invitationsCount: number;
-  fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
+  publishedCount: number;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -34,23 +38,23 @@ export async function getInitialState(): Promise<{
   };
 
   const invitationsCountRequest = await queryInvitations();
-  const invitationsCount = invitationsCountRequest?.data?.filter(
-    (e) => e.invitee_user_id === 0,
-  )?.length;
+  const invitationsCount =
+    invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
+
+  const publishedCountRequest = await fetchPublishedPosts();
+  const publishedCount = publishedCountRequest?.data?.items?.length || 0;
+
+  const states: any = {
+    fetchUserInfo,
+    invitationsCount,
+    publishedCount,
+  };
 
   if (history.location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
-
-    return {
-      fetchUserInfo,
-      currentUser,
-      invitationsCount,
-    };
+    if (currentUser) states.currentUser = currentUser;
   }
-  return {
-    fetchUserInfo,
-    invitationsCount,
-  };
+  return states;
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
@@ -77,14 +81,20 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         }
         case '邀请码': {
           return (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Link to={menuItemProps.path as string}>{defaultDom}</Link>
-              <Badge
-                showZero
-                style={{ backgroundColor: '#1890ff', marginTop: '7px' }}
-                count={initialState?.invitationsCount || 0}
-              />
-            </div>
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.invitationsCount || 0}
+            />
+          );
+        }
+        case '已发布': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.publishedCount || 0}
+            />
           );
         }
         default: {
@@ -92,6 +102,35 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         }
       }
     },
+    menuExtraRender: (menuItemProps) => (
+      <div className="menu-extra-cards">
+        <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click', 'hover']}>
+          <Card className={menuItemProps.collapsed ? 'menu-user-card-collapsed' : 'menu-user-card'}>
+            <Card.Meta
+              className="menu-user-card-meta"
+              avatar={<Avatar src={initialState?.currentUser?.avatar} />}
+              title={initialState?.currentUser?.nickname}
+            />
+            <DownOutlined className="menu-extra-icons" />
+          </Card>
+        </Dropdown>
+        <a href="https://metaspace.federarks.xyz/" target="__blank">
+          <Card
+            className={
+              menuItemProps.collapsed ? 'menu-site-card-collapsed' : 'menu-site-card my-site-link'
+            }
+          >
+            <Card.Meta
+              className="menu-site-card-meta"
+              avatar={<Avatar src="/logo.svg" />}
+              title="My Site Title"
+              description="remi.metaspaces.me"
+            />
+            <ExportOutlined className="my-site-link-icon menu-extra-icons" />
+          </Card>
+        </a>
+      </div>
+    ),
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login

@@ -6,22 +6,21 @@
     icon: 'dashboard',
   },
   {
-    path: '/my-meta-space',
-    component: './MyMetaSpace',
-    name: '我的 Meta Space',
-    icon: 'link',
-  },
-  {
     path: '/user',
-    layout: false,
     routes: [
       {
         path: '/user',
         routes: [
           {
             name: 'login',
+            layout: false,
             path: '/user/login',
             component: './user/Login',
+          },
+          {
+            name: 'info',
+            path: '/user/info',
+            component: './user/Information',
           },
         ],
       },

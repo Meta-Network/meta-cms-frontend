@@ -186,10 +186,10 @@ export default () => {
     <PageContainer
       breadcrumb={{}}
       content={[
-        <div style={{ paddingTop: '11px', marginBottom: '4px' }}>
+        <div key="header-info" style={{ paddingTop: '11px', marginBottom: '4px' }}>
           <p>在这里来控制发布从其他源获取到的文章列表</p>
         </div>,
-        <div className={styles.syncButtons}>
+        <div key="header-actions" className={styles.syncButtons}>
           <Button key="sync-button" style={{ marginRight: 10 }} type="primary">
             立即同步
           </Button>

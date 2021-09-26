@@ -1,6 +1,5 @@
-import { useModel } from '@@/plugin-model/useModel';
 import { Alert } from 'antd';
-import { FormattedMessage } from 'umi';
+import { useModel, FormattedMessage } from 'umi';
 import styles from './styles.less';
 
 export default () => {

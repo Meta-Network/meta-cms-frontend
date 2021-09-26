@@ -157,31 +157,46 @@ const posts = [
   },
 ];
 
+const returnMockPosts = (req: Request, res: Response, items: Partial<typeof posts>) => {
+  return res.send({
+    statusCode: 200,
+    message: 'Ok',
+    data: {
+      meta: {
+        itemCount: 10,
+        totalItems: 20,
+        itemsPerPage: 10,
+        totalPages: 2,
+        currentPage: 1,
+      },
+      links: {
+        first: '/post?limit=10',
+        previous: '',
+        next: '/post?page=2&limit=10',
+        last: '/post?page=2&limit=10',
+      },
+      items,
+    },
+  });
+};
+
 export default {
   'GET /api/token': (req: Request, res: Response) => {
     res.send({ data: sourcePlatforms });
   },
   'GET /api/post': (req: Request, res: Response) => {
-    res.send({
-      statusCode: 200,
-      message: 'Ok',
-      data: {
-        meta: {
-          itemCount: 10,
-          totalItems: 20,
-          itemsPerPage: 10,
-          totalPages: 2,
-          currentPage: 1,
-        },
-        links: {
-          first: '/post?limit=10',
-          previous: '',
-          next: '/post?page=2&limit=10',
-          last: '/post?page=2&limit=10',
-        },
-        items: posts.filter((post) => !finishedPosts.includes(post.id)),
-      },
-    });
+    returnMockPosts(
+      req,
+      res,
+      posts.filter((post) => !finishedPosts.includes(post.id)),
+    );
+  },
+  'GET /api/published-posts': (req: Request, res: Response) => {
+    returnMockPosts(
+      req,
+      res,
+      posts.filter((post) => finishedPosts.includes(post.id)),
+    );
   },
   'POST /api/sync': (req: Request, res: Response) => {
     setTimeout(() => {

@@ -1,6 +1,5 @@
 import { getGithubUsername } from '@/services/api/global';
-import { FormattedMessage } from '@@/plugin-locale/localeExports';
-import { useModel } from '@@/plugin-model/useModel';
+import { useModel, FormattedMessage } from 'umi';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
 import PlatformModal from '@/components/StorePicker/PlatformModal';
