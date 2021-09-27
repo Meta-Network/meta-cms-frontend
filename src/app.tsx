@@ -21,10 +21,10 @@ export const initialStateConfig = {
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<{
-  currentUser?: GLOBAL.CurrentUser;
-  fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
-  invitationsCount: number;
-  publishedCount: number;
+  currentUser?: GLOBAL.CurrentUser | undefined;
+  fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
+  invitationsCount?: number;
+  publishedCount?: number;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -69,16 +69,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     footerRender: () => <Footer />,
     menuItemRender: (menuItemProps, defaultDom) => {
       switch (menuItemProps.name) {
-        case '我的 Meta Space': {
-          return (
-            <>
-              <Link className="my-site-link" to={menuItemProps.path as string}>
-                {defaultDom}
-              </Link>
-              <ExportOutlined className="my-site-link-icon" />
-            </>
-          );
-        }
         case '邀请码': {
           return (
             <MenuItemWithBadge
@@ -122,7 +112,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
           >
             <Card.Meta
               className="menu-site-card-meta"
-              avatar={<Avatar src="/logo.svg" />}
+              avatar={<Avatar src="/icons/custom/meta-space-icon.svg" />}
               title="My Site Title"
               description="remi.metaspaces.me"
             />

@@ -1,11 +1,23 @@
+import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Card, Result } from 'antd';
 
-export default () => (
-  <Card>
-    <Result
-      status="success"
-      title="已成功配置仓储"
-      subTitle="恭喜您完成了仓储的配置，现在可以关闭此页面，回到刚才的页面点击完成按钮即可。"
-    />
-  </Card>
-);
+export default () => {
+  const platforms = ['GitHub', 'Gitee'];
+  const param = new URLSearchParams(window.location.search).get('platform') || '';
+
+  const title = platforms.includes(param) ? (
+    <FormattedMessage id="guide.result.titleWithPlatform" values={{ platform: param }} />
+  ) : (
+    <FormattedMessage id="guide.result.titleNoPlatform" />
+  );
+
+  return (
+    <Card>
+      <Result
+        status="success"
+        title={title}
+        subTitle={<FormattedMessage id="guide.result.info" />}
+      />
+    </Card>
+  );
+};

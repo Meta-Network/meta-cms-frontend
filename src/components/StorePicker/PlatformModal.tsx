@@ -1,6 +1,9 @@
-import { LinkOutlined } from '@ant-design/icons';
 import { Button, Modal } from 'antd';
+import { FormattedMessage } from 'umi';
+import Icon, { GithubOutlined } from '@ant-design/icons';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
+import FormattedInfo from '../FormattedInfo';
+import { ReactComponent as GiteeIcon } from '../../../public/icons/custom/gitee-colored.svg';
 
 export default ({
   name,
@@ -17,9 +20,22 @@ export default ({
   const handleRequest = async () => {
     const request = await requestSocialAuth(
       name.toLowerCase(),
-      `${window.location.origin}/result/store-setting-success`,
+      `${window.location.origin}/result/store-setting-success?platform=${name}`,
     );
     window.open(request.data, '_blank');
+  };
+
+  const buttons = {
+    github: (
+      <Button key="submit" icon={<GithubOutlined />} onClick={handleRequest}>
+        GitHub
+      </Button>
+    ),
+    gitee: (
+      <Button key="submit" icon={<Icon component={GiteeIcon} />} onClick={handleRequest}>
+        Gitee
+      </Button>
+    ),
   };
 
   const operationCancel = () => {
@@ -34,28 +50,18 @@ export default ({
   return (
     <Modal
       visible={modalVisible}
-      title={`使用 ${name} 作为仓储`}
+      title={<FormattedMessage id="guide.authorize.title" values={{ platform: name }} />}
       onOk={operationDone}
       onCancel={operationCancel}
       footer={[
-        <Button key="back" onClick={operationCancel}>
-          返回
-        </Button>,
         <Button key="submit" type="primary" onClick={operationDone}>
           完成
         </Button>,
       ]}
     >
-      <h2>请注意！</h2>
-      <p>接下来您会将被引导到 {name} 的授权页面，为创建站点进行授权。</p>
-      <p>我们会为您创建并维护您的个人站点，除此之外，不会产生其他行为。</p>
-      <p>请确保您拥有 {name} 的账号，并在其授权页面进行授权。</p>
-      <p>
-        <Button key="submit" icon={<LinkOutlined />} onClick={handleRequest}>
-          跳转到 {name} 进行授权
-        </Button>
-      </p>
-      <p>完成授权后，请点击下方的完成按钮。</p>
+      <FormattedMessage id="guide.authorize.subtitle" tagName="h2" />
+      <FormattedInfo id="guide.authorize.info" values={{ platform: name }} customClass="" />
+      <p>{buttons[name.toLowerCase()]}</p>
     </Modal>
   );
 };

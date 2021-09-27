@@ -20,8 +20,14 @@
   .menu-extra-cards {
     .ant-card-body {
       display: flex;
-      margin: 30px 16px;
+      justify-content: space-between;
+      margin: 30px 20px 35px 10px;
       padding: 0;
+    }
+
+    .ant-card-body::after,
+    .ant-card-body::before {
+      display: none;
     }
 
     .menu-extra-icons {

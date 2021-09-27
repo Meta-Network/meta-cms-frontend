@@ -5,7 +5,7 @@ import { FormattedMessage } from 'umi';
 export default ({
   id,
   values = {},
-  customClass = false,
+  customClass = undefined,
 }: {
   id: string;
   values?: any;
@@ -13,7 +13,7 @@ export default ({
 }) => (
   <FormattedMessage id={id} values={values}>
     {(msg: string) => (
-      <div className={customClass || styles.textInfo}>
+      <div className={customClass ?? styles.textInfo}>
         {msg
           ?.trim()
           .split('\n')

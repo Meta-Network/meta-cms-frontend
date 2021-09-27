@@ -43,9 +43,10 @@ export default {
   'guide.authorize.title': '授权使用 {platform} 作为 Meta Space 存储仓库（免费）',
   'guide.authorize.subtitle': '授权流程：',
   'guide.authorize.info': `
-    点击下方按钮前往 {platform} 的授权页面（若无账号则可以注册）
-    点击授权页面中的绿色按钮（Authorize Meta Network）
+    1. 点击下方按钮前往 {platform} 的授权页面（若无账号则可以注册）
+    2. 点击授权页面中的绿色按钮（Authorize Meta Network）
   `,
-  'guide.result.title': '您已成功授权 Github 作为存储仓储',
+  'guide.result.titleWithPlatform': '您已成功授权 {platform} 作为存储仓库',
+  'guide.result.titleNoPlatform': '您已成功授权存储仓库',
   'guide.result.info': '现在您可以关闭此浏览器页面',
 };

@@ -55,7 +55,7 @@ export default () => {
               validator: (_, value) => {
                 if (!userRepos) {
                   setIsSuccess(false);
-                  return Promise.reject(new Error('未成功加载 token。请先选择一个仓储。'));
+                  return Promise.reject(new Error('未成功加载 token。请先选择一个仓库'));
                 }
                 if (!value) {
                   setIsSuccess(false);
