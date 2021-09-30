@@ -23,7 +23,7 @@ export async function getThemeTemplates(type: 'HEXO' | 'ALL') {
 }
 
 /** 提交新的站点信息 POST /site/info */
-export async function postSiteInfo(body: CMS.SiteInfoRequest) {
+export async function newSiteInfoSetting(body: CMS.NewSiteInfoSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/info', {
     method: 'POST',
     headers: {
@@ -34,7 +34,7 @@ export async function postSiteInfo(body: CMS.SiteInfoRequest) {
 }
 
 /** 提交新的站点设置 POST /site/config */
-export async function postSiteConfig(siteId: number, body: CMS.SiteConfigRequest) {
+export async function newSiteConfigSetting(siteId: number, body: CMS.NewSiteConfigSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/config', {
     params: {
       siteId,
@@ -48,10 +48,10 @@ export async function postSiteConfig(siteId: number, body: CMS.SiteConfigRequest
 }
 
 /** 提交新的存储配置 POST /storage/{platform} */
-export async function postNewStorageSetting(
+export async function newSiteStorageSetting(
   configId: number,
   platform: string,
-  body: CMS.NewStorageSettingRequest,
+  body: CMS.NewSiteStorageSettingRequest,
 ) {
   return request<GLOBAL.GeneralResponse<any>>(`/storage/${platform}`, {
     params: {
@@ -62,6 +62,37 @@ export async function postNewStorageSetting(
       'Content-Type': 'application/json',
     },
     data: body,
+  });
+}
+
+/** 提交新的存储配置 POST /storage/{platform} */
+export async function newSitePublishSetting(
+  configId: number,
+  platform: string,
+  body: CMS.NewSitePublishSettingRequest,
+) {
+  return request<GLOBAL.GeneralResponse<any>>(`/publisher/${platform}`, {
+    params: {
+      configId,
+    },
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+  });
+}
+
+/** 提交新的存储配置 POST /tasks/deploy-publish */
+export async function deployAndPublishSite(configId: number) {
+  return request<GLOBAL.GeneralResponse<any>>('/tasks/deploy-publish', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: {
+      configId,
+    },
   });
 }
 
@@ -78,15 +109,14 @@ export async function isDomainForbidden(domain: string) {
   return response?.data?.status !== 'AVAILABLE';
 }
 
-/** 执行同步文章 GET /post */
+/** 进行特定平台的文章同步 POST /post/sync/{platform} */
 export async function syncPostsByPlatform(platform: string) {
-  return mockRequest<GLOBAL.GeneralResponse<any>>('/sync', {
+  return request<GLOBAL.GeneralResponse<any>>(`/post/sync/${platform}`, {
     credentials: 'include',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    data: { platform },
   });
 }
 
@@ -136,10 +166,24 @@ export async function ignorePendingPost(postId: number) {
 
 /** 获取文章同步源账号的绑定状态 GET /token */
 export async function getSourceStatus() {
-  return mockRequest<GLOBAL.GeneralResponse<CMS.SourceStatusResponse[]>>('/token', {
+  return request<GLOBAL.GeneralResponse<CMS.SourceStatusResponse[]>>('/token', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
+  });
+}
+
+/** 绑定一个内容源平台的 token POST /token/{platform}/enable_sync */
+export async function bindSourcePlatform(platform: string) {
+  return request<GLOBAL.GeneralResponse<string>>(`/token/${platform}/enable_sync`, {
+    method: 'POST',
+  });
+}
+
+/** 解绑一个内容源平台的 token POST /token/{platform}/disable_sync */
+export async function unbindSourcePlatform(platform: string) {
+  return request<GLOBAL.GeneralResponse<string>>(`/token/${platform}/disable_sync`, {
+    method: 'POST',
   });
 }

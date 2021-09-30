@@ -18,11 +18,23 @@
 
 .ant-component-modifier() {
   .menu-extra-cards {
-    .ant-card-body {
-      display: flex;
-      justify-content: space-between;
-      margin: 30px 20px 35px 10px;
-      padding: 0;
+    .menu-card {
+      width: 260px;
+      border: none;
+
+      .ant-card-body {
+        display: flex;
+        justify-content: space-between;
+        margin: 30px 20px 35px 10px;
+        padding: 0;
+      }
+    }
+
+    .menu-card-collapsed {
+      .ant-card-body {
+        max-height: 50px;
+        padding: 12px 7px;
+      }
     }
 
     .ant-card-body::after,
@@ -33,16 +45,6 @@
     .menu-extra-icons {
       margin-left: 10px;
       line-height: 2;
-    }
-
-    .menu-user-card {
-      width: 260px;
-      border: none;
-    }
-
-    .menu-site-card {
-      width: 260px;
-      border: none;
     }
 
     .menu-user-card-meta {

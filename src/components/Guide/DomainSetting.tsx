@@ -27,7 +27,7 @@ export default () => {
         <ProFormText
           width="md"
           fieldProps={{
-            addonAfter: '.metaspaces.me',
+            addonAfter: `.${META_SPACE_BASE_DOMAIN || 'metaspaces.me'}`,
           }}
           name="domain"
           placeholder="输入前缀域名"

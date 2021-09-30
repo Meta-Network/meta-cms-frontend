@@ -1,9 +1,5 @@
 import { extendWithErrorHandler } from '@/services/api/base-request';
 
-const mockRequest = extendWithErrorHandler({
-  prefix: '/api',
-});
-
 const request = extendWithErrorHandler({
   prefix: META_UCENTER_API || 'https://ucenter-test-api.mttk.net',
   credentials: 'include', // 默认请求是否带上cookie
@@ -145,22 +141,5 @@ export async function updateUserInfo(body: Partial<GLOBAL.UserInfo>) {
 export async function requestStorageToken() {
   return request<GLOBAL.GeneralResponse<string>>('/storage/token', {
     method: 'POST',
-  });
-}
-
-// TODO: Does not exist, ONLY FOR MOCK
-/** 绑定一个内容源平台的 token POST /social-auth/{platform}/token */
-export async function bindSourcePlatform(platform: string) {
-  return mockRequest<GLOBAL.GeneralResponse<string>>(`/social-auth/${platform}/token`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-}
-
-/** 解绑一个内容源平台的 token DELETE /social-auth/{platform}/token */
-export async function unbindSourcePlatform(platform: string) {
-  return mockRequest<GLOBAL.GeneralResponse<string>>(`/social-auth/${platform}/token`, {
-    method: 'DELETE',
-    credentials: 'include',
   });
 }

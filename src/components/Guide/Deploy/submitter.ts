@@ -1,4 +1,10 @@
-import { postNewStorageSetting, postSiteConfig, postSiteInfo } from '@/services/api/meta-cms';
+import {
+  newSiteInfoSetting,
+  newSiteStorageSetting,
+  newSiteConfigSetting,
+  newSitePublishSetting,
+  deployAndPublishSite,
+} from '@/services/api/meta-cms';
 
 export default async ({
   siteSetting,
@@ -9,7 +15,7 @@ export default async ({
   setStageCompleted,
   updateProcessing,
 }: any) => {
-  const submitSiteInfo = await postSiteInfo({
+  const infoSetting = await newSiteInfoSetting({
     title: siteSetting.title,
     subtitle: siteSetting.subtitle,
     description: siteSetting.description,
@@ -18,40 +24,40 @@ export default async ({
     favicon: siteSetting.favicon, // TODO: change this
   });
 
-  if (submitSiteInfo.message === 'Ok') {
+  if (infoSetting.message === 'Ok') {
     updateProcessing({ message: '提交站点信息成功。', state: 'success' });
-    updateProcessing({ message: `SiteInfoId: ${submitSiteInfo.data.id}。`, state: 'info' });
+    updateProcessing({ message: `SiteInfoId: ${infoSetting.data.id}。`, state: 'info' });
   } else {
     updateProcessing({
-      message: `提交站点信息失败，原因：${submitSiteInfo.message}`,
+      message: `提交站点信息失败，原因：${infoSetting.message}。`,
       state: 'error',
     });
     setOnError(true);
     return;
   }
 
-  const submitSiteConfig = await postSiteConfig(submitSiteInfo.data.id, {
+  const configSetting = await newSiteConfigSetting(infoSetting.data.id, {
     language: siteSetting.language,
     timezone: siteSetting.timezone,
     templateId: themeSetting,
-    domain: `${domainSetting}.metaspaces.me`,
-    subdomain: `${domainSetting}.metaspaces.me`,
+    metaSpacePrefix: domainSetting,
+    domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN || 'metaspaces.me'}`,
   });
 
-  if (submitSiteConfig.message === 'Ok') {
+  if (configSetting.message === 'Ok') {
     updateProcessing({ message: '提交站点配置成功。', state: 'success' });
-    updateProcessing({ message: `SiteConfigId: ${submitSiteConfig.data.id}。`, state: 'info' });
+    updateProcessing({ message: `SiteConfigId: ${configSetting.data.id}。`, state: 'info' });
   } else {
     updateProcessing({
-      message: `提交站点配置失败，原因：${submitSiteConfig.message}`,
+      message: `提交站点配置失败，原因：${configSetting.message}。`,
       state: 'error',
     });
     setOnError(true);
     return;
   }
 
-  const submitStorageSetting = await postNewStorageSetting(
-    submitSiteConfig.data.id,
+  const storageSetting = await newSiteStorageSetting(
+    configSetting.data.id,
     storeSetting.storage.toLowerCase(),
     {
       userName: storeSetting.username,
@@ -62,15 +68,60 @@ export default async ({
     },
   );
 
-  if (submitStorageSetting.message === 'Ok') {
+  if (storageSetting.message === 'Ok') {
     updateProcessing({ message: '提交存储配置成功。', state: 'success' });
     updateProcessing({
-      message: `StorageSettingId: ${submitStorageSetting.data.id}。`,
+      message: `StorageSettingId: ${storageSetting.data.id}。`,
       state: 'info',
     });
   } else {
     updateProcessing({
-      message: `提交存储配置失败，原因：${submitStorageSetting.message}`,
+      message: `提交存储配置失败，原因：${storageSetting.message}。`,
+      state: 'error',
+    });
+    setOnError(true);
+    return;
+  }
+
+  const publishSetting = await newSitePublishSetting(
+    configSetting.data.id,
+    storeSetting.storage.toLowerCase(),
+    {
+      userName: storeSetting.username,
+      repoName: storeSetting.repo,
+      branchName: 'gh-pages',
+      dataType: 'HEXO',
+      useGitProvider: true,
+      publishDir: 'public',
+    },
+  );
+
+  if (publishSetting.message === 'Ok') {
+    updateProcessing({ message: '提交发布配置成功。', state: 'success' });
+    updateProcessing({
+      message: `PublishSettingId: ${publishSetting.data.id}。`,
+      state: 'info',
+    });
+  } else {
+    updateProcessing({
+      message: `提交发布配置失败，原因：${publishSetting.message}。`,
+      state: 'error',
+    });
+    setOnError(true);
+    return;
+  }
+
+  const deployAndPublish = await deployAndPublishSite(configSetting.data.id);
+
+  if (deployAndPublish.message === 'Ok') {
+    updateProcessing({ message: '站点部署与发布成功。', state: 'success' });
+    updateProcessing({
+      message: `Result: ${deployAndPublish.data}。`,
+      state: 'info',
+    });
+  } else {
+    updateProcessing({
+      message: `提交发布配置失败，原因：${deployAndPublish.message}。`,
       state: 'error',
     });
     setOnError(true);

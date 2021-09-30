@@ -40,7 +40,7 @@ export default () => {
       <ProForm
         style={{ width: 500 }}
         name="site-info"
-        initialValues={{ repoName: 'meta-space' }}
+        initialValues={{ repoName: storeSetting?.repo ?? 'meta-space' }}
         onFinish={updateRepoSettings}
         requiredMark="optional"
       >

@@ -3,7 +3,6 @@ import {
   publishPendingPost,
   fetchPostsPendingSync,
 } from '@/services/api/meta-cms';
-import { EllipsisOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
@@ -193,21 +192,6 @@ export default () => {
           <Button key="sync-button" style={{ marginRight: 10 }} type="primary">
             立即同步
           </Button>
-          <Dropdown
-            key="dropdown"
-            trigger={['click']}
-            overlay={
-              <Menu>
-                <Menu.Item key="1">下拉菜单</Menu.Item>
-                <Menu.Item key="2">下拉菜单2</Menu.Item>
-                <Menu.Item key="3">下拉菜单3</Menu.Item>
-              </Menu>
-            }
-          >
-            <Button key="4" style={{ padding: '0 8px' }}>
-              <EllipsisOutlined />
-            </Button>
-          </Dropdown>
         </div>,
       ]}
       title="同步中心"

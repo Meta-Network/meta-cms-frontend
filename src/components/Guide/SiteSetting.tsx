@@ -5,6 +5,8 @@ import { uploadAvatar } from '@/services/api/global';
 import { requestStorageToken } from '@/services/api/meta-ucenter';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import ProForm, { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+// import moment from 'moment';
+import momentTimezone from 'moment-timezone';
 import styles from './styles.less';
 
 export default () => {
@@ -23,7 +25,7 @@ export default () => {
   const author = initialState?.currentUser?.nickname || '';
   const initialValues = {
     language: 'zh',
-    timezone: 'UTC+8',
+    timezone: momentTimezone.tz.guess(),
     author,
     ...siteSetting,
   };
@@ -114,7 +116,7 @@ export default () => {
           width="md"
           name="language"
           label="语言"
-          rules={[{ required: true, message: '请选择您的站点语言' }]}
+          rules={[{ required: true, message: '请选择您的 Meta Space 语言' }]}
           valueEnum={{
             zh: '中文',
             en: 'English',
@@ -122,12 +124,14 @@ export default () => {
             es: 'Español',
           }}
         />
-        <ProFormText
+        <ProFormSelect
           width="md"
           name="timezone"
           label="时区"
-          placeholder="Meta Space 时区设置"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: '请选择您的 Meta Space 时区' }]}
+          valueEnum={{
+            'Asia/Shanghai': 'Asia/Shanghai',
+          }}
         />
         <ProForm.Item
           name="favicon"

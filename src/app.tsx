@@ -95,7 +95,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     menuExtraRender: (menuItemProps) => (
       <div className="menu-extra-cards">
         <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click', 'hover']}>
-          <Card className={menuItemProps.collapsed ? 'menu-user-card-collapsed' : 'menu-user-card'}>
+          <Card className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card'}>
             <Card.Meta
               className="menu-user-card-meta"
               avatar={<Avatar src={initialState?.currentUser?.avatar} />}
@@ -106,9 +106,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         </Dropdown>
         <a href="https://metaspace.federarks.xyz/" target="__blank">
           <Card
-            className={
-              menuItemProps.collapsed ? 'menu-site-card-collapsed' : 'menu-site-card my-site-link'
-            }
+            className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
           >
             <Card.Meta
               className="menu-site-card-meta"

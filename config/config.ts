@@ -14,6 +14,7 @@ export default defineConfig({
     META_CMS_API: process.env.META_CMS_API,
     META_NETWORK_API: process.env.META_NETWORK_API,
     META_STORAGE_API: process.env.META_STORAGE_API,
+    META_SPACE_BASE_DOMAIN: process.env.META_SPACE_BASE_DOMAIN,
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout

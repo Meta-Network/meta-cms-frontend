@@ -1,5 +1,9 @@
-import { getSourceStatus, syncPostsByPlatform } from '@/services/api/meta-cms';
-import { bindSourcePlatform, unbindSourcePlatform } from '@/services/api/meta-ucenter';
+import {
+  getSourceStatus,
+  syncPostsByPlatform,
+  bindSourcePlatform,
+  unbindSourcePlatform,
+} from '@/services/api/meta-cms';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { Button, List, message, Tag } from 'antd';
 import { Fragment, useEffect, useState } from 'react';
