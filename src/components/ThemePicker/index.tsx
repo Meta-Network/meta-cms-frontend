@@ -13,7 +13,7 @@ export default () => {
 
   useEffect(() => {
     getThemeTemplates('HEXO').then((response) => {
-      setThemes(response.data);
+      setThemes(response?.data ?? []);
     });
   }, []);
 

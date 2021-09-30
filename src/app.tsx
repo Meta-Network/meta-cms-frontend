@@ -1,4 +1,6 @@
 import { fetchPublishedPosts } from '@/services/api/meta-cms';
+import { useModel } from '@@/plugin-model/useModel';
+import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 import { Avatar, Card, Dropdown } from 'antd';
 import { history, Link } from 'umi';
 import Footer from '@/components/Footer';
@@ -11,6 +13,45 @@ import MenuUserInfo from './components/MenuUserInfo';
 import MenuItemWithBadge from './components/MenuItemWithBadge';
 
 const loginPath = '/user/login';
+
+function CustomSiderMenu({
+  initialState,
+  menuItemProps,
+}: {
+  initialState: any;
+  menuItemProps: SiderMenuProps;
+}) {
+  const { deployedSite } = useModel('storage');
+  return (
+    <div className="menu-extra-cards">
+      <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click', 'hover']}>
+        <Card className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card'}>
+          <Card.Meta
+            className="menu-user-card-meta"
+            avatar={<Avatar src={initialState?.currentUser?.avatar} />}
+            title={initialState?.currentUser?.nickname}
+          />
+          <DownOutlined className="menu-extra-icons" />
+        </Card>
+      </Dropdown>
+      {deployedSite.domain && (
+        <a href={deployedSite.domain} target="__blank">
+          <Card
+            className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
+          >
+            <Card.Meta
+              className="menu-site-card-meta"
+              avatar={<Avatar src="/icons/custom/meta-space-icon.svg" />}
+              title={deployedSite.title}
+              description={deployedSite.domain}
+            />
+            <ExportOutlined className="my-site-link-icon menu-extra-icons" />
+          </Card>
+        </a>
+      )}
+    </div>
+  );
+}
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -93,31 +134,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       }
     },
     menuExtraRender: (menuItemProps) => (
-      <div className="menu-extra-cards">
-        <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click', 'hover']}>
-          <Card className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card'}>
-            <Card.Meta
-              className="menu-user-card-meta"
-              avatar={<Avatar src={initialState?.currentUser?.avatar} />}
-              title={initialState?.currentUser?.nickname}
-            />
-            <DownOutlined className="menu-extra-icons" />
-          </Card>
-        </Dropdown>
-        <a href="https://metaspace.federarks.xyz/" target="__blank">
-          <Card
-            className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
-          >
-            <Card.Meta
-              className="menu-site-card-meta"
-              avatar={<Avatar src="/icons/custom/meta-space-icon.svg" />}
-              title="My Site Title"
-              description="remi.metaspaces.me"
-            />
-            <ExportOutlined className="my-site-link-icon menu-extra-icons" />
-          </Card>
-        </a>
-      </div>
+      <CustomSiderMenu initialState={initialState} menuItemProps={menuItemProps} />
     ),
     onPageChange: () => {
       const { location } = history;

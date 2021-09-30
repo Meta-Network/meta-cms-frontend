@@ -25,11 +25,11 @@ export default async ({
   });
 
   if (infoSetting.message === 'Ok') {
-    updateProcessing({ message: '提交站点信息成功。', state: 'success' });
+    updateProcessing({ message: '提交 Meta Space 信息成功。', state: 'success' });
     updateProcessing({ message: `SiteInfoId: ${infoSetting.data.id}。`, state: 'info' });
   } else {
     updateProcessing({
-      message: `提交站点信息失败，原因：${infoSetting.message}。`,
+      message: `提交 Meta Space 信息失败，原因：${infoSetting.message}。`,
       state: 'error',
     });
     setOnError(true);
@@ -45,11 +45,11 @@ export default async ({
   });
 
   if (configSetting.message === 'Ok') {
-    updateProcessing({ message: '提交站点配置成功。', state: 'success' });
+    updateProcessing({ message: '提交 Meta Space 配置成功。', state: 'success' });
     updateProcessing({ message: `SiteConfigId: ${configSetting.data.id}。`, state: 'info' });
   } else {
     updateProcessing({
-      message: `提交站点配置失败，原因：${configSetting.message}。`,
+      message: `提交 Meta Space 配置失败，原因：${configSetting.message}。`,
       state: 'error',
     });
     setOnError(true);
@@ -114,11 +114,7 @@ export default async ({
   const deployAndPublish = await deployAndPublishSite(configSetting.data.id);
 
   if (deployAndPublish.message === 'Ok') {
-    updateProcessing({ message: '站点部署与发布成功。', state: 'success' });
-    updateProcessing({
-      message: `Result: ${deployAndPublish.data}。`,
-      state: 'info',
-    });
+    updateProcessing({ message: ' Meta Space 部署与发布成功。', state: 'success' });
   } else {
     updateProcessing({
       message: `提交发布配置失败，原因：${deployAndPublish.message}。`,
@@ -128,6 +124,10 @@ export default async ({
     return;
   }
 
-  updateProcessing({ message: '部署站点完成。', state: 'success' });
+  updateProcessing({
+    message: `请在左侧菜单中访问您的 Meta Space。`,
+    state: 'success',
+  });
+
   setStageCompleted(true);
 };

@@ -9,7 +9,8 @@ import generateTaggedInfo from './generateTaggedInfo';
 import styles from './index.less';
 
 export default () => {
-  const { siteSetting, storeSetting, themeSetting, domainSetting } = useModel('storage');
+  const { siteSetting, storeSetting, themeSetting, domainSetting, setDeployedSite } =
+    useModel('storage');
   const {
     currentStage,
     setCurrentStage,
@@ -57,7 +58,12 @@ export default () => {
         break;
       }
       case DeployStages.deploying: {
-        deploying();
+        deploying().then(() => {
+          setDeployedSite({
+            title: siteSetting.title,
+            domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN || 'metaspaces.me'}`,
+          });
+        });
         break;
       }
       default:

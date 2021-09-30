@@ -13,6 +13,9 @@ export default () => {
   const [siteSetting, setSiteSetting] = useState<GLOBAL.SiteSetting>(
     JSON.parse(window.localStorage.getItem('siteSetting') || '{}'),
   );
+  const [deployedSite, setDeployedSite] = useState<any>(
+    JSON.parse(window.localStorage.getItem('deployedSite') || '{}'),
+  );
 
   const setStorage = (key: string, value: any) => {
     window.localStorage.setItem(key, JSON.stringify(value));
@@ -34,6 +37,10 @@ export default () => {
     setStorage('siteSetting', siteSetting);
   }, [siteSetting]);
 
+  useEffect(() => {
+    setStorage('deployedSite', deployedSite);
+  }, [deployedSite]);
+
   return {
     domainSetting,
     setDomainSetting,
@@ -43,5 +50,7 @@ export default () => {
     setStoreSetting,
     siteSetting,
     setSiteSetting,
+    deployedSite,
+    setDeployedSite,
   };
 };
