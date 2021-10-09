@@ -137,6 +137,13 @@ export async function updateUserInfo(body: Partial<GLOBAL.UserInfo>) {
   });
 }
 
+/** 删除一个内容源平台的 token POST /storage/token */
+export async function deleteSourcePlatformToken(platform: string) {
+  return request<GLOBAL.GeneralResponse<string>>(`/social-auth/${platform}/token`, {
+    method: 'DELETE',
+  });
+}
+
 /** 请求存储 token POST /storage/token */
 export async function requestStorageToken() {
   return request<GLOBAL.GeneralResponse<string>>('/storage/token', {

@@ -48,7 +48,7 @@ export default () => {
             message.success(`已成功选择仓储为 ${storeConfirmed}`);
             break;
           }
-          // TODO: add 'Gitee'
+          // TODO: add 'Gitee' as a valid store option
           default: {
             throw new Error('未知的仓储');
           }

@@ -71,7 +71,7 @@ export const Storages = [
   },
   {
     name: '部署',
-    key: 'hasSite',
+    key: '',
     get value() {
       return Storage.get(this.key);
     },

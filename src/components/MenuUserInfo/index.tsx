@@ -4,7 +4,6 @@ import { history, useModel } from 'umi';
 import { outLogin } from '@/services/api/meta-ucenter';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
-import styles from './index.less';
 
 const logout = async () => {
   await outLogin();
@@ -33,12 +32,12 @@ export default () => {
   );
 
   return (
-    <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-      <Menu.Item key="info">
+    <Menu className="custom-user-menu" selectedKeys={[]} onClick={onMenuClick}>
+      <Menu.Item className="user-menu-item" key="info">
         <UserOutlined />
         个人中心
       </Menu.Item>
-      <Menu.Item key="logout">
+      <Menu.Item className="user-menu-item" key="logout">
         <LogoutOutlined />
         退出登录
       </Menu.Item>

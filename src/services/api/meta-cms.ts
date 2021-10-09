@@ -164,26 +164,31 @@ export async function ignorePendingPost(postId: number) {
   });
 }
 
-/** 获取文章同步源账号的绑定状态 GET /token */
-export async function getSourceStatus() {
-  return request<GLOBAL.GeneralResponse<CMS.SourceStatusResponse[]>>('/token', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-}
-
-/** 绑定一个内容源平台的 token POST /token/{platform}/enable_sync */
+/** 启用一个内容源平台的 token POST /token/{platform}/enable_sync */
 export async function bindSourcePlatform(platform: string) {
   return request<GLOBAL.GeneralResponse<string>>(`/token/${platform}/enable_sync`, {
     method: 'POST',
   });
 }
 
-/** 解绑一个内容源平台的 token POST /token/{platform}/disable_sync */
-export async function unbindSourcePlatform(platform: string) {
-  return request<GLOBAL.GeneralResponse<string>>(`/token/${platform}/disable_sync`, {
-    method: 'POST',
+/** 获取文章同步源账号的绑定状态 GET /token */
+export async function getSourceStatus() {
+  const response = await request<GLOBAL.GeneralResponse<CMS.SourceStatusResponse[]>>('/token', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
+
+  // WARNING of side effect: set active as true for all platforms
+  response.data = response.data.map((platform) => {
+    if (!platform.active) {
+      bindSourcePlatform(platform.platform);
+    }
+    // eslint-disable-next-line no-param-reassign
+    platform.active = true;
+    return platform;
+  });
+
+  return response;
 }

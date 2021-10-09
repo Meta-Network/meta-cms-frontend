@@ -10,13 +10,37 @@
   opacity: 1;
 }
 
+.menu-card-collapsed .my-site-link-icon {
+  display: none;
+}
+
 .header-text-info {
   p:not(:last-child) {
     margin-bottom: 6px;
   }
 }
 
+.custom-user-menu {
+  .anticon {
+    margin-right: 8px !important;
+  }
+  .ant-dropdown-menu-item {
+    min-width: 160px;
+  }
+  .user-menu-item {
+    padding: 0 10px;
+  }
+}
+
 .ant-component-modifier() {
+  .custom-user-menu.ant-menu-inline-collapsed {
+    width: 120px;
+    li {
+      padding: 0;
+      text-align: center;
+    }
+  }
+
   .menu-extra-cards {
     .menu-card {
       width: 260px;
@@ -32,9 +56,13 @@
 
     .menu-card-collapsed {
       .ant-card-body {
-        max-height: 50px;
+        max-height: 47px;
         padding: 12px 7px;
       }
+    }
+
+    .ant-menu-inline-collapsed-tooltip svg[data-icon='question'] {
+      display: none;
     }
 
     .ant-card-body::after,
@@ -97,7 +125,7 @@
     margin-bottom: 0;
   }
 
-  .ant-menu-submenu-open {
+  .ant-menu-submenu-open:not(.ant-menu-submenu-vertical) {
     margin-bottom: 12px;
   }
 

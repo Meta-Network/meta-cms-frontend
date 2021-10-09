@@ -35,7 +35,7 @@ function CustomSiderMenu({
         </Card>
       </Dropdown>
       {deployedSite.domain && (
-        <a href={deployedSite.domain} target="__blank">
+        <a href={`https://${deployedSite.domain}`} target="__blank">
           <Card
             className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
           >

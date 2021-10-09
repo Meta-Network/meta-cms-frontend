@@ -1,12 +1,8 @@
-import {
-  getSourceStatus,
-  syncPostsByPlatform,
-  bindSourcePlatform,
-  unbindSourcePlatform,
-} from '@/services/api/meta-cms';
-import { GridContent, PageContainer } from '@ant-design/pro-layout';
+import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
 import { Button, List, message, Tag } from 'antd';
 import { Fragment, useEffect, useState } from 'react';
+import { GridContent, PageContainer } from '@ant-design/pro-layout';
+import { getSourceStatus, syncPostsByPlatform } from '@/services/api/meta-cms';
 import styles from './index.less';
 
 const status: GLOBAL.SourcePlatforms = {
@@ -30,7 +26,7 @@ export default () => {
             setSyncLoading(true);
             const done = message.loading('文章同步中，请稍候…', 0);
             syncPostsByPlatform('matataki').then((result) => {
-              if (result.statusCode === 200) {
+              if (result.statusCode === 201) {
                 message.success('文章同步成功！');
               } else {
                 message.error('文章同步失败，请重新同步或绑定账号。');
@@ -47,7 +43,6 @@ export default () => {
       bind: (
         <Button
           onClick={() => {
-            bindSourcePlatform('matataki');
             window.open('https://developer.matataki.io/app/44ba10e59e954bf4/oauth');
           }}
           type="primary"
@@ -61,7 +56,7 @@ export default () => {
           onClick={() => {
             setUnbindLoading(true);
             const done = message.loading('解绑中，请稍候…', 0);
-            unbindSourcePlatform('matataki').then((result) => {
+            deleteSourcePlatformToken('matataki').then((result) => {
               if (result.statusCode === 200) {
                 message.success('解绑成功。请刷新页面。');
               } else {

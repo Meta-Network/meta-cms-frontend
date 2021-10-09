@@ -1,5 +1,6 @@
 import { Alert } from 'antd';
 import { useModel, FormattedMessage } from 'umi';
+import FormattedInfo from '../FormattedInfo';
 import styles from './styles.less';
 
 export default () => {
@@ -7,9 +8,12 @@ export default () => {
 
   const SelectedStore = () => {
     return (
-      <span>
-        当前选择的存储服务：<strong>{storeSetting.storage || '还未选择存储'}</strong>
-      </span>
+      <>
+        <FormattedMessage id="messages.publish.currentStore" />
+        <strong>
+          {storeSetting.storage || <FormattedMessage id="messages.publish.noStoreSelected" />}
+        </strong>
+      </>
     );
   };
 
@@ -21,20 +25,7 @@ export default () => {
         message={<FormattedMessage id="guide.publish.message" />}
         description={
           <>
-            {/* below code replaces string with every line-break to <br> tag */}
-            <FormattedMessage id="guide.publish.info">
-              {(msg: string) =>
-                msg
-                  ?.trim()
-                  .split('\n')
-                  .map((e, index) => (
-                    <div key={`publishinfo_${index + 1}`}>
-                      {e}
-                      <br />
-                    </div>
-                  ))
-              }
-            </FormattedMessage>
+            <FormattedInfo id="guide.publish.info" />
             <SelectedStore />
           </>
         }
