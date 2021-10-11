@@ -96,7 +96,9 @@ export default () => {
       setSourceStatus((source: GLOBAL.SourcePlatforms) => {
         const copy = { ...source };
         result.data.forEach((service: CMS.SourceStatusResponse) => {
-          copy[service.platform].active = service.active;
+          if (copy[service.platform]) {
+            copy[service.platform].active = service.active;
+          }
         });
         return copy;
       });

@@ -122,7 +122,22 @@ export async function syncPostsByPlatform(platform: string) {
 
 /** 获取待同步的文章列表 GET /post */
 export async function fetchPostsPendingSync() {
-  return mockRequest<GLOBAL.GeneralResponse<any>>('/post', {
+  return request<GLOBAL.GeneralResponse<any>>('/post', {
+    credentials: 'include',
+    method: 'GET',
+    params: {
+      page: 1,
+      limit: 10,
+    },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
+/** 获取当前用户默认的站点设置 GET /site/config/default */
+export async function getDefaultSiteConfig() {
+  return request<GLOBAL.GeneralResponse<CMS.SiteConfiguration>>('/site/config/default', {
     credentials: 'include',
     method: 'GET',
     headers: {
@@ -143,10 +158,11 @@ export async function fetchPublishedPosts() {
 }
 
 /** 发布一篇待同步待文章 POST /post/{postId}/publish */
-export async function publishPendingPost(postId: number) {
-  return mockRequest<GLOBAL.GeneralResponse<any>>(`/post/${postId}/publish`, {
+export async function publishPendingPost(postId: number, configIds: number[]) {
+  return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/publish`, {
     credentials: 'include',
     method: 'POST',
+    data: { configIds },
     headers: {
       'Content-Type': 'application/json',
     },
@@ -155,7 +171,7 @@ export async function publishPendingPost(postId: number) {
 
 /** 取消发布一篇待同步待文章 POST /post/{postId}/ignore */
 export async function ignorePendingPost(postId: number) {
-  return mockRequest<GLOBAL.GeneralResponse<any>>(`/post/${postId}/ignore`, {
+  return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/ignore`, {
     credentials: 'include',
     method: 'POST',
     headers: {

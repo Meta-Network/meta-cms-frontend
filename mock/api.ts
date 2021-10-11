@@ -184,19 +184,8 @@ export default {
   'GET /api/token': (req: Request, res: Response) => {
     res.send({ data: sourcePlatforms });
   },
-  'GET /api/post': (req: Request, res: Response) => {
-    returnMockPosts(
-      req,
-      res,
-      posts.filter((post) => !finishedPosts.includes(post.id)),
-    );
-  },
   'GET /api/published-posts': (req: Request, res: Response) => {
-    returnMockPosts(
-      req,
-      res,
-      posts.filter((post) => finishedPosts.includes(post.id)),
-    );
+    returnMockPosts(req, res, posts);
   },
   'POST /api/sync': (req: Request, res: Response) => {
     setTimeout(() => {

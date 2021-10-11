@@ -1,4 +1,4 @@
-import { fetchPublishedPosts } from '@/services/api/meta-cms';
+import { fetchPublishedPosts, getDefaultSiteConfig } from '@/services/api/meta-cms';
 import { useModel } from '@@/plugin-model/useModel';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 import { Avatar, Card, Dropdown } from 'antd';
@@ -11,6 +11,7 @@ import type { RunTimeLayoutConfig } from 'umi';
 import MenuMoreInfo from './components/MenuMoreInfo';
 import MenuUserInfo from './components/MenuUserInfo';
 import MenuItemWithBadge from './components/MenuItemWithBadge';
+import { useEffect } from 'react';
 
 const loginPath = '/user/login';
 
@@ -21,7 +22,17 @@ function CustomSiderMenu({
   initialState: any;
   menuItemProps: SiderMenuProps;
 }) {
-  const { deployedSite } = useModel('storage');
+  const { deployedSite, setDeployedSite } = useModel('storage');
+  useEffect(() => {
+    getDefaultSiteConfig().then((response) => {
+      if (response.statusCode === 200) {
+        setDeployedSite({
+          title: response.data.siteInfo.title,
+          domain: response.data.domain,
+        });
+      }
+    });
+  }, [setDeployedSite]);
   return (
     <div className="menu-extra-cards">
       <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click', 'hover']}>

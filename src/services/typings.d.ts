@@ -58,6 +58,38 @@ declare namespace CMS {
     useGitProvider: boolean;
     publishDir: string;
   };
+
+  type SiteConfiguration = {
+    language: string;
+    timezone: string;
+    templateId: number;
+    domain: string;
+    storeType: string;
+    storeProviderId: number;
+    cicdType: string;
+    cicdProviderId: number;
+    publisherType: string;
+    publisherProviderId: number;
+    cdnType: string;
+    cdnProviderId: number;
+    status: string;
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    metaSpacePrefix: string;
+    siteInfo: {
+      subtitle: string;
+      description: string;
+      author: string;
+      keywords: string[];
+      favicon: string;
+      id: number;
+      createdAt: Date;
+      updatedAt: Date;
+      userId: number;
+      title: string;
+    };
+  };
 }
 
 declare namespace GLOBAL {

@@ -1,6 +1,7 @@
 import {
   ignorePendingPost,
   publishPendingPost,
+  getDefaultSiteConfig,
   fetchPostsPendingSync,
 } from '@/services/api/meta-cms';
 import ProTable from '@ant-design/pro-table';
@@ -14,9 +15,9 @@ type HexoPostsInfo = {
   id: number;
   cover: string | null;
   title: string;
-  summary: string;
-  tags: string[];
-  category: string;
+  summary: string | null;
+  tags: string[] | null;
+  category: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -28,8 +29,15 @@ enum LoadingStates {
 }
 
 export default () => {
+  const [siteConfigId, setSiteConfigId] = useState<number | null>(null);
   const [itemsNumbers, setItemsNumbers] = useState<number>(0);
   const [loadings, setLoadings] = useState<LoadingStates[]>([]);
+
+  getDefaultSiteConfig().then((response) => {
+    if (response.statusCode === 200) {
+      setSiteConfigId(response.data.id);
+    }
+  });
 
   const ref = useRef<ActionType>();
 
@@ -69,9 +77,11 @@ export default () => {
       onFilter: true,
       render: (_, record) => (
         <Space>
-          <Tag color="green" key={`${record.category}_cate`}>
-            {record.category}
-          </Tag>
+          {record.category && (
+            <Tag color="green" key={`${record.category}_cate`}>
+              {record.category}
+            </Tag>
+          )}
         </Space>
       ),
     },
@@ -86,7 +96,7 @@ export default () => {
           trigger={['click', 'hover']}
           overlay={
             <Menu>
-              {record.tags.map((name) => (
+              {record?.tags?.map((name) => (
                 <Menu.Item key={`${name}_menu`}>
                   <Tag color="blue" key={`${name}_tag`}>
                     {name}
@@ -154,8 +164,12 @@ export default () => {
       render: (_, record, index) => [
         <Button
           onClick={async () => {
+            if (siteConfigId === null) {
+              message.error('未获取到站点信息，无法发布文章。请先创建站点');
+              return;
+            }
             setLoading(index, LoadingStates.Publishing);
-            await publishPendingPost(record.id);
+            await publishPendingPost(record.id, [siteConfigId]);
             await ref.current?.reload();
             message.success('已成功发布此文章');
           }}
@@ -233,7 +247,7 @@ export default () => {
         pagination={{}}
         expandable={{
           expandedRowRender: (record: HexoPostsInfo) => (
-            <p dangerouslySetInnerHTML={{ __html: record.summary }} />
+            <p dangerouslySetInnerHTML={{ __html: record.summary || '' }} />
           ),
         }}
         dateFormatter="string"
