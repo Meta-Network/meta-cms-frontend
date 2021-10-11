@@ -208,3 +208,28 @@ export async function getSourceStatus() {
 
   return response;
 }
+
+/** 等待一个平台文章同步完成 GET /post/sync/{platform}/state */
+export async function waitUntilSyncFinish(platform: string) {
+  const requestState = () =>
+    request<GLOBAL.GeneralResponse<string | number>>(`/post/sync/${platform}/state`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+  const timeout = new Date();
+
+  let status = (await requestState()).data;
+  while (typeof status !== 'number' && status === 'syncing') {
+    // @ts-ignore
+    if (new Date() - timeout > 15000) {
+      return false;
+    }
+    // eslint-disable-next-line no-await-in-loop
+    status = (await requestState()).data;
+  }
+
+  return true;
+}

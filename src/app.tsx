@@ -1,17 +1,19 @@
-import { fetchPublishedPosts, getDefaultSiteConfig } from '@/services/api/meta-cms';
-import { useModel } from '@@/plugin-model/useModel';
-import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
-import { Avatar, Card, Dropdown } from 'antd';
+import { useEffect } from 'react';
 import { history, Link } from 'umi';
 import Footer from '@/components/Footer';
-import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
+import type { RunTimeLayoutConfig } from 'umi';
+import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import type { RunTimeLayoutConfig } from 'umi';
+import { Typography, Avatar, Card, Dropdown } from 'antd';
+import { fetchPublishedPosts, getDefaultSiteConfig } from '@/services/api/meta-cms';
+import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import MenuMoreInfo from './components/MenuMoreInfo';
 import MenuUserInfo from './components/MenuUserInfo';
 import MenuItemWithBadge from './components/MenuItemWithBadge';
-import { useEffect } from 'react';
+import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
+
+const { Text } = Typography;
 
 const loginPath = '/user/login';
 
@@ -29,6 +31,7 @@ function CustomSiderMenu({
         setDeployedSite({
           title: response.data.siteInfo.title,
           domain: response.data.domain,
+          configId: response.data.id,
         });
       }
     });
@@ -54,7 +57,11 @@ function CustomSiderMenu({
               className="menu-site-card-meta"
               avatar={<Avatar src="/icons/custom/meta-space-icon.svg" />}
               title={deployedSite.title}
-              description={deployedSite.domain}
+              description={
+                <Text type="secondary" ellipsis={deployedSite.domain.length > 20}>
+                  {deployedSite.domain}
+                </Text>
+              }
             />
             <ExportOutlined className="my-site-link-icon menu-extra-icons" />
           </Card>

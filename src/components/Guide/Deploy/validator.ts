@@ -1,3 +1,4 @@
+import { getGithubReposName } from '@/services/api/global';
 import { isDomainForbidden } from '@/services/api/meta-cms';
 import { StorageKeys, Storages } from '@/services/constants';
 
@@ -31,7 +32,11 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
     case StorageKeys.StoreSetting: {
       const { storage, username, repo } = JSON.parse(values || '{}');
       const providers: GLOBAL.StoreProvider[] = ['GitHub', 'Gitee'];
-      return providers.includes(storage) && username && repo;
+
+      const repoNamesRequest = await getGithubReposName();
+      const repoNames = repoNamesRequest.map((name) => name.toLowerCase());
+
+      return providers.includes(storage) && username && repo && !repoNames.includes(repo);
     }
     case '': {
       return true;
