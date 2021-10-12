@@ -90,6 +90,42 @@ declare namespace CMS {
       title: string;
     };
   };
+
+  type ExistsPostsResponse = {
+    items: {
+      id: number;
+      createdAt: Date;
+      updatedAt: Date;
+      userId: number;
+      title: string;
+      cover: string;
+      summary: string;
+      platform: string;
+      source: string;
+      state: string;
+      category: string;
+      tags: string[];
+      siteConfigRelas: {
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        state: 'SUCCESS';
+      }[];
+    }[];
+    meta: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+    links: {
+      first: string;
+      previous: string;
+      next: string;
+      last: string;
+    };
+  };
 }
 
 declare namespace GLOBAL {

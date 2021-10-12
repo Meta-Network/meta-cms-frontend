@@ -2,11 +2,11 @@ import {
   ignorePendingPost,
   publishPendingPost,
   getDefaultSiteConfig,
-  fetchPostsPendingSync,
   syncPostsByPlatform,
   getSourceStatus,
   waitUntilSyncFinish,
   deployAndPublishSite,
+  fetchPostsPending,
 } from '@/services/api/meta-cms';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -15,16 +15,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import styles from './SyncCenter.less';
 
-type HexoPostsInfo = {
-  id: number;
-  cover: string | null;
-  title: string;
-  summary: string | null;
-  tags: string[] | null;
-  category: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
+type PostsInfo = CMS.ExistsPostsResponse['items'][number];
 
 enum LoadingStates {
   Pending,
@@ -91,7 +82,7 @@ export default () => {
     });
   }, []);
 
-  const columns: ProColumns<HexoPostsInfo>[] = [
+  const columns: ProColumns<PostsInfo>[] = [
     {
       dataIndex: 'cover',
       title: '封面图片',
@@ -262,13 +253,13 @@ export default () => {
       ]}
       title="同步中心"
     >
-      <ProTable<HexoPostsInfo>
+      <ProTable<PostsInfo>
         actionRef={ref}
         columns={columns}
-        request={async () => {
+        request={async ({ pageSize, current }) => {
           // TODO: 分页
-          const request = await fetchPostsPendingSync();
-          setItemsNumbers(request.data.items.length);
+          const request = await fetchPostsPending(current ?? 1, pageSize ?? 10);
+          setItemsNumbers(request.data.meta.totalItems);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
           return {
@@ -277,7 +268,7 @@ export default () => {
             // 不然 table 会停止解析数据，即使有数据
             success: true,
             // 不传会使用 data 的长度，如果是分页一定要传
-            total: 10,
+            total: request.data.meta.totalItems,
           };
         }}
         rowKey={(record) => record.id}
@@ -298,7 +289,7 @@ export default () => {
         }}
         pagination={{}}
         expandable={{
-          expandedRowRender: (record: HexoPostsInfo) => (
+          expandedRowRender: (record: PostsInfo) => (
             <p dangerouslySetInnerHTML={{ __html: record.summary || '' }} />
           ),
         }}

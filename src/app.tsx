@@ -4,9 +4,9 @@ import Footer from '@/components/Footer';
 import type { RunTimeLayoutConfig } from 'umi';
 import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
-import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
-import { fetchPublishedPosts, getDefaultSiteConfig } from '@/services/api/meta-cms';
+import { DownOutlined, ExportOutlined } from '@ant-design/icons';
+import { fetchPostsPublished, getDefaultSiteConfig } from '@/services/api/meta-cms';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import MenuMoreInfo from './components/MenuMoreInfo';
 import MenuUserInfo from './components/MenuUserInfo';
@@ -100,8 +100,8 @@ export async function getInitialState(): Promise<{
   const invitationsCount =
     invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
 
-  const publishedCountRequest = await fetchPublishedPosts();
-  const publishedCount = publishedCountRequest?.data?.items?.length || 0;
+  const publishedCountRequest = await fetchPostsPublished(1, 10);
+  const publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
 
   const states: any = {
     fetchUserInfo,
