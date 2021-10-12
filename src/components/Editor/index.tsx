@@ -1,21 +1,18 @@
+import { StorageFleek } from '@/services/storage';
 import React, { useEffect, useCallback } from 'react';
 import Vditor from 'vditor';
-import md from './index.md';
+
+interface Props {
+  readonly token: string;
+  readonly md: string;
+  synchronizeContent: (val: string) => void;
+}
 
 const e = React.createElement;
 
-const Editor: React.FC = () => {
+const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent, token, md }) {
   const init = useCallback(() => {
-    // const _width =
-    //   window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    const _height =
-      window.innerHeight ||
-      document.documentElement.clientHeight ||
-      document.body.clientHeight ||
-      800;
-
     const vditor = new Vditor('vditor', {
-      height: _height - 60 - 100,
       cache: {
         enable: false,
       },
@@ -32,7 +29,7 @@ const Editor: React.FC = () => {
       },
       debugger: true,
       typewriterMode: true,
-      placeholder: 'Hello, Vditor!',
+      placeholder: '现在就开始编辑吧！',
       preview: {
         markdown: {
           toc: true,
@@ -44,6 +41,29 @@ const Editor: React.FC = () => {
           engine: 'KaTeX',
         },
       },
+      toolbar: [
+        'headings',
+        'bold',
+        'italic',
+        'strike',
+        'link',
+        '|',
+        'list',
+        'ordered-list',
+        'check',
+        'outdent',
+        'indent',
+        '|',
+        'quote',
+        'line',
+        'code',
+        'inline-code',
+        'insert-before',
+        'insert-after',
+        'table',
+        '|',
+        'upload',
+      ],
       toolbarConfig: {
         pin: true,
       },
@@ -57,6 +77,10 @@ const Editor: React.FC = () => {
         emoji: {
           sd: '💔',
           j: 'https://unpkg.com/vditor@1.3.1/dist/images/emoji/j.png',
+          robot: '🤖️',
+          rocket: '🚀',
+          grin: '😁',
+          heart: '❤️',
         },
         parse: false,
         extend: [
@@ -64,11 +88,19 @@ const Editor: React.FC = () => {
             key: '@',
             hint: (key) => {
               console.log(key);
-              if ('vanessa'.indexOf(key.toLocaleLowerCase()) > -1) {
+              if ('meta'.indexOf(key.toLocaleLowerCase()) > -1) {
                 return [
                   {
-                    value: '@Vanessa',
-                    html: '<img src="https://avatars0.githubusercontent.com/u/970828?s=60&v=4"/> Vanessa',
+                    value: '@Meta',
+                    html: '<img src="https://ipfs.fleek.co/ipfs/bafybeibqhio6jfywuthqbvtuit2dy2eq37usxmiq26oeiddkrwpsrqdaou"/> Meta',
+                  },
+                  {
+                    value: '@MetaNetwork',
+                    html: '<img src="https://ipfs.fleek.co/ipfs/bafybeibqhio6jfywuthqbvtuit2dy2eq37usxmiq26oeiddkrwpsrqdaou"/> MetaNetwork',
+                  },
+                  {
+                    value: '@MetaCMS',
+                    html: '<img src="https://ipfs.fleek.co/ipfs/bafybeibqhio6jfywuthqbvtuit2dy2eq37usxmiq26oeiddkrwpsrqdaou"/> MetaCMS',
                   },
                 ];
               }
@@ -79,11 +111,19 @@ const Editor: React.FC = () => {
             key: '#',
             hint: (key) => {
               console.log(key);
-              if ('vditor'.indexOf(key.toLocaleLowerCase()) > -1) {
+              if ('meta'.indexOf(key.toLocaleLowerCase()) > -1) {
                 return [
                   {
-                    value: '#Vditor',
-                    html: '<span style="color: #999;">#Vditor</span> ♏ 一款浏览器端的 Markdown 编辑器，支持所见即所得（富文本）、即时渲染（类似 Typora）和分屏预览模式。',
+                    value: '#Meta',
+                    html: '<span style="color: #999;">#Meta</span>',
+                  },
+                  {
+                    value: '#MetaNetwork',
+                    html: '<span style="color: #999;">#MetaNetwork</span>',
+                  },
+                  {
+                    value: '#MetaCMS',
+                    html: '<span style="color: #999;">#MetaCMS</span>',
                   },
                 ];
               }
@@ -94,22 +134,63 @@ const Editor: React.FC = () => {
       },
       tab: '\t',
       upload: {
-        accept: 'image/*,.mp3, .wav, .rar',
-        token: 'test',
-        url: '/api/upload/editor',
-        linkToImgUrl: '/api/upload/fetch',
+        fieldName: 'file',
+        accept: '.jpg,.jpeg,.png,.gif,.webp,.webm,.bmp',
+        // token: token,
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        url: StorageFleek,
+        linkToImgUrl: StorageFleek,
         filename(name) {
           return name
             .replace(/[^(a-zA-Z0-9\u4e00-\u9fa5\.)]/g, '')
             .replace(/[\?\\/:|<>\*\[\]\(\)\$%\{\}@~]/g, '')
             .replace('/\\s/g', '');
         },
+        format(files: File[], responseText: string): any {
+          // console.log('files', files);
+          // console.log('responseText', responseText);
+          // 字符串转换为对象
+          const { data, statusCode, message } = JSON.parse(responseText);
+
+          if (statusCode == 201) {
+            return JSON.stringify({
+              msg: message,
+              code: statusCode,
+              data: {
+                errFiles: [],
+                succMap: {
+                  [data.key]: data.publicUrl,
+                },
+              },
+            });
+          } else {
+            message.error('图片上传失败: ' + message);
+            return;
+          }
+        },
+        // success(editor: HTMLPreElement, msg: string): void {
+        //   console.log('success editor', editor);
+        //   console.log('success msg', msg);
+        // },
+        // error(msg: string): void {
+        //   console.log('error msg', msg);
+        // },
+        // linkToImgFormat(responseText: string): string {
+        //   console.log('responseText', responseText);
+        //   return 'https://storageapi.fleek.co/casimir-crystal-team-bucket/metanetwork/users/metaio-storage/621fb1d2880811ebb6edd017c2d2eca2.png';
+        // },
+      },
+      input(val: string) {
+        // console.log('val', val);
+        synchronizeContent(val);
       },
     });
 
     (window as any).vditor = vditor;
     return vditor;
-  }, []);
+  }, [synchronizeContent, token]);
 
   useEffect(() => {
     init();
@@ -117,6 +198,5 @@ const Editor: React.FC = () => {
   }, [init]);
 
   return e('div', { id: 'vditor', className: 'vditor-edit' });
-};
-
+});
 export default Editor;
