@@ -48,7 +48,7 @@ export default () => {
   const ref = useRef<ActionType>();
 
   const syncPostsRequest = async () => {
-    message.info('开始部署站点，请稍候…');
+    message.info('文章同步中…请稍候');
     setSyncLoading(true);
     const sources = await getSourceStatus();
     const syncQueue: Promise<any>[] = [];
