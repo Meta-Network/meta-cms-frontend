@@ -7,4 +7,5 @@ export interface Posts {
   hash: string;
   status: 'pending' | 'publish';
   timestamp: number;
+  delete: 0 | 1;
 }

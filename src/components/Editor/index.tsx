@@ -1,23 +1,32 @@
 import { StorageFleek } from '@/services/storage';
+import { message } from 'antd';
 import React, { useEffect, useCallback } from 'react';
 import Vditor from 'vditor';
 
 interface Props {
   readonly token: string;
-  readonly md: string;
   synchronizeContent: (val: string) => void;
+}
+
+interface UploadFormat {
+  msg: string;
+  code: number;
+  data: {
+    errFiles: string[];
+    succMap: Record<string, string>;
+  };
 }
 
 const e = React.createElement;
 
-const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent, token, md }) {
+const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent, token }) {
   const init = useCallback(() => {
     const vditor = new Vditor('vditor', {
       cache: {
         enable: false,
       },
       after() {
-        vditor.setValue(md);
+        vditor.setValue('');
       },
       // _lutePath: `http://192.168.0.107:9090/lute.min.js?${new Date().getTime()}`,
       // _lutePath: 'src/js/lute/lute.min.js',
@@ -62,7 +71,11 @@ const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent,
         'insert-after',
         'table',
         '|',
-        'upload',
+        // 'upload',
+        {
+          name: 'upload',
+          tip: '上传图片',
+        },
       ],
       toolbarConfig: {
         pin: true,
@@ -148,15 +161,14 @@ const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent,
             .replace(/[\?\\/:|<>\*\[\]\(\)\$%\{\}@~]/g, '')
             .replace('/\\s/g', '');
         },
-        format(files: File[], responseText: string): any {
+        format(files: File[], responseText: string): string {
           // console.log('files', files);
           // console.log('responseText', responseText);
-          // 字符串转换为对象
-          const { data, statusCode, message } = JSON.parse(responseText);
+          const { data, statusCode, message: msg } = JSON.parse(responseText);
 
           if (statusCode == 201) {
             return JSON.stringify({
-              msg: message,
+              msg: msg,
               code: statusCode,
               data: {
                 errFiles: [],
@@ -164,19 +176,16 @@ const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent,
                   [data.key]: data.publicUrl,
                 },
               },
-            });
+            } as UploadFormat);
           } else {
-            message.error('图片上传失败: ' + message);
-            return;
+            message.error('图片上传失败: ' + msg);
+            return '';
           }
         },
-        // success(editor: HTMLPreElement, msg: string): void {
-        //   console.log('success editor', editor);
-        //   console.log('success msg', msg);
-        // },
-        // error(msg: string): void {
-        //   console.log('error msg', msg);
-        // },
+        error(msg: string): void {
+          console.log('error msg', msg);
+          message.error(`error ${msg}`);
+        },
         // linkToImgFormat(responseText: string): string {
         //   console.log('responseText', responseText);
         //   return 'https://storageapi.fleek.co/casimir-crystal-team-bucket/metanetwork/users/metaio-storage/621fb1d2880811ebb6edd017c2d2eca2.png';

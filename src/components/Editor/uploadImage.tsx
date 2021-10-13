@@ -1,14 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Upload, message, notification } from 'antd';
-import {
-  // LoadingOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-  FileImageOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, FileImageOutlined } from '@ant-design/icons';
 import styles from './uploadImage.less';
 import { StorageFleek } from '@/services/storage';
 import { UploadImageSize } from '../../../config/index';
+import { fetchTokenAPI } from '@/helpers';
 
 const keyUploadAvatar = 'keyUploadAvatar';
 
@@ -23,16 +19,13 @@ interface UploadAvatar {
 }
 
 interface Props {
-  readonly token: string;
-  readonly imageUrl: string;
-  setImageUrl: React.Dispatch<React.SetStateAction<string>>;
+  readonly cover: string;
+  asyncCoverToDB: (url: string) => Promise<void>;
 }
 
-const UploadImage: React.FC<Props> = ({ token, imageUrl, setImageUrl }) => {
+const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
   // const [loading, setLoading] = useState<boolean>(false);
-  // const [imageUrl, setImageUrl] = useState<string>(
-  //   'https://storageapi.fleek.co/casimir-crystal-team-bucket/metanetwork/users/metaio-storage/psketch.png',
-  // );
+  const [token, setToken] = useState<string>('');
 
   // upload props
   const props: any = useMemo(
@@ -43,7 +36,7 @@ const UploadImage: React.FC<Props> = ({ token, imageUrl, setImageUrl }) => {
       headers: {
         authorization: `Bearer ${token}`,
       },
-      beforeUpload(file: File) {
+      async beforeUpload(file: File) {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         const type = 'JPG/PNG';
         if (!isJpgOrPng) {
@@ -59,6 +52,14 @@ const UploadImage: React.FC<Props> = ({ token, imageUrl, setImageUrl }) => {
         const res = isJpgOrPng && isLtMB;
 
         if (res) {
+          const result = await fetchTokenAPI();
+          setToken(result);
+
+          if (!result) {
+            message.info('认证失败');
+            return false;
+          }
+
           notification.open({
             key: keyUploadAvatar,
             className: 'custom-notification',
@@ -77,7 +78,7 @@ const UploadImage: React.FC<Props> = ({ token, imageUrl, setImageUrl }) => {
           console.log('info', info);
           if (info.file.response.statusCode === 201) {
             message.info({ content: '上传成功' });
-            setImageUrl(info.file.response.data.publicUrl);
+            asyncCoverToDB(info.file.response.data.publicUrl);
           }
           notification.close(keyUploadAvatar);
           // (`${info.file.name} file uploaded successfully`);
@@ -88,7 +89,7 @@ const UploadImage: React.FC<Props> = ({ token, imageUrl, setImageUrl }) => {
         }
       },
     }),
-    [token, setImageUrl],
+    [token, asyncCoverToDB],
   );
 
   return (
@@ -96,10 +97,10 @@ const UploadImage: React.FC<Props> = ({ token, imageUrl, setImageUrl }) => {
       <Upload
         {...props}
         className={
-          imageUrl ? `custom-feature-upload ${styles.featureUpload}` : 'custom-feature-upload'
+          cover ? `custom-feature-upload ${styles.featureUpload}` : 'custom-feature-upload'
         }
       >
-        {imageUrl ? (
+        {cover ? (
           <FileImageOutlined className={styles.featureIconUpload} />
         ) : (
           <section className={styles.featureTextUpload}>
@@ -108,12 +109,12 @@ const UploadImage: React.FC<Props> = ({ token, imageUrl, setImageUrl }) => {
           </section>
         )}
       </Upload>
-      {imageUrl ? (
+      {cover ? (
         <>
           <div className={styles.cover}>
-            <img src={imageUrl} alt="Cover" />
+            <img src={cover} alt="Cover" />
           </div>
-          <div className={styles.featureRemove} onClick={() => setImageUrl('')}>
+          <div className={styles.featureRemove} onClick={() => asyncCoverToDB('')}>
             <DeleteOutlined />
           </div>
         </>
