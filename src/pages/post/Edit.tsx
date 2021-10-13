@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { history } from 'umi';
 import { Input } from 'antd';
@@ -12,7 +12,7 @@ import { PostTempData } from '../../models/Posts';
 import type { Query } from '../../typings/Posts.d';
 import { fetchTokenAPI } from '@/helpers';
 import { assign } from 'lodash';
-
+import type Vditor from 'vditor';
 const Edit: React.FC = () => {
   // cover
   const [cover, setCover] = useState<string>('');
@@ -23,7 +23,7 @@ const Edit: React.FC = () => {
   // draft mode
   const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
   const [token, setToken] = useState<string>('');
-
+  const [vditor, setVditor] = useState<Vditor>();
   /**
    * publish
    */
@@ -38,11 +38,11 @@ const Edit: React.FC = () => {
    * generate summary
    */
   const generateSummary = useCallback((): string => {
-    const htmlContent = (window as any).vditor.getHTML();
+    const htmlContent = (window as any).vditor!.getHTML();
     if (htmlContent) {
       const div = document.createElement('div');
       div.innerHTML = htmlContent;
-      return div.innerText;
+      return div.innerText.length >= 100 ? div.innerText.slice(0, 97) + '...' : div.innerText;
     }
     return '';
   }, []);
@@ -97,10 +97,10 @@ const Edit: React.FC = () => {
         setCover(result.cover);
         setTitle(result.title);
         setContent(result.content);
-        // TODO: need modify
+
         setTimeout(() => {
-          (window as any).vditor.setValue(result.content);
-        }, 1000);
+          (window as any).vditor!.setValue(result.content);
+        }, 300);
       }
     }
   }, []);
@@ -151,9 +151,15 @@ const Edit: React.FC = () => {
   );
 
   useMount(() => {
-    fetchToken();
     fetchDBContent();
+    fetchToken();
   });
+
+  useEffect(() => {
+    if (!!vditor) {
+      console.log(`Update Default Vditor:`, vditor);
+    }
+  }, [vditor]);
 
   return (
     <section className={styles.container}>
@@ -168,7 +174,7 @@ const Edit: React.FC = () => {
           value={title}
           onChange={(e) => asyncTitleToDB(e.target.value)}
         />
-        <Editor asyncContentToDB={asyncContentToDB} token={token} />
+        <Editor asyncContentToDB={asyncContentToDB} token={token} bindVditor={setVditor} />
       </section>
     </section>
   );

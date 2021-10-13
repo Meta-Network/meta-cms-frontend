@@ -1,11 +1,14 @@
 import { StorageFleek } from '@/services/storage';
+// import '~vditor/src/assets/scss/index';
 import { message } from 'antd';
-import React, { useEffect, useCallback } from 'react';
+import React, { createRef } from 'react';
 import Vditor from 'vditor';
+import { useMount } from 'ahooks';
 
 interface Props {
   readonly token: string;
   asyncContentToDB: (val: string) => void;
+  bindVditor?: (vditor: Vditor) => void;
 }
 
 interface UploadFormat {
@@ -19,14 +22,20 @@ interface UploadFormat {
 
 const e = React.createElement;
 
-const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, token }) {
-  const init = useCallback(() => {
+const Editor: React.FC<Props> = React.memo(function Editor({
+  asyncContentToDB,
+  bindVditor,
+  token,
+}) {
+  const vditorRef = createRef<HTMLDivElement>();
+
+  useMount(() => {
     const vditor = new Vditor('vditor', {
       cache: {
         enable: false,
       },
       after() {
-        vditor.setValue('');
+        // vditor.setValue('');
       },
       // _lutePath: `http://192.168.0.107:9090/lute.min.js?${new Date().getTime()}`,
       // _lutePath: 'src/js/lute/lute.min.js',
@@ -197,15 +206,13 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, t
       },
     });
 
+    if (!!bindVditor) {
+      bindVditor(vditor);
+    }
+    // TODO: need modify
     (window as any).vditor = vditor;
-    return vditor;
-  }, [asyncContentToDB, token]);
+  });
 
-  useEffect(() => {
-    init();
-    return () => {};
-  }, [init]);
-
-  return e('div', { id: 'vditor', className: 'vditor-edit' });
+  return e('div', { id: 'vditor', className: 'vditor-edit', ref: vditorRef });
 });
 export default Editor;
