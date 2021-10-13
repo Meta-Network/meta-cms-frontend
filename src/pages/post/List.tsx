@@ -2,23 +2,25 @@ import { useState, useCallback } from 'react';
 import { history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
-import { Table, Tag, Button } from 'antd';
+import { Table, Tag, Button, Image } from 'antd';
 import { db } from '../../models/db';
+import type { Posts } from '../../models/Posts';
 
 export default () => {
+  const [postsList, setPostsList] = useState<Posts[]>([]);
   const columns = [
     {
       title: 'COVER',
       dataIndex: 'cover',
       key: 'cover',
-      width: 100,
-      render: (val: string) => <img src={val} width={60} />,
+      width: 120,
+      render: (val: string) => <Image width={120} src={val} />,
     },
     {
       title: 'TITLE',
       dataIndex: 'title',
       key: 'title',
-      render: (val: string) => <a>{val}</a>,
+      render: (val: string) => <span>{val}</span>,
     },
     {
       title: 'SUMMARY',
@@ -40,14 +42,12 @@ export default () => {
     },
   ];
 
-  const [postsList, setPostsList] = useState<any[]>([]);
-
-  // const allPosts = useLiveQuery(() => db.posts.toArray(), []);
-  // console.log('allPosts', allPosts);
-
+  /**
+   * fetch posts list
+   */
   const fetchPosts = useCallback(async () => {
     const result = await db.posts.toArray();
-    console.log('result', result);
+    // console.log('result', result);
     setPostsList(result);
   }, []);
 
@@ -57,8 +57,24 @@ export default () => {
 
   return (
     <PageContainer breadcrumb={{}} title="Post" content={<div className="text-info" />}>
-      <Button onClick={() => history.push('/post/edit')}>+</Button>
-      <Table columns={columns} dataSource={postsList} />
+      <Button onClick={() => history.push('/post/edit')}>创作</Button>
+      <Table
+        rowKey={(record: Posts) => String(record.id)}
+        onRow={(record) => {
+          return {
+            onClick: () => {
+              history.push({
+                pathname: `/post/edit`,
+                query: {
+                  id: String(record.id),
+                },
+              });
+            },
+          };
+        }}
+        columns={columns}
+        dataSource={postsList}
+      />
     </PageContainer>
   );
 };
