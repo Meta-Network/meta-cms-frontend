@@ -8,8 +8,10 @@ import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '../../models/db';
+import { PostTempData } from '../../models/Posts';
 import type { Query } from '../../typings/Posts.d';
 import { fetchTokenAPI } from '@/helpers';
+import { assign } from 'lodash';
 
 const Edit: React.FC = () => {
   // cover
@@ -58,39 +60,22 @@ const Edit: React.FC = () => {
    */
   const asyncContentToDB = useCallback(
     async (val: string) => {
-      const { id } = history.location.query as Query;
+      setContent(val);
       setDraftMode(1);
 
+      const { id } = history.location.query as Query;
+      const data = { content: val, summary: generateSummary() };
       if (id) {
-        await dbPostsUpdate(Number(id), { content: val, summary: generateSummary() });
+        await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd({
-          cover: cover,
-          title: title,
-          summary: generateSummary(),
-          content: val,
-          hash: '',
-          status: 'pending',
-          timestamp: Date.now(),
-          delete: 0,
-        });
+        const resultID = await dbPostsAdd(assign(PostTempData, data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(2);
     },
-    [cover, title, generateSummary, handleHistoryState],
+    [generateSummary, handleHistoryState],
   );
-
-  /**
-   * synchronize content
-   */
-  const synchronizeContent = useCallback((val: string) => {
-    console.log('synchronizeContent');
-    setContent(val);
-    asyncContentToDB(val);
-    // todo：暂时不能加入依赖 会导致编辑器重新渲染
-  }, []);
 
   /**
    * 获取 Token
@@ -109,9 +94,10 @@ const Edit: React.FC = () => {
       const result = await dbPostsGet(Number(id));
       if (result) {
         console.log('result', result);
-        setContent(result.content);
-        setTitle(result.title);
         setCover(result.cover);
+        setTitle(result.title);
+        setContent(result.content);
+        // TODO: need modify
         setTimeout(() => {
           (window as any).vditor.setValue(result.content);
         }, 1000);
@@ -125,29 +111,20 @@ const Edit: React.FC = () => {
   const asyncCoverToDB = useCallback(
     async (url: string) => {
       setCover(url);
-
-      const { id } = history.location.query as Query;
       setDraftMode(1);
 
+      const { id } = history.location.query as Query;
+      const data = { cover: url };
       if (id) {
-        await dbPostsUpdate(Number(id), { cover: url });
+        await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd({
-          cover: url,
-          title: title,
-          summary: generateSummary(),
-          content: content,
-          hash: '',
-          status: 'pending',
-          timestamp: Date.now(),
-          delete: 0,
-        });
+        const resultID = await dbPostsAdd(assign(PostTempData, data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(2);
     },
-    [title, content, generateSummary, handleHistoryState],
+    [handleHistoryState],
   );
 
   /**
@@ -156,29 +133,21 @@ const Edit: React.FC = () => {
   const asyncTitleToDB = useCallback(
     async (val: string) => {
       setTitle(val);
-
-      const { id } = history.location.query as Query;
       setDraftMode(1);
 
+      const { id } = history.location.query as Query;
+      const data = { title: val };
       if (id) {
-        await dbPostsUpdate(Number(id), { title: val });
+        await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd({
-          cover: cover,
-          title: val,
-          summary: generateSummary(),
-          content: content,
-          hash: '',
-          status: 'pending',
-          timestamp: Date.now(),
-          delete: 0,
-        });
+        assign(PostTempData, data);
+        const resultID = await dbPostsAdd(assign(PostTempData, data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(2);
     },
-    [cover, content, generateSummary, handleHistoryState],
+    [handleHistoryState],
   );
 
   useMount(() => {
@@ -199,7 +168,7 @@ const Edit: React.FC = () => {
           value={title}
           onChange={(e) => asyncTitleToDB(e.target.value)}
         />
-        <Editor synchronizeContent={synchronizeContent} token={token} />
+        <Editor asyncContentToDB={asyncContentToDB} token={token} />
       </section>
     </section>
   );

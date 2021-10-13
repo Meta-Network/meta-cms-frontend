@@ -5,7 +5,7 @@ import Vditor from 'vditor';
 
 interface Props {
   readonly token: string;
-  synchronizeContent: (val: string) => void;
+  asyncContentToDB: (val: string) => void;
 }
 
 interface UploadFormat {
@@ -19,7 +19,7 @@ interface UploadFormat {
 
 const e = React.createElement;
 
-const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent, token }) {
+const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, token }) {
   const init = useCallback(() => {
     const vditor = new Vditor('vditor', {
       cache: {
@@ -193,13 +193,13 @@ const Editor: React.FC<Props> = React.memo(function Editor({ synchronizeContent,
       },
       input(val: string) {
         // console.log('val', val);
-        synchronizeContent(val);
+        asyncContentToDB(val);
       },
     });
 
     (window as any).vditor = vditor;
     return vditor;
-  }, [synchronizeContent, token]);
+  }, [asyncContentToDB, token]);
 
   useEffect(() => {
     init();
