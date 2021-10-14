@@ -22,14 +22,10 @@ export default () => {
     }
 
     if (defaultSiteConfig?.id && defaultSiteConfig?.siteInfo?.id) {
-      const siteConfigRequest = modifySiteConfigSetting(
-        defaultSiteConfig.siteInfo.id,
-        defaultSiteConfig.id,
-        {
-          language: values.language,
-          timezone: values.timezone,
-        },
-      );
+      const siteConfigRequest = modifySiteConfigSetting(defaultSiteConfig.id, {
+        language: values.language,
+        timezone: values.timezone,
+      });
 
       const siteInfoRequest = modifySiteInfoSetting(defaultSiteConfig.siteInfo.id, {
         title: values.title,
