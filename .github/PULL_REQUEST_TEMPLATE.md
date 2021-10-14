@@ -11,14 +11,6 @@
 - [ ] Build-related changes
 - [ ] Other, please describe:
 
-If adding a **new feature**, the PR's description should includes a convincing reason for adding this feature (to avoid wasting your time, it's best to open a suggestion issue first and wait for approval before working on it).
-
-## Description
-
-<!-- Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change. -->
-
-Fixes # (issue)
-
 **Does this PR introduce a breaking change?** (check one)
 
 - [ ] Yes
@@ -32,6 +24,14 @@ If yes, please describe the impact and migration path for existing applications:
 - [ ] No
 
 If yes, please updated the documentation accordingly.
+
+## Description
+
+<!-- Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change. -->
+
+<!-- If adding a **new feature**, please include a convincing reason for adding this feature (to avoid wasting your time, it's best to open a suggestion issue first and wait for approval before working on it). -->
+
+Fixes # (issue)
 
 ## How Has This Been Tested?
 
