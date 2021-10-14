@@ -102,21 +102,23 @@ const Edit: React.FC = () => {
       ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
     ];
 
-    const imgListFilter = imgList.filter((i) => !i.src.includes('https://storageapi.fleek.co'));
-    console.log('imgListFilter', imgListFilter);
+    const imgListFilter = imgList.filter((i) => {
+      const reg = new RegExp('[a-zA-z]+://[^s]*');
+
+      // get img src
+      const result = i.outerHTML.match('src=".*?"');
+      const _src = result ? result[0].slice(5, -1) : '';
+      // console.log('_src', _src);
+
+      return i.src && !i.src.includes('https://storageapi.fleek.co') && reg.test(_src);
+    });
+    // console.log('imgListFilter', imgListFilter);
 
     if (imgListFilter.length > 0) {
       _vditor.disabled();
 
       for (let i = 0; i < imgListFilter.length; i++) {
         const ele = imgListFilter[i];
-
-        console.log('ele.src', ele.src);
-
-        // TODO：验证 url 格式
-        if (!ele.src) {
-          continue;
-        }
 
         const result = await imageUploadByUrlAPI(ele.src);
         if (result) {
@@ -167,6 +169,8 @@ const Edit: React.FC = () => {
 
         setTimeout(() => {
           (window as any).vditor!.setValue(result.content);
+          // handle all image
+          handleImageUploadToIpfs();
         }, 1000);
       }
     }
@@ -227,8 +231,9 @@ const Edit: React.FC = () => {
       console.log(`Update Default Vditor:`, vditor);
     }
 
-    // const timer = setInterval(handleImageUploadToIpfs, 5000);
-    // return () => clearInterval(timer);
+    // 10s handle all image
+    const timer = setInterval(handleImageUploadToIpfs, 10000);
+    return () => clearInterval(timer);
   }, [vditor, handleImageUploadToIpfs]);
 
   return (
