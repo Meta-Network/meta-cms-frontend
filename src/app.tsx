@@ -16,6 +16,7 @@ import MenuMoreInfo from './components/MenuMoreInfo';
 import MenuUserInfo from './components/MenuUserInfo';
 import MenuItemWithBadge from './components/MenuItemWithBadge';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
+import MenuLanguageSwitch from './components/MenuLanguageSwitch';
 
 const { Text } = Typography;
 
@@ -50,7 +51,6 @@ function CustomSiderMenu({
 
     if (deployedSite.configId) {
       const response = await deployAndPublishSite(deployedSite.configId);
-      console.log(response);
       if (response.statusCode === 201) {
         notification.success({
           message: '任务完成',
@@ -214,7 +214,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push(loginPath);
       }
     },
-    links: [MenuMoreInfo],
+    links: [<MenuLanguageSwitch key="MenuLanguageSwitch" />, <MenuMoreInfo key="MenuMoreInfo" />],
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
   };
