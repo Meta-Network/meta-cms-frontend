@@ -1,7 +1,6 @@
 import { Alert } from 'antd';
 import { useModel, FormattedMessage } from 'umi';
 import FormattedInfo from '../FormattedInfo';
-import styles from './styles.less';
 
 export default () => {
   const { storeSetting } = useModel('storage');
@@ -18,18 +17,16 @@ export default () => {
   };
 
   return (
-    <div className={styles.container}>
-      <Alert
-        type="success"
-        showIcon
-        message={<FormattedMessage id="guide.publish.message" />}
-        description={
-          <>
-            <FormattedInfo id="guide.publish.info" />
-            <SelectedStore />
-          </>
-        }
-      />
-    </div>
+    <Alert
+      type="success"
+      showIcon
+      message={<FormattedMessage id="guide.publish.message" />}
+      description={
+        <>
+          <FormattedInfo id="guide.publish.info" />
+          <SelectedStore />
+        </>
+      }
+    />
   );
 };

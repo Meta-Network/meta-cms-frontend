@@ -1,48 +1,60 @@
+/* eslint-disable no-await-in-loop */
 import { extendWithErrorHandler } from '@/services/api/base-request';
 
-const mockRequest = extendWithErrorHandler({
-  prefix: '/api',
-});
-
 const request = extendWithErrorHandler({
+  credentials: 'include',
   prefix: META_CMS_API || 'https://meta-cms-api-dev.mttk.net',
-  // prefix: META_CMS_API || 'http://127.0.0.1:3002',
-
-  credentials: 'include', // 默认请求是否带上cookie
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 /** 获取主题模板 GET /theme/template */
 export async function getThemeTemplates(type: 'HEXO' | 'ALL') {
   return request<GLOBAL.GeneralResponse<CMS.ThemeTemplatesResponse[]>>('/templates', {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     params: { type },
   });
 }
 
 /** 提交新的站点信息 POST /site/info */
-export async function newSiteInfoSetting(body: CMS.NewSiteInfoSettingRequest) {
+export async function newSiteInfoSetting(body: CMS.SiteInfoSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/info', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
 
 /** 提交新的站点设置 POST /site/config */
-export async function newSiteConfigSetting(siteId: number, body: CMS.NewSiteConfigSettingRequest) {
+export async function newSiteConfigSetting(siteId: number, body: CMS.SiteConfigSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/config', {
     params: {
       siteId,
     },
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+    data: body,
+  });
+}
+
+/** 更新一个站点信息 PATCH /site/info */
+export async function modifySiteInfoSetting(siteInfoId: number, body: CMS.SiteInfoSettingRequest) {
+  return request<GLOBAL.GeneralResponse<any>>(`/site/info/${siteInfoId}`, {
+    method: 'PATCH',
+    data: body,
+  });
+}
+
+/** 更新一个站点设置 PATCH /site/config */
+export async function modifySiteConfigSetting(
+  siteInfoId: number,
+  configId: number,
+  body: CMS.SiteConfigSettingRequest,
+) {
+  return request<GLOBAL.GeneralResponse<any>>(`/site/config/${configId}`, {
+    params: {
+      siteId: siteInfoId,
     },
+    method: 'PATCH',
     data: body,
   });
 }
@@ -51,16 +63,13 @@ export async function newSiteConfigSetting(siteId: number, body: CMS.NewSiteConf
 export async function newSiteStorageSetting(
   configId: number,
   platform: string,
-  body: CMS.NewSiteStorageSettingRequest,
+  body: CMS.SiteStorageSettingRequest,
 ) {
   return request<GLOBAL.GeneralResponse<any>>(`/storage/${platform}`, {
     params: {
       configId,
     },
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
@@ -69,16 +78,13 @@ export async function newSiteStorageSetting(
 export async function newSitePublishSetting(
   configId: number,
   platform: string,
-  body: CMS.NewSitePublishSettingRequest,
+  body: CMS.SitePublishSettingRequest,
 ) {
   return request<GLOBAL.GeneralResponse<any>>(`/publisher/${platform}`, {
     params: {
       configId,
     },
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
@@ -87,9 +93,6 @@ export async function newSitePublishSetting(
 export async function deployAndPublishSite(configId: number) {
   return request<GLOBAL.GeneralResponse<any>>('/tasks/deploy-publish', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: {
       configId,
     },
@@ -101,58 +104,45 @@ export async function isDomainForbidden(domain: string) {
   if (!domain) return true;
   const response = await request<GLOBAL.GeneralResponse<any>>('/domain/validate', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: { domain },
   });
   return response?.data?.status !== 'AVAILABLE';
 }
 
+/** 获取当前用户默认的站点设置 GET /site/config/default */
+export async function getDefaultSiteConfig() {
+  return request<GLOBAL.GeneralResponse<CMS.SiteConfiguration>>('/site/config/default', {
+    method: 'GET',
+  });
+}
+
 /** 进行特定平台的文章同步 POST /post/sync/{platform} */
 export async function syncPostsByPlatform(platform: string) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/sync/${platform}`, {
-    credentials: 'include',
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 }
 
 /** 获取待同步的文章列表 GET /post */
-export async function fetchPostsPendingSync() {
-  return request<GLOBAL.GeneralResponse<any>>('/post', {
-    credentials: 'include',
+export async function fetchPostsPending(page: number, limit: number) {
+  return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post', {
     method: 'GET',
     params: {
-      page: 1,
-      limit: 10,
-    },
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-}
-
-/** 获取当前用户默认的站点设置 GET /site/config/default */
-export async function getDefaultSiteConfig() {
-  return request<GLOBAL.GeneralResponse<CMS.SiteConfiguration>>('/site/config/default', {
-    credentials: 'include',
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
+      page,
+      limit,
+      state: 'pending',
     },
   });
 }
 
 /** 获取已经同步的文章列表 GET /post */
-export async function fetchPublishedPosts() {
-  return mockRequest<GLOBAL.GeneralResponse<{ items: any }>>('/published-posts', {
-    credentials: 'include',
+export async function fetchPostsPublished(page: number, limit: number) {
+  return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post', {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
+    params: {
+      page,
+      limit,
+      state: 'published',
     },
   });
 }
@@ -160,23 +150,15 @@ export async function fetchPublishedPosts() {
 /** 发布一篇待同步待文章 POST /post/{postId}/publish */
 export async function publishPendingPost(postId: number, configIds: number[]) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/publish`, {
-    credentials: 'include',
     method: 'POST',
     data: { configIds },
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 }
 
 /** 取消发布一篇待同步待文章 POST /post/{postId}/ignore */
 export async function ignorePendingPost(postId: number) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/ignore`, {
-    credentials: 'include',
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 }
 
@@ -191,9 +173,6 @@ export async function bindSourcePlatform(platform: string) {
 export async function getSourceStatus() {
   const response = await request<GLOBAL.GeneralResponse<CMS.SourceStatusResponse[]>>('/token', {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 
   // WARNING of side effect: set active as true for all platforms
@@ -214,20 +193,12 @@ export async function waitUntilSyncFinish(platform: string) {
   const requestState = () =>
     request<GLOBAL.GeneralResponse<string | number>>(`/post/sync/${platform}/state`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
-
-  const timeout = new Date();
 
   let status = (await requestState()).data;
   while (typeof status !== 'number' && status === 'syncing') {
-    // @ts-ignore
-    if (new Date() - timeout > 15000) {
-      return false;
-    }
-    // eslint-disable-next-line no-await-in-loop
+    // sleep for 3 seconds after every request
+    await new Promise((r) => setTimeout(r, 3000));
     status = (await requestState()).data;
   }
 

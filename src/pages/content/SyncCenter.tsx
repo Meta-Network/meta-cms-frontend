@@ -2,12 +2,12 @@ import {
   ignorePendingPost,
   publishPendingPost,
   getDefaultSiteConfig,
-  fetchPostsPendingSync,
   syncPostsByPlatform,
   getSourceStatus,
   waitUntilSyncFinish,
-  deployAndPublishSite,
+  fetchPostsPending,
 } from '@/services/api/meta-cms';
+import { useModel } from '@@/plugin-model/useModel';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
@@ -15,16 +15,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import styles from './SyncCenter.less';
 
-type HexoPostsInfo = {
-  id: number;
-  cover: string | null;
-  title: string;
-  summary: string | null;
-  tags: string[] | null;
-  category: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
+type PostsInfo = CMS.ExistsPostsResponse['items'][number];
 
 enum LoadingStates {
   Pending,
@@ -36,8 +27,8 @@ export default () => {
   const [siteConfigId, setSiteConfigId] = useState<number | null>(null);
   const [itemsNumbers, setItemsNumbers] = useState<number>(0);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
-  const [publishLoading, setPublishLoading] = useState<boolean>(false);
   const [postsLoadings, setPostsLoading] = useState<LoadingStates[]>([]);
+  const { setSiteNeedToDeploy } = useModel('storage');
 
   getDefaultSiteConfig().then((response) => {
     if (response.statusCode === 200) {
@@ -48,8 +39,9 @@ export default () => {
   const ref = useRef<ActionType>();
 
   const syncPostsRequest = async () => {
-    message.info('文章同步中…请稍候');
+    const done = message.loading('文章同步中…请稍候');
     setSyncLoading(true);
+
     const sources = await getSourceStatus();
     const syncQueue: Promise<any>[] = [];
     const syncStates: Promise<boolean>[] = [];
@@ -60,23 +52,13 @@ export default () => {
     });
 
     await Promise.all(syncQueue);
-    Promise.all(syncStates).then(() => setSyncLoading(false));
-  };
 
-  const publishSiteRequest = async () => {
-    message.info('开始部署站点，请稍候…');
-    setPublishLoading(true);
-    if (siteConfigId === null) {
-      message.error('未获取到站点信息，无法发布文章。请先创建站点');
-    } else {
-      const response = await deployAndPublishSite(siteConfigId);
-      if (response.statusCode === 201) {
-        message.success('站点已成功部署。');
-      } else {
-        message.error('站点部署失败。');
-      }
-    }
-    setPublishLoading(false);
+    Promise.all(syncStates).then(() => {
+      message.success('文章同步完成。');
+      ref.current?.reload();
+      setSyncLoading(false);
+      done();
+    });
   };
 
   useEffect(() => {
@@ -91,7 +73,7 @@ export default () => {
     });
   }, []);
 
-  const columns: ProColumns<HexoPostsInfo>[] = [
+  const columns: ProColumns<PostsInfo>[] = [
     {
       dataIndex: 'cover',
       title: '封面图片',
@@ -207,9 +189,15 @@ export default () => {
               return;
             }
             setLoading(index, LoadingStates.Publishing);
+            const done = message.loading('文章发布中…请稍候。', 0);
             await publishPendingPost(record.id, [siteConfigId]);
-            await ref.current?.reload();
+            if (ref.current?.reset) {
+              await ref.current?.reset();
+            }
+            done();
             message.success('已成功发布此文章');
+            setSiteNeedToDeploy(true);
+            setLoading(index, LoadingStates.Pending);
           }}
           loading={postsLoadings[index] === LoadingStates.Publishing}
           disabled={postsLoadings[index] === LoadingStates.Discarding}
@@ -219,9 +207,14 @@ export default () => {
         <Button
           onClick={async () => {
             setLoading(index, LoadingStates.Discarding);
+            const done = message.loading('取消发布中…请稍候。', 0);
             await ignorePendingPost(record.id);
-            await ref.current?.reload();
+            if (ref.current?.reset) {
+              await ref.current?.reset();
+            }
+            done();
             message.success('成功取消发布此文章');
+            setLoading(index, LoadingStates.Pending);
           }}
           loading={postsLoadings[index] === LoadingStates.Discarding}
           disabled={postsLoadings[index] === LoadingStates.Publishing}
@@ -249,26 +242,17 @@ export default () => {
           >
             立即同步
           </Button>
-          <Button
-            type="primary"
-            key="publish-button"
-            loading={publishLoading}
-            onClick={publishSiteRequest}
-            style={{ marginRight: 10 }}
-          >
-            提交更新
-          </Button>
         </div>,
       ]}
       title="同步中心"
     >
-      <ProTable<HexoPostsInfo>
+      <ProTable<PostsInfo>
         actionRef={ref}
         columns={columns}
-        request={async () => {
+        request={async ({ pageSize, current }) => {
           // TODO: 分页
-          const request = await fetchPostsPendingSync();
-          setItemsNumbers(request.data.items.length);
+          const request = await fetchPostsPending(current ?? 1, pageSize ?? 10);
+          setItemsNumbers(request.data.meta.totalItems);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
           return {
@@ -277,7 +261,7 @@ export default () => {
             // 不然 table 会停止解析数据，即使有数据
             success: true,
             // 不传会使用 data 的长度，如果是分页一定要传
-            total: 10,
+            total: request.data.meta.totalItems,
           };
         }}
         rowKey={(record) => record.id}
@@ -298,7 +282,7 @@ export default () => {
         }}
         pagination={{}}
         expandable={{
-          expandedRowRender: (record: HexoPostsInfo) => (
+          expandedRowRender: (record: PostsInfo) => (
             <p dangerouslySetInnerHTML={{ __html: record.summary || '' }} />
           ),
         }}

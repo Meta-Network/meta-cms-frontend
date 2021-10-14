@@ -1,16 +1,16 @@
 import { extendWithErrorHandler } from '@/services/api/base-request';
 
 const request = extendWithErrorHandler({
+  credentials: 'include',
   prefix: META_UCENTER_API || 'https://ucenter-test-api.mttk.net',
-  credentials: 'include', // 默认请求是否带上cookie
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 export async function webauthnLogin(body: any) {
   return request<GLOBAL.GeneralResponse<{ user: GLOBAL.CurrentUser }>>('/accounts/webauthn/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
@@ -20,9 +20,6 @@ export async function webauthnSignup(body: any, signature: string) {
     `/accounts/webauthn/signup/${signature}`,
     {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       data: body,
     },
   );
@@ -32,9 +29,6 @@ export async function webauthnSignup(body: any, signature: string) {
 export async function webauthnGetAssertion(body: GLOBAL.VerificationCodeParams) {
   return request<GLOBAL.GeneralResponse<any>>('/accounts/webauthn/generate-assertion', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: { key: body },
   });
 }
@@ -43,9 +37,6 @@ export async function webauthnGetAssertion(body: GLOBAL.VerificationCodeParams) 
 export async function webauthnGetAttestation(body: GLOBAL.VerificationCodeParams) {
   return request<GLOBAL.GeneralResponse<any>>('/accounts/webauthn/generate-attestation', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: { key: body },
   });
 }
@@ -54,9 +45,6 @@ export async function webauthnGetAttestation(body: GLOBAL.VerificationCodeParams
 export async function emailLogin(body: GLOBAL.EmailLoginParams) {
   return request<GLOBAL.GeneralResponse<{ user: GLOBAL.CurrentUser }>>('/accounts/email/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
@@ -65,9 +53,6 @@ export async function emailLogin(body: GLOBAL.EmailLoginParams) {
 export async function emailGetVerificationCode(body: GLOBAL.VerificationCodeParams) {
   return request<GLOBAL.GeneralResponse<{ key: string }>>('/accounts/email/verification-code', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
@@ -90,9 +75,6 @@ export async function queryInvitations() {
 export async function updateInvitation(signature: string, body: GLOBAL.InvitationInfo) {
   return request<GLOBAL.GeneralResponse<GLOBAL.Invitation>>(`/invitations/${signature}/message`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
@@ -130,9 +112,6 @@ export async function getSocialAuthToken(platform: string) {
 export async function updateUserInfo(body: Partial<GLOBAL.UserInfo>) {
   return request<GLOBAL.GeneralResponse<GLOBAL.Invitation>>('/users/me', {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     data: body,
   });
 }
