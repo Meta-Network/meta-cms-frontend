@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
 import { history } from 'umi';
-import { Input } from 'antd';
+import { Input, message } from 'antd';
 import Editor from '../../components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
@@ -10,7 +10,7 @@ import { useMount } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '../../models/db';
 import { PostTempData } from '../../models/Posts';
 import type { Query } from '../../typings/Posts.d';
-import { fetchTokenAPI } from '@/helpers';
+import { imageUploadByUrlAPI } from '@/helpers';
 import { assign } from 'lodash';
 import type Vditor from 'vditor';
 const Edit: React.FC = () => {
@@ -22,8 +22,10 @@ const Edit: React.FC = () => {
   const [content, setContent] = useState<string>('');
   // draft mode
   const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
-  const [token, setToken] = useState<string>('');
+  // vditor
   const [vditor, setVditor] = useState<Vditor>();
+  // 处理图片上传开关
+  const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState(false);
   /**
    * publish
    */
@@ -78,12 +80,77 @@ const Edit: React.FC = () => {
   );
 
   /**
-   * 获取 Token
+   * handle image upload to ipfs
    */
-  const fetchToken = useCallback(async () => {
-    const result = await fetchTokenAPI();
-    setToken(result);
-  }, []);
+  const handleImageUploadToIpfs = useCallback(async () => {
+    if (flagImageUploadToIpfs) return;
+    setFlagImageUploadToIpfs(true);
+
+    const _vditor = (window as any).vditor;
+    if (!_vditor) {
+      setFlagImageUploadToIpfs(false);
+      return;
+    }
+
+    const contentHTML = _vditor.getHTML();
+    const DIV = document.createElement('div');
+    DIV.innerHTML = contentHTML;
+
+    const imgList: HTMLImageElement[] = [
+      // TODO: type ts
+      // @ts-ignore
+      ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
+    ];
+
+    const imgListFilter = imgList.filter((i) => !i.src.includes('https://storageapi.fleek.co'));
+    console.log('imgListFilter', imgListFilter);
+
+    if (imgListFilter.length > 0) {
+      _vditor.disabled();
+
+      for (let i = 0; i < imgListFilter.length; i++) {
+        const ele = imgListFilter[i];
+
+        console.log('ele.src', ele.src);
+
+        // TODO：验证 url 格式
+        if (!ele.src) {
+          continue;
+        }
+
+        const result = await imageUploadByUrlAPI(ele.src);
+        if (result) {
+          // _vditor.tip('上传成功', 2000);
+          message.success('上传成功');
+          ele.src = result.publicUrl;
+          ele.alt = result.key;
+        }
+      }
+
+      // console.log('imgList', imgList);
+
+      const mdValue = _vditor.html2md(DIV.innerHTML);
+
+      _vditor.setValue(mdValue);
+
+      await asyncContentToDB(mdValue);
+
+      _vditor.enable();
+    }
+
+    setFlagImageUploadToIpfs(false);
+  }, [flagImageUploadToIpfs, asyncContentToDB]);
+
+  /**
+   * handle async content to db
+   */
+  const handleAsyncContentToDB = useCallback(
+    async (val: string) => {
+      await asyncContentToDB(val);
+      await handleImageUploadToIpfs();
+    },
+    [asyncContentToDB, handleImageUploadToIpfs],
+  );
 
   /**
    * fetch DB content
@@ -100,7 +167,7 @@ const Edit: React.FC = () => {
 
         setTimeout(() => {
           (window as any).vditor!.setValue(result.content);
-        }, 300);
+        }, 1000);
       }
     }
   }, []);
@@ -152,14 +219,17 @@ const Edit: React.FC = () => {
 
   useMount(() => {
     fetchDBContent();
-    fetchToken();
   });
 
   useEffect(() => {
+    console.log('watch', vditor);
     if (!!vditor) {
       console.log(`Update Default Vditor:`, vditor);
     }
-  }, [vditor]);
+
+    // const timer = setInterval(handleImageUploadToIpfs, 5000);
+    // return () => clearInterval(timer);
+  }, [vditor, handleImageUploadToIpfs]);
 
   return (
     <section className={styles.container}>
@@ -174,7 +244,7 @@ const Edit: React.FC = () => {
           value={title}
           onChange={(e) => asyncTitleToDB(e.target.value)}
         />
-        <Editor asyncContentToDB={asyncContentToDB} token={token} bindVditor={setVditor} />
+        <Editor asyncContentToDB={handleAsyncContentToDB} bindVditor={setVditor} />
       </section>
     </section>
   );

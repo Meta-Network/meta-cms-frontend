@@ -1,4 +1,5 @@
 import { extendWithErrorHandler } from '@/services/api/base-request';
+import type { Storage } from '../../typings/Storage.d';
 
 const mockRequest = extendWithErrorHandler({
   prefix: '/api',
@@ -185,5 +186,15 @@ export async function bindSourcePlatform(platform: string) {
 export async function unbindSourcePlatform(platform: string) {
   return request<GLOBAL.GeneralResponse<string>>(`/token/${platform}/disable_sync`, {
     method: 'POST',
+  });
+}
+
+/**
+ * image upload by url
+ */
+export async function imageUploadByUrl(url: string) {
+  return request<GLOBAL.GeneralResponse<Storage>>(`/image/uploadByUrl`, {
+    method: 'POST',
+    data: { url },
   });
 }

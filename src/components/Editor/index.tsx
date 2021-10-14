@@ -1,12 +1,11 @@
+import { fetchTokenAPI } from '@/helpers';
 import { StorageFleek } from '@/services/storage';
 // import '~vditor/src/assets/scss/index';
 import { message } from 'antd';
-import React, { createRef } from 'react';
+import React, { useEffect, createRef, useCallback } from 'react';
 import Vditor from 'vditor';
-import { useMount } from 'ahooks';
-
+import type { Storage } from '../../typings/Storage.d';
 interface Props {
-  readonly token: string;
   asyncContentToDB: (val: string) => void;
   bindVditor?: (vditor: Vditor) => void;
 }
@@ -21,15 +20,17 @@ interface UploadFormat {
 }
 
 const e = React.createElement;
+let _TOKEN = '';
 
-const Editor: React.FC<Props> = React.memo(function Editor({
-  asyncContentToDB,
-  bindVditor,
-  token,
-}) {
+const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, bindVditor }) {
   const vditorRef = createRef<HTMLDivElement>();
 
-  useMount(() => {
+  const fetchToken = useCallback(async () => {
+    const result = await fetchTokenAPI();
+    _TOKEN = result;
+  }, []);
+
+  const init = useCallback(() => {
     const vditor = new Vditor('vditor', {
       cache: {
         enable: false,
@@ -159,11 +160,12 @@ const Editor: React.FC<Props> = React.memo(function Editor({
         fieldName: 'file',
         accept: '.jpg,.jpeg,.png,.gif,.webp,.webm,.bmp',
         // token: token,
-        headers: {
-          authorization: `Bearer ${token}`,
+        setHeaders() {
+          return {
+            authorization: `Bearer ${_TOKEN}`,
+          };
         },
         url: StorageFleek,
-        linkToImgUrl: StorageFleek,
         filename(name) {
           return name
             .replace(/[^(a-zA-Z0-9\u4e00-\u9fa5\.)]/g, '')
@@ -171,9 +173,14 @@ const Editor: React.FC<Props> = React.memo(function Editor({
             .replace('/\\s/g', '');
         },
         format(files: File[], responseText: string): string {
+          console.log('format');
           // console.log('files', files);
           // console.log('responseText', responseText);
-          const { data, statusCode, message: msg } = JSON.parse(responseText);
+          const {
+            data,
+            statusCode,
+            message: msg,
+          }: GLOBAL.GeneralResponse<Storage> = JSON.parse(responseText);
 
           if (statusCode == 201) {
             return JSON.stringify({
@@ -195,10 +202,6 @@ const Editor: React.FC<Props> = React.memo(function Editor({
           console.log('error msg', msg);
           message.error(`error ${msg}`);
         },
-        // linkToImgFormat(responseText: string): string {
-        //   console.log('responseText', responseText);
-        //   return 'https://storageapi.fleek.co/casimir-crystal-team-bucket/metanetwork/users/metaio-storage/621fb1d2880811ebb6edd017c2d2eca2.png';
-        // },
       },
       input(val: string) {
         // console.log('val', val);
@@ -206,12 +209,24 @@ const Editor: React.FC<Props> = React.memo(function Editor({
       },
     });
 
+    // TODO: need modify
+    (window as any).vditor = vditor;
+
     if (!!bindVditor) {
       bindVditor(vditor);
     }
-    // TODO: need modify
-    (window as any).vditor = vditor;
-  });
+  }, [asyncContentToDB, bindVditor]);
+
+  useEffect(() => {
+    fetchToken();
+    init();
+
+    // TODO: 没有找到更好的办法获取 token 暂时 loop
+    const timer = setInterval(fetchToken, 1000 * 60 * 3);
+    return clearInterval(timer);
+    // only once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return e('div', { id: 'vditor', className: 'vditor-edit', ref: vditorRef });
 });
