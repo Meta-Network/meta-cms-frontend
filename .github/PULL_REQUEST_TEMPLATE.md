@@ -40,11 +40,15 @@ Fixes # (issue)
 <!--- see how your change affects other areas of the code, etc. -->
 
 **Desktop:** 
-
 <!-- Please complete the following information -->
- - OS: [e.g. MacOS]
+<!-- Or paste your full system/browser infomation, e.g. the output of `uname -a`  -->
+<!-- Darwin MacPro 20.6.0 Darwin Kernel Version 20.6.0 ... arm64  -->
+
+ - OS:
+   - [ ] Windows [version]
+   - [ ] macOS [version]
+   - [ ] Linux [version]
  - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
 
 **Smartphone:**
 
@@ -52,7 +56,6 @@ Fixes # (issue)
  - Device: [e.g. iPhone6]
  - OS: [e.g. iOS8.1]
  - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
 
 ## Screenshots
  
