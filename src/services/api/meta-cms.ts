@@ -26,10 +26,10 @@ export async function newSiteInfoSetting(body: CMS.SiteInfoSettingRequest) {
 }
 
 /** 提交新的站点设置 POST /site/config */
-export async function newSiteConfigSetting(siteId: number, body: CMS.SiteConfigSettingRequest) {
+export async function newSiteConfigSetting(siteInfoId: number, body: CMS.SiteConfigSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/config', {
     params: {
-      siteId,
+      siteInfoId,
     },
     method: 'POST',
     data: body,
@@ -46,14 +46,10 @@ export async function modifySiteInfoSetting(siteInfoId: number, body: CMS.SiteIn
 
 /** 更新一个站点设置 PATCH /site/config */
 export async function modifySiteConfigSetting(
-  siteInfoId: number,
   configId: number,
   body: CMS.SiteConfigSettingRequest,
 ) {
   return request<GLOBAL.GeneralResponse<any>>(`/site/config/${configId}`, {
-    params: {
-      siteId: siteInfoId,
-    },
     method: 'PATCH',
     data: body,
   });
