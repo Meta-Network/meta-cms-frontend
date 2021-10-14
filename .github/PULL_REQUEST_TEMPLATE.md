@@ -23,7 +23,7 @@ If yes, please describe the impact and migration path for existing applications:
 - [ ] Yes
 - [ ] No
 
-If yes, please updated the documentation accordingly.
+If yes, please update the documentation accordingly.
 
 ## Description
 
