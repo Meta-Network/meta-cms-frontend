@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { extendWithErrorHandler } from '@/services/api/base-request';
 
 const request = extendWithErrorHandler({
@@ -17,7 +18,7 @@ export async function getThemeTemplates(type: 'HEXO' | 'ALL') {
 }
 
 /** 提交新的站点信息 POST /site/info */
-export async function newSiteInfoSetting(body: CMS.NewSiteInfoSettingRequest) {
+export async function newSiteInfoSetting(body: CMS.SiteInfoSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/info', {
     method: 'POST',
     data: body,
@@ -25,7 +26,7 @@ export async function newSiteInfoSetting(body: CMS.NewSiteInfoSettingRequest) {
 }
 
 /** 提交新的站点设置 POST /site/config */
-export async function newSiteConfigSetting(siteId: number, body: CMS.NewSiteConfigSettingRequest) {
+export async function newSiteConfigSetting(siteId: number, body: CMS.SiteConfigSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>('/site/config', {
     params: {
       siteId,
@@ -35,11 +36,34 @@ export async function newSiteConfigSetting(siteId: number, body: CMS.NewSiteConf
   });
 }
 
+/** 更新一个站点信息 PATCH /site/info */
+export async function modifySiteInfoSetting(siteInfoId: number, body: CMS.SiteInfoSettingRequest) {
+  return request<GLOBAL.GeneralResponse<any>>(`/site/info/${siteInfoId}`, {
+    method: 'PATCH',
+    data: body,
+  });
+}
+
+/** 更新一个站点设置 PATCH /site/config */
+export async function modifySiteConfigSetting(
+  siteInfoId: number,
+  configId: number,
+  body: CMS.SiteConfigSettingRequest,
+) {
+  return request<GLOBAL.GeneralResponse<any>>(`/site/config/${configId}`, {
+    params: {
+      siteId: siteInfoId,
+    },
+    method: 'PATCH',
+    data: body,
+  });
+}
+
 /** 提交新的存储配置 POST /storage/{platform} */
 export async function newSiteStorageSetting(
   configId: number,
   platform: string,
-  body: CMS.NewSiteStorageSettingRequest,
+  body: CMS.SiteStorageSettingRequest,
 ) {
   return request<GLOBAL.GeneralResponse<any>>(`/storage/${platform}`, {
     params: {
@@ -54,7 +78,7 @@ export async function newSiteStorageSetting(
 export async function newSitePublishSetting(
   configId: number,
   platform: string,
-  body: CMS.NewSitePublishSettingRequest,
+  body: CMS.SitePublishSettingRequest,
 ) {
   return request<GLOBAL.GeneralResponse<any>>(`/publisher/${platform}`, {
     params: {
@@ -171,15 +195,10 @@ export async function waitUntilSyncFinish(platform: string) {
       method: 'GET',
     });
 
-  const timeout = new Date();
-
   let status = (await requestState()).data;
   while (typeof status !== 'number' && status === 'syncing') {
-    // @ts-ignore
-    if (new Date() - timeout > 15000) {
-      return false;
-    }
-    // eslint-disable-next-line no-await-in-loop
+    // sleep for 3 seconds after every request
+    await new Promise((r) => setTimeout(r, 3000));
     status = (await requestState()).data;
   }
 

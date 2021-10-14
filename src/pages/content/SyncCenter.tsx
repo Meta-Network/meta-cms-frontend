@@ -5,9 +5,9 @@ import {
   syncPostsByPlatform,
   getSourceStatus,
   waitUntilSyncFinish,
-  deployAndPublishSite,
   fetchPostsPending,
 } from '@/services/api/meta-cms';
+import { useModel } from '@@/plugin-model/useModel';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
@@ -27,8 +27,8 @@ export default () => {
   const [siteConfigId, setSiteConfigId] = useState<number | null>(null);
   const [itemsNumbers, setItemsNumbers] = useState<number>(0);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
-  const [publishLoading, setPublishLoading] = useState<boolean>(false);
   const [postsLoadings, setPostsLoading] = useState<LoadingStates[]>([]);
+  const { setSiteNeedToDeploy } = useModel('storage');
 
   getDefaultSiteConfig().then((response) => {
     if (response.statusCode === 200) {
@@ -39,8 +39,9 @@ export default () => {
   const ref = useRef<ActionType>();
 
   const syncPostsRequest = async () => {
-    message.info('文章同步中…请稍候');
+    const done = message.loading('文章同步中…请稍候');
     setSyncLoading(true);
+
     const sources = await getSourceStatus();
     const syncQueue: Promise<any>[] = [];
     const syncStates: Promise<boolean>[] = [];
@@ -51,23 +52,13 @@ export default () => {
     });
 
     await Promise.all(syncQueue);
-    Promise.all(syncStates).then(() => setSyncLoading(false));
-  };
 
-  const publishSiteRequest = async () => {
-    message.info('开始部署站点，请稍候…');
-    setPublishLoading(true);
-    if (siteConfigId === null) {
-      message.error('未获取到站点信息，无法发布文章。请先创建站点');
-    } else {
-      const response = await deployAndPublishSite(siteConfigId);
-      if (response.statusCode === 201) {
-        message.success('站点已成功部署。');
-      } else {
-        message.error('站点部署失败。');
-      }
-    }
-    setPublishLoading(false);
+    Promise.all(syncStates).then(() => {
+      message.success('文章同步完成。');
+      ref.current?.reload();
+      setSyncLoading(false);
+      done();
+    });
   };
 
   useEffect(() => {
@@ -198,9 +189,15 @@ export default () => {
               return;
             }
             setLoading(index, LoadingStates.Publishing);
+            const done = message.loading('文章发布中…请稍候。', 0);
             await publishPendingPost(record.id, [siteConfigId]);
-            await ref.current?.reload();
+            if (ref.current?.reset) {
+              await ref.current?.reset();
+            }
+            done();
             message.success('已成功发布此文章');
+            setSiteNeedToDeploy(true);
+            setLoading(index, LoadingStates.Pending);
           }}
           loading={postsLoadings[index] === LoadingStates.Publishing}
           disabled={postsLoadings[index] === LoadingStates.Discarding}
@@ -210,9 +207,14 @@ export default () => {
         <Button
           onClick={async () => {
             setLoading(index, LoadingStates.Discarding);
+            const done = message.loading('取消发布中…请稍候。', 0);
             await ignorePendingPost(record.id);
-            await ref.current?.reload();
+            if (ref.current?.reset) {
+              await ref.current?.reset();
+            }
+            done();
             message.success('成功取消发布此文章');
+            setLoading(index, LoadingStates.Pending);
           }}
           loading={postsLoadings[index] === LoadingStates.Discarding}
           disabled={postsLoadings[index] === LoadingStates.Publishing}
@@ -239,15 +241,6 @@ export default () => {
             style={{ marginRight: 10 }}
           >
             立即同步
-          </Button>
-          <Button
-            type="primary"
-            key="publish-button"
-            loading={publishLoading}
-            onClick={publishSiteRequest}
-            style={{ marginRight: 10 }}
-          >
-            提交更新
           </Button>
         </div>,
       ]}

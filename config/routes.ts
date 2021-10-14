@@ -57,7 +57,7 @@
       {
         path: '/manage/site-setting',
         name: 'siteSetting',
-        component: './manage/Site',
+        component: './manage/SiteSetting',
         icon: 'setting',
       },
       {

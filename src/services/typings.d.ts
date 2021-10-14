@@ -23,7 +23,7 @@ declare namespace CMS {
     previewSite: string;
   };
 
-  type NewSiteInfoSettingRequest = {
+  type SiteInfoSettingRequest = {
     title: string;
     subtitle: string;
     description: string;
@@ -32,24 +32,24 @@ declare namespace CMS {
     favicon: string;
   };
 
-  type NewSiteConfigSettingRequest = {
+  type SiteConfigSettingRequest = Partial<{
     language: string;
     timezone: string;
     templateId: number;
     domain: string;
     metaSpacePrefix: string;
-  };
+  }>;
 
-  type NewSiteStorageSettingRequest = {
+  type SiteStorageSettingRequest = Partial<{
     userName: string;
     repoName: string;
     branchName: string;
     lastCommitHash?: string;
     dataType: 'HEXO';
     useGitProvider: boolean;
-  };
+  }>;
 
-  type NewSitePublishSettingRequest = {
+  type SitePublishSettingRequest = Partial<{
     userName: string;
     repoName: string;
     branchName: string;
@@ -57,7 +57,7 @@ declare namespace CMS {
     dataType: 'HEXO';
     useGitProvider: boolean;
     publishDir: string;
-  };
+  }>;
 
   type SiteConfiguration = {
     language: string;
@@ -191,9 +191,10 @@ declare namespace GLOBAL {
     title: string;
     subtitle: string;
     author: string;
+    timezone: string;
     language: string;
     description: string;
-    keywords: string;
+    keywords: string[];
     favicon: string;
   };
 

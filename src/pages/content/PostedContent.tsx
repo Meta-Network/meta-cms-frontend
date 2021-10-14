@@ -108,7 +108,11 @@ export default () => {
     <PageContainer
       breadcrumb={{}}
       title="已发布内容"
-      content={<p>已发布的文章列表可以在这里查看</p>}
+      content={
+        <div key="header-info">
+          <p>已发布的文章列表可以在这里查看</p>
+        </div>
+      }
     >
       <ProTable<PostsInfo>
         columns={columns}
@@ -117,15 +121,17 @@ export default () => {
           const request = await fetchPostsPublished(current ?? 1, pageSize ?? 10);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
-          console.log(request.data.items);
-          return {
-            data: request.data.items,
-            // success 请返回 true，
-            // 不然 table 会停止解析数据，即使有数据
-            success: true,
-            // 不传会使用 data 的长度，如果是分页一定要传
-            total: request.data.meta.totalItems,
-          };
+          if (request?.data) {
+            return {
+              data: request.data.items,
+              // success 请返回 true，
+              // 不然 table 会停止解析数据，即使有数据
+              success: true,
+              // 不传会使用 data 的长度，如果是分页一定要传
+              total: request.data.meta.totalItems,
+            };
+          }
+          return { success: false };
         }}
         rowKey={(record) => record.id}
         search={{
