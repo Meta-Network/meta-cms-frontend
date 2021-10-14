@@ -19,32 +19,42 @@ const request = extend({
 
 /** 获取本用户 GitHub 的所有 repo 名称  */
 export async function getGithubReposName(): Promise<string[]> {
-  const { token } = (await getSocialAuthToken('github')).data;
+  const token = (await getSocialAuthToken('github'))?.data?.token;
+  if (!token) {
+    throw new ReferenceError('Unable to get GitHub OAuth token.');
+  }
+
   const res = await request<any>('https://api.github.com/user/repos', {
     method: 'GET',
     headers: {
       Authorization: `token ${token}`,
     },
   });
-  // returns only repos name
+
+  // return repos name
   return res.map((repo: any) => repo.name);
 }
 
 /** 获取 GitHub 用户名 */
 export async function getGithubUsername(): Promise<string> {
-  const { token } = (await getSocialAuthToken('github')).data;
+  const token = (await getSocialAuthToken('github'))?.data?.token;
+  if (!token) {
+    throw new ReferenceError('Unable to get GitHub OAuth token.');
+  }
+
   const res = await request<any>('https://api.github.com/user', {
     method: 'GET',
     headers: {
       Authorization: `token ${token}`,
     },
   });
-  // just return the username as result
+
+  // return the username
   return res.login;
 }
 
 /** 上传并更新用户头像 */
-export async function uploadAvatar(file: FormData, token: string) {
+export async function uploadImageIPFS(file: FormData, token: string) {
   return request<GLOBAL.GeneralResponse<any>>(
     META_STORAGE_API || 'https://fleek-storage.vercel.mttk.net/fleek/storage',
     {

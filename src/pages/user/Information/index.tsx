@@ -5,9 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
-import { uploadAvatar } from '@/services/api/global';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-import { requestStorageToken, updateUserInfo } from '@/services/api/meta-ucenter';
+import { updateUserInfo } from '@/services/api/meta-ucenter';
+import uploadImageRequest from '@/utils/upload-image-request';
 
 const BaseView: React.FC = () => {
   const { initialState } = useModel('@@initialState');
@@ -16,32 +16,6 @@ const BaseView: React.FC = () => {
   useEffect(() => {
     updateUserInfo({ avatar: userAvatar }).then(() => '');
   }, [userAvatar]);
-
-  const customRequest = async ({ file }: { file: File }): Promise<void> => {
-    const done = message.loading('上传头像中...请稍候', 0);
-    const tokenRequest = await requestStorageToken();
-    const token = tokenRequest.data;
-
-    if (!token) {
-      if (tokenRequest.statusCode === 401) {
-        message.error('图像上传失败，请重新登录。');
-      }
-      message.error('图像上传失败，内部错误或无网络。');
-    }
-
-    const form = new FormData();
-    form.append('file', file);
-
-    const result = await uploadAvatar(form, token);
-    done();
-
-    if (result.statusCode === 201) {
-      message.success('更新头像成功。');
-      setUserAvatar(result.data.publicUrl);
-    } else {
-      message.error('图像上传失败。');
-    }
-  };
 
   const handleFinish = async (values: GLOBAL.UserInfo) => {
     await updateUserInfo(values);
@@ -56,7 +30,7 @@ const BaseView: React.FC = () => {
       </div>
       <ImgCrop rotate>
         {/* @ts-ignore */}
-        <Upload customRequest={customRequest} showUploadList={false}>
+        <Upload customRequest={uploadImageRequest(setUserAvatar)} showUploadList={false}>
           <div className={styles.button_view}>
             <Button>
               <UploadOutlined />

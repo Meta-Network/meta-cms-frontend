@@ -10,6 +10,69 @@
   opacity: 1;
 }
 
+.global-publish-button-background-invisible {
+  height: 0;
+}
+
+.global-publish-button-background-visible {
+  height: 100px;
+}
+
+.global-publish-button-background {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 1.5s ease;
+  mask: linear-gradient(to top, black 90%, black 0%, transparent);
+
+  .global-publish-button {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    min-width: 130px;
+    height: 40px;
+    margin-top: 33px;
+    padding: 5px 10px;
+    overflow: hidden;
+    color: #fff;
+    font-weight: bold;
+    background-color: #1890ff;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .global-publish-button:hover {
+    padding-right: 24px;
+    padding-left: 8px;
+    border-radius: 5px;
+  }
+
+  .global-publish-button:hover::after {
+    right: 10px;
+    opacity: 1;
+  }
+
+  .global-publish-button::after {
+    position: absolute;
+    top: 0;
+    right: -20px;
+    font-size: 20px;
+    line-height: 40px;
+    opacity: 0;
+    transition: 0.4s;
+    content: '\00BB';
+  }
+}
+
 .menu-card-collapsed .my-site-link-icon {
   display: none;
 }
@@ -24,9 +87,11 @@
   .anticon {
     margin-right: 8px !important;
   }
+
   .ant-dropdown-menu-item {
     min-width: 160px;
   }
+
   .user-menu-item {
     padding: 0 10px;
   }
@@ -35,6 +100,7 @@
 .ant-component-modifier() {
   .custom-user-menu.ant-menu-inline-collapsed {
     width: 120px;
+
     li {
       padding: 0;
       text-align: center;
@@ -192,6 +258,10 @@
     font-size: 20px;
     line-height: 32px;
   }
+
+  .ant-form-item-has-success .ant-form-item-explain {
+    color: #52c41a;
+  }
 }
 
 html,
@@ -241,11 +311,13 @@ ol {
   .ant-table {
     width: 100%;
     overflow-x: auto;
+
     &-thead > tr,
     &-tbody > tr {
       > th,
       > td {
         white-space: pre;
+
         > span {
           display: block;
         }
