@@ -1,4 +1,4 @@
-import type { Table } from 'dexie';
+import type { Table, Transaction } from 'dexie';
 import Dexie from 'dexie';
 import type { Posts } from './Posts';
 
@@ -10,8 +10,8 @@ export class StoreDB extends Dexie {
       .stores({
         posts: '++id, cover, title, summary, content, hash, status, timestamp, delete',
       })
-      .upgrade((tx: any) => {
-        // TODO: typescript
+      .upgrade((tx: Transaction | any) => {
+        // TODO: modify typescript
         return tx.posts.toCollection().modify((post: Posts) => {
           console.log('post', post);
           post.cover = post.cover || '';

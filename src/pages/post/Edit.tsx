@@ -13,6 +13,7 @@ import type { Query } from '../../typings/Posts.d';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { assign } from 'lodash';
 import type Vditor from 'vditor';
+import { FleekName } from '@/services/storage';
 const Edit: React.FC = () => {
   // cover
   const [cover, setCover] = useState<string>('');
@@ -97,8 +98,6 @@ const Edit: React.FC = () => {
     DIV.innerHTML = contentHTML;
 
     const imgList: HTMLImageElement[] = [
-      // TODO: type ts
-      // @ts-ignore
       ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
     ];
 
@@ -110,7 +109,7 @@ const Edit: React.FC = () => {
       const _src = result ? result[0].slice(5, -1) : '';
       // console.log('_src', _src);
 
-      return i.src && !i.src.includes('https://storageapi.fleek.co') && reg.test(_src);
+      return i.src && !i.src.includes(FleekName) && reg.test(_src);
     });
     // console.log('imgListFilter', imgListFilter);
 

@@ -5,3 +5,8 @@
  */
 export const StorageFleek =
   META_STORAGE_API || 'https://fleek-storage.vercel.mttk.net/fleek/storage';
+
+/**
+ * fleek name
+ */
+export const FleekName = 'https://storageapi.fleek.co';

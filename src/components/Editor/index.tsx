@@ -1,6 +1,7 @@
 import { fetchTokenAPI } from '@/helpers';
 import { StorageFleek } from '@/services/storage';
 // import '~vditor/src/assets/scss/index';
+// import '~vditor/dist/index.css';
 import { message } from 'antd';
 import React, { useEffect, createRef, useCallback } from 'react';
 import Vditor from 'vditor';
@@ -222,7 +223,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
     init();
 
     // TODO: 没有找到更好的办法获取 token 暂时 loop
-    const timer = setInterval(fetchToken, 1000 * 60 * 3);
+    const timer = setInterval(fetchToken, 1000 * 30);
     return clearInterval(timer);
     // only once
     // eslint-disable-next-line react-hooks/exhaustive-deps
