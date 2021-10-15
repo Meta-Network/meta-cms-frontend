@@ -1,4 +1,12 @@
-import { imageUploadByUrl, postById, publishPostAsDraft } from '@/services/api/meta-cms';
+import {
+  getDefaultSiteConfig,
+  imageUploadByUrl,
+  postById,
+  publishPendingPost,
+  publishPost,
+  publishPostAsDraft,
+  updatePost,
+} from '@/services/api/meta-cms';
 import { requestStorageToken } from '@/services/api/meta-ucenter';
 
 /**
@@ -64,6 +72,79 @@ export const publishPostAsDraftAPI = async (id: number) => {
 export const postByIdAPI = async (id: number) => {
   try {
     const res = await postById(id);
+    if (res.statusCode === 200) {
+      return res.data;
+    } else {
+      throw new Error(res.message);
+    }
+  } catch (e) {
+    console.log(e);
+    return '';
+  }
+};
+
+/**
+ * get default site config
+ */
+export const getDefaultSiteConfigAPI = async () => {
+  try {
+    const res = await getDefaultSiteConfig();
+    if (res.statusCode === 200) {
+      return res.data;
+    } else {
+      throw new Error(res.message);
+    }
+  } catch (e) {
+    console.log(e);
+    return '';
+  }
+};
+
+/**
+ * publish post
+ * @param postId
+ * @param configIds
+ * @returns
+ */
+export const publishPendingPostAPI = async (postId: number, configIds: number[]) => {
+  try {
+    const res = await publishPendingPost(postId, configIds);
+    if (res.statusCode === 201) {
+      return res.data;
+    } else {
+      throw new Error(res.message);
+    }
+  } catch (e) {
+    console.log(e);
+    return '';
+  }
+};
+
+/**
+ * publishPostAPI
+ * @param data
+ * @returns
+ */
+export const publishPostAPI = async (data: CMS.LocalDraft) => {
+  try {
+    const res = await publishPost(data);
+    if (res.statusCode === 201) {
+      return res.data;
+    } else {
+      throw new Error(res.message);
+    }
+  } catch (e) {
+    console.log(e);
+    return '';
+  }
+};
+
+/**
+ * update draft
+ */
+export const updatePostAPI = async (id: number, data: CMS.LocalDraft) => {
+  try {
+    const res = await updatePost(id, data);
     if (res.statusCode === 200) {
       return res.data;
     } else {
