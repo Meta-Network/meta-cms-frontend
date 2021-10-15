@@ -6,9 +6,9 @@ export class StoreDB extends Dexie {
   posts!: Table<Posts, number>;
   constructor() {
     super('StoreDB');
-    this.version(2)
+    this.version(4)
       .stores({
-        posts: '++id, cover, title, summary, content, hash, status, timestamp, delete',
+        posts: '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft',
       })
       .upgrade((tx: Transaction | any) => {
         // TODO: modify typescript
@@ -22,6 +22,8 @@ export class StoreDB extends Dexie {
           post.status = post.status || 'pending';
           post.timestamp = post.timestamp || Date.now();
           post.delete = post.delete || 0;
+          post.post = post.post || null;
+          post.draft = post.draft || null;
         });
       });
   }
@@ -62,4 +64,13 @@ export const dbPostsGet = async (id: number): Promise<Posts | undefined> => {
  */
 export const dbPostsDelete = async (id: number): Promise<void> => {
   return await db.posts.delete(id);
+};
+
+/**
+ * db posts where exist by id
+ */
+export const dbPostsWhereExist = async (id: number): Promise<any> => {
+  // 草稿删除了 允许重新编辑
+  const result = await db.posts.where('delete').equals(0).reverse().sortBy('id');
+  return result.some((post) => post.post && Number(post.post.id) === id);
 };

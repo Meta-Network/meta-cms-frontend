@@ -91,27 +91,45 @@ declare namespace CMS {
     };
   };
 
-  type ExistsPostsResponse = {
-    items: {
+  type Draft = {
+    userId: number;
+    title: string;
+    cover: string;
+    summary: string | null;
+    platform: string;
+    source: string;
+    state: string;
+    categories: string[] | null;
+    tags: string[];
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    content?: string;
+  };
+
+  type Post = {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: number;
+    title: string;
+    cover: string;
+    summary: string;
+    platform: string;
+    source: string;
+    state: string;
+    category: string;
+    tags: string[];
+    siteConfigRelas: {
       id: number;
       createdAt: Date;
       updatedAt: Date;
-      userId: number;
-      title: string;
-      cover: string;
-      summary: string;
-      platform: string;
-      source: string;
-      state: string;
-      category: string;
-      tags: string[];
-      siteConfigRelas: {
-        id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        state: 'SUCCESS';
-      }[];
+      state: 'SUCCESS';
     }[];
+  };
+
+  type ExistsPostsResponse = {
+    items: Post[];
     meta: {
       totalItems: number;
       itemCount: number;

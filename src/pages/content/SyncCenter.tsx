@@ -14,6 +14,12 @@ import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import styles from './SyncCenter.less';
+import { dbPostsAdd, dbPostsWhereExist } from '@/models/db';
+import { assign, cloneDeep } from 'lodash';
+import { PostTempData } from '@/models/Posts';
+import { FleekName } from '@/services/storage';
+import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
+import { history } from 'umi';
 
 type PostsInfo = CMS.ExistsPostsResponse['items'][number];
 
@@ -28,6 +34,8 @@ export default () => {
   const [itemsNumbers, setItemsNumbers] = useState<number>(0);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [postsLoadings, setPostsLoading] = useState<LoadingStates[]>([]);
+  // transfer draft loading
+  const [transferDraftLoading, setTransferDraftLoading] = useState<boolean>(false);
   const { setSiteNeedToDeploy } = useModel('storage');
 
   getDefaultSiteConfig().then((response) => {
@@ -70,6 +78,76 @@ export default () => {
       const newLoadings = [...prevLoadings];
       newLoadings[index] = value;
       return newLoadings;
+    });
+  }, []);
+
+  /**
+   * transfer draft
+   */
+  const transferDraft = useCallback(async (post: CMS.Post) => {
+    setTransferDraftLoading(true);
+
+    // check save as draft
+    const isExist = await dbPostsWhereExist(post.id);
+    if (isExist) {
+      message.info('已经转存到本地');
+      setTransferDraftLoading(false);
+      return;
+    }
+
+    // console.log('post', post);
+    const _post = cloneDeep(post);
+
+    // image transfer ipfs
+    if (_post.cover && !_post.cover.includes(FleekName)) {
+      const result = await imageUploadByUrlAPI(_post.cover);
+      if (result) {
+        message.success('封面转存成功');
+        _post.cover = result.publicUrl;
+      }
+    }
+
+    // post publish draft
+    const _draft = await publishPostAsDraftAPI(Number(_post.id));
+    if (!_draft) {
+      message.error('转存失败');
+      setTransferDraftLoading(false);
+      return;
+    }
+    message.success('文章转存草稿成功');
+
+    // get draft content
+    const _draftData = await postByIdAPI(Number(_draft.id));
+    if (!_draftData) {
+      message.error('获取内容失败');
+      setTransferDraftLoading(false);
+      return;
+    }
+    message.success('成功获取内容');
+
+    // send local
+    const resultID = await dbPostsAdd(
+      assign(PostTempData, {
+        cover: _post.cover,
+        title: _post.title,
+        summary: _post.summary || '',
+        content: _draftData.content,
+        post: _post,
+        draft: _draftData,
+      }),
+    );
+    console.log('resultID', resultID);
+
+    // TODO：跳转到列表或者直接进入编辑页面，或者提示跳转
+
+    message.success('成功存储到本地');
+    setTransferDraftLoading(false);
+
+    history.push({
+      pathname: `/post/edit`,
+      query: {
+        id: String(resultID),
+      },
     });
   }, []);
 
@@ -179,7 +257,7 @@ export default () => {
     {
       title: '操作',
       key: 'option',
-      width: 210,
+      width: 290,
       valueType: 'option',
       render: (_, record, index) => [
         <Button
@@ -221,6 +299,9 @@ export default () => {
           danger
         >
           取消发布
+        </Button>,
+        <Button onClick={() => transferDraft(record)} loading={transferDraftLoading}>
+          本地编辑
         </Button>,
       ],
     },

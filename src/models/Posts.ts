@@ -8,6 +8,8 @@ export interface Posts {
   status: 'pending' | 'publish';
   timestamp: number;
   delete: 0 | 1;
+  post: CMS.Post | null;
+  draft: CMS.Draft | null;
 }
 
 export interface PostsTemp {
@@ -31,4 +33,6 @@ export const PostTempData: Posts = {
   status: 'pending',
   timestamp: Date.now(),
   delete: 0,
+  post: null,
+  draft: null,
 };

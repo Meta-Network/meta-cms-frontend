@@ -30,7 +30,7 @@ const Edit: React.FC = () => {
   /**
    * publish
    */
-  const handlePublish = useCallback(() => {
+  const handlePublish = useCallback(async () => {
     console.log('publish');
 
     console.log(title);

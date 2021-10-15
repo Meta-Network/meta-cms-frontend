@@ -152,6 +152,28 @@ export async function publishPendingPost(postId: number, configIds: number[]) {
   });
 }
 
+/**
+ * 文章转存一份为草稿
+ * @param postId
+ * @returns
+ */
+export async function publishPostAsDraft(postId: number) {
+  return request<GLOBAL.GeneralResponse<CMS.Draft>>(`/post/${postId}/draft`, {
+    method: 'POST',
+  });
+}
+
+/**
+ * 获取 post，草稿 id 会返回 content
+ * @param postId
+ * @returns
+ */
+export async function postById(postId: number) {
+  return request<GLOBAL.GeneralResponse<CMS.Draft>>(`/post/${postId}`, {
+    method: 'GET',
+  });
+}
+
 /** 取消发布一篇待同步待文章 POST /post/{postId}/ignore */
 export async function ignorePendingPost(postId: number) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/ignore`, {
