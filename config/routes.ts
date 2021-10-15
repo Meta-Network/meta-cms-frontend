@@ -2,7 +2,7 @@
   {
     path: '/guide',
     component: './Guide',
-    name: '创建 Meta Space',
+    name: 'guide',
     icon: 'dashboard',
   },
   {
@@ -12,13 +12,11 @@
         path: '/user',
         routes: [
           {
-            name: 'login',
             layout: false,
             path: '/user/login',
             component: './user/Login',
           },
           {
-            name: 'info',
             path: '/user/info',
             component: './user/Information',
           },
@@ -31,45 +29,45 @@
   },
   {
     path: '/content',
-    name: '内容',
+    name: 'content',
     icon: 'edit',
     routes: [
       {
         path: '/content/sync-center',
-        name: '同步中心',
+        name: 'syncCenter',
         component: './content/SyncCenter',
       },
       {
         path: '/content/posted-content',
-        name: '已发布',
+        name: 'postedContent',
         component: './content/PostedContent',
       },
     ],
   },
   {
     path: '/manage',
-    name: '管理',
+    name: 'manage',
     icon: 'branches',
     routes: [
       {
         path: '/manage/source',
-        name: '内容源',
+        name: 'source',
         component: './manage/Source',
       },
       {
         path: '/manage/site-setting',
-        name: '信息',
-        component: './manage/Site',
+        name: 'siteSetting',
+        component: './manage/SiteSetting',
         icon: 'setting',
       },
       {
         path: '/manage/store-setting',
-        name: '存储',
+        name: 'storeSetting',
         component: './manage/StoreSetting',
       },
       {
         path: '/manage/domain-setting',
-        name: '域名',
+        name: 'domainSetting',
         component: './manage/DomainSetting',
       },
     ],
@@ -87,7 +85,7 @@
   },
   {
     path: '/invitation',
-    name: '邀请码',
+    name: 'invitation',
     icon: 'apartment',
     component: './Invitation',
   },

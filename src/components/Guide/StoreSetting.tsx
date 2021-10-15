@@ -4,7 +4,6 @@ import { getGithubReposName } from '@/services/api/global';
 import StoragePicker from '@/components/StorePicker';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
-import styles from './styles.less';
 import FormattedInfo from '../FormattedInfo';
 
 export default () => {
@@ -14,11 +13,13 @@ export default () => {
 
   useEffect(() => {
     if (storeSetting.username) {
+      // TODO: This is for Github only
       getGithubReposName()
         .then((result) => {
           setUserRepos(result.map((name) => name.toLowerCase()));
         })
         .catch(() => {
+          message.error('未获取到 token，请重新授权存储仓库。');
           setStoreSetting({ storage: '', username: '' });
         });
     }
@@ -31,7 +32,7 @@ export default () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div>
       <StoragePicker />
 
       <Divider />

@@ -102,6 +102,8 @@ export default async ({
       message: `PublishSettingId: ${publishSetting.data.id}。`,
       state: 'info',
     });
+    updateProcessing({ message: '正在开始部署站点…', state: 'info' });
+    updateProcessing({ message: '请稍候，不要关闭此页面。此过程大约需要3-5分钟。', state: 'info' });
   } else {
     updateProcessing({
       message: `提交发布配置失败，原因：${publishSetting.message}。`,
@@ -111,6 +113,7 @@ export default async ({
     return;
   }
 
+  // TODO: should be seperated to deploying stage
   const deployAndPublish = await deployAndPublishSite(configSetting.data.id);
 
   if (deployAndPublish.message === 'Ok') {

@@ -90,7 +90,7 @@ export default () => {
       breadcrumb={{}}
     >
       <div className={styles.main}>
-        <Affix offsetTop={60}>
+        <Affix offsetTop={40}>
           <Card className={styles.steps}>
             <Steps size="small" direction="vertical" current={current}>
               {steps.map((step, index) => (
@@ -98,7 +98,11 @@ export default () => {
                   icon={stepStatus[index] === 'error' && <ExclamationCircleOutlined />}
                   status={stepStatus[index]}
                   key={step.name}
-                  title={step.name}
+                  title={
+                    <a style={{ color: 'rgba(0, 0, 0, 0.85)' }} href={`#${step.name}`}>
+                      {step.name}
+                    </a>
+                  }
                 />
               ))}
             </Steps>

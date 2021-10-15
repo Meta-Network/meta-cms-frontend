@@ -75,12 +75,12 @@ const menu = (
   </Menu>
 );
 
-export default (
+export default () => (
   <Dropdown
     overlay={menu}
     placement="topLeft"
     overlayClassName={style.menuMoreInfo}
-    trigger={['click', 'hover']}
+    trigger={['click']}
   >
     <QuestionOutlined />
   </Dropdown>

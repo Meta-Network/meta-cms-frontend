@@ -1,25 +1,13 @@
-import { fetchPublishedPosts } from '@/services/api/meta-cms';
 import { useRef } from 'react';
 import { Image, Tag, Space } from 'antd';
-import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
+import { PageContainer } from '@ant-design/pro-layout';
+import { fetchPostsPublished } from '@/services/api/meta-cms';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 
-type HexoPostsInfo = {
-  id: number;
-  cover: string | null;
-  title: string;
-  summary: string;
-  tags: string[];
-  category: string;
-  createdAt: string;
-  updatedAt: string;
-};
+type PostsInfo = CMS.ExistsPostsResponse['items'][number];
 
-const baseUrl = 'https://metaspace.federarks.xyz';
-const response = await fetchPublishedPosts();
-
-const columns: ProColumns<HexoPostsInfo>[] = [
+const columns: ProColumns<PostsInfo>[] = [
   {
     dataIndex: 'cover',
     title: '封面图片',
@@ -28,16 +16,7 @@ const columns: ProColumns<HexoPostsInfo>[] = [
       return defaultRender(_);
     },
     render: (_, record) => (
-      <Space>
-        {record.cover ? (
-          <Image
-            width={100}
-            src={record.cover.startsWith('/') ? baseUrl + record.cover : record.cover}
-          />
-        ) : (
-          '无封面图'
-        )}
-      </Space>
+      <Space>{record.cover ? <Image width={100} src={record.cover} /> : '无封面图'}</Space>
     ),
   },
   {
@@ -71,7 +50,7 @@ const columns: ProColumns<HexoPostsInfo>[] = [
       return defaultRender(_);
     },
     render: (_, record) =>
-      record.tags.map((tag) => (
+      record?.tags?.map((tag) => (
         <Tag color="blue" key={`${tag}_tag`}>
           {tag}
         </Tag>
@@ -129,13 +108,32 @@ export default () => {
     <PageContainer
       breadcrumb={{}}
       title="已发布内容"
-      content={<p>已发布的文章列表可以在这里查看</p>}
+      content={
+        <div key="header-info">
+          <p>已发布的文章列表可以在这里查看</p>
+        </div>
+      }
     >
-      <ProTable<HexoPostsInfo>
+      <ProTable<PostsInfo>
         columns={columns}
         actionRef={actionRef}
-        dataSource={response.data.items}
-        rowKey={(record, index) => index!.toString()}
+        request={async ({ pageSize, current }) => {
+          const request = await fetchPostsPublished(current ?? 1, pageSize ?? 10);
+          // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
+          // 如果需要转化参数可以在这里进行修改
+          if (request?.data) {
+            return {
+              data: request.data.items,
+              // success 请返回 true，
+              // 不然 table 会停止解析数据，即使有数据
+              success: true,
+              // 不传会使用 data 的长度，如果是分页一定要传
+              total: request.data.meta.totalItems,
+            };
+          }
+          return { success: false };
+        }}
+        rowKey={(record) => record.id}
         search={{
           labelWidth: 'auto',
         }}
@@ -156,7 +154,7 @@ export default () => {
         //   pageSize: response.pageSize,
         // }}
         expandable={{
-          expandedRowRender: (record: HexoPostsInfo) => (
+          expandedRowRender: (record: PostsInfo) => (
             <p dangerouslySetInnerHTML={{ __html: record.summary }} />
           ),
         }}

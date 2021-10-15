@@ -3,55 +3,58 @@ import { useModel } from '@@/plugin-model/useModel';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { message } from 'antd';
 import { useState } from 'react';
-import styles from './styles.less';
+import { useIntl } from 'umi';
 
 export default () => {
+  const intl = useIntl();
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const { domainSetting, setDomainSetting } = useModel('storage');
 
   const updateDomainSettings = async (values: { domain: string }) => {
     const { domain } = values;
     setDomainSetting(domain);
-    message.success('已成功更新域名。');
+    message.success(intl.formatMessage({ id: 'notifications.domain.updated' }));
   };
 
   return (
-    <div className={styles.container}>
-      <ProForm
-        style={{ width: 500 }}
-        name="site-info"
-        initialValues={{ domain: domainSetting }}
-        onFinish={updateDomainSettings}
-        requiredMark="optional"
-      >
-        <ProFormText
-          width="md"
-          fieldProps={{
-            addonAfter: `.${META_SPACE_BASE_DOMAIN || 'metaspaces.me'}`,
-          }}
-          name="domain"
-          placeholder="输入前缀域名"
-          validateStatus={isSuccess ? 'success' : undefined}
-          help={isSuccess ? '此域名可用！' : undefined}
-          rules={[
-            {
-              validator: async (_, value) => {
-                if (!value) {
-                  setIsSuccess(false);
-                  return Promise.reject(new Error('域名不能为空。'));
-                }
-                const isForbidden = await isDomainForbidden(value);
-                if (isForbidden) {
-                  setIsSuccess(false);
-                  return Promise.reject(new Error('此域名被禁用或已存在，请另选一个。'));
-                }
-                setIsSuccess(true);
-                return Promise.resolve();
-              },
+    <ProForm
+      style={{ width: 500 }}
+      name="site-info"
+      initialValues={{ domain: domainSetting }}
+      onFinish={updateDomainSettings}
+      requiredMark="optional"
+    >
+      <ProFormText
+        width="md"
+        fieldProps={{
+          addonAfter: `.${META_SPACE_BASE_DOMAIN || 'metaspaces.me'}`,
+        }}
+        name="domain"
+        placeholder={intl.formatMessage({ id: 'messages.domain.enterPrefixDomain' })}
+        validateStatus={isSuccess ? 'success' : undefined}
+        help={isSuccess ? intl.formatMessage({ id: 'notifications.domain.isValid' }) : undefined}
+        rules={[
+          {
+            validator: async (_, value) => {
+              if (!value) {
+                setIsSuccess(false);
+                return Promise.reject(
+                  new Error(intl.formatMessage({ id: 'notifications.domain.shouldNotBeEmpty' })),
+                );
+              }
+              const isForbidden = await isDomainForbidden(value);
+              if (isForbidden) {
+                setIsSuccess(false);
+                return Promise.reject(
+                  new Error(intl.formatMessage({ id: 'notifications.domain.isForbidden' })),
+                );
+              }
+              setIsSuccess(true);
+              return Promise.resolve();
             },
-          ]}
-        />
-      </ProForm>
-    </div>
+          },
+        ]}
+      />
+    </ProForm>
   );
 };

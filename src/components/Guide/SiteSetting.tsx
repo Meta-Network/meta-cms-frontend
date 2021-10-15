@@ -1,13 +1,12 @@
+import { message } from 'antd';
+import { getLocale } from 'umi';
 import React, { useState } from 'react';
-import { message, Upload } from 'antd';
+import ProForm from '@ant-design/pro-form';
 import { useModel } from '@@/plugin-model/useModel';
-import { uploadAvatar } from '@/services/api/global';
-import { requestStorageToken } from '@/services/api/meta-ucenter';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import ProForm, { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-// import moment from 'moment';
+import SiteSettingFormItems from '../SiteSettingFormItems';
+// @ts-ignore
+import moment from 'moment'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import momentTimezone from 'moment-timezone';
-import styles from './styles.less';
 
 export default () => {
   const { initialState } = useModel('@@initialState');
@@ -19,147 +18,31 @@ export default () => {
     setSiteSetting: React.Dispatch<React.SetStateAction<GLOBAL.SiteSetting>>;
   } = useModel('storage');
 
-  const [uploading, setUploading] = useState<boolean>(false);
-  const [imageUrl, setImageUrl] = useState<string>(siteSetting.favicon || '');
+  const [faviconUrl, setFaviconUrl] = useState<string>(siteSetting.favicon || '');
 
   const author = initialState?.currentUser?.nickname || '';
   const initialValues = {
-    language: 'zh',
+    language: getLocale().split('-')[0],
     timezone: momentTimezone.tz.guess(),
     author,
     ...siteSetting,
   };
 
-  const customRequest = async ({ file }: { file: File }): Promise<void> => {
-    const done = message.loading('文件上传中...请稍候', 0);
-    setUploading(true);
-    const tokenRequest = await requestStorageToken();
-    const token = tokenRequest.data;
-
-    if (!token) {
-      if (tokenRequest.statusCode === 401) {
-        message.error('图像上传失败，请重新登录。');
-      }
-      message.error('图像上传失败。内部错误或无网络。');
-    }
-
-    const form = new FormData();
-    form.append('file', file);
-
-    const result = await uploadAvatar(form, token);
-    done();
-
-    if (result.statusCode === 201) {
-      setImageUrl(result.data.publicUrl);
-      message.success('上传成功，请提交您的站点信息设置。');
-    } else {
-      message.error('图像上传失败。');
-    }
-    setUploading(false);
-  };
-
   const handleFinishing = async (values: GLOBAL.SiteSetting) => {
-    values.favicon = imageUrl; // eslint-disable-line no-param-reassign
+    values.favicon = faviconUrl; // eslint-disable-line no-param-reassign
     setSiteSetting(values);
     message.success('成功保存站点信息设置。');
   };
 
   return (
-    <div className={styles.container}>
-      <ProForm
-        style={{ width: 500 }}
-        name="site-info"
-        initialValues={initialValues}
-        onFinish={handleFinishing}
-        requiredMark="optional"
-      >
-        <ProFormText
-          width="md"
-          name="title"
-          label="标题"
-          placeholder="你的 Meta Space 标题"
-          rules={[{ required: true }]}
-        />
-        <ProFormText
-          width="md"
-          name="subtitle"
-          label="副标题"
-          placeholder="你的 Meta Space 副标题"
-          rules={[{ required: true }]}
-        />
-        <ProFormText
-          width="md"
-          name="author"
-          label="作者"
-          placeholder="作为 Meta Space 拥有者的名称"
-          rules={[{ required: true }]}
-        />
-        <ProFormTextArea
-          width="md"
-          name="description"
-          label="描述"
-          placeholder="你的 Meta Space 描述"
-          rules={[{ required: true }]}
-        />
-        <ProFormSelect
-          mode="tags"
-          width="md"
-          name="keywords"
-          fieldProps={{
-            open: false,
-          }}
-          label="关键词"
-          extra="其他人在搜索引擎中输入这些关键词会更容易找到你的站点"
-          rules={[{ required: true }]}
-        />
-        <ProFormSelect
-          width="md"
-          name="language"
-          label="语言"
-          rules={[{ required: true, message: '请选择您的 Meta Space 语言' }]}
-          valueEnum={{
-            zh: '中文',
-            en: 'English',
-            jp: '日本語',
-            es: 'Español',
-          }}
-        />
-        <ProFormSelect
-          width="md"
-          name="timezone"
-          label="时区"
-          rules={[{ required: true, message: '请选择您的 Meta Space 时区' }]}
-          valueEnum={{
-            'Asia/Shanghai': 'Asia/Shanghai',
-          }}
-        />
-        <ProForm.Item
-          name="favicon"
-          getValueProps={(value) => [value]}
-          valuePropName={'fileList'}
-          label="网站图标"
-          extra="可上传.ico .jpg .png 格式图片，展示在页面标签上"
-          rules={[{ required: true, message: '请上传一个站点图标' }]}
-        >
-          <Upload
-            title="上传站点图标"
-            listType="picture-card"
-            /*
-              // @ts-ignore */
-            customRequest={customRequest}
-            showUploadList={false}
-          >
-            {imageUrl ? (
-              <img src={imageUrl} alt="favicon preview" style={{ width: '80%', height: '80%' }} />
-            ) : (
-              <div>
-                {uploading ? <LoadingOutlined /> : <PlusOutlined />}
-                <div style={{ marginTop: 8 }}>Upload</div>
-              </div>
-            )}
-          </Upload>
-        </ProForm.Item>
-      </ProForm>
-    </div>
+    <ProForm
+      style={{ width: 500 }}
+      name="site-info"
+      initialValues={initialValues}
+      onFinish={handleFinishing}
+      requiredMark="optional"
+    >
+      <SiteSettingFormItems faviconUrl={faviconUrl} setFavIconUrl={setFaviconUrl} />
+    </ProForm>
   );
 };
