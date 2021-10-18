@@ -10,16 +10,19 @@ import {
 import { useModel } from '@@/plugin-model/useModel';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
+import { Image, Button, Space, Tag, message, Dropdown, Menu, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import styles from './SyncCenter.less';
-import { dbPostsAdd, dbPostsWhereExist } from '@/models/db';
+import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/models/db';
 import { assign, cloneDeep } from 'lodash';
 import { PostTempData } from '@/models/Posts';
 import { FleekName } from '@/services/storage';
 import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
 import { history } from 'umi';
+
+const { confirm } = Modal;
 
 type PostsInfo = CMS.ExistsPostsResponse['items'][number];
 
@@ -90,8 +93,20 @@ export default () => {
     // check save as draft
     const isExist = await dbPostsWhereExist(post.id);
     if (isExist) {
-      message.info('已经转存到本地');
       setTransferDraftLoading(false);
+
+      const currentDraft = await dbPostsWhereByID(post.id);
+      console.log('currentDraft', currentDraft);
+      const _url = currentDraft ? `/post/edit?id=${currentDraft.id}` : `/posts`;
+      confirm({
+        title: '提示',
+        icon: <ExclamationCircleOutlined />,
+        content: '已经转存到本地,是否跳转编辑？',
+        async onOk() {
+          history.push(_url);
+        },
+        onCancel() {},
+      });
       return;
     }
 
@@ -136,19 +151,11 @@ export default () => {
         draft: _draftData,
       }),
     );
-    console.log('resultID', resultID);
 
-    // TODO：跳转到列表或者直接进入编辑页面，或者提示跳转
-
-    message.success('成功存储到本地');
     setTransferDraftLoading(false);
 
-    history.push({
-      pathname: `/post/edit`,
-      query: {
-        id: String(resultID),
-      },
-    });
+    // TODO：params 有问题
+    history.push(`/post/edit?id=${resultID}`);
   }, []);
 
   const columns: ProColumns<PostsInfo>[] = [

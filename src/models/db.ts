@@ -69,8 +69,14 @@ export const dbPostsDelete = async (id: number): Promise<void> => {
 /**
  * db posts where exist by id
  */
-export const dbPostsWhereExist = async (id: number): Promise<any> => {
+export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
   // 草稿删除了 允许重新编辑
   const result = await db.posts.where('delete').equals(0).reverse().sortBy('id');
   return result.some((post) => post.post && Number(post.post.id) === id);
+};
+
+export const dbPostsWhereByID = async (id: number): Promise<Posts | undefined> => {
+  // 草稿删除了 允许重新编辑
+  const result = await db.posts.where('delete').equals(0).reverse().sortBy('id');
+  return result.find((post) => post.post && Number(post.post.id) === id);
 };

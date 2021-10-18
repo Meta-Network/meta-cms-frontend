@@ -126,7 +126,7 @@ declare namespace CMS {
     summary: string;
     platform: string;
     source: string;
-    state: string;
+    state: 'drafted' | 'pending';
     category: string;
     tags: string[];
     siteConfigRelas: {

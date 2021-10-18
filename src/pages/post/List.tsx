@@ -3,6 +3,7 @@ import { history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
+import { CopyOutlined } from '@ant-design/icons';
 import { db, dbPostsUpdate } from '../../models/db';
 import type { Posts } from '../../models/Posts';
 
@@ -50,13 +51,39 @@ export default () => {
       dataIndex: 'hash',
       key: 'hash',
       width: 140,
+      render: (_: any, record: Posts) => (
+        <span>
+          {isNaN(Number(record.post?.source)) ? (
+            record.post?.source ? (
+              <>
+                <span>{record.post?.source?.slice(0, 6)}...</span>
+                <CopyOutlined onClick={() => message.info('开发中')} />
+              </>
+            ) : (
+              ''
+            )
+          ) : (
+            ''
+          )}
+        </span>
+      ),
     },
     {
       title: 'STATUS',
       dataIndex: 'status',
       key: 'status',
       width: 140,
-      render: (val: string) => <Tag key={val}>{val}</Tag>,
+      render: (_: any, record: Posts) => (
+        <Tag key={record.id}>
+          {record.post
+            ? record.post.state === 'drafted'
+              ? '云端草稿'
+              : record.post.state === 'pending'
+              ? '待发布'
+              : '本地草稿'
+            : '本地草稿'}
+        </Tag>
+      ),
     },
     {
       title: 'ACTION',
@@ -65,7 +92,20 @@ export default () => {
       width: 180,
       render: (val: string, record: Posts) => (
         <Space>
-          {val === 'pending' ? <Button type="primary">发布</Button> : null}
+          {val === 'pending' ? (
+            <Button
+              onClick={() => {
+                history.push({
+                  pathname: `/post/edit`,
+                  query: {
+                    id: String(record.id),
+                  },
+                });
+              }}
+            >
+              编辑
+            </Button>
+          ) : null}
           <Popconfirm
             title="确定删除?"
             onConfirm={async (e) => {
@@ -78,7 +118,7 @@ export default () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button type="primary" danger onClick={(e) => e.stopPropagation()}>
+            <Button danger onClick={(e) => e.stopPropagation()}>
               删除
             </Button>
           </Popconfirm>
@@ -98,17 +138,8 @@ export default () => {
       <br />
       <Table
         rowKey={(record: Posts) => String(record.id)}
-        onRow={(record) => {
-          return {
-            onClick: () => {
-              history.push({
-                pathname: `/post/edit`,
-                query: {
-                  id: String(record.id),
-                },
-              });
-            },
-          };
+        onRow={() => {
+          return {};
         }}
         columns={columns}
         dataSource={postsList}

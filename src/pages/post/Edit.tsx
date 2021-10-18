@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
 import { history } from 'umi';
-import { Input, message } from 'antd';
+import { Input, message, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Editor from '../../components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
@@ -16,10 +17,14 @@ import {
   publishPendingPostAPI,
   publishPostAPI,
   updatePostAPI,
+  publishPostAsDraftAPI,
 } from '@/helpers';
 import { assign } from 'lodash';
 import type Vditor from 'vditor';
 import { FleekName } from '@/services/storage';
+
+const { confirm } = Modal;
+
 const Edit: React.FC = () => {
   // cover
   const [cover, setCover] = useState<string>('');
@@ -34,6 +39,8 @@ const Edit: React.FC = () => {
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState(false);
   const [flagUpdateDraft, setFlagUpdateDraft] = useState(false);
+  // TODO: 好像没什么用
+  const [flagDB, setFlagDB] = useState(false);
 
   /**
    * generate summary
@@ -94,42 +101,6 @@ const Edit: React.FC = () => {
   }, []);
 
   /**
-   * publish
-   */
-  const handlePublish = useCallback(async () => {
-    // console.log('publish');
-
-    const { id } = history.location.query as Query;
-    if (!id) {
-      message.warning('请先编辑文章');
-      return;
-    }
-
-    if (!title && !content) {
-      message.warning('文章或内容不能为空');
-      return;
-    }
-
-    const result = await dbPostsGet(Number(id));
-    // 转存草稿发布
-    if (result && result.draft) {
-      await draftPublishAsPost(result.draft.id);
-    } else if (result && result.post) {
-      message.warning('文章已经发布了，但还没对接功能');
-    } else {
-      // 本地编辑发布
-      await publishAsPost({
-        title: title,
-        cover: cover,
-        summary: generateSummary(),
-        tags: [],
-        categories: [],
-        content: content,
-      });
-    }
-  }, [title, cover, content, generateSummary, publishAsPost, draftPublishAsPost]);
-
-  /**
    * update draft
    */
   const updateDraft = useCallback(async () => {
@@ -165,6 +136,99 @@ const Edit: React.FC = () => {
     }
     setFlagUpdateDraft(false);
   }, [title, cover, content, flagUpdateDraft, generateSummary]);
+
+  /**
+   * post publish to post
+   */
+  const postPublishToPost = useCallback(
+    async (id: number) => {
+      // post publish draft
+      const _draft = await publishPostAsDraftAPI(Number(id));
+      if (!_draft) {
+        message.error('转存失败');
+        // setTransferDraftLoading(false);
+        return;
+      }
+      message.success('文章转存草稿成功');
+
+      // update
+      const res = await updatePostAPI(Number(_draft.id), {
+        title: title,
+        cover: cover,
+        summary: generateSummary(),
+        tags: [],
+        categories: [],
+        content: content,
+      });
+      // 更新草稿信息
+      if (res) {
+        const { id: _id } = history.location.query as Query;
+        if (_id) {
+          await dbPostsUpdate(Number(_id), { draft: res });
+        } else {
+          message.warning('获取草稿 ID 失败');
+          return Promise.reject();
+        }
+      }
+      // send
+      await draftPublishAsPost(_draft.id);
+
+      return Promise.resolve();
+    },
+    [draftPublishAsPost, title, cover, content, generateSummary],
+  );
+
+  /**
+   * publish
+   */
+  const handlePublish = useCallback(async () => {
+    // console.log('publish');
+
+    const { id } = history.location.query as Query;
+    if (!id) {
+      message.warning('请先编辑文章');
+      return;
+    }
+
+    if (!title && !content) {
+      message.warning('文章或内容不能为空');
+      return;
+    }
+
+    const result = await dbPostsGet(Number(id));
+    // 转存草稿发布
+    if (result && result.draft) {
+      await draftPublishAsPost(result.draft.id);
+    } else if (result && result.post) {
+      confirm({
+        title: '提示',
+        icon: <ExclamationCircleOutlined />,
+        content: '文章已发布，再次发布会覆盖文章的信息',
+        async onOk() {
+          await postPublishToPost(result.post!.id);
+        },
+        onCancel() {},
+      });
+    } else {
+      // 本地编辑发布
+      await publishAsPost({
+        title: title,
+        cover: cover,
+        summary: generateSummary(),
+        tags: [],
+        categories: [],
+        content: content,
+      });
+    }
+  }, [
+    title,
+    cover,
+    content,
+    generateSummary,
+    publishAsPost,
+    draftPublishAsPost,
+    postPublishToPost,
+  ]);
 
   /**
    * handle history url state
@@ -318,6 +382,11 @@ const Edit: React.FC = () => {
    */
   const asyncTitleToDB = useCallback(
     async (val: string) => {
+      if (flagDB) {
+        return;
+      }
+      setFlagDB(true);
+
       setTitle(val);
       setDraftMode(1);
 
@@ -332,8 +401,9 @@ const Edit: React.FC = () => {
       }
 
       setDraftMode(2);
+      setFlagDB(false);
     },
-    [handleHistoryState],
+    [handleHistoryState, flagDB],
   );
 
   useMount(() => {
