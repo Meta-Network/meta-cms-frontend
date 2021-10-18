@@ -22,6 +22,7 @@ import {
 import { assign } from 'lodash';
 import type Vditor from 'vditor';
 import { FleekName } from '@/services/storage';
+import { generateSummary } from '@/utils/editor';
 
 const { confirm } = Modal;
 
@@ -41,25 +42,6 @@ const Edit: React.FC = () => {
   const [flagUpdateDraft, setFlagUpdateDraft] = useState(false);
   // TODO: 好像没什么用
   const [flagDB, setFlagDB] = useState(false);
-
-  /**
-   * generate summary
-   */
-  const generateSummary = useCallback((): string => {
-    // TODO: modify
-    try {
-      const htmlContent = (window as any).vditor!.getHTML();
-      if (htmlContent) {
-        const div = document.createElement('div');
-        div.innerHTML = htmlContent;
-        return div.innerText.length >= 100 ? div.innerText.slice(0, 97) + '...' : div.innerText;
-      }
-      return '';
-    } catch (e) {
-      console.log(e);
-      return '';
-    }
-  }, []);
 
   /**
    * draft publish as post
@@ -120,13 +102,11 @@ const Edit: React.FC = () => {
 
     // 更新草稿
     if (result && result.draft) {
-      console.log('updateDraft', result);
+      // console.log('updateDraft', result);
       const res = await updatePostAPI(Number(result.draft.id), {
         title: title,
         cover: cover,
         summary: generateSummary(),
-        tags: [],
-        categories: [],
         content: content,
       });
       if (res) {
@@ -135,7 +115,7 @@ const Edit: React.FC = () => {
       }
     }
     setFlagUpdateDraft(false);
-  }, [title, cover, content, flagUpdateDraft, generateSummary]);
+  }, [title, cover, content, flagUpdateDraft]);
 
   /**
    * post publish to post
@@ -152,30 +132,26 @@ const Edit: React.FC = () => {
       message.success('文章转存草稿成功');
 
       // update
-      const res = await updatePostAPI(Number(_draft.id), {
+      const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
         title: title,
         cover: cover,
         summary: generateSummary(),
-        tags: [],
-        categories: [],
         content: content,
       });
       // 更新草稿信息
-      if (res) {
+      if (resultUpdatePost) {
         const { id: _id } = history.location.query as Query;
-        if (_id) {
-          await dbPostsUpdate(Number(_id), { draft: res });
-        } else {
-          message.warning('获取草稿 ID 失败');
-          return Promise.reject();
-        }
+        await dbPostsUpdate(Number(_id), { draft: resultUpdatePost });
+      } else {
+        message.error('更新失败');
+        return Promise.reject();
       }
       // send
       await draftPublishAsPost(_draft.id);
 
       return Promise.resolve();
     },
-    [draftPublishAsPost, title, cover, content, generateSummary],
+    [draftPublishAsPost, title, cover, content],
   );
 
   /**
@@ -220,15 +196,7 @@ const Edit: React.FC = () => {
         content: content,
       });
     }
-  }, [
-    title,
-    cover,
-    content,
-    generateSummary,
-    publishAsPost,
-    draftPublishAsPost,
-    postPublishToPost,
-  ]);
+  }, [title, cover, content, publishAsPost, draftPublishAsPost, postPublishToPost]);
 
   /**
    * handle history url state
@@ -257,7 +225,7 @@ const Edit: React.FC = () => {
 
       setDraftMode(2);
     },
-    [generateSummary, handleHistoryState],
+    [handleHistoryState],
   );
 
   /**
@@ -339,15 +307,16 @@ const Edit: React.FC = () => {
   const fetchDBContent = useCallback(async () => {
     const { id } = history.location.query as Query;
     if (id) {
-      const result = await dbPostsGet(Number(id));
-      if (result) {
-        console.log('result', result);
-        setCover(result.cover);
-        setTitle(result.title);
-        setContent(result.content);
+      const resultPost = await dbPostsGet(Number(id));
+      if (resultPost) {
+        // console.log('resultPost', resultPost);
+        setCover(resultPost.cover);
+        setTitle(resultPost.title);
+        setContent(resultPost.content);
 
+        // TODO：need modify
         setTimeout(() => {
-          (window as any).vditor!.setValue(result.content);
+          (window as any).vditor!.setValue(resultPost.content);
           // handle all image
           handleImageUploadToIpfs();
         }, 1000);
@@ -411,9 +380,9 @@ const Edit: React.FC = () => {
   });
 
   useEffect(() => {
-    console.log('watch', vditor);
+    // console.log('watch', vditor);
     if (!!vditor) {
-      console.log(`Update Default Vditor:`, vditor);
+      // console.log(`Update Default Vditor:`, vditor);
     }
 
     // 10s handle all image
@@ -422,7 +391,7 @@ const Edit: React.FC = () => {
   }, [vditor, handleImageUploadToIpfs]);
 
   useEffect(() => {
-    console.log('updateDraft useEffect');
+    // console.log('updateDraft useEffect');
 
     updateDraft();
     // watch title, content, cover

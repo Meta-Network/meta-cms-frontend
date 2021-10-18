@@ -95,8 +95,8 @@ declare namespace CMS {
     title: string;
     cover: string;
     summary: string;
-    tags: string[];
-    categories: string[];
+    tags?: string[];
+    categories?: string[];
     content: string;
   };
 
