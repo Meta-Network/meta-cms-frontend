@@ -152,10 +152,9 @@ export default () => {
       }),
     );
 
-    setTransferDraftLoading(false);
-
-    // TODO：params 有问题
     history.push(`/post/edit?id=${resultID}`);
+
+    setTransferDraftLoading(false);
   }, []);
 
   const columns: ProColumns<PostsInfo>[] = [
