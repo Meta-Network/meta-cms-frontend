@@ -30,6 +30,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
   // upload props
   const props: any = useMemo(
     () => ({
+      accept: '.jpg,.jpeg,.png',
       name: 'file',
       action: StorageFleek,
       maxCount: 1,
