@@ -6,6 +6,7 @@ import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { db, dbPostsUpdate } from '../../models/db';
 import type { Posts } from '../../models/Posts';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 export default () => {
   const [postsList, setPostsList] = useState<Posts[]>([]);
@@ -53,18 +54,18 @@ export default () => {
       width: 140,
       render: (_: any, record: Posts) => (
         <span>
-          {isNaN(Number(record.post?.source)) ? (
-            record.post?.source ? (
-              <>
-                <span>{record.post?.source?.slice(0, 6)}...</span>
-                <CopyOutlined onClick={() => message.info('开发中')} />
-              </>
-            ) : (
-              ''
-            )
-          ) : (
-            ''
-          )}
+          {(isNaN(Number(record.post?.source)) && record.post?.source && (
+            <>
+              <span>{record.post?.source?.slice(0, 6)}...</span>
+              <CopyToClipboard
+                text={record.post?.source}
+                onCopy={() => message.info('已粘贴到剪切板')}
+              >
+                <CopyOutlined />
+              </CopyToClipboard>
+            </>
+          )) ||
+            ''}
         </span>
       ),
     },

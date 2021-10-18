@@ -16,6 +16,7 @@ declare module '@antv/data-set';
 declare module 'mockjs';
 declare module 'react-fittext';
 declare module 'bizcharts-plugin-slider';
+declare module 'react-copy-to-clipboard';
 
 declare const META_UCENTER_API: string;
 declare const META_CMS_API: string;
