@@ -111,7 +111,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
           {
             key: '@',
             hint: (key) => {
-              console.log(key);
+              // console.log(key);
               if ('meta'.indexOf(key.toLocaleLowerCase()) > -1) {
                 return [
                   {
@@ -134,7 +134,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
           {
             key: '#',
             hint: (key) => {
-              console.log(key);
+              // console.log(key);
               if ('meta'.indexOf(key.toLocaleLowerCase()) > -1) {
                 return [
                   {

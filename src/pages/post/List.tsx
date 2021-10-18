@@ -96,7 +96,7 @@ export default () => {
             <Button
               onClick={() => {
                 history.push({
-                  pathname: `/post/edit`,
+                  pathname: '/post/edit',
                   query: {
                     id: String(record.id),
                   },
