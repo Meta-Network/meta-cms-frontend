@@ -5,7 +5,6 @@ import { StorageFleek } from '@/services/storage';
 import { message } from 'antd';
 import React, { useEffect, createRef, useCallback } from 'react';
 import Vditor from 'vditor';
-import type { Storage } from '../../typings/Storage.d';
 interface Props {
   asyncContentToDB: (val: string) => void;
   bindVditor?: (vditor: Vditor) => void;
@@ -181,7 +180,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
             data,
             statusCode,
             message: msg,
-          }: GLOBAL.GeneralResponse<Storage> = JSON.parse(responseText);
+          }: GLOBAL.GeneralResponse<Storage.Fleek> = JSON.parse(responseText);
 
           if (statusCode == 201) {
             return JSON.stringify({

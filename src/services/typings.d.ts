@@ -247,3 +247,13 @@ declare namespace GLOBAL {
 
   type StoreProvider = 'GitHub' | 'Gitee';
 }
+
+declare namespace Storage {
+  type Fleek = {
+    hash: string;
+    hashV0: string;
+    key: string;
+    bucket: string;
+    publicUrl: string;
+  };
+}

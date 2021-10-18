@@ -9,7 +9,7 @@ import { fetchTokenAPI } from '@/helpers';
 const keyUploadAvatar = 'keyUploadAvatar';
 
 interface FileData extends File {
-  response: GLOBAL.GeneralResponse<Storage>;
+  response: GLOBAL.GeneralResponse<Storage.Fleek>;
   status: 'done' | 'uploading' | 'error';
 }
 

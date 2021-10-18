@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
 import { extendWithErrorHandler } from '@/services/api/base-request';
-import type { Storage } from '../../typings/Storage.d';
 
 const request = extendWithErrorHandler({
   credentials: 'include',
@@ -253,7 +252,7 @@ export async function waitUntilSyncFinish(platform: string) {
  * image upload by url
  */
 export async function imageUploadByUrl(url: string) {
-  return request<GLOBAL.GeneralResponse<Storage>>(`/image/uploadByUrl`, {
+  return request<GLOBAL.GeneralResponse<Storage.Fleek>>(`/image/uploadByUrl`, {
     method: 'POST',
     data: { url },
   });
