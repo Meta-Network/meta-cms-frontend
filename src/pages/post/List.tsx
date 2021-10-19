@@ -3,7 +3,7 @@ import { history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
-import { CopyOutlined } from '@ant-design/icons';
+import { CopyOutlined, EditOutlined } from '@ant-design/icons';
 import { db, dbPostsUpdate } from '../../models/db';
 import type { Posts } from '../../models/Posts';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -34,7 +34,21 @@ export default () => {
       dataIndex: 'cover',
       key: 'cover',
       width: 100,
-      render: (val: string) => <Image onClick={(e) => e.stopPropagation()} width={100} src={val} />,
+      render: (val: string) => (
+        <>
+          {val ? (
+            <Image
+              onClick={(e) => e.stopPropagation()}
+              width={100}
+              height={50}
+              src={val}
+              style={{ objectFit: 'cover' }}
+            />
+          ) : (
+            <div style={{ width: 100, height: 50, backgroundColor: '#dcdcdc' }} />
+          )}
+        </>
+      ),
     },
     {
       title: 'TITLE',
@@ -46,6 +60,7 @@ export default () => {
       title: 'SUMMARY',
       dataIndex: 'summary',
       key: 'summary',
+      render: (val: string) => <span>{val.length >= 60 ? `${val.slice(0, 57)}...` : val}</span>,
     },
     {
       title: 'HASH',
@@ -133,10 +148,18 @@ export default () => {
   });
 
   return (
-    <PageContainer breadcrumb={{}} title="Post" content={<div className="text-info" />}>
-      <Button onClick={() => history.push('/post/edit')}>创作</Button>
-      <br />
-      <br />
+    <PageContainer
+      breadcrumb={{}}
+      title="Post"
+      content={<div className="text-info">用于管理本地的文章</div>}
+    >
+      <Button
+        style={{ marginBottom: 10 }}
+        icon={<EditOutlined />}
+        onClick={() => history.push('/post/edit')}
+      >
+        创作
+      </Button>
       <Table
         rowKey={(record: Posts) => String(record.id)}
         onRow={() => {
