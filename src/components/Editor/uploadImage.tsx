@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { Upload, message, notification } from 'antd';
 import { PlusOutlined, DeleteOutlined, FileImageOutlined } from '@ant-design/icons';
 import styles from './uploadImage.less';
-import { StorageFleek } from '@/services/storage';
 import { UploadImageSize } from '../../../config/index';
 import { fetchTokenAPI } from '@/helpers';
 
@@ -32,7 +31,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
     () => ({
       accept: '.jpg,.jpeg,.png',
       name: 'file',
-      action: StorageFleek,
+      action: META_STORAGE_API,
       maxCount: 1,
       headers: {
         authorization: `Bearer ${token}`,

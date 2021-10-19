@@ -1,5 +1,4 @@
 import { fetchTokenAPI } from '@/helpers';
-import { StorageFleek } from '@/services/storage';
 // import '~vditor/src/assets/scss/index';
 // import '~vditor/dist/index.css';
 import { message } from 'antd';
@@ -165,7 +164,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
             authorization: `Bearer ${_TOKEN}`,
           };
         },
-        url: StorageFleek,
+        url: META_STORAGE_API,
         filename(name) {
           return name
             .replace(/[^(a-zA-Z0-9\u4e00-\u9fa5\.)]/g, '')

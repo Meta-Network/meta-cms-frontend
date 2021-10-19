@@ -21,7 +21,6 @@ import {
 } from '@/helpers';
 import { assign } from 'lodash';
 import type Vditor from 'vditor';
-import { FleekName } from '@/services/storage';
 import { generateSummary } from '@/utils/editor';
 
 const { confirm } = Modal;
@@ -257,7 +256,7 @@ const Edit: React.FC = () => {
       const _src = result ? result[0].slice(5, -1) : '';
       // console.log('_src', _src);
 
-      return i.src && !i.src.includes(FleekName) && reg.test(_src);
+      return i.src && !i.src.includes(FLEEK_NAME) && reg.test(_src);
     });
     // console.log('imgListFilter', imgListFilter);
 

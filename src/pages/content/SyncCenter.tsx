@@ -18,7 +18,6 @@ import styles from './SyncCenter.less';
 import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/models/db';
 import { assign, cloneDeep } from 'lodash';
 import { PostTempData } from '@/models/Posts';
-import { FleekName } from '@/services/storage';
 import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
 import { history } from 'umi';
 
@@ -114,7 +113,7 @@ export default () => {
     const _post = cloneDeep(post);
 
     // image transfer ipfs
-    if (_post.cover && !_post.cover.includes(FleekName)) {
+    if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
       const result = await imageUploadByUrlAPI(_post.cover);
       if (result) {
         message.success('封面转存成功');
