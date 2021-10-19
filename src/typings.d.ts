@@ -23,3 +23,4 @@ declare const META_CMS_API: string;
 declare const META_STORAGE_API: string;
 declare const META_NETWORK_API: string;
 declare const META_SPACE_BASE_DOMAIN: string;
+declare const FLEEK_NAME: string;
