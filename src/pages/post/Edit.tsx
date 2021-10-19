@@ -22,6 +22,7 @@ import {
 import { assign } from 'lodash';
 import type Vditor from 'vditor';
 import { generateSummary } from '@/utils/editor';
+import FullLoading from '@/components/FullLoading';
 
 const { confirm } = Modal;
 
@@ -37,18 +38,23 @@ const Edit: React.FC = () => {
   // vditor
   const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
-  const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState(false);
-  const [flagUpdateDraft, setFlagUpdateDraft] = useState(false);
+  const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
+  const [flagUpdateDraft, setFlagUpdateDraft] = useState<boolean>(false);
   // TODO: 好像没什么用
-  const [flagDB, setFlagDB] = useState(false);
+  const [flagDB, setFlagDB] = useState<boolean>(false);
+  // publish loading
+  const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   /**
    * draft publish as post
    */
   const draftPublishAsPost = useCallback(async (id: number) => {
+    setPublishLoading(true);
+
     const siteConfig = await getDefaultSiteConfigAPI();
     if (!siteConfig) {
       message.warning('获取默认配置失败');
+      setPublishLoading(false);
       return;
     }
 
@@ -58,9 +64,13 @@ const Edit: React.FC = () => {
       await dbPostsUpdate(Number(id), { post: res, draft: null });
 
       message.success('发布成功');
-      history.push('/posts');
     } else {
       message.error('发布失败');
+    }
+    setPublishLoading(false);
+
+    if (res) {
+      history.push('/posts');
     }
   }, []);
 
@@ -68,6 +78,8 @@ const Edit: React.FC = () => {
    * local draft as post
    */
   const publishAsPost = useCallback(async (data: CMS.LocalDraft) => {
+    setPublishLoading(true);
+
     const res = await publishPostAPI(data);
     if (res) {
       // 发布文章 更新最新 Post 数据
@@ -75,9 +87,13 @@ const Edit: React.FC = () => {
       await dbPostsUpdate(Number(id), { post: res });
 
       message.success('发布成功');
-      history.push('/posts');
     } else {
       message.error('发布失败');
+    }
+    setPublishLoading(false);
+
+    if (res) {
+      history.push('/posts');
     }
   }, []);
 
@@ -121,28 +137,33 @@ const Edit: React.FC = () => {
    */
   const postPublishToPost = useCallback(
     async (id: number) => {
+      setPublishLoading(true);
+
       // post publish draft
       const _draft = await publishPostAsDraftAPI(Number(id));
       if (!_draft) {
         message.error('转存失败');
         // setTransferDraftLoading(false);
+        setPublishLoading(false);
         return;
       }
       message.success('文章转存草稿成功');
 
-      // update
+      // update post(draft)
       const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
         title: title,
         cover: cover,
         summary: generateSummary(),
         content: content,
       });
-      // 更新草稿信息
+
+      // update local db draft data
       if (resultUpdatePost) {
         const { id: _id } = history.location.query as Query;
         await dbPostsUpdate(Number(_id), { draft: resultUpdatePost });
       } else {
         message.error('更新失败');
+        setPublishLoading(false);
         return Promise.reject();
       }
       // send
@@ -179,8 +200,8 @@ const Edit: React.FC = () => {
         title: '提示',
         icon: <ExclamationCircleOutlined />,
         content: '文章已发布，再次发布会覆盖文章的信息',
-        async onOk() {
-          await postPublishToPost(result.post!.id);
+        onOk() {
+          postPublishToPost(result.post!.id);
         },
         onCancel() {},
       });
@@ -412,6 +433,8 @@ const Edit: React.FC = () => {
         />
         <Editor asyncContentToDB={handleAsyncContentToDB} bindVditor={setVditor} />
       </section>
+
+      <FullLoading loading={publishLoading} setLoading={setPublishLoading} />
     </section>
   );
 };
