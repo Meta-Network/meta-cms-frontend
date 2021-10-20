@@ -1,0 +1,23 @@
+.container {
+  box-sizing: border-box;
+}
+
+.title {
+  padding: 20px 0;
+  font-weight: bold;
+  font-size: 28px;
+  border: 0;
+  &:focus {
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.edit {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 100px 0 0 0;
+  @media screen and (max-width: 1200px) {
+    padding-top: 35px;
+  }
+}

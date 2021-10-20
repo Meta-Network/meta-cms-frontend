@@ -39,26 +39,28 @@ Fixes # (issue)
 <!--- Include details of your testing environment, and the tests you ran to -->
 <!--- see how your change affects other areas of the code, etc. -->
 
-**Desktop:** 
+**Desktop:**
+
 <!-- Please complete the following information -->
 <!-- Or paste your full system/browser infomation, e.g. the output of `uname -a`  -->
 <!-- Darwin MacPro 20.6.0 Darwin Kernel Version 20.6.0 ... arm64  -->
 
- - OS:
-   - [ ] Windows [version]
-   - [ ] macOS [version]
-   - [ ] Linux [version]
- - Browser [e.g. chrome, safari]
+- OS:
+  - [ ] Windows [version]
+  - [ ] macOS [version]
+  - [ ] Linux [version]
+- Browser [e.g. chrome, safari]
 
 **Smartphone:**
 
 <!-- Please complete the following information -->
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
+
+- Device: [e.g. iPhone6]
+- OS: [e.g. iOS8.1]
+- Browser [e.g. stock browser, safari]
 
 ## Screenshots
- 
+
 Remove if no visual changes have been made.
 
 ## Checklist:

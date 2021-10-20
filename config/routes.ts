@@ -73,6 +73,17 @@
     ],
   },
   {
+    path: '/posts',
+    name: 'Post',
+    icon: 'edit',
+    component: './post/List',
+  },
+  {
+    path: '/post/edit',
+    component: './post/Edit',
+    layout: false,
+  },
+  {
     path: '/invitation',
     name: 'invitation',
     icon: 'apartment',

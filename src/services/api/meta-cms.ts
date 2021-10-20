@@ -145,9 +145,56 @@ export async function fetchPostsPublished(page: number, limit: number) {
 
 /** 发布一篇待同步待文章 POST /post/{postId}/publish */
 export async function publishPendingPost(postId: number, configIds: number[]) {
-  return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/publish`, {
+  return request<GLOBAL.GeneralResponse<CMS.Post>>(`/post/${postId}/publish`, {
     method: 'POST',
     data: { configIds },
+  });
+}
+
+/**
+ * 文章转存一份为草稿
+ * @param postId
+ * @returns
+ */
+export async function publishPostAsDraft(postId: number) {
+  return request<GLOBAL.GeneralResponse<CMS.Draft>>(`/post/${postId}/draft`, {
+    method: 'POST',
+  });
+}
+
+/**
+ * 获取 post，草稿 id 会返回 content
+ * @param postId
+ * @returns
+ */
+export async function postById(postId: number) {
+  return request<GLOBAL.GeneralResponse<CMS.Draft>>(`/post/${postId}`, {
+    method: 'GET',
+  });
+}
+
+/**
+ * local draft publish as post
+ * @param data
+ * @returns
+ */
+export async function publishPost(data: CMS.LocalDraft) {
+  return request<GLOBAL.GeneralResponse<CMS.Draft>>(`/post`, {
+    method: 'POST',
+    data,
+  });
+}
+
+/**
+ * update draft
+ * @param postId
+ * @param data
+ * @returns
+ */
+export async function updatePost(postId: number, data: CMS.LocalDraft) {
+  return request<GLOBAL.GeneralResponse<CMS.Draft>>(`/post/${postId}`, {
+    method: 'PATCH',
+    data,
   });
 }
 
@@ -199,4 +246,14 @@ export async function waitUntilSyncFinish(platform: string) {
   }
 
   return true;
+}
+
+/**
+ * image upload by url
+ */
+export async function imageUploadByUrl(url: string) {
+  return request<GLOBAL.GeneralResponse<Storage.Fleek>>(`/image/uploadByUrl`, {
+    method: 'POST',
+    data: { url },
+  });
 }

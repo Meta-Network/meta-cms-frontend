@@ -10,10 +10,18 @@ import {
 import { useModel } from '@@/plugin-model/useModel';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
+import { Image, Button, Space, Tag, message, Dropdown, Menu, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import styles from './SyncCenter.less';
+import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/models/db';
+import { assign, cloneDeep } from 'lodash';
+import { PostTempData } from '@/models/Posts';
+import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
+import { history } from 'umi';
+
+const { confirm } = Modal;
 
 type PostsInfo = CMS.ExistsPostsResponse['items'][number];
 
@@ -28,6 +36,8 @@ export default () => {
   const [itemsNumbers, setItemsNumbers] = useState<number>(0);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [postsLoadings, setPostsLoading] = useState<LoadingStates[]>([]);
+  // transfer draft loading
+  const [transferDraftLoading, setTransferDraftLoading] = useState<boolean>(false);
   const { setSiteNeedToDeploy } = useModel('storage');
 
   getDefaultSiteConfig().then((response) => {
@@ -71,6 +81,79 @@ export default () => {
       newLoadings[index] = value;
       return newLoadings;
     });
+  }, []);
+
+  /**
+   * transfer draft
+   */
+  const transferDraft = useCallback(async (post: CMS.Post) => {
+    setTransferDraftLoading(true);
+
+    // check save as draft
+    const isExist = await dbPostsWhereExist(post.id);
+    if (isExist) {
+      setTransferDraftLoading(false);
+
+      const currentDraft = await dbPostsWhereByID(post.id);
+      console.log('currentDraft', currentDraft);
+      const _url = currentDraft ? `/post/edit?id=${currentDraft.id}` : `/posts`;
+      confirm({
+        title: '提示',
+        icon: <ExclamationCircleOutlined />,
+        content: '已经转存到本地,是否跳转编辑？',
+        async onOk() {
+          history.push(_url);
+        },
+        onCancel() {},
+      });
+      return;
+    }
+
+    // console.log('post', post);
+    const _post = cloneDeep(post);
+
+    // image transfer ipfs
+    if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
+      const result = await imageUploadByUrlAPI(_post.cover);
+      if (result) {
+        message.success('封面转存成功');
+        _post.cover = result.publicUrl;
+      }
+    }
+
+    // post publish draft
+    const _draft = await publishPostAsDraftAPI(Number(_post.id));
+    if (!_draft) {
+      message.error('转存失败');
+      setTransferDraftLoading(false);
+      return;
+    }
+    message.success('文章转存草稿成功');
+
+    // get draft content
+    const _draftData = await postByIdAPI(Number(_draft.id));
+    if (!_draftData) {
+      message.error('获取内容失败');
+      setTransferDraftLoading(false);
+      return;
+    }
+    message.success('成功获取内容');
+
+    // send local
+    const resultID = await dbPostsAdd(
+      assign(PostTempData, {
+        cover: _post.cover,
+        title: _post.title,
+        summary: _post.summary || '',
+        content: _draftData.content,
+        post: _post,
+        draft: _draftData,
+      }),
+    );
+
+    history.push(`/post/edit?id=${resultID}`);
+
+    setTransferDraftLoading(false);
   }, []);
 
   const columns: ProColumns<PostsInfo>[] = [
@@ -179,7 +262,7 @@ export default () => {
     {
       title: '操作',
       key: 'option',
-      width: 210,
+      width: 290,
       valueType: 'option',
       render: (_, record, index) => [
         <Button
@@ -221,6 +304,9 @@ export default () => {
           danger
         >
           取消发布
+        </Button>,
+        <Button onClick={() => transferDraft(record)} loading={transferDraftLoading}>
+          本地编辑
         </Button>,
       ],
     },
