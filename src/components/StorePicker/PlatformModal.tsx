@@ -1,8 +1,8 @@
 import { Button, Modal } from 'antd';
-import { FormattedMessage } from 'umi';
+import { useIntl, FormattedMessage } from 'umi';
 import Icon, { GithubOutlined } from '@ant-design/icons';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
-import FormattedInfo from '../FormattedInfo';
+import FormattedDescription from '../FormattedDescription';
 import { ReactComponent as GiteeIcon } from '../../../public/icons/custom/gitee-colored.svg';
 
 export default ({
@@ -14,8 +14,9 @@ export default ({
   visibleState: any;
   confirmedState: any;
 }) => {
-  const [modalVisible, setModalVisible] = visibleState;
+  const intl = useIntl();
   const [, setConfirmed] = confirmedState;
+  const [modalVisible, setModalVisible] = visibleState;
 
   const handleRequest = async () => {
     const request = await requestSocialAuth(
@@ -50,17 +51,21 @@ export default ({
   return (
     <Modal
       visible={modalVisible}
-      title={<FormattedMessage id="guide.authorize.title" values={{ platform: name }} />}
+      title={<FormattedMessage id="guide.authorization.title" values={{ platform: name }} />}
       onOk={operationDone}
       onCancel={operationCancel}
       footer={[
         <Button key="submit" type="primary" onClick={operationDone}>
-          完成
+          {intl.formatMessage({ id: 'component.button.finish' })}
         </Button>,
       ]}
     >
-      <FormattedMessage id="guide.authorize.subtitle" tagName="h2" />
-      <FormattedInfo id="guide.authorize.info" values={{ platform: name }} customClass="" />
+      <FormattedMessage id="guide.authorization.subtitle" tagName="h2" />
+      <FormattedDescription
+        id="guide.authorization.description"
+        variables={{ platform: name }}
+        customClass=""
+      />
       <p>{buttons[name.toLowerCase()]}</p>
     </Modal>
   );

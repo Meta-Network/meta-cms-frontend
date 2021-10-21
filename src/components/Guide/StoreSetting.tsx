@@ -1,12 +1,14 @@
-import { useModel } from '@@/plugin-model/useModel';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
 import { getGithubReposName } from '@/services/api/global';
 import StoragePicker from '@/components/StorePicker';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
-import FormattedInfo from '../FormattedInfo';
+import FormattedInfo from '../FormattedDescription';
 
 export default () => {
+  const intl = useIntl();
   const [userRepos, setUserRepos] = useState<string[]>([]);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const { storeSetting, setStoreSetting } = useModel('storage');
@@ -19,7 +21,7 @@ export default () => {
           setUserRepos(result.map((name) => name.toLowerCase()));
         })
         .catch(() => {
-          message.error('未获取到 token，请重新授权存储仓库。');
+          message.error(intl.formatMessage({ id: 'messages.store.noRepoTokenReSelect' }));
           setStoreSetting({ storage: '', username: '' });
         });
     }
@@ -28,7 +30,7 @@ export default () => {
   const updateRepoSettings = async (values: { repoName: string }) => {
     const repo = values.repoName;
     setStoreSetting((prev) => ({ ...prev, repo }));
-    message.success(`已提交仓库名为 ${repo}`);
+    message.success(intl.formatMessage({ id: 'messages.store.setRepoName' }, { repo }));
   };
 
   return (
@@ -37,7 +39,7 @@ export default () => {
 
       <Divider />
 
-      <FormattedInfo id="guide.repo.info" />
+      <FormattedInfo id="guide.repo.description" />
       <ProForm
         style={{ width: 500 }}
         name="site-info"
@@ -48,23 +50,33 @@ export default () => {
         <ProFormText
           width="md"
           name="repoName"
-          placeholder="请输入创建的仓库名称"
+          placeholder={intl.formatMessage({ id: 'messages.store.form.repoName' })}
           validateStatus={isSuccess ? 'success' : undefined}
-          help={isSuccess ? '此仓库名可用！' : undefined}
+          help={
+            isSuccess
+              ? intl.formatMessage({ id: 'messages.store.form.repoNameAvailable' })
+              : undefined
+          }
           rules={[
             {
               validator: (_, value) => {
                 if (!userRepos) {
                   setIsSuccess(false);
-                  return Promise.reject(new Error('未成功加载 token。请先选择一个仓库'));
+                  return Promise.reject(
+                    new Error(intl.formatMessage({ id: 'messages.store.noRepoTokenFirstSelect' })),
+                  );
                 }
                 if (!value) {
                   setIsSuccess(false);
-                  return Promise.reject(new Error('仓库名不能为空。'));
+                  return Promise.reject(
+                    new Error(intl.formatMessage({ id: 'messages.store.repoNameCanNotBeEmpty' })),
+                  );
                 }
                 if (userRepos?.includes(value.toLowerCase())) {
                   setIsSuccess(false);
-                  return Promise.reject(new Error('此仓库名已存在，请选择一个未被占用的仓库名。'));
+                  return Promise.reject(
+                    new Error(intl.formatMessage({ id: 'messages.store.repoNameAlreadyExists' })),
+                  );
                 }
                 setIsSuccess(true);
                 return Promise.resolve();

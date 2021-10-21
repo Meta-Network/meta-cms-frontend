@@ -16,7 +16,7 @@ export default () => {
       <Result
         status="success"
         title={title}
-        subTitle={<FormattedMessage id="guide.result.info" />}
+        subTitle={<FormattedMessage id="guide.result.description" />}
       />
     </Card>
   );

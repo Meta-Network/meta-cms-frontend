@@ -1,18 +1,24 @@
 import styles from './index.less';
 
-export default ({ name }: { name: string }) => (
+/**
+ * Make an anchored title(content only, no header tag).
+ * Use margin and padding to jump to the correct position.
+ * @param {string} title
+ * @returns {JSX.Element}
+ */
+export default ({ title }: { title: string }) => (
   <>
     <span
       style={{
         marginTop: '-78px',
         paddingTop: '78px',
       }}
-      id={name}
+      id={title}
     >
-      {name}
+      {title}
     </span>
 
-    <a href={`#${name}`} className={styles.anchor}>
+    <a href={`#${title}`} className={styles.anchor}>
       #
     </a>
   </>

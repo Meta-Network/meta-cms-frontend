@@ -55,14 +55,11 @@ export async function getGithubUsername(): Promise<string> {
 
 /** 上传并更新用户头像 */
 export async function uploadImageIPFS(file: FormData, token: string) {
-  return request<GLOBAL.GeneralResponse<any>>(
-    META_STORAGE_API || 'https://fleek-storage.vercel.mttk.net/fleek/storage',
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data: file,
+  return request<GLOBAL.GeneralResponse<any>>(META_STORAGE_API, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+    data: file,
+  });
 }

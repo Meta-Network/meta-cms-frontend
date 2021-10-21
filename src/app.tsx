@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { history, Link } from 'umi';
-import Footer from '@/components/Footer';
+import { useLocation } from 'react-router-dom';
+import { useIntl, useModel, history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
-import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown, Button, message, notification } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
@@ -11,12 +10,12 @@ import {
   fetchPostsPublished,
   getDefaultSiteConfig,
 } from '@/services/api/meta-cms';
-import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import MenuMoreInfo from './components/MenuMoreInfo';
 import MenuUserInfo from './components/MenuUserInfo';
 import MenuItemWithBadge from './components/MenuItemWithBadge';
-import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 import MenuLanguageSwitch from './components/MenuLanguageSwitch';
+import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
+import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
 
@@ -29,9 +28,12 @@ function CustomSiderMenu({
   initialState: any;
   menuItemProps: SiderMenuProps;
 }) {
+  const intl = useIntl();
+  const [publishButtonDisplay, setPublishButtonDisplay] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
   const { deployedSite, setDeployedSite, siteNeedToDeploy, setSiteNeedToDeploy } =
     useModel('storage');
+  const location = useLocation();
 
   useEffect(() => {
     getDefaultSiteConfig().then((response) => {
@@ -46,36 +48,60 @@ function CustomSiderMenu({
   }, [setDeployedSite]);
 
   const publishSiteRequest = async () => {
-    const done = message.loading('开始部署站点，请稍候…', 0);
+    const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
     setPublishLoading(true);
 
     if (deployedSite.configId) {
       const response = await deployAndPublishSite(deployedSite.configId);
       if (response.statusCode === 201) {
         notification.success({
-          message: '任务完成',
-          description: 'Meta Space 已经重新部署成功！',
+          message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),
+          description: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.description' }),
           duration: 0,
         });
         setSiteNeedToDeploy(false);
       } else {
         notification.error({
-          message: '任务失败',
-          description: 'Meta Space 部署失败 ，请重新尝试或向开发团队反馈。',
+          message: intl.formatMessage({ id: 'messages.redeployment.taskFailed.title' }),
+          description: intl.formatMessage({ id: 'messages.redeployment.taskFailed.description' }),
           duration: 0,
         });
       }
     } else {
-      message.error('未获取到站点信息，无法发布文章。请先创建站点。');
+      message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
     }
 
     done();
     setPublishLoading(false);
   };
 
+  useEffect(() => {
+    if (siteNeedToDeploy && window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+      setPublishButtonDisplay(true);
+    }
+  }, [location, siteNeedToDeploy]);
+
+  useEffect(() => {
+    const scrollListener = () => {
+      if (!siteNeedToDeploy) {
+        return setPublishButtonDisplay(false);
+      }
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+        return setPublishButtonDisplay(false);
+      }
+      return setPublishButtonDisplay(true);
+    };
+
+    if (siteNeedToDeploy) {
+      window.addEventListener('scroll', scrollListener);
+    } else {
+      window.removeEventListener('scroll', scrollListener);
+    }
+  }, [siteNeedToDeploy]);
+
   return (
     <div className="menu-extra-cards">
-      <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click', 'hover']}>
+      <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click']}>
         <Card className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card'}>
           <Card.Meta
             className="menu-user-card-meta"
@@ -106,7 +132,7 @@ function CustomSiderMenu({
       )}
       <div
         className={`global-publish-button-background ${
-          siteNeedToDeploy
+          publishButtonDisplay
             ? 'global-publish-button-background-visible'
             : 'global-publish-button-background-invisible'
         }`}
@@ -117,7 +143,7 @@ function CustomSiderMenu({
           onClick={publishSiteRequest}
           className="global-publish-button"
         >
-          部署我的 Meta Space
+          {intl.formatMessage({ id: 'messages.redeployment.button' })}
         </Button>
       </div>
     </div>
@@ -175,13 +201,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     disableContentMargin: false,
     siderWidth: 300,
     layout: 'side',
-    // rightContentRender: () => <RightContent />,
     headerRender: () => false,
     headerContentRender: () => false,
-    footerRender: () => <Footer />,
     menuItemRender: (menuItemProps, defaultDom) => {
-      switch (menuItemProps.name) {
-        case '邀请码': {
+      switch (menuItemProps.path) {
+        // 邀请码数量
+        case '/invitation': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}
@@ -190,7 +215,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
             />
           );
         }
-        case '已发布': {
+        // 已发布文章
+        case '/content/published-posts': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}
@@ -215,7 +241,5 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       }
     },
     links: [<MenuLanguageSwitch key="MenuLanguageSwitch" />, <MenuMoreInfo key="MenuMoreInfo" />],
-    // 自定义 403 页面
-    // unAccessible: <div>unAccessible</div>,
   };
 };

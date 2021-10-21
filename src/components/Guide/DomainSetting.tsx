@@ -1,9 +1,8 @@
-import { isDomainForbidden } from '@/services/api/meta-cms';
-import { useModel } from '@@/plugin-model/useModel';
-import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { message } from 'antd';
 import { useState } from 'react';
-import { useIntl } from 'umi';
+import { useIntl, useModel } from 'umi';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
+import { isDomainForbidden } from '@/services/api/meta-cms';
 
 export default () => {
   const intl = useIntl();
@@ -13,7 +12,7 @@ export default () => {
   const updateDomainSettings = async (values: { domain: string }) => {
     const { domain } = values;
     setDomainSetting(domain);
-    message.success(intl.formatMessage({ id: 'notifications.domain.updated' }));
+    message.success(intl.formatMessage({ id: 'messages.domain.updated' }));
   };
 
   return (
@@ -27,26 +26,26 @@ export default () => {
       <ProFormText
         width="md"
         fieldProps={{
-          addonAfter: `.${META_SPACE_BASE_DOMAIN || 'metaspaces.me'}`,
+          addonAfter: `.${META_SPACE_BASE_DOMAIN}`,
         }}
         name="domain"
         placeholder={intl.formatMessage({ id: 'messages.domain.enterPrefixDomain' })}
         validateStatus={isSuccess ? 'success' : undefined}
-        help={isSuccess ? intl.formatMessage({ id: 'notifications.domain.isValid' }) : undefined}
+        help={isSuccess ? intl.formatMessage({ id: 'messages.domain.isValid' }) : undefined}
         rules={[
           {
             validator: async (_, value) => {
               if (!value) {
                 setIsSuccess(false);
                 return Promise.reject(
-                  new Error(intl.formatMessage({ id: 'notifications.domain.shouldNotBeEmpty' })),
+                  new Error(intl.formatMessage({ id: 'messages.domain.shouldNotBeEmpty' })),
                 );
               }
               const isForbidden = await isDomainForbidden(value);
               if (isForbidden) {
                 setIsSuccess(false);
                 return Promise.reject(
-                  new Error(intl.formatMessage({ id: 'notifications.domain.isForbidden' })),
+                  new Error(intl.formatMessage({ id: 'messages.domain.isForbidden' })),
                 );
               }
               setIsSuccess(true);

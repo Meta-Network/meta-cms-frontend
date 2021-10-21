@@ -1,24 +1,22 @@
+import { useIntl } from 'umi';
 import { CopyOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { List, Badge, Card, Divider, notification } from 'antd';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { useRequest } from '@@/plugin-request/request';
+import FormattedInfo from '@/components/FormattedDescription';
 import { queryInvitations, updateInvitation } from '@/services/api/meta-ucenter';
 
 export default () => {
+  const intl = useIntl();
   const { data, loading } = useRequest(() => queryInvitations());
   const list = data || [];
 
   return (
     <PageContainer
       breadcrumb={{}}
-      title="邀请码管理"
-      content={
-        <div className="text-info">
-          <p>在这里管理你拥有的邀请码。</p>
-          <p>你可以在下方编辑邀请信息，定制发送后对方会接受的信息。</p>
-        </div>
-      }
+      title={intl.formatMessage({ id: 'messages.invitation.title' })}
+      content={<FormattedInfo id="messages.invitation.description" />}
     >
       <List
         rowKey="id"
@@ -34,11 +32,18 @@ export default () => {
           return (
             <List.Item key={item.id}>
               <Badge.Ribbon
-                text={isUnused ? '邀请码可用' : '邀请码已使用'}
+                text={
+                  isUnused
+                    ? intl.formatMessage({ id: 'component.badge.invitationAvailable' })
+                    : intl.formatMessage({ id: 'component.badge.invitationUsed' })
+                }
                 color={isUnused ? 'green' : 'blue'}
               >
                 <Card
-                  title={`邀请码 #${item.id}`}
+                  title={intl.formatMessage(
+                    { id: 'component.badge.invitationAvailable' },
+                    { id: item.id },
+                  )}
                   hoverable
                   bordered={false}
                   style={{ marginTop: 16 }}
@@ -59,11 +64,11 @@ export default () => {
                       const result = await updateInvitation(item.signature, body);
                       if (result.message === 'ok') {
                         notification.success({
-                          message: '信息更新完成',
+                          message: intl.formatMessage({ id: 'messages.info.updateSuccess' }),
                         });
                       } else {
                         notification.error({
-                          message: '信息更新失败',
+                          message: intl.formatMessage({ id: 'messages.info.updateFailed' }),
                           description: result.message,
                         });
                       }
@@ -81,7 +86,9 @@ export default () => {
                               ) as HTMLInputElement;
                               sigArea?.select();
                               document.execCommand('copy');
-                              notification.success({ message: '复制成功' });
+                              notification.success({
+                                message: intl.formatMessage({ id: 'messages.info.copySuccess' }),
+                              });
                             }}
                           >
                             <CopyOutlined />
@@ -91,26 +98,28 @@ export default () => {
                         ),
                       }}
                       initialValue={item.signature}
-                      label="邀请代码"
+                      label={intl.formatMessage({ id: 'messages.invitation.cardLabel' })}
                       width="md"
                       name="signature"
                       disabled={!isUnused}
                     />
                     <Divider />
-                    <p>可以在此处编辑信息</p>
+                    <p>{intl.formatMessage({ id: 'messages.invitation.editInfoHere' })}</p>
                     <ProFormText
                       fieldProps={{ id: `sub_${item.id}` }}
-                      label="受邀人"
+                      label={intl.formatMessage({ id: 'messages.invitation.inviteeLabel' })}
                       width="md"
                       name="sub"
-                      placeholder="受邀人的称呼"
+                      placeholder={intl.formatMessage({ id: 'messages.invitation.inviteeName' })}
                     />
                     <ProFormText
                       fieldProps={{ id: `${item.id}_message` }}
-                      label="邀请信息"
+                      label={intl.formatMessage({ id: 'messages.invitation.inviteInfo' })}
                       width="md"
                       name="message"
-                      placeholder="一段写给对方的话"
+                      placeholder={intl.formatMessage({
+                        id: 'messages.invitation.messageToInvitee',
+                      })}
                     />
                   </ProForm>
                 </Card>

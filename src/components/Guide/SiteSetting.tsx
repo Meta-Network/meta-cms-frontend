@@ -1,14 +1,14 @@
 import { message } from 'antd';
-import { getLocale } from 'umi';
 import React, { useState } from 'react';
 import ProForm from '@ant-design/pro-form';
-import { useModel } from '@@/plugin-model/useModel';
+import { getLocale, useModel, useIntl } from 'umi';
 import SiteSettingFormItems from '../SiteSettingFormItems';
 // @ts-ignore
 import moment from 'moment'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import momentTimezone from 'moment-timezone';
 
 export default () => {
+  const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const {
     siteSetting,
@@ -31,7 +31,7 @@ export default () => {
   const handleFinishing = async (values: GLOBAL.SiteSetting) => {
     values.favicon = faviconUrl; // eslint-disable-line no-param-reassign
     setSiteSetting(values);
-    message.success('成功保存站点信息设置。');
+    message.success(intl.formatMessage({ id: 'messages.deployment.saveConfigSuccess' }));
   };
 
   return (

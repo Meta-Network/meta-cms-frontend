@@ -28,50 +28,50 @@ export enum StorageKeys {
 
 export const Storages = [
   {
-    name: '域名',
+    title: 'guide.domain.title',
     key: 'domainSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '主题',
+    title: 'guide.theme.title',
     key: 'themeSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '信息',
+    title: 'guide.config.title',
     key: 'siteSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '存储',
+    title: 'guide.storage.title',
     key: 'storeSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '发布',
+    title: 'guide.publish.title',
     key: '',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: 'CDN',
+    title: 'guide.cdn.title',
     key: '',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: '部署',
-    key: '',
+    title: 'guide.deploy.title',
+    key: 'deploy',
     get value() {
       return Storage.get(this.key);
     },

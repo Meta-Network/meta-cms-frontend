@@ -1,5 +1,5 @@
 import SiteSettingFormItems from '@/components/SiteSettingFormItems';
-import { useModel } from '@@/plugin-model/useModel';
+import { useIntl, useModel } from 'umi';
 import { Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
@@ -10,8 +10,10 @@ import {
 import { message } from 'antd';
 import ProForm from '@ant-design/pro-form';
 import { useState } from 'react';
+import FormattedInfo from '@/components/FormattedDescription';
 
 export default () => {
+  const intl = useIntl();
   const [defaultSiteConfig, setDefaultSiteConfig] = useState<CMS.SiteConfiguration>();
   const [faviconUrl, setFaviconUrl] = useState<string>('');
   const { setSiteNeedToDeploy } = useModel('storage');
@@ -36,10 +38,10 @@ export default () => {
         favicon: values.favicon,
       });
 
-      const done = message.loading('正在提交数据，请等待完成…', 0);
+      const done = message.loading(intl.formatMessage({ id: 'messages.site.submittingInfo' }), 0);
       await Promise.all([siteConfigRequest, siteInfoRequest]);
       done();
-      message.success('数据提交完成。');
+      message.success(intl.formatMessage({ id: 'messages.site.submitSuccess' }));
       setSiteNeedToDeploy(true);
     }
   };
@@ -47,12 +49,8 @@ export default () => {
   return (
     <PageContainer
       breadcrumb={{}}
-      title="站点信息设置"
-      content={
-        <div key="header-info">
-          <p>在此编辑您的 Meta Space 信息</p>
-        </div>
-      }
+      title={intl.formatMessage({ id: 'messages.site.title' })}
+      content={<FormattedInfo id="messages.site.description" />}
     >
       <Card>
         <ProForm

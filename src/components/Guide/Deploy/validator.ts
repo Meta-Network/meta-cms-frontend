@@ -1,6 +1,6 @@
 import { getGithubReposName } from '@/services/api/global';
 import { isDomainForbidden } from '@/services/api/meta-cms';
-import { StorageKeys, Storages } from '@/services/constants';
+import { StorageKeys } from '@/services/constants';
 
 type ValueOf<T> = T[keyof T];
 
@@ -43,35 +43,5 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
     }
     default:
       return false;
-  }
-};
-
-export const validating = async ({ setStageCompleted, setOnError, updateProcessing }: any) => {
-  const validation = await Promise.all(
-    Storages.map(async ({ name, key, value }) => {
-      if (name !== '部署') {
-        const isSuccess = await validator(key || '', value);
-        return isSuccess ? null : `${name}：未完成`;
-      }
-      return null;
-    }),
-  );
-
-  const validated = validation.every((e) => e === null);
-
-  if (validated) {
-    updateProcessing({ message: '校验设置成功。', state: 'success' });
-    setStageCompleted(true);
-  } else {
-    updateProcessing({
-      message: '校验设置失败。请检查以下您没有配置的设置。',
-      state: 'error',
-    });
-    validation
-      .filter((e) => e)
-      .forEach((e) => {
-        updateProcessing({ message: e as string, state: 'error' });
-      });
-    setOnError(true);
   }
 };
