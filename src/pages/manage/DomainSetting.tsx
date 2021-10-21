@@ -1,20 +1,19 @@
+import { useIntl } from 'umi';
+import { useState } from 'react';
 import { Button, Card } from 'antd';
 import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
-import { useState } from 'react';
+import FormattedInfo from '@/components/FormattedInfo';
 
 export default () => {
+  const intl = useIntl();
   const [isPlatformEditable, setIsPlatformEditable] = useState<boolean>(false);
 
   return (
     <PageContainer
       breadcrumb={{}}
-      title="域名配置"
-      content={
-        <div className="text-info">
-          <p>可以在此配置你的域名，即别人访问到你的 Meta Space 的地址。</p>
-        </div>
-      }
+      title={intl.formatMessage({ id: 'messages.domain.title' })}
+      content={<FormattedInfo id="messages.domain.info" />}
     >
       <Card>
         <ProForm
@@ -33,7 +32,7 @@ export default () => {
                   danger
                   onClick={() => setIsPlatformEditable(true)}
                 >
-                  修改部署平台
+                  {intl.formatMessage({ id: 'messages.domain.form.edit' })}
                 </Button>,
               ];
             },
@@ -43,14 +42,19 @@ export default () => {
             <ProFormSelect
               width="md"
               name="platform"
-              label="部署平台"
+              label={intl.formatMessage({ id: 'messages.domain.form.label' })}
               valueEnum={{
                 github: 'GitHub',
                 gitee: 'Gitee',
               }}
               disabled={!isPlatformEditable}
             />
-            <ProFormText width="md" name="domain" label="域名设置" placeholder="你的站点域名" />
+            <ProFormText
+              width="md"
+              name="domain"
+              label={intl.formatMessage({ id: 'messages.domain.form.content' })}
+              placeholder={intl.formatMessage({ id: 'messages.domain.form.placeholder' })}
+            />
           </ProForm.Group>
         </ProForm>
       </Card>

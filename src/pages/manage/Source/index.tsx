@@ -4,6 +4,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { getSourceStatus, syncPostsByPlatform } from '@/services/api/meta-cms';
 import styles from './index.less';
+import { useIntl } from 'umi';
+import FormattedInfo from '@/components/FormattedInfo';
 
 const status: GLOBAL.SourcePlatforms = {
   matataki: {
@@ -13,6 +15,7 @@ const status: GLOBAL.SourcePlatforms = {
 };
 
 export default () => {
+  const intl = useIntl();
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [unbindLoading, setUnbindLoading] = useState<boolean>(false);
   const [sourceStatus, setSourceStatus] = useState<GLOBAL.SourcePlatforms>(status);
@@ -24,12 +27,12 @@ export default () => {
           loading={syncLoading}
           onClick={() => {
             setSyncLoading(true);
-            const done = message.loading('文章同步中，请稍候…', 0);
+            const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
             syncPostsByPlatform('matataki').then((result) => {
               if (result.statusCode === 201) {
-                message.success('文章同步成功！');
+                message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }), 0);
               } else {
-                message.error('文章同步失败，请重新同步或绑定账号。');
+                message.error(intl.formatMessage({ id: 'messages.source.syncFailed' }), 0);
               }
               done();
               setSyncLoading(false);
@@ -37,7 +40,7 @@ export default () => {
           }}
           type="primary"
         >
-          立即同步
+          {intl.formatMessage({ id: 'component.button.syncNow' })}
         </Button>
       ),
       bind: (
@@ -47,7 +50,7 @@ export default () => {
           }}
           type="primary"
         >
-          绑定
+          {intl.formatMessage({ id: 'component.button.bind' })}
         </Button>
       ),
       unbind: (
@@ -55,12 +58,15 @@ export default () => {
           loading={unbindLoading}
           onClick={() => {
             setUnbindLoading(true);
-            const done = message.loading('解绑中，请稍候…', 0);
+            const done = message.loading(
+              intl.formatMessage({ id: 'messages.source.unbinding' }),
+              0,
+            );
             deleteSourcePlatformToken('matataki').then((result) => {
               if (result.statusCode === 200) {
-                message.success('解绑成功。请刷新页面。');
+                message.success(intl.formatMessage({ id: 'messages.source.unbindSuccess' }), 0);
               } else {
-                message.error('解绑失败，请检查网络或登录状态。');
+                message.error(intl.formatMessage({ id: 'messages.source.unbindFailed' }), 0);
               }
               done();
               setUnbindLoading(false);
@@ -69,7 +75,7 @@ export default () => {
           type="primary"
           danger
         >
-          解绑
+          {intl.formatMessage({ id: 'component.button.unbind' })}
         </Button>
       ),
     },
@@ -78,11 +84,11 @@ export default () => {
   const getStatus = (platform: GLOBAL.SourcePlatformProperties) =>
     platform.active ? (
       <Tag key={`${platform.name}_bind`} className="status" color="blue">
-        已绑定
+        {intl.formatMessage({ id: 'component.status.alreadyBound' })}
       </Tag>
     ) : (
       <Tag key={`${platform.name}_not_bind`} className="status" color="red">
-        未绑定
+        {intl.formatMessage({ id: 'component.status.notBound' })}
       </Tag>
     );
 
@@ -108,7 +114,7 @@ export default () => {
   const sourcePlatforms = [
     {
       title: ['Matataki', getStatus(sourceStatus.matataki)],
-      description: '每一篇自由的创作都应该被永远记录',
+      description: intl.formatMessage({ id: 'messages.source.matatakiDescription' }),
       actions: getActions(sourceStatus.matataki),
       avatar: (
         <img
@@ -122,12 +128,8 @@ export default () => {
 
   return (
     <PageContainer
-      title="内容源绑定"
-      content={
-        <div className="text-info">
-          <p>你可以在此将其他平台的文章同步至你的个人站点。</p>
-        </div>
-      }
+      title={intl.formatMessage({ id: 'messages.source.title' })}
+      content={<FormattedInfo id="messages.source.info" />}
       breadcrumb={{}}
     >
       <GridContent>

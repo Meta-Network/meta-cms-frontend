@@ -1,33 +1,27 @@
 import {
   ignorePendingPost,
-  publishPendingPost,
+  publishPostById,
   getDefaultSiteConfig,
-  syncPostsByPlatform,
-  getSourceStatus,
-  waitUntilSyncFinish,
   fetchPostsPending,
+  getSourceStatus,
+  publishPosts,
 } from '@/services/api/meta-cms';
-import { useModel } from '@@/plugin-model/useModel';
+import { useIntl, useModel } from 'umi';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Image, Button, Space, Tag, message, Dropdown, Menu } from 'antd';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { Image, Button, Space, Tag, message, notification } from 'antd';
+import { useState, useRef } from 'react';
+import syncPostsRequest from '../../utils/sync-posts-request';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import styles from './SyncCenter.less';
 
-type PostsInfo = CMS.ExistsPostsResponse['items'][number];
-
-enum LoadingStates {
-  Pending,
-  Publishing,
-  Discarding,
-}
+type PostInfo = CMS.ExistsPostsResponse['items'][number];
 
 export default () => {
+  const intl = useIntl();
   const [siteConfigId, setSiteConfigId] = useState<number | null>(null);
-  const [itemsNumbers, setItemsNumbers] = useState<number>(0);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
-  const [postsLoadings, setPostsLoading] = useState<LoadingStates[]>([]);
+  const { getLockedConfigState, setLockedConfig } = useModel('global');
   const { setSiteNeedToDeploy } = useModel('storage');
 
   getDefaultSiteConfig().then((response) => {
@@ -38,102 +32,107 @@ export default () => {
 
   const ref = useRef<ActionType>();
 
-  const syncPostsRequest = async () => {
-    const done = message.loading('文章同步中…请稍候');
-    setSyncLoading(true);
-
-    const sources = await getSourceStatus();
-    const syncQueue: Promise<any>[] = [];
-    const syncStates: Promise<boolean>[] = [];
-
-    sources.data.forEach((service: CMS.SourceStatusResponse) => {
-      syncQueue.push(syncPostsByPlatform(service.platform));
-      syncStates.push(waitUntilSyncFinish(service.platform));
-    });
-
-    await Promise.all(syncQueue);
-
-    Promise.all(syncStates).then(() => {
-      message.success('文章同步完成。');
-      ref.current?.reload();
-      setSyncLoading(false);
-      done();
-    });
+  const publishSinglePost = async (record: PostInfo) => {
+    if (siteConfigId === null) {
+      notification.error({
+        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.title' }),
+        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.description' }),
+      });
+      return;
+    }
+    if (getLockedConfigState(siteConfigId)) {
+      notification.error({
+        message: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.title' }),
+        description: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.description' }),
+      });
+      return;
+    }
+    setLockedConfig(siteConfigId, true);
+    const done = message.loading(intl.formatMessage({ id: 'messages.syncCenter.publishPost' }), 0);
+    await publishPostById(record.id, [siteConfigId]);
+    setLockedConfig(siteConfigId, false);
+    done();
+    message.success(intl.formatMessage({ id: 'messages.syncCenter.publishPostSuccess' }));
+    setSiteNeedToDeploy(true);
+    if (ref.current?.reset) {
+      await ref.current?.reset();
+    }
   };
 
-  useEffect(() => {
-    setPostsLoading(Array(itemsNumbers).fill(LoadingStates.Pending));
-  }, [itemsNumbers]);
+  const publishMultiplePosts = async (selectedKeys: number[]) => {
+    if (siteConfigId === null) {
+      notification.error({
+        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.title' }),
+        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.description' }),
+      });
+      return;
+    }
+    if (getLockedConfigState(siteConfigId)) {
+      notification.error({
+        message: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.title' }),
+        description: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.description' }),
+      });
+      return;
+    }
+    setLockedConfig(siteConfigId, true);
+    const done = message.loading(
+      intl.formatMessage({ id: 'messages.syncCenter.publishMultiPosts' }),
+      0,
+    );
+    await publishPosts(selectedKeys, [siteConfigId]);
+    setLockedConfig(siteConfigId, false);
+    done();
+    message.success(intl.formatMessage({ id: 'messages.syncCenter.publishMultiPostsSuccess' }));
+    setSiteNeedToDeploy(true);
+    if (ref.current?.reset) {
+      await ref.current?.reset();
+    }
+  };
 
-  const setLoading = useCallback((index, value: LoadingStates) => {
-    setPostsLoading((prevLoadings: LoadingStates[]) => {
-      const newLoadings = [...prevLoadings];
-      newLoadings[index] = value;
-      return newLoadings;
-    });
-  }, []);
+  const ignoreSinglePost = async (record: PostInfo) => {
+    const done = message.loading(intl.formatMessage({ id: 'messages.syncCenter.discardPost' }), 0);
+    await ignorePendingPost(record.id);
+    done();
+    message.success(intl.formatMessage({ id: 'messages.syncCenter.discardPostSuccess' }));
+    if (ref.current?.reset) {
+      await ref.current?.reset();
+    }
+  };
 
-  const columns: ProColumns<PostsInfo>[] = [
+  const columns: ProColumns<PostInfo>[] = [
     {
       dataIndex: 'cover',
-      title: '封面图片',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.cover' }),
       search: false,
       render: (_, record) => (
         <Space>{record.cover ? <Image width={100} src={record.cover} /> : '无封面图'}</Space>
       ),
     },
     {
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.title' }),
       dataIndex: 'title',
-      title: '标题',
       width: 200,
       copyable: true,
       ellipsis: true,
-      tip: '标题过长会自动收缩',
     },
     {
-      title: '分类',
-      dataIndex: 'category',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.platform' }),
+      dataIndex: 'platform',
+      width: 100,
       filters: true,
       onFilter: true,
       render: (_, record) => (
         <Space>
-          {record.category && (
-            <Tag color="green" key={`${record.category}_cate`}>
-              {record.category}
+          {record.platform && (
+            <Tag color="blue" key={`source-platform-${record.id}`}>
+              {record.platform}
             </Tag>
           )}
         </Space>
       ),
     },
     {
-      title: '标签',
-      dataIndex: 'tags',
-      filters: true,
-      onFilter: true,
-      render: (_, record) => (
-        <Dropdown
-          key="menu_tags"
-          trigger={['click', 'hover']}
-          overlay={
-            <Menu>
-              {record?.tags?.map((name) => (
-                <Menu.Item key={`${name}_menu`}>
-                  <Tag color="blue" key={`${name}_tag`}>
-                    {name}
-                  </Tag>
-                </Menu.Item>
-              ))}
-            </Menu>
-          }
-        >
-          <Button key="tags_list" type="dashed" style={{ padding: '0 8px' }}>
-            标签列表
-          </Button>
-        </Dropdown>
-      ),
-    },
-    {
-      title: '创建时间',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.createTime' }),
       key: 'showTime',
       dataIndex: 'createdAt',
       valueType: 'date',
@@ -141,7 +140,7 @@ export default () => {
       hideInSearch: true,
     },
     {
-      title: '创建时间',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.createTime' }),
       dataIndex: 'createdAt',
       valueType: 'dateRange',
       hideInTable: true,
@@ -155,7 +154,7 @@ export default () => {
       },
     },
     {
-      title: '更新时间',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
       key: 'showTime',
       dataIndex: 'updatedAt',
       valueType: 'date',
@@ -163,7 +162,7 @@ export default () => {
       hideInSearch: true,
     },
     {
-      title: '更新时间',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
       dataIndex: 'updatedAt',
       valueType: 'dateRange',
       hideInTable: true,
@@ -177,50 +176,30 @@ export default () => {
       },
     },
     {
-      title: '操作',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.actions' }),
       key: 'option',
-      width: 210,
+      width: 280,
       valueType: 'option',
-      render: (_, record, index) => [
+      render: (_, record) => [
         <Button
-          onClick={async () => {
-            if (siteConfigId === null) {
-              message.error('未获取到站点信息，无法发布文章。请先创建站点');
-              return;
-            }
-            setLoading(index, LoadingStates.Publishing);
-            const done = message.loading('文章发布中…请稍候。', 0);
-            await publishPendingPost(record.id, [siteConfigId]);
-            if (ref.current?.reset) {
-              await ref.current?.reset();
-            }
-            done();
-            message.success('已成功发布此文章');
-            setSiteNeedToDeploy(true);
-            setLoading(index, LoadingStates.Pending);
-          }}
-          loading={postsLoadings[index] === LoadingStates.Publishing}
-          disabled={postsLoadings[index] === LoadingStates.Discarding}
+          key="option-publish"
+          onClick={() => publishSinglePost(record)}
+          // loading={postsLoadings[index] === LoadingStates.Publishing}
+          // disabled={postsLoadings[index] === LoadingStates.Discarding}
         >
-          发布
+          {intl.formatMessage({ id: 'component.button.publish' })}
+        </Button>,
+        <Button key="option-edit" ghost type="primary">
+          {intl.formatMessage({ id: 'component.button.edit' })}
         </Button>,
         <Button
-          onClick={async () => {
-            setLoading(index, LoadingStates.Discarding);
-            const done = message.loading('取消发布中…请稍候。', 0);
-            await ignorePendingPost(record.id);
-            if (ref.current?.reset) {
-              await ref.current?.reset();
-            }
-            done();
-            message.success('成功取消发布此文章');
-            setLoading(index, LoadingStates.Pending);
-          }}
-          loading={postsLoadings[index] === LoadingStates.Discarding}
-          disabled={postsLoadings[index] === LoadingStates.Publishing}
+          key="option-ignore"
+          onClick={() => ignoreSinglePost(record)}
+          // loading={postsLoadings[index] === LoadingStates.Discarding}
+          // disabled={postsLoadings[index] === LoadingStates.Publishing}
           danger
         >
-          取消发布
+          {intl.formatMessage({ id: 'component.button.discard' })}
         </Button>,
       ],
     },
@@ -229,30 +208,44 @@ export default () => {
   return (
     <PageContainer
       breadcrumb={{}}
+      title={intl.formatMessage({ id: 'messages.syncCenter.title' })}
       content={[
         <div key="header-info" style={{ paddingTop: '11px', marginBottom: '4px' }}>
-          <p>在这里来控制发布从其他源获取到的文章列表</p>
+          <p>{intl.formatMessage({ id: 'messages.syncCenter.info' })}</p>
         </div>,
         <div key="header-actions" className={styles.syncButtons}>
           <Button
             key="sync-button"
             loading={syncLoading}
-            onClick={syncPostsRequest}
+            onClick={async () =>
+              syncPostsRequest((await getSourceStatus()).data, setSyncLoading, ref)
+            }
             style={{ marginRight: 10 }}
           >
-            立即同步
+            {intl.formatMessage({ id: 'component.button.syncNow' })}
           </Button>
         </div>,
       ]}
-      title="同步中心"
     >
-      <ProTable<PostsInfo>
+      <ProTable<PostInfo>
         actionRef={ref}
         columns={columns}
+        rowSelection={{}}
+        tableAlertOptionRender={({ selectedRowKeys }) => {
+          return (
+            <Space size={16}>
+              <Button onClick={() => publishMultiplePosts(selectedRowKeys as number[])}>
+                {intl.formatMessage({ id: 'messages.syncCenter.button.publishMultiPosts' })}
+              </Button>
+              <Button danger>
+                {intl.formatMessage({ id: 'messages.syncCenter.button.discardMultiPosts' })}
+              </Button>
+            </Space>
+          );
+        }}
         request={async ({ pageSize, current }) => {
           // TODO: 分页
           const request = await fetchPostsPending(current ?? 1, pageSize ?? 10);
-          setItemsNumbers(request.data.meta.totalItems);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
           return {
@@ -279,12 +272,6 @@ export default () => {
             }
             return values;
           },
-        }}
-        pagination={{}}
-        expandable={{
-          expandedRowRender: (record: PostsInfo) => (
-            <p dangerouslySetInnerHTML={{ __html: record.summary || '' }} />
-          ),
         }}
         dateFormatter="string"
         options={false}

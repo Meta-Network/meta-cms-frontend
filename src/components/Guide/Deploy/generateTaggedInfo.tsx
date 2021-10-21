@@ -1,6 +1,13 @@
 import { Tag } from 'antd';
 import styles from './generateTaggedInfo.less';
 
+/**
+ * Generates deployment status messages with colored labels.
+ * Can be used in the Guide component's last step.
+ * @param {GLOBAL.LogMessagesTemplate} info the message template
+ * @param {number} index For the unique key, so don't be the same as the others
+ * @returns {JSX.Element}
+ */
 export default (info: GLOBAL.LogMessagesTemplate, index: number) => {
   let color: string;
 

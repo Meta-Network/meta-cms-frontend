@@ -3,7 +3,7 @@ import { extendWithErrorHandler } from '@/services/api/base-request';
 
 const request = extendWithErrorHandler({
   credentials: 'include',
-  prefix: META_CMS_API || 'https://meta-cms-api-dev.mttk.net',
+  prefix: META_CMS_API,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -144,10 +144,18 @@ export async function fetchPostsPublished(page: number, limit: number) {
 }
 
 /** 发布一篇待同步待文章 POST /post/{postId}/publish */
-export async function publishPendingPost(postId: number, configIds: number[]) {
+export async function publishPostById(postId: number, configIds: number[]) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/publish`, {
     method: 'POST',
     data: { configIds },
+  });
+}
+
+/** 发布若干篇待同步待文章 POST /post/publish */
+export async function publishPosts(postIds: number[], configIds: number[]) {
+  return request<GLOBAL.GeneralResponse<any>>(`/post/publish`, {
+    method: 'POST',
+    data: { postIds, configIds },
   });
 }
 

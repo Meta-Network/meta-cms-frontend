@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { history, Link } from 'umi';
+import { useLocation } from 'react-router-dom';
 import Footer from '@/components/Footer';
+import { history, Link, useModel } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
-import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown, Button, message, notification } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
@@ -11,12 +11,12 @@ import {
   fetchPostsPublished,
   getDefaultSiteConfig,
 } from '@/services/api/meta-cms';
-import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import MenuMoreInfo from './components/MenuMoreInfo';
 import MenuUserInfo from './components/MenuUserInfo';
 import MenuItemWithBadge from './components/MenuItemWithBadge';
-import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 import MenuLanguageSwitch from './components/MenuLanguageSwitch';
+import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
+import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
 
@@ -29,9 +29,11 @@ function CustomSiderMenu({
   initialState: any;
   menuItemProps: SiderMenuProps;
 }) {
+  const [publishButtonDisplay, setPublishButtonDisplay] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
   const { deployedSite, setDeployedSite, siteNeedToDeploy, setSiteNeedToDeploy } =
     useModel('storage');
+  const location = useLocation();
 
   useEffect(() => {
     getDefaultSiteConfig().then((response) => {
@@ -73,9 +75,33 @@ function CustomSiderMenu({
     setPublishLoading(false);
   };
 
+  useEffect(() => {
+    if (siteNeedToDeploy && window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+      setPublishButtonDisplay(true);
+    }
+  }, [location, siteNeedToDeploy]);
+
+  useEffect(() => {
+    const scrollListener = () => {
+      if (!siteNeedToDeploy) {
+        return setPublishButtonDisplay(false);
+      }
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+        return setPublishButtonDisplay(false);
+      }
+      return setPublishButtonDisplay(true);
+    };
+
+    if (siteNeedToDeploy) {
+      window.addEventListener('scroll', scrollListener);
+    } else {
+      window.removeEventListener('scroll', scrollListener);
+    }
+  }, [siteNeedToDeploy]);
+
   return (
     <div className="menu-extra-cards">
-      <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click', 'hover']}>
+      <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click']}>
         <Card className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card'}>
           <Card.Meta
             className="menu-user-card-meta"
@@ -106,7 +132,7 @@ function CustomSiderMenu({
       )}
       <div
         className={`global-publish-button-background ${
-          siteNeedToDeploy
+          publishButtonDisplay
             ? 'global-publish-button-background-visible'
             : 'global-publish-button-background-invisible'
         }`}

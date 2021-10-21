@@ -1,6 +1,6 @@
 import { Menu } from 'antd';
 import { useCallback } from 'react';
-import { history, useModel } from 'umi';
+import { history, useIntl, useModel } from 'umi';
 import { outLogin } from '@/services/api/meta-ucenter';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
@@ -13,6 +13,7 @@ const logout = async () => {
 };
 
 export default () => {
+  const intl = useIntl();
   const { setInitialState } = useModel('@@initialState');
 
   const onMenuClick = useCallback(
@@ -35,11 +36,11 @@ export default () => {
     <Menu className="custom-user-menu" selectedKeys={[]} onClick={onMenuClick}>
       <Menu.Item className="user-menu-item" key="info">
         <UserOutlined />
-        个人中心
+        {intl.formatMessage({ id: 'menu.user.profile' })}
       </Menu.Item>
       <Menu.Item className="user-menu-item" key="logout">
         <LogoutOutlined />
-        退出登录
+        {intl.formatMessage({ id: 'menu.user.logout' })}
       </Menu.Item>
     </Menu>
   );

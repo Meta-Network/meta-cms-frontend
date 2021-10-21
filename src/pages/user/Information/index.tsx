@@ -1,15 +1,17 @@
-import { PageContainer } from '@ant-design/pro-layout';
-import styles from './index.less';
+import { useModel, useIntl } from 'umi';
 import ImgCrop from 'antd-img-crop';
 import React, { useEffect, useState } from 'react';
-import { UploadOutlined } from '@ant-design/icons';
 import { Button, Upload, message, Card } from 'antd';
-import { useModel } from '@@/plugin-model/useModel';
-import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import { UploadOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-layout';
+import FormattedInfo from '@/components/FormattedInfo';
 import { updateUserInfo } from '@/services/api/meta-ucenter';
 import uploadImageRequest from '@/utils/upload-image-request';
+import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import styles from './index.less';
 
 const BaseView: React.FC = () => {
+  const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const [userAvatar, setUserAvatar] = useState(initialState?.currentUser?.avatar);
 
@@ -19,22 +21,24 @@ const BaseView: React.FC = () => {
 
   const handleFinish = async (values: GLOBAL.UserInfo) => {
     await updateUserInfo(values);
-    message.success('更新成功。');
+    message.success(intl.formatMessage({ id: 'messages.general.updateSuccess' }));
   };
 
   const AvatarView = ({ currentAvatar }: { currentAvatar: string }) => (
     <>
-      <div className={styles.avatar_title}>头像</div>
+      <div className={styles.avatarTitle}>
+        {intl.formatMessage({ id: 'messages.profile.avatar' })}
+      </div>
       <div className={styles.avatar}>
         <img src={currentAvatar} alt="avatar" />
       </div>
       <ImgCrop rotate>
         {/* @ts-ignore */}
         <Upload customRequest={uploadImageRequest(setUserAvatar)} showUploadList={false}>
-          <div className={styles.button_view}>
+          <div className={styles.buttonView}>
             <Button>
               <UploadOutlined />
-              更换头像
+              {intl.formatMessage({ id: 'messages.profile.changeAvatar' })}
             </Button>
           </div>
         </Upload>
@@ -45,12 +49,8 @@ const BaseView: React.FC = () => {
   return (
     <PageContainer
       breadcrumb={{}}
-      title="个人信息"
-      content={
-        <div className="text-info">
-          <p>您可以在这里编辑您的个人信息。</p>
-        </div>
-      }
+      title={intl.formatMessage({ id: 'messages.profile.personalInfo' })}
+      content={<FormattedInfo id="messages.profile.editInfoHere" />}
     >
       <Card>
         <div className={styles.information}>
@@ -65,7 +65,7 @@ const BaseView: React.FC = () => {
                   },
                 },
                 submitButtonProps: {
-                  children: '更新基本信息',
+                  children: intl.formatMessage({ id: 'messages.profile.updateBaseInfo' }),
                 },
               }}
               initialValues={{ ...initialState?.currentUser }}
@@ -74,24 +74,26 @@ const BaseView: React.FC = () => {
               <ProFormText
                 width="md"
                 name="nickname"
-                label="昵称"
+                label={intl.formatMessage({ id: 'messages.profile.form.nickname' })}
                 rules={[
                   {
                     required: true,
-                    message: '请输入您的昵称!',
+                    message: intl.formatMessage({
+                      id: 'messages.profile.form.pleaseEnterNickname',
+                    }),
                   },
                 ]}
               />
               <ProFormTextArea
                 name="bio"
-                label="个人简介"
+                label={intl.formatMessage({ id: 'messages.profile.form.bio' })}
                 rules={[
                   {
                     required: true,
-                    message: '请输入个人简介!',
+                    message: intl.formatMessage({ id: 'messages.profile.form.pleaseEnterBio' }),
                   },
                 ]}
-                placeholder="个人简介"
+                placeholder={intl.formatMessage({ id: 'messages.profile.form.bio' })}
               />
             </ProForm>
           </div>

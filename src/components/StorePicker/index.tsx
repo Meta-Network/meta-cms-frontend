@@ -1,24 +1,12 @@
 import { getGithubUsername } from '@/services/api/global';
-import { useModel, FormattedMessage } from 'umi';
+import { useModel, useIntl, FormattedMessage } from 'umi';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
 import PlatformModal from '@/components/StorePicker/PlatformModal';
 import styles from './index.less';
 
-const storage = [
-  {
-    name: 'GitHub',
-    description: '世界上最大的代码存放网站和开源社区',
-    avatar: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
-  },
-  {
-    name: 'Gitee',
-    description: '提供中国本土化的代码仓库托管服务',
-    avatar: 'https://gitee.com/static/images/logo_gitee_g_red.png',
-  },
-];
-
 export default () => {
+  const intl = useIntl();
   const { storeSetting, setStoreSetting } = useModel('storage');
   const visibleState = useState(false);
   const [, setModalVisible] = visibleState;
@@ -27,6 +15,19 @@ export default () => {
   const [storeConfirmed, setStoreConfirmed] = confirmedState;
 
   const [selectedStoreName, setSelectedStoreName] = useState('');
+
+  const storage = [
+    {
+      name: 'GitHub',
+      description: intl.formatMessage({ id: 'guide.storage.githubDescription' }),
+      avatar: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
+    },
+    {
+      name: 'Gitee',
+      description: intl.formatMessage({ id: 'guide.storage.giteeDescription' }),
+      avatar: 'https://gitee.com/static/images/logo_gitee_g_red.png',
+    },
+  ];
 
   useEffect(() => {
     const validating = async () => {
@@ -39,18 +40,20 @@ export default () => {
             try {
               username = await getGithubUsername();
             } catch {
-              throw new Error('未获取到 token，请进行授权。');
+              throw new Error(intl.formatMessage({ id: 'guide.storage.noAuthToken' }));
             }
             if (!username) {
-              throw new Error('未成功获取到用户名');
+              throw new Error(intl.formatMessage({ id: 'guide.storage.canNotGetUsername' }));
             }
             setStoreSetting({ storage: storeConfirmed, username });
-            message.success(`已成功选择仓储为 ${storeConfirmed}`);
+            message.success(
+              intl.formatMessage({ id: 'guide.storage.setStorageAs' }, { storage: storeConfirmed }),
+            );
             break;
           }
           // TODO: Only works for Github
           default: {
-            throw new Error('未知的仓储');
+            throw new Error(intl.formatMessage({ id: 'guide.storage.unknownStorage' }));
           }
         }
       }
@@ -58,7 +61,9 @@ export default () => {
     validating().catch((error) => {
       setStoreConfirmed('');
       setStoreSetting({ storage: '', username: '' });
-      message.error(`存储仓库选择失败。原因：${error}`);
+      message.error(
+        intl.formatMessage({ id: 'guide.storage.selectStorageFailed' }, { reason: error }),
+      );
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setStoreConfirmed, setStoreSetting, storeConfirmed]);
@@ -99,7 +104,7 @@ export default () => {
         <strong>
           {storeConfirmed && storeSetting.username
             ? `${storeConfirmed} (${storeSetting.username})`
-            : '未选择'}
+            : intl.formatMessage({ id: 'guide.storage.unselected' })}
         </strong>
       </p>
 

@@ -2,7 +2,7 @@ import { extendWithErrorHandler } from '@/services/api/base-request';
 
 const request = extendWithErrorHandler({
   credentials: 'include',
-  prefix: META_UCENTER_API || 'https://ucenter-test-api.mttk.net',
+  prefix: META_UCENTER_API,
   headers: {
     'Content-Type': 'application/json',
   },

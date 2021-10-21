@@ -38,9 +38,9 @@
         component: './content/SyncCenter',
       },
       {
-        path: '/content/posted-content',
-        name: 'postedContent',
-        component: './content/PostedContent',
+        path: '/content/published-posts',
+        name: 'publishedPosts',
+        component: './content/PublishedPosts',
       },
     ],
   },

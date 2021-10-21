@@ -8,7 +8,7 @@ export default () => {
   const SelectedStore = () => {
     return (
       <>
-        <FormattedMessage id="messages.publish.currentStore" />
+        <FormattedMessage id="messages.publish.currentStore" />:{' '}
         <strong>
           {storeSetting.storage || <FormattedMessage id="messages.publish.noStoreSelected" />}
         </strong>
