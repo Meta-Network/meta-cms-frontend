@@ -45,8 +45,8 @@ export default () => {
   const publishSinglePost = async (record: PostInfo) => {
     if (siteConfigId === null) {
       notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.description' }),
+        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
+        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.description' }),
       });
       return;
     }
@@ -72,8 +72,8 @@ export default () => {
   const publishMultiplePosts = async (selectedKeys: number[]) => {
     if (siteConfigId === null) {
       notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteInfo.description' }),
+        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
+        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.description' }),
       });
       return;
     }
@@ -285,7 +285,7 @@ export default () => {
           {intl.formatMessage({ id: 'component.button.discard' })}
         </Button>,
         <Button onClick={() => transferDraft(record)} loading={transferDraftLoading}>
-          本地编辑
+          {intl.formatMessage({ id: 'component.button.editLocally' })}
         </Button>,
       ],
     },
@@ -296,16 +296,27 @@ export default () => {
       breadcrumb={{}}
       title={intl.formatMessage({ id: 'messages.syncCenter.title' })}
       content={[
-        <div key="header-info" style={{ paddingTop: '11px', marginBottom: '4px' }}>
+        <div key="header-description" style={{ paddingTop: '11px', marginBottom: '4px' }}>
           <p>{intl.formatMessage({ id: 'messages.syncCenter.description' })}</p>
         </div>,
         <div key="header-actions" className={styles.syncButtons}>
           <Button
             key="sync-button"
             loading={syncLoading}
-            onClick={async () =>
-              syncPostsRequest((await getSourceStatus()).data, setSyncLoading, ref)
-            }
+            onClick={async () => {
+              setSyncLoading(true);
+              const done = message.loading(
+                intl.formatMessage({ id: 'messages.source.syncing' }),
+                0,
+              );
+              await syncPostsRequest((await getSourceStatus()).data);
+              done();
+              message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
+              setSyncLoading(false);
+              if (ref.current?.reset) {
+                ref.current.reset();
+              }
+            }}
             style={{ marginRight: 10 }}
           >
             {intl.formatMessage({ id: 'component.button.syncNow' })}

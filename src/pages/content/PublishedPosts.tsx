@@ -22,7 +22,13 @@ export default () => {
         return defaultRender(_);
       },
       render: (_, record) => (
-        <Space>{record.cover ? <Image width={100} src={record.cover} /> : '无封面图'}</Space>
+        <Space>
+          {record.cover ? (
+            <Image width={100} src={record.cover} />
+          ) : (
+            intl.formatMessage({ id: 'messages.published.table.noCoverExists' })
+          )}
+        </Space>
       ),
     },
     {
