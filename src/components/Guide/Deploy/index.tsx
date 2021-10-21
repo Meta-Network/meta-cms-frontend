@@ -50,12 +50,12 @@ export default () => {
       case DeployStages.validating: {
         const validating = async () => {
           const validation = await Promise.all(
-            Storages.map(async ({ name, key, value }) => {
+            Storages.map(async ({ title, key, value }) => {
               if (key === 'deploy') return null;
               const isSuccess = await validator(key || '', value);
               return isSuccess
                 ? null
-                : `${intl.formatMessage({ id: name })}：${intl.formatMessage({
+                : `${intl.formatMessage({ id: title })}：${intl.formatMessage({
                     id: 'messages.deployment.notFinished',
                   })}`;
             }),
@@ -296,10 +296,10 @@ export default () => {
           processDone();
           notification.success({
             message: intl.formatMessage({
-              id: 'notifications.deployment.taskFinished.title',
+              id: 'messages.deployment.taskFinished.title',
             }),
             description: intl.formatMessage({
-              id: 'notifications.deployment.taskFinished.content',
+              id: 'messages.deployment.taskFinished.description',
             }),
             duration: 0,
           });

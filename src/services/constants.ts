@@ -28,49 +28,49 @@ export enum StorageKeys {
 
 export const Storages = [
   {
-    name: 'guide.domain.name',
+    title: 'guide.domain.title',
     key: 'domainSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: 'guide.theme.name',
+    title: 'guide.theme.title',
     key: 'themeSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: 'guide.config.name',
+    title: 'guide.config.title',
     key: 'siteSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: 'guide.storage.name',
+    title: 'guide.storage.title',
     key: 'storeSetting',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: 'guide.publish.name',
+    title: 'guide.publish.title',
     key: '',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: 'guide.cdn.name',
+    title: 'guide.cdn.title',
     key: '',
     get value() {
       return Storage.get(this.key);
     },
   },
   {
-    name: 'guide.deploy.name',
+    title: 'guide.deploy.title',
     key: 'deploy',
     get value() {
       return Storage.get(this.key);

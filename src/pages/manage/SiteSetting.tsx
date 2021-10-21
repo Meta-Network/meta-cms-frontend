@@ -10,7 +10,7 @@ import {
 import { message } from 'antd';
 import ProForm from '@ant-design/pro-form';
 import { useState } from 'react';
-import FormattedInfo from '@/components/FormattedInfo';
+import FormattedInfo from '@/components/FormattedDescription';
 
 export default () => {
   const intl = useIntl();
@@ -50,7 +50,7 @@ export default () => {
     <PageContainer
       breadcrumb={{}}
       title={intl.formatMessage({ id: 'messages.site.title' })}
-      content={<FormattedInfo id="messages.site.info" />}
+      content={<FormattedInfo id="messages.site.description" />}
     >
       <Card>
         <ProForm

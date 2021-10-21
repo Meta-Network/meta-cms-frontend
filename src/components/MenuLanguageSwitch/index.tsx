@@ -5,11 +5,11 @@ import { setLocale } from 'umi';
 
 const languages = [
   {
-    name: '中文',
+    title: '中文',
     value: 'zh-CN',
   },
   {
-    name: 'English',
+    title: 'English',
     value: 'en-US',
   },
 ];
@@ -23,7 +23,7 @@ const menu = (
           setLocale(language.value, true);
         }}
       >
-        {<Typography.Text>{language.name}</Typography.Text>}
+        {<Typography.Text>{language.title}</Typography.Text>}
       </Menu.Item>
     ))}
   </Menu>

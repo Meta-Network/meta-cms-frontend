@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Upload, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import FormattedInfo from '@/components/FormattedInfo';
+import FormattedInfo from '@/components/FormattedDescription';
 import { updateUserInfo } from '@/services/api/meta-ucenter';
 import uploadImageRequest from '@/utils/upload-image-request';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
@@ -21,7 +21,7 @@ const BaseView: React.FC = () => {
 
   const handleFinish = async (values: GLOBAL.UserInfo) => {
     await updateUserInfo(values);
-    message.success(intl.formatMessage({ id: 'messages.general.updateSuccess' }));
+    message.success(intl.formatMessage({ id: 'messages.profile.updateSuccess' }));
   };
 
   const AvatarView = ({ currentAvatar }: { currentAvatar: string }) => (

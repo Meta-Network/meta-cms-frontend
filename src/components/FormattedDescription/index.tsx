@@ -2,11 +2,11 @@ import styles from './index.less';
 import { FormattedMessage } from 'umi';
 
 /**
- * Format i18n message with custom `text-info` style.
+ * Format i18n message with custom `text-description` style.
  * For the consist page header's helper content.
  * @param {string} id i18n content id
  * @param {any} variables set the variables of this content
- * @param {any} customClass set the custom css class name, it's {styles.textInfo} by default
+ * @param {any} customClass set the custom css class name, it's {styles.textDescription} by default
  * @returns {JSX.Element}
  */
 export default ({
@@ -20,7 +20,7 @@ export default ({
 }) => (
   <FormattedMessage id={id} values={variables}>
     {(msg: string) => (
-      <div className={customClass ?? styles.textInfo}>
+      <div className={customClass ?? styles.textDescription}>
         {msg
           ?.trim()
           .split('\n')

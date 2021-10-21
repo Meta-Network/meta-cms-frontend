@@ -1,6 +1,6 @@
 import { Alert } from 'antd';
 import { useModel, FormattedMessage } from 'umi';
-import FormattedInfo from '../FormattedInfo';
+import FormattedInfo from '../FormattedDescription';
 
 export default () => {
   const { storeSetting } = useModel('storage');
@@ -23,7 +23,7 @@ export default () => {
       message={<FormattedMessage id="guide.publish.message" />}
       description={
         <>
-          <FormattedInfo id="guide.publish.info" />
+          <FormattedInfo id="guide.publish.content" />
           <SelectedStore />
         </>
       }

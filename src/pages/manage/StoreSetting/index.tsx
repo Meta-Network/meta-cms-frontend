@@ -47,7 +47,7 @@ export default () => {
   return (
     <PageContainer
       title={intl.formatMessage({ id: 'messages.storeSetting.title' })}
-      content={<p>{intl.formatMessage({ id: 'messages.storeSetting.info' })}</p>}
+      content={<p>{intl.formatMessage({ id: 'messages.storeSetting.description' })}</p>}
       breadcrumb={{}}
     >
       <GridContent>

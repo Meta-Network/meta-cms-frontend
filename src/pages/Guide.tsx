@@ -6,7 +6,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
 import Deploy from '@/components/Guide/Deploy';
 import CDNSetting from '@/components/Guide/CDNSetting';
-import FormattedInfo from '@/components/FormattedInfo';
+import FormattedDescription from '@/components/FormattedDescription';
 import AnchoredTitle from '@/components/AnchoredTitle';
 import SiteSetting from '@/components/Guide/SiteSetting';
 import ThemeSetting from '@/components/Guide/ThemeSetting';
@@ -20,41 +20,41 @@ const { Step } = Steps;
 export default () => {
   const intl = useIntl();
 
-  const steps = useMemo<{ name: string; component: JSX.Element; description?: JSX.Element }[]>(
+  const steps = useMemo<{ title: string; component: JSX.Element; description?: JSX.Element }[]>(
     () => [
       {
-        name: intl.formatMessage({ id: 'guide.domain.name' }),
-        description: <FormattedInfo id="guide.domain.info" />,
+        title: intl.formatMessage({ id: 'guide.domain.title' }),
+        description: <FormattedDescription id="guide.domain.description" />,
         component: <DomainSetting />,
       },
       {
-        name: intl.formatMessage({ id: 'guide.theme.name' }),
-        description: <FormattedInfo id="guide.theme.info" />,
+        title: intl.formatMessage({ id: 'guide.theme.title' }),
+        description: <FormattedDescription id="guide.theme.description" />,
         component: <ThemeSetting />,
       },
       {
-        name: intl.formatMessage({ id: 'guide.config.name' }),
-        description: <FormattedInfo id="guide.config.info" />,
+        title: intl.formatMessage({ id: 'guide.config.title' }),
+        description: <FormattedDescription id="guide.config.description" />,
         component: <SiteSetting />,
       },
       {
-        name: intl.formatMessage({ id: 'guide.storage.name' }),
-        description: <FormattedInfo id="guide.storage.info" />,
+        title: intl.formatMessage({ id: 'guide.storage.title' }),
+        description: <FormattedDescription id="guide.storage.description" />,
         component: <StoreSetting />,
       },
       {
-        name: intl.formatMessage({ id: 'guide.publish.name' }),
-        description: <FormattedInfo id="guide.publish.info" />,
+        title: intl.formatMessage({ id: 'guide.publish.title' }),
+        description: <FormattedDescription id="guide.publish.description" />,
         component: <PublisherSetting />,
       },
       {
-        name: intl.formatMessage({ id: 'guide.cdn.name' }),
-        description: <FormattedInfo id="guide.cdn.info" />,
+        title: intl.formatMessage({ id: 'guide.cdn.title' }),
+        description: <FormattedDescription id="guide.cdn.description" />,
         component: <CDNSetting />,
       },
       {
-        name: intl.formatMessage({ id: 'guide.deploy.name' }),
-        description: <FormattedInfo id="guide.deploy.info" />,
+        title: intl.formatMessage({ id: 'guide.deploy.title' }),
+        description: <FormattedDescription id="guide.deploy.description" />,
         component: <Deploy />,
       },
     ],
@@ -65,7 +65,7 @@ export default () => {
   useEffect(() => {
     const positioningOffset = () => {
       let positions = steps.map(
-        (step) => document.getElementById(step.name)?.getBoundingClientRect()?.top || 0,
+        (step) => document.getElementById(step.title)?.getBoundingClientRect()?.top || 0,
       );
 
       const currentPosition = window.pageYOffset;
@@ -89,7 +89,9 @@ export default () => {
   return (
     <PageContainer
       title={<FormattedMessage id="guide.intro.title" />}
-      content={<FormattedInfo id="guide.intro.info" customClass="header-text-info" />}
+      content={
+        <FormattedDescription id="guide.intro.description" customClass="header-text-description" />
+      }
       breadcrumb={{}}
     >
       <div className={styles.main}>
@@ -100,10 +102,10 @@ export default () => {
                 <Step
                   icon={stepStatus[index] === 'error' && <ExclamationCircleOutlined />}
                   status={stepStatus[index]}
-                  key={step.name}
+                  key={step.title}
                   title={
-                    <a style={{ color: 'rgba(0, 0, 0, 0.85)' }} href={`#${step.name}`}>
-                      {step.name}
+                    <a style={{ color: 'rgba(0, 0, 0, 0.85)' }} href={`#${step.title}`}>
+                      {step.title}
                     </a>
                   }
                 />
@@ -116,10 +118,10 @@ export default () => {
             <ProCard
               headerBordered
               className={styles.contentCard}
-              key={step.name}
+              key={step.title}
               title={
                 <div>
-                  <AnchoredTitle name={step.name} />
+                  <AnchoredTitle title={step.title} />
                   <div className={styles.cardDescription}>{step.description}</div>
                 </div>
               }

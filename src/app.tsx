@@ -1,7 +1,6 @@
-import { useIntl } from '@@/plugin-locale/localeExports';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { history, Link, useModel } from 'umi';
+import { useIntl, useModel, history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown, Button, message, notification } from 'antd';
@@ -49,27 +48,27 @@ function CustomSiderMenu({
   }, [setDeployedSite]);
 
   const publishSiteRequest = async () => {
-    const done = message.loading(intl.formatMessage({ id: 'messages.redeploy.taskStart' }), 0);
+    const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
     setPublishLoading(true);
 
     if (deployedSite.configId) {
       const response = await deployAndPublishSite(deployedSite.configId);
       if (response.statusCode === 201) {
         notification.success({
-          message: intl.formatMessage({ id: 'messages.redeploy.taskSuccess.title' }),
-          description: intl.formatMessage({ id: 'messages.redeploy.taskSuccess.info' }),
+          message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),
+          description: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.description' }),
           duration: 0,
         });
         setSiteNeedToDeploy(false);
       } else {
         notification.error({
-          message: intl.formatMessage({ id: 'messages.redeploy.taskFailed.title' }),
-          description: intl.formatMessage({ id: 'messages.redeploy.taskFailed.info' }),
+          message: intl.formatMessage({ id: 'messages.redeployment.taskFailed.title' }),
+          description: intl.formatMessage({ id: 'messages.redeployment.taskFailed.description' }),
           duration: 0,
         });
       }
     } else {
-      message.error(intl.formatMessage({ id: 'messages.redeploy.noSiteConfig' }));
+      message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
     }
 
     done();
@@ -144,7 +143,7 @@ function CustomSiderMenu({
           onClick={publishSiteRequest}
           className="global-publish-button"
         >
-          {intl.formatMessage({ id: 'messages.redeploy.button' })}
+          {intl.formatMessage({ id: 'messages.redeployment.button' })}
         </Button>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { Button, Modal } from 'antd';
 import { useIntl, FormattedMessage } from 'umi';
 import Icon, { GithubOutlined } from '@ant-design/icons';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
-import FormattedInfo from '../FormattedInfo';
+import FormattedDescription from '../FormattedDescription';
 import { ReactComponent as GiteeIcon } from '../../../public/icons/custom/gitee-colored.svg';
 
 export default ({
@@ -51,7 +51,7 @@ export default ({
   return (
     <Modal
       visible={modalVisible}
-      title={<FormattedMessage id="guide.authorize.title" values={{ platform: name }} />}
+      title={<FormattedMessage id="guide.authorization.title" values={{ platform: name }} />}
       onOk={operationDone}
       onCancel={operationCancel}
       footer={[
@@ -60,8 +60,12 @@ export default ({
         </Button>,
       ]}
     >
-      <FormattedMessage id="guide.authorize.subtitle" tagName="h2" />
-      <FormattedInfo id="guide.authorize.info" variables={{ platform: name }} customClass="" />
+      <FormattedMessage id="guide.authorization.subtitle" tagName="h2" />
+      <FormattedDescription
+        id="guide.authorization.description"
+        variables={{ platform: name }}
+        customClass=""
+      />
       <p>{buttons[name.toLowerCase()]}</p>
     </Modal>
   );

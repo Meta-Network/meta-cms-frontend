@@ -297,7 +297,7 @@ export default () => {
       title={intl.formatMessage({ id: 'messages.syncCenter.title' })}
       content={[
         <div key="header-info" style={{ paddingTop: '11px', marginBottom: '4px' }}>
-          <p>{intl.formatMessage({ id: 'messages.syncCenter.info' })}</p>
+          <p>{intl.formatMessage({ id: 'messages.syncCenter.description' })}</p>
         </div>,
         <div key="header-actions" className={styles.syncButtons}>
           <Button
