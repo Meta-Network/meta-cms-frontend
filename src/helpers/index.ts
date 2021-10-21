@@ -2,7 +2,7 @@ import {
   getDefaultSiteConfig,
   imageUploadByUrl,
   postById,
-  publishPendingPost,
+  publishPostById,
   publishPost,
   publishPostAsDraft,
   updatePost,
@@ -17,9 +17,8 @@ export const fetchTokenAPI = async () => {
     const res = await requestStorageToken();
     if (res.statusCode === 201) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';
@@ -36,9 +35,8 @@ export const imageUploadByUrlAPI = async (url: string) => {
     const res = await imageUploadByUrl(url);
     if (res.statusCode === 201) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';
@@ -55,9 +53,8 @@ export const publishPostAsDraftAPI = async (id: number) => {
     const res = await publishPostAsDraft(id);
     if (res.statusCode === 201) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';
@@ -74,9 +71,8 @@ export const postByIdAPI = async (id: number) => {
     const res = await postById(id);
     if (res.statusCode === 200) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';
@@ -91,9 +87,8 @@ export const getDefaultSiteConfigAPI = async () => {
     const res = await getDefaultSiteConfig();
     if (res.statusCode === 200) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';
@@ -108,12 +103,11 @@ export const getDefaultSiteConfigAPI = async () => {
  */
 export const publishPendingPostAPI = async (postId: number, configIds: number[]) => {
   try {
-    const res = await publishPendingPost(postId, configIds);
+    const res = await publishPostById(postId, configIds);
     if (res.statusCode === 201) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';
@@ -130,9 +124,8 @@ export const publishPostAPI = async (data: CMS.LocalDraft) => {
     const res = await publishPost(data);
     if (res.statusCode === 201) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';
@@ -147,9 +140,8 @@ export const updatePostAPI = async (id: number, data: CMS.LocalDraft) => {
     const res = await updatePost(id, data);
     if (res.statusCode === 200) {
       return res.data;
-    } else {
-      throw new Error(res.message);
     }
+    throw new Error(res.message);
   } catch (e) {
     console.log(e);
     return '';

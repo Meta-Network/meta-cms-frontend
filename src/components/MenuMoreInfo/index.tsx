@@ -6,11 +6,14 @@ import {
   TwitterOutlined,
 } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
+import { FormattedMessage } from 'umi';
 import style from './index.less';
 
 const menu = (
   <Menu>
-    <span className="slider-title">联络我们</span>
+    <span className="slider-title">
+      <FormattedMessage id="menu.moreInfo.contactUs" />
+    </span>
     <Menu.Item icon={<TwitterOutlined />}>
       <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/realMetaNetwork">
         Twitter
@@ -37,14 +40,18 @@ const menu = (
       </a>
     </Menu.Item>
     <Menu.Divider />
-    <span className="slider-title">资源</span>
+    <span className="slider-title">
+      <FormattedMessage id="menu.moreInfo.resources" />
+    </span>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer" href="https://github.com/Meta-Network">
-        版本记录
+        <FormattedMessage id="menu.moreInfo.versions" />
       </a>
     </Menu.Item>
     <Menu.Divider />
-    <span className="slider-title">友情链接</span>
+    <span className="slider-title">
+      <FormattedMessage id="menu.moreInfo.links" />
+    </span>
     <Menu.Item>
       <a href="https://www.meta.io" target="_blank" rel="noopener noreferrer">
         Meta.io
@@ -61,15 +68,17 @@ const menu = (
       </a>
     </Menu.Item>
     <Menu.Divider />
-    <span className="slider-title">政策</span>
+    <span className="slider-title">
+      <FormattedMessage id="menu.moreInfo.policy" />
+    </span>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer" href="https://meta-network.mttk.net">
-        条款
+        <FormattedMessage id="menu.moreInfo.terms" />
       </a>
     </Menu.Item>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer" href="https://meta-network.mttk.net">
-        隐私政策
+        <FormattedMessage id="menu.moreInfo.privacyPolicy" />
       </a>
     </Menu.Item>
   </Menu>

@@ -1,6 +1,6 @@
 import ProCard from '@ant-design/pro-card';
 import { Affix, Steps, Card } from 'antd';
-import { FormattedMessage, useModel } from 'umi';
+import { useIntl, FormattedMessage, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
@@ -18,50 +18,52 @@ import styles from './Guide.less';
 const { Step } = Steps;
 
 export default () => {
+  const intl = useIntl();
+
   const steps = useMemo<{ name: string; component: JSX.Element; description?: JSX.Element }[]>(
     () => [
       {
-        name: '域名',
+        name: intl.formatMessage({ id: 'guide.domain.name' }),
         description: <FormattedInfo id="guide.domain.info" />,
         component: <DomainSetting />,
       },
       {
-        name: '主题',
+        name: intl.formatMessage({ id: 'guide.theme.name' }),
         description: <FormattedInfo id="guide.theme.info" />,
         component: <ThemeSetting />,
       },
       {
-        name: '信息',
+        name: intl.formatMessage({ id: 'guide.config.name' }),
         description: <FormattedInfo id="guide.config.info" />,
         component: <SiteSetting />,
       },
       {
-        name: '存储',
+        name: intl.formatMessage({ id: 'guide.storage.name' }),
         description: <FormattedInfo id="guide.storage.info" />,
         component: <StoreSetting />,
       },
       {
-        name: '发布',
+        name: intl.formatMessage({ id: 'guide.publish.name' }),
         description: <FormattedInfo id="guide.publish.info" />,
         component: <PublisherSetting />,
       },
       {
-        name: 'CDN',
+        name: intl.formatMessage({ id: 'guide.cdn.name' }),
         description: <FormattedInfo id="guide.cdn.info" />,
         component: <CDNSetting />,
       },
       {
-        name: '部署',
+        name: intl.formatMessage({ id: 'guide.deploy.name' }),
         description: <FormattedInfo id="guide.deploy.info" />,
         component: <Deploy />,
       },
     ],
-    [],
+    [intl],
   );
   const { current, setCurrent, stepStatus } = useModel('steps');
 
   useEffect(() => {
-    window.onscroll = () => {
+    const positioningOffset = () => {
       let positions = steps.map(
         (step) => document.getElementById(step.name)?.getBoundingClientRect()?.top || 0,
       );
@@ -77,9 +79,10 @@ export default () => {
         setCurrent(positions.findIndex((e) => e === closest));
       }
     };
+    window.addEventListener('scroll', positioningOffset);
 
     return () => {
-      window.onscroll = null;
+      window.removeEventListener('scroll', positioningOffset);
     };
   }, [steps, setCurrent]);
 

@@ -1,9 +1,8 @@
-import { isDomainForbidden } from '@/services/api/meta-cms';
-import { useModel } from '@@/plugin-model/useModel';
-import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { message } from 'antd';
 import { useState } from 'react';
-import { useIntl } from 'umi';
+import { useIntl, useModel } from 'umi';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
+import { isDomainForbidden } from '@/services/api/meta-cms';
 
 export default () => {
   const intl = useIntl();
@@ -27,7 +26,7 @@ export default () => {
       <ProFormText
         width="md"
         fieldProps={{
-          addonAfter: `.${META_SPACE_BASE_DOMAIN || 'metaspaces.me'}`,
+          addonAfter: `.${META_SPACE_BASE_DOMAIN}`,
         }}
         name="domain"
         placeholder={intl.formatMessage({ id: 'messages.domain.enterPrefixDomain' })}

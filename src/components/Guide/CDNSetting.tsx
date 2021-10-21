@@ -11,7 +11,7 @@ export default () => (
             ?.trim()
             .split('\n')
             .map((e, index) => (
-              <div key={`cdninfo${index + 1}`}>
+              <div key={`cdn-info${index + 1}`}>
                 {e}
                 <br />
               </div>

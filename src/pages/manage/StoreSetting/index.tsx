@@ -1,19 +1,23 @@
-import { GridContent, PageContainer } from '@ant-design/pro-layout';
-import { Button, List, Tag } from 'antd';
+import { useIntl } from 'umi';
 import { Fragment } from 'react';
+import { Button, List, Tag } from 'antd';
+import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
 
 export default () => {
-  const getData = () => [
+  const intl = useIntl();
+  const stores = [
     {
       title: [
         'GitHub',
         <Tag className="status" color="red">
-          未绑定
+          {intl.formatMessage({ id: 'component.status.notBound' })}
         </Tag>,
       ],
-      description: '世界上最大的代码存放网站和开源社区',
-      actions: [<Button type="primary">绑定</Button>],
+      description: intl.formatMessage({ id: 'guide.storage.githubDescription' }),
+      actions: [
+        <Button type="primary">{intl.formatMessage({ id: 'component.button.bind' })}</Button>,
+      ],
       avatar: (
         <img
           className="icon"
@@ -26,11 +30,11 @@ export default () => {
       title: [
         'Gitee',
         <Tag className="status" color="blue">
-          已绑定
+          {intl.formatMessage({ id: 'component.status.alreadyBound' })}
         </Tag>,
       ],
-      actions: [<Button danger>解绑</Button>],
-      description: '提供中国本土化的代码仓库托管服务',
+      actions: [<Button danger>{intl.formatMessage({ id: 'component.button.unbind' })}</Button>],
+      description: intl.formatMessage({ id: 'guide.storage.giteeDescription' }),
       avatar: (
         <img
           className="icon"
@@ -41,13 +45,17 @@ export default () => {
     },
   ];
   return (
-    <PageContainer title="存储配置" content={<p>你可以在此配置站点存储源。</p>} breadcrumb={{}}>
+    <PageContainer
+      title={intl.formatMessage({ id: 'messages.storeSetting.title' })}
+      content={<p>{intl.formatMessage({ id: 'messages.storeSetting.info' })}</p>}
+      breadcrumb={{}}
+    >
       <GridContent>
         <div className={styles.main}>
           <Fragment>
             <List
               itemLayout="horizontal"
-              dataSource={getData()}
+              dataSource={stores}
               renderItem={(item) => (
                 <List.Item actions={item.actions}>
                   <List.Item.Meta

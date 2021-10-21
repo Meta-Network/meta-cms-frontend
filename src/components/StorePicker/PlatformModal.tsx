@@ -1,5 +1,5 @@
 import { Button, Modal } from 'antd';
-import { FormattedMessage } from 'umi';
+import { useIntl, FormattedMessage } from 'umi';
 import Icon, { GithubOutlined } from '@ant-design/icons';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
 import FormattedInfo from '../FormattedInfo';
@@ -14,8 +14,9 @@ export default ({
   visibleState: any;
   confirmedState: any;
 }) => {
-  const [modalVisible, setModalVisible] = visibleState;
+  const intl = useIntl();
   const [, setConfirmed] = confirmedState;
+  const [modalVisible, setModalVisible] = visibleState;
 
   const handleRequest = async () => {
     const request = await requestSocialAuth(
@@ -55,12 +56,12 @@ export default ({
       onCancel={operationCancel}
       footer={[
         <Button key="submit" type="primary" onClick={operationDone}>
-          完成
+          {intl.formatMessage({ id: 'component.button.finish' })}
         </Button>,
       ]}
     >
       <FormattedMessage id="guide.authorize.subtitle" tagName="h2" />
-      <FormattedInfo id="guide.authorize.info" values={{ platform: name }} customClass="" />
+      <FormattedInfo id="guide.authorize.info" variables={{ platform: name }} customClass="" />
       <p>{buttons[name.toLowerCase()]}</p>
     </Modal>
   );
