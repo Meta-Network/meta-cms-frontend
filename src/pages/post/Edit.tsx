@@ -39,6 +39,7 @@ const Edit: React.FC = () => {
   const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
+  // 更新草稿开关
   const [flagUpdateDraft, setFlagUpdateDraft] = useState<boolean>(false);
   // publish loading
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
@@ -187,6 +188,11 @@ const Edit: React.FC = () => {
     if (!title && !content) {
       message.warning('文章或内容不能为空');
       return;
+    }
+
+    // check cover format
+    if (cover && !cover.includes(FLEEK_NAME)) {
+      message.success('封面链接格式不正确，请重新上传！');
     }
 
     const result = await dbPostsGet(Number(id));
@@ -413,11 +419,7 @@ const Edit: React.FC = () => {
   }, [vditor, handleImageUploadToIpfs]);
 
   useEffect(() => {
-    // console.log('updateDraft useEffect');
-
     updateDraft();
-    // watch title, content, cover
-    // TODO: modify
   }, [title, content, cover]);
 
   return (
