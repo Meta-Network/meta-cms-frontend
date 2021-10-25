@@ -7,7 +7,7 @@ import Editor from '../../components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
-import { useMount } from 'ahooks';
+import { useMount, useThrottleFn } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '../../models/db';
 import { PostTempData } from '../../models/Posts';
 import type { Query } from '../../typings/Posts.d';
@@ -40,8 +40,6 @@ const Edit: React.FC = () => {
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
   const [flagUpdateDraft, setFlagUpdateDraft] = useState<boolean>(false);
-  // TODO: 好像没什么用
-  const [flagDB, setFlagDB] = useState<boolean>(false);
   // publish loading
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
@@ -369,16 +367,8 @@ const Edit: React.FC = () => {
   /**
    * async title to DB
    */
-  const asyncTitleToDB = useCallback(
+  const { run: asyncTitleToDB } = useThrottleFn(
     async (val: string) => {
-      if (flagDB) {
-        return;
-      }
-      setFlagDB(true);
-
-      setTitle(val);
-      setDraftMode(1);
-
       const { id } = history.location.query as Query;
       const data = { title: val };
       if (id) {
@@ -388,11 +378,23 @@ const Edit: React.FC = () => {
         const resultID = await dbPostsAdd(assign(PostTempData, data));
         handleHistoryState(String(resultID));
       }
+    },
+    { wait: 500 },
+  );
+
+  /**
+   * handle change title
+   */
+  const handleChangeTitle = useCallback(
+    async (val: string) => {
+      setTitle(val);
+      setDraftMode(1);
+
+      await asyncTitleToDB(val);
 
       setDraftMode(2);
-      setFlagDB(false);
     },
-    [handleHistoryState, flagDB],
+    [asyncTitleToDB],
   );
 
   useMount(() => {
@@ -429,7 +431,7 @@ const Edit: React.FC = () => {
           className={styles.title}
           maxLength={30}
           value={title}
-          onChange={(e) => asyncTitleToDB(e.target.value)}
+          onChange={(e) => handleChangeTitle(e.target.value)}
         />
         <Editor asyncContentToDB={handleAsyncContentToDB} bindVditor={setVditor} />
       </section>
