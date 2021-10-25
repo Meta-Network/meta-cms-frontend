@@ -67,6 +67,14 @@ export const dbPostsDelete = async (id: number): Promise<void> => {
 };
 
 /**
+ * db posts all
+ * @returns
+ */
+export const dbPostsAll = async (): Promise<Posts[] | undefined> => {
+  return await db.posts.where('delete').equals(0).reverse().sortBy('id');
+};
+
+/**
  * db posts where exist by id
  */
 export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
