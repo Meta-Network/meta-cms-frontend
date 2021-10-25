@@ -15,9 +15,9 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useCallback, useRef } from 'react';
 import syncPostsRequest from '../../utils/sync-posts-request';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/models/db';
+import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
-import { PostTempData } from '@/models/Posts';
+import { PostTempData } from '@/db/Posts.d';
 import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
 import styles from './SyncCenter.less';
 

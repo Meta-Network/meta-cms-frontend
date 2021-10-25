@@ -7,9 +7,9 @@ import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
-import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '../../models/db';
-import { PostTempData } from '../../models/Posts';
-import type { Query } from '../../typings/Posts.d';
+import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '@/db/db';
+import { PostTempData } from '@/db/Posts.d';
+import type { Query } from '@/typings/Posts.d';
 import {
   imageUploadByUrlAPI,
   getDefaultSiteConfigAPI,

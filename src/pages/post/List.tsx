@@ -4,8 +4,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
 import { CopyOutlined, EditOutlined } from '@ant-design/icons';
-import { dbPostsUpdate, dbPostsAll } from '../../models/db';
-import type { Posts } from '../../models/Posts';
+import { dbPostsUpdate, dbPostsAll } from '@/db/db';
+import type { Posts } from '@/db/Posts.d';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { strSlice } from '@/utils';
 
