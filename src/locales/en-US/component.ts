@@ -14,8 +14,12 @@ export default {
   'component.button.edit': '编辑',
   'component.button.editLocally': '本地编辑',
   'component.button.discard': '移除',
+  'component.button.delete': '删除',
+  'component.button.yes': '是',
+  'component.button.no': '否',
   'component.status.alreadyBound': '已绑定',
   'component.status.notBound': '未绑定',
   'component.badge.invitationAvailable': '邀请码可用',
   'component.badge.invitationUsed': '邀请码已使用',
+  'component.full.tip': '如遇到页面失去反馈，可手动关闭！',
 };

@@ -1,9 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
-
-import { history } from 'umi';
+import { history, useIntl } from 'umi';
 import { Input, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import Editor from '../../components/Editor';
+import Editor from '@/components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
@@ -27,6 +26,7 @@ import FullLoading from '@/components/FullLoading';
 const { confirm } = Modal;
 
 const Edit: React.FC = () => {
+  const intl = useIntl();
   // cover
   const [cover, setCover] = useState<string>('');
   // title
@@ -47,54 +47,80 @@ const Edit: React.FC = () => {
   /**
    * draft publish as post
    */
-  const draftPublishAsPost = useCallback(async (id: number) => {
-    setPublishLoading(true);
+  const draftPublishAsPost = useCallback(
+    async (id: number) => {
+      setPublishLoading(true);
 
-    const siteConfig = await getDefaultSiteConfigAPI();
-    if (!siteConfig) {
-      message.warning('获取默认配置失败');
+      const siteConfig = await getDefaultSiteConfigAPI();
+      if (!siteConfig) {
+        message.warning(
+          intl.formatMessage({
+            id: 'editor.defaultConfig',
+          }),
+        );
+        setPublishLoading(false);
+        return;
+      }
+
+      const res = await publishPendingPostAPI(id, [siteConfig.id]);
+      if (res) {
+        // 发布文章， 更新最新 Post 数据
+        await dbPostsUpdate(Number(id), { post: res, draft: null });
+
+        message.success(
+          intl.formatMessage({
+            id: 'editor.success',
+          }),
+        );
+      } else {
+        message.error(
+          intl.formatMessage({
+            id: 'editor.fail',
+          }),
+        );
+      }
       setPublishLoading(false);
-      return;
-    }
 
-    const res = await publishPendingPostAPI(id, [siteConfig.id]);
-    if (res) {
-      // 发布文章， 更新最新 Post 数据
-      await dbPostsUpdate(Number(id), { post: res, draft: null });
-
-      message.success('发布成功');
-    } else {
-      message.error('发布失败');
-    }
-    setPublishLoading(false);
-
-    if (res) {
-      history.push('/posts');
-    }
-  }, []);
+      if (res) {
+        history.push('/posts');
+      }
+    },
+    [intl],
+  );
 
   /**
    * local draft as post
    */
-  const publishAsPost = useCallback(async (data: CMS.LocalDraft) => {
-    setPublishLoading(true);
+  const publishAsPost = useCallback(
+    async (data: CMS.LocalDraft) => {
+      setPublishLoading(true);
 
-    const res = await publishPostAPI(data);
-    if (res) {
-      // 发布文章 更新最新 Post 数据
-      const { id } = history.location.query as Query;
-      await dbPostsUpdate(Number(id), { post: res });
+      const res = await publishPostAPI(data);
+      if (res) {
+        // 发布文章 更新最新 Post 数据
+        const { id } = history.location.query as Query;
+        await dbPostsUpdate(Number(id), { post: res });
 
-      message.success('发布成功');
-    } else {
-      message.error('发布失败');
-    }
-    setPublishLoading(false);
+        message.success(
+          intl.formatMessage({
+            id: 'editor.success',
+          }),
+        );
+      } else {
+        message.error(
+          intl.formatMessage({
+            id: 'editor.fail',
+          }),
+        );
+      }
+      setPublishLoading(false);
 
-    if (res) {
-      history.push('/posts');
-    }
-  }, []);
+      if (res) {
+        history.push('/posts');
+      }
+    },
+    [intl],
+  );
 
   /**
    * update draft
@@ -141,12 +167,20 @@ const Edit: React.FC = () => {
       // post publish draft
       const _draft = await publishPostAsDraftAPI(Number(id));
       if (!_draft) {
-        message.error('转存失败');
+        message.error(
+          intl.formatMessage({
+            id: 'editor.saveToDraftFail',
+          }),
+        );
         // setTransferDraftLoading(false);
         setPublishLoading(false);
         return;
       }
-      message.success('文章转存草稿成功');
+      message.success(
+        intl.formatMessage({
+          id: 'editor.saveToDraftSuccess',
+        }),
+      );
 
       // update post(draft)
       const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
@@ -161,7 +195,11 @@ const Edit: React.FC = () => {
         const { id: _id } = history.location.query as Query;
         await dbPostsUpdate(Number(_id), { draft: resultUpdatePost });
       } else {
-        message.error('更新失败');
+        message.error(
+          intl.formatMessage({
+            id: 'editor.draftUpdateFail',
+          }),
+        );
         setPublishLoading(false);
         return Promise.reject();
       }
@@ -170,7 +208,7 @@ const Edit: React.FC = () => {
 
       return Promise.resolve();
     },
-    [draftPublishAsPost, title, cover, content],
+    [draftPublishAsPost, title, cover, content, intl],
   );
 
   /**
@@ -181,18 +219,30 @@ const Edit: React.FC = () => {
 
     const { id } = history.location.query as Query;
     if (!id) {
-      message.warning('请先编辑文章');
+      message.warning(
+        intl.formatMessage({
+          id: 'editor.tip.id',
+        }),
+      );
       return;
     }
 
     if (!title && !content) {
-      message.warning('文章或内容不能为空');
+      message.warning(
+        intl.formatMessage({
+          id: 'editor.tip.titleOrContent',
+        }),
+      );
       return;
     }
 
     // check cover format
     if (cover && !cover.includes(FLEEK_NAME)) {
-      message.success('封面链接格式不正确，请重新上传！');
+      message.success(
+        intl.formatMessage({
+          id: 'editor.tip.coverFormat',
+        }),
+      );
     }
 
     const result = await dbPostsGet(Number(id));
@@ -201,9 +251,10 @@ const Edit: React.FC = () => {
       await draftPublishAsPost(result.draft.id);
     } else if (result && result.post) {
       confirm({
-        title: '提示',
         icon: <ExclamationCircleOutlined />,
-        content: '文章已发布，再次发布会覆盖文章的信息',
+        content: intl.formatMessage({
+          id: 'editor.tip.postExists',
+        }),
         onOk() {
           postPublishToPost(result.post!.id);
         },
@@ -220,7 +271,7 @@ const Edit: React.FC = () => {
         content: content,
       });
     }
-  }, [title, cover, content, publishAsPost, draftPublishAsPost, postPublishToPost]);
+  }, [title, cover, content, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
 
   /**
    * handle history url state
@@ -294,7 +345,11 @@ const Edit: React.FC = () => {
         const result = await imageUploadByUrlAPI(ele.src);
         if (result) {
           // _vditor.tip('上传成功', 2000);
-          message.success('上传成功');
+          message.success(
+            intl.formatMessage({
+              id: 'editor.upload.image.success',
+            }),
+          );
           ele.src = result.publicUrl;
           ele.alt = result.key;
         }
@@ -312,7 +367,7 @@ const Edit: React.FC = () => {
     }
 
     setFlagImageUploadToIpfs(false);
-  }, [flagImageUploadToIpfs, asyncContentToDB]);
+  }, [flagImageUploadToIpfs, asyncContentToDB, intl]);
 
   /**
    * handle async content to db
@@ -429,7 +484,9 @@ const Edit: React.FC = () => {
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />
         <Input
           type="text"
-          placeholder="Title"
+          placeholder={intl.formatMessage({
+            id: 'editor.title',
+          })}
           className={styles.title}
           maxLength={30}
           value={title}

@@ -105,6 +105,12 @@ export default {
   'messages.syncCenter.description': '在这里来控制发布从其他源获取到的文章列表',
   'messages.syncCenter.button.publishMultiPosts': '批量发布',
   'messages.syncCenter.button.discardMultiPosts': '批量移除',
+  'messages.syncCenter.draftSavedTips': '是否跳转编辑？',
+  'messages.syncCenter.coverSavedSuccess': '封面转存成功',
+  'messages.syncCenter.savedSuccess': '转存成功',
+  'messages.syncCenter.savedFail': '转存失败',
+  'messages.syncCenter.getContentSuccess': '获取内容成功',
+  'messages.syncCenter.getContentFail': '获取内容失败',
   'messages.domain.updated': '已成功更新域名',
   'messages.domain.shouldNotBeEmpty': '域名不能为空',
   'messages.domain.isForbidden': '此域名被禁用或已存在，请另选一个',
@@ -123,4 +129,5 @@ export default {
     'Meta Space 部署失败 ，请重新尝试或向开发团队反馈',
   'messages.redeployment.noSiteConfig': '未获取到站点信息，请先创建站点',
   'messages.redeployment.button': '部署我的 Meta Space',
+  'messages.copy.success': '已粘贴到剪切板',
 };
