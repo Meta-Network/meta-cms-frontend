@@ -1,10 +1,12 @@
 import { fetchTokenAPI } from '@/helpers';
+// 目前在 document 内导入
 // import '~vditor/src/assets/scss/index';
 // import '~vditor/dist/index.css';
 import { useIntl } from 'umi';
 import { message } from 'antd';
-import React, { useEffect, createRef, useCallback } from 'react';
+import React, { createRef, useCallback } from 'react';
 import Vditor from 'vditor';
+import { useMount } from 'ahooks';
 interface Props {
   asyncContentToDB: (val: string) => void;
   bindVditor?: (vditor: Vditor) => void;
@@ -229,16 +231,14 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
     }
   }, [asyncContentToDB, bindVditor, intl]);
 
-  useEffect(() => {
+  useMount(() => {
     fetchToken();
     init();
 
-    // TODO: 没有找到更好的办法获取 token 暂时 loop
+    // TODO: 没有找到更好的办法获取 token (最好在上传前获取一次)， 暂时 loop
     const timer = setInterval(fetchToken, 1000 * 30);
     return clearInterval(timer);
-    // only once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return e('div', { id: 'vditor', className: 'vditor-edit', ref: vditorRef });
 });

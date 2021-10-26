@@ -474,6 +474,7 @@ const Edit: React.FC = () => {
 
   useEffect(() => {
     updateDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, content, cover]);
 
   return (
