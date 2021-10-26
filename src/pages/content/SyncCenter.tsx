@@ -159,11 +159,11 @@ export default () => {
       // get draft content
       const _draftData = await postByIdAPI(Number(_draft.id));
       if (!_draftData) {
-        message.error(intl.formatMessage({ id: 'messages.syncCenter.getContentSuccess' }));
+        message.error(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
         setTransferDraftLoading(false);
         return;
       }
-      message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
+      message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentSuccess' }));
 
       // send local
       const resultID = await dbPostsAdd(
