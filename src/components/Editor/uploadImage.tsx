@@ -45,7 +45,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
           message.info({
             content: intl.formatMessage(
               {
-                id: 'editor.upload.image.type',
+                id: 'messages.editor.upload.image.type',
               },
               {
                 type,
@@ -58,7 +58,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
           message.warning({
             content: intl.formatMessage(
               {
-                id: 'editor.upload.image.size',
+                id: 'messages.editor.upload.image.size',
               },
               {
                 size: UploadImageSize,
@@ -76,7 +76,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
           if (!result) {
             message.info(
               intl.formatMessage({
-                id: 'editor.upload.image.token.not',
+                id: 'messages.editor.upload.image.token.not',
               }),
             );
             return false;
@@ -86,10 +86,10 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
             key: keyUploadAvatar,
             className: 'custom-notification',
             message: intl.formatMessage({
-              id: 'editor.upload.image.notification.title',
+              id: 'messages.editor.upload.image.notification.title',
             }),
             description: intl.formatMessage({
-              id: 'editor.upload.image.notification.description',
+              id: 'messages.editor.upload.image.notification.description',
             }),
           });
         }
@@ -105,7 +105,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
           if (info.file.response.statusCode === 201) {
             message.info({
               content: intl.formatMessage({
-                id: 'editor.upload.image.success',
+                id: 'messages.editor.upload.image.success',
               }),
             });
             asyncCoverToDB(info.file.response.data.publicUrl);
@@ -116,7 +116,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
           // (`${info.file.name} file upload failed.`);
           message.info({
             content: intl.formatMessage({
-              id: 'editor.upload.image.fail',
+              id: 'messages.editor.upload.image.fail',
             }),
           });
           notification.close(keyUploadAvatar);
@@ -141,7 +141,7 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
             <PlusOutlined />
             <span className={styles.featureText}>
               {intl.formatMessage({
-                id: 'editor.upload.image.description',
+                id: 'editor.upload.cover.description',
               })}
             </span>
           </section>

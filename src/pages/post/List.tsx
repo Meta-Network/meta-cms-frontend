@@ -202,7 +202,7 @@ export default () => {
         onClick={() => history.push('/post/edit')}
       >
         {intl.formatMessage({
-          id: 'posts.button.create',
+          id: 'component.button.create',
         })}
       </Button>
       <Table

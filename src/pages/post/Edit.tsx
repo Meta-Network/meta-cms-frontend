@@ -57,7 +57,7 @@ const Edit: React.FC = () => {
       if (!siteConfig) {
         message.warning(
           intl.formatMessage({
-            id: 'editor.defaultConfig',
+            id: 'messages.editor.noDefaultConfig',
           }),
         );
         setPublishLoading(false);
@@ -71,13 +71,13 @@ const Edit: React.FC = () => {
 
         message.success(
           intl.formatMessage({
-            id: 'editor.success',
+            id: 'messages.editor.success',
           }),
         );
       } else {
         message.error(
           intl.formatMessage({
-            id: 'editor.fail',
+            id: 'messages.editor.fail',
           }),
         );
       }
@@ -105,13 +105,13 @@ const Edit: React.FC = () => {
 
         message.success(
           intl.formatMessage({
-            id: 'editor.success',
+            id: 'messages.editor.success',
           }),
         );
       } else {
         message.error(
           intl.formatMessage({
-            id: 'editor.fail',
+            id: 'messages.editor.fail',
           }),
         );
       }
@@ -169,7 +169,7 @@ const Edit: React.FC = () => {
       if (!_draft) {
         message.error(
           intl.formatMessage({
-            id: 'editor.saveToDraftFail',
+            id: 'messages.editor.saveToDraftFail',
           }),
         );
         // setTransferDraftLoading(false);
@@ -178,7 +178,7 @@ const Edit: React.FC = () => {
       }
       message.success(
         intl.formatMessage({
-          id: 'editor.saveToDraftSuccess',
+          id: 'messages.editor.saveToDraftSuccess',
         }),
       );
 
@@ -197,7 +197,7 @@ const Edit: React.FC = () => {
       } else {
         message.error(
           intl.formatMessage({
-            id: 'editor.draftUpdateFail',
+            id: 'messages.editor.draftUpdateFail',
           }),
         );
         setPublishLoading(false);
@@ -221,7 +221,7 @@ const Edit: React.FC = () => {
     if (!id) {
       message.warning(
         intl.formatMessage({
-          id: 'editor.tip.id',
+          id: 'messages.editor.tip.id',
         }),
       );
       return;
@@ -230,7 +230,7 @@ const Edit: React.FC = () => {
     if (!title && !content) {
       message.warning(
         intl.formatMessage({
-          id: 'editor.tip.titleOrContent',
+          id: 'messages.editor.tip.titleOrContent',
         }),
       );
       return;
@@ -240,7 +240,7 @@ const Edit: React.FC = () => {
     if (cover && !cover.includes(FLEEK_NAME)) {
       message.success(
         intl.formatMessage({
-          id: 'editor.tip.coverFormat',
+          id: 'messages.editor.tip.coverFormat',
         }),
       );
     }
@@ -253,7 +253,7 @@ const Edit: React.FC = () => {
       confirm({
         icon: <ExclamationCircleOutlined />,
         content: intl.formatMessage({
-          id: 'editor.tip.postExists',
+          id: 'messages.editor.tip.postExists',
         }),
         onOk() {
           postPublishToPost(result.post!.id);

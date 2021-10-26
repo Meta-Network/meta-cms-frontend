@@ -207,7 +207,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
           } else {
             message.error(
               `${intl.formatMessage({
-                id: 'editor.edit.tool.upload.fail',
+                id: 'messages.editor.edit.tool.upload.fail',
               })}: ${msg}`,
             );
             return '';
