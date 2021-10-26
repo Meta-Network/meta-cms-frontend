@@ -123,38 +123,36 @@ const Edit: React.FC = () => {
 
   /**
    * update draft
+   * 在更新 title content cover 更新草稿
    */
-  const updateDraft = useCallback(async () => {
-    if (flagUpdateDraft) return;
+  const updateDraft = useCallback(
+    async (data: CMS.LocalDraft) => {
+      if (flagUpdateDraft) return;
 
-    setFlagUpdateDraft(true);
-    const { id } = history.location.query as Router.PostQuery;
-    if (!id) {
-      setFlagUpdateDraft(false);
-      return;
-    }
-    const result = await dbPostsGet(Number(id));
-    if (!result) {
-      setFlagUpdateDraft(false);
-      return;
-    }
-
-    // 更新草稿
-    if (result && result.draft) {
-      // console.log('updateDraft', result);
-      const res = await updatePostAPI(Number(result.draft.id), {
-        title: title,
-        cover: cover,
-        summary: generateSummary(),
-        content: content,
-      });
-      if (res) {
-        // 更新草稿信息
-        await dbPostsUpdate(Number(id), { draft: res });
+      setFlagUpdateDraft(true);
+      const { id } = history.location.query as Router.PostQuery;
+      if (!id) {
+        setFlagUpdateDraft(false);
+        return;
       }
-    }
-    setFlagUpdateDraft(false);
-  }, [title, cover, content, flagUpdateDraft]);
+      const result = await dbPostsGet(Number(id));
+      if (!result) {
+        setFlagUpdateDraft(false);
+        return;
+      }
+
+      // 更新草稿
+      if (result && result.draft) {
+        const res = await updatePostAPI(Number(result.draft.id), data);
+        if (res) {
+          // 更新草稿信息
+          await dbPostsUpdate(Number(id), { draft: res });
+        }
+      }
+      setFlagUpdateDraft(false);
+    },
+    [flagUpdateDraft],
+  );
 
   /**
    * post publish to post
@@ -375,8 +373,14 @@ const Edit: React.FC = () => {
     async (val: string) => {
       await asyncContentToDB(val);
       await handleImageUploadToIpfs();
+
+      // 更新草稿内容
+      await updateDraft({
+        content: val,
+        summary: generateSummary(),
+      });
     },
-    [asyncContentToDB, handleImageUploadToIpfs],
+    [asyncContentToDB, handleImageUploadToIpfs, updateDraft],
   );
 
   /**
@@ -419,9 +423,14 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
+      // 更新草稿内容
+      await updateDraft({
+        cover: url,
+      });
+
       setDraftMode(2);
     },
-    [handleHistoryState],
+    [handleHistoryState, updateDraft],
   );
 
   /**
@@ -438,6 +447,11 @@ const Edit: React.FC = () => {
         const resultID = await dbPostsAdd(assign(PostTempData, data));
         handleHistoryState(String(resultID));
       }
+
+      // 更新草稿内容
+      await updateDraft({
+        title: val,
+      });
     },
     { wait: 500 },
   );
@@ -468,14 +482,9 @@ const Edit: React.FC = () => {
     }
 
     // 10s handle all image
-    const timer = setInterval(handleImageUploadToIpfs, 10000);
+    const timer = setInterval(handleImageUploadToIpfs, 1000 * 10);
     return () => clearInterval(timer);
   }, [vditor, handleImageUploadToIpfs]);
-
-  useEffect(() => {
-    updateDraft();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, content, cover]);
 
   return (
     <section className={styles.container}>
