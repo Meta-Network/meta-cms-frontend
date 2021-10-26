@@ -2,13 +2,15 @@ import React, { useCallback } from 'react';
 import { history, useIntl } from 'umi';
 import styles from './editorHeader.less';
 import { LeftOutlined } from '@ant-design/icons';
+import Settings from './settings';
 
 interface Props {
+  readonly post: CMS.Post | CMS.Draft | null;
   readonly draftMode: 0 | 1 | 2;
   handlePublish: () => void;
 }
 
-const EditorHeader: React.FC<Props> = ({ draftMode, handlePublish }) => {
+const EditorHeader: React.FC<Props> = ({ post, draftMode, handlePublish }) => {
   const intl = useIntl();
 
   /**
@@ -49,6 +51,7 @@ const EditorHeader: React.FC<Props> = ({ draftMode, handlePublish }) => {
             id: 'editor.header.publish',
           })}
         </span>
+        <Settings post={post} />
       </span>
     </section>
   );

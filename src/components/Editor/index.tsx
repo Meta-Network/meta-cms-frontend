@@ -1,11 +1,11 @@
+import React, { createRef, useCallback } from 'react';
+import Vditor from 'vditor';
 import { fetchTokenAPI } from '@/helpers';
 // 目前在 document 内导入
 // import '~vditor/src/assets/scss/index';
 // import '~vditor/dist/index.css';
 import { useIntl } from 'umi';
 import { message } from 'antd';
-import React, { createRef, useCallback } from 'react';
-import Vditor from 'vditor';
 import { useMount } from 'ahooks';
 interface Props {
   asyncContentToDB: (val: string) => void;
@@ -218,7 +218,6 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
         },
       },
       input(val: string) {
-        // console.log('val', val);
         asyncContentToDB(val);
       },
     });
@@ -242,4 +241,5 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
 
   return e('div', { id: 'vditor', className: 'vditor-edit', ref: vditorRef });
 });
+
 export default Editor;

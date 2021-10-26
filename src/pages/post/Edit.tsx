@@ -8,6 +8,7 @@ import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '@/db/db';
+import type { Posts } from '@/db/Posts.d';
 import { PostTempData } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
@@ -26,6 +27,8 @@ const { confirm } = Modal;
 
 const Edit: React.FC = () => {
   const intl = useIntl();
+  // post data
+  const [postData, setPostData] = useState<Posts>({} as Posts);
   // cover
   const [cover, setCover] = useState<string>('');
   // title
@@ -392,6 +395,9 @@ const Edit: React.FC = () => {
       const resultPost = await dbPostsGet(Number(id));
       if (resultPost) {
         // console.log('resultPost', resultPost);
+
+        setPostData(resultPost);
+
         setCover(resultPost.cover);
         setTitle(resultPost.title);
         setContent(resultPost.content);
@@ -488,7 +494,11 @@ const Edit: React.FC = () => {
 
   return (
     <section className={styles.container}>
-      <EditorHeader draftMode={draftMode} handlePublish={handlePublish} />
+      <EditorHeader
+        post={postData.post || postData.draft}
+        draftMode={draftMode}
+        handlePublish={handlePublish}
+      />
       <section className={styles.edit}>
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />
         <Input
