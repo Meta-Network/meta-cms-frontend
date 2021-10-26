@@ -71,7 +71,7 @@ export default () => {
       title: 'SUMMARY',
       dataIndex: 'summary',
       key: 'summary',
-      render: (val: string) => <span>{strSlice(val, 60)}</span>,
+      render: (val: string) => <span>{strSlice(val, 40)}</span>,
     },
     {
       title: 'HASH',
@@ -82,7 +82,7 @@ export default () => {
         <span>
           {(isNaN(Number(record.post?.source)) && record.post?.source && (
             <>
-              <span>{record.post?.source?.slice(0, 6)}...</span>
+              <span>{strSlice(record.post?.source, 10)}</span>
               <CopyToClipboard
                 text={record.post?.source}
                 onCopy={() =>
