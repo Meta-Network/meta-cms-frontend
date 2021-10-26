@@ -1,7 +1,7 @@
 export default {
   'editor.header.title': '本地草稿',
   'editor.header.draft': '草稿',
-  'editor.header.draft.saveing': '保存中...',
+  'editor.header.draft.saving': '保存中...',
   'editor.header.draft.saved': '保存',
   'editor.header.publish': '发布',
   'editor.upload.image.description': '添加封面',

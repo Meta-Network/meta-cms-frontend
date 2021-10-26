@@ -33,7 +33,7 @@ const EditorHeader: React.FC<Props> = ({ draftMode, handlePublish }) => {
           })}
           {draftMode === 1
             ? ` - ${intl.formatMessage({
-                id: 'editor.header.draft.saveing',
+                id: 'editor.header.draft.saving',
               })}`
             : draftMode === 2
             ? ` - ${intl.formatMessage({
