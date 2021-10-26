@@ -9,7 +9,6 @@ import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '@/db/db';
 import { PostTempData } from '@/db/Posts.d';
-import type { Query } from '@/typings/Posts.d';
 import {
   imageUploadByUrlAPI,
   getDefaultSiteConfigAPI,
@@ -98,7 +97,7 @@ const Edit: React.FC = () => {
       const res = await publishPostAPI(data);
       if (res) {
         // 发布文章 更新最新 Post 数据
-        const { id } = history.location.query as Query;
+        const { id } = history.location.query as Router.PostQuery;
         await dbPostsUpdate(Number(id), { post: res });
 
         message.success(
@@ -129,7 +128,7 @@ const Edit: React.FC = () => {
     if (flagUpdateDraft) return;
 
     setFlagUpdateDraft(true);
-    const { id } = history.location.query as Query;
+    const { id } = history.location.query as Router.PostQuery;
     if (!id) {
       setFlagUpdateDraft(false);
       return;
@@ -192,7 +191,7 @@ const Edit: React.FC = () => {
 
       // update local db draft data
       if (resultUpdatePost) {
-        const { id: _id } = history.location.query as Query;
+        const { id: _id } = history.location.query as Router.PostQuery;
         await dbPostsUpdate(Number(_id), { draft: resultUpdatePost });
       } else {
         message.error(
@@ -217,7 +216,7 @@ const Edit: React.FC = () => {
   const handlePublish = useCallback(async () => {
     // console.log('publish');
 
-    const { id } = history.location.query as Query;
+    const { id } = history.location.query as Router.PostQuery;
     if (!id) {
       message.warning(
         intl.formatMessage({
@@ -289,7 +288,7 @@ const Edit: React.FC = () => {
       setContent(val);
       setDraftMode(1);
 
-      const { id } = history.location.query as Query;
+      const { id } = history.location.query as Router.PostQuery;
       const data = { content: val, summary: generateSummary() };
       if (id) {
         await dbPostsUpdate(Number(id), data);
@@ -384,7 +383,7 @@ const Edit: React.FC = () => {
    * fetch DB content
    */
   const fetchDBContent = useCallback(async () => {
-    const { id } = history.location.query as Query;
+    const { id } = history.location.query as Router.PostQuery;
     if (id) {
       const resultPost = await dbPostsGet(Number(id));
       if (resultPost) {
@@ -411,7 +410,7 @@ const Edit: React.FC = () => {
       setCover(url);
       setDraftMode(1);
 
-      const { id } = history.location.query as Query;
+      const { id } = history.location.query as Router.PostQuery;
       const data = { cover: url };
       if (id) {
         await dbPostsUpdate(Number(id), data);
@@ -430,7 +429,7 @@ const Edit: React.FC = () => {
    */
   const { run: asyncTitleToDB } = useThrottleFn(
     async (val: string) => {
-      const { id } = history.location.query as Query;
+      const { id } = history.location.query as Router.PostQuery;
       const data = { title: val };
       if (id) {
         await dbPostsUpdate(Number(id), data);

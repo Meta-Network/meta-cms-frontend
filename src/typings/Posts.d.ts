@@ -1,3 +1,5 @@
-export type Query = {
-  id: string;
-};
+declare namespace Router {
+  type PostQuery = {
+    id: string;
+  };
+}
