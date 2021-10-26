@@ -129,5 +129,5 @@ export default {
     'Meta Space 部署失败 ，请重新尝试或向开发团队反馈',
   'messages.redeployment.noSiteConfig': '未获取到站点信息，请先创建站点',
   'messages.redeployment.button': '部署我的 Meta Space',
-  'messages.copy.success': '已粘贴到剪切板',
+  'messages.copy.success': '已复制到剪贴板',
 };
