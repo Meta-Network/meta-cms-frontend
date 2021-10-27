@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Drawer, Select } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
+import { useIntl } from 'umi';
 import styles from './settings.less';
 
 const { Option } = Select;
@@ -22,6 +23,8 @@ const tagsList = [
 ];
 
 const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
+  const intl = useIntl();
+
   const [visible, setVisible] = useState(false);
   const showDrawer = () => {
     setVisible(true);
@@ -34,14 +37,20 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
     <span className={styles.wrapper}>
       <SettingOutlined onClick={showDrawer} />
       <Drawer
-        title="Post settings"
+        title={intl.formatMessage({
+          id: 'editor.header.settings.title',
+        })}
         placement="right"
         onClose={onClose}
         visible={visible}
         width={300}
       >
         <section className={styles.item}>
-          <p className={styles.itemTitle}>Tags</p>
+          <p className={styles.itemTitle}>
+            {intl.formatMessage({
+              id: 'editor.header.settings.tags',
+            })}
+          </p>
           <section className={styles.itemContent}>
             <Select
               mode="tags"
