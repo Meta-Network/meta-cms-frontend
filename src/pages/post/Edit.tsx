@@ -8,7 +8,7 @@ import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '@/db/db';
-import type { Posts } from '@/db/Posts.d';
+// import type { Posts } from '@/db/Posts.d';
 import { PostTempData } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
@@ -22,19 +22,19 @@ import { assign } from 'lodash';
 import type Vditor from 'vditor';
 import { generateSummary } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
+import Settings from '@/components/Editor/settings';
 
 const { confirm } = Modal;
 
 const Edit: React.FC = () => {
   const intl = useIntl();
   // post data
-  const [postData, setPostData] = useState<Posts>({} as Posts);
-  // cover
+  // const [postData, setPostData] = useState<Posts>({} as Posts);
   const [cover, setCover] = useState<string>('');
-  // title
   const [title, setTitle] = useState<string>('');
-  // content
   const [content, setContent] = useState<string>('');
+  const [tags, setTags] = useState<string[]>([]);
+
   // draft mode
   const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
   // vditor
@@ -188,6 +188,7 @@ const Edit: React.FC = () => {
         cover: cover,
         summary: generateSummary(),
         content: content,
+        tags: tags,
       });
 
       // update local db draft data
@@ -208,7 +209,7 @@ const Edit: React.FC = () => {
 
       return Promise.resolve();
     },
-    [draftPublishAsPost, title, cover, content, intl],
+    [draftPublishAsPost, title, cover, content, tags, intl],
   );
 
   /**
@@ -266,12 +267,12 @@ const Edit: React.FC = () => {
         title: title,
         cover: cover,
         summary: generateSummary(),
-        tags: [],
+        tags: tags,
         categories: [],
         content: content,
       });
     }
-  }, [title, cover, content, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
+  }, [title, cover, content, tags, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
 
   /**
    * handle history url state
@@ -396,11 +397,12 @@ const Edit: React.FC = () => {
       if (resultPost) {
         // console.log('resultPost', resultPost);
 
-        setPostData(resultPost);
+        // setPostData(resultPost);
 
         setCover(resultPost.cover);
         setTitle(resultPost.title);
         setContent(resultPost.content);
+        setTags(resultPost.tags);
 
         // TODO：need modify
         setTimeout(() => {
@@ -477,6 +479,37 @@ const Edit: React.FC = () => {
     [asyncTitleToDB],
   );
 
+  /**
+   * handle change tags
+   */
+  const handleChangeTags = useCallback(
+    async (val: string[]) => {
+      // console.log('val', val);
+      if (val.length > 10) {
+        return;
+      }
+      setTags(val);
+      setDraftMode(1);
+
+      const { id } = history.location.query as Router.PostQuery;
+      const data = { tags: val };
+      if (id) {
+        await dbPostsUpdate(Number(id), data);
+      } else {
+        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        handleHistoryState(String(resultID));
+      }
+
+      // 更新草稿内容
+      await updateDraft({
+        tags: val,
+      });
+
+      setDraftMode(2);
+    },
+    [handleHistoryState, updateDraft],
+  );
+
   useMount(() => {
     fetchDBContent();
   });
@@ -495,9 +528,9 @@ const Edit: React.FC = () => {
   return (
     <section className={styles.container}>
       <EditorHeader
-        post={postData.post || postData.draft}
         draftMode={draftMode}
         handlePublish={handlePublish}
+        settings={<Settings tags={tags} handleChangeTags={handleChangeTags} />}
       />
       <section className={styles.edit}>
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />

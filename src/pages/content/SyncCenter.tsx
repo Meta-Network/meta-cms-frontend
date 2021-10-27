@@ -174,6 +174,7 @@ export default () => {
           content: _draftData.content,
           post: _post,
           draft: _draftData,
+          tags: _draftData.tags || _post.tags || [],
         }),
       );
 

@@ -184,7 +184,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
             .replace('/\\s/g', '');
         },
         format(files: File[], responseText: string): string {
-          console.log('format');
+          // console.log('format');
           // console.log('files', files);
           // console.log('responseText', responseText);
           const {
