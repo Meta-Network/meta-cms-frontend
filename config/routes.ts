@@ -74,7 +74,7 @@
   },
   {
     path: '/posts',
-    name: 'Post',
+    name: 'localDraft',
     icon: 'edit',
     component: './post/List',
   },

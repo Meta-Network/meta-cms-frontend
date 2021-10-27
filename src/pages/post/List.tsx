@@ -1,31 +1,42 @@
 import { useState, useCallback } from 'react';
-import { history } from 'umi';
+import { history, useIntl } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
 import { CopyOutlined, EditOutlined } from '@ant-design/icons';
-import { db, dbPostsUpdate } from '../../models/db';
-import type { Posts } from '../../models/Posts';
+import { dbPostsUpdate, dbPostsAll } from '@/db/db';
+import type { Posts } from '@/db/Posts.d';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { strSlice } from '@/utils';
 
 export default () => {
+  const intl = useIntl();
   const [postsList, setPostsList] = useState<Posts[]>([]);
 
   /**
    * handle delete
    */
-  const handleDelete = useCallback(async (id: number) => {
-    await dbPostsUpdate(id, { delete: 1 });
-    message.success('删除成功');
-  }, []);
+  const handleDelete = useCallback(
+    async (id: number) => {
+      await dbPostsUpdate(id, { delete: 1 });
+      message.success(
+        intl.formatMessage({
+          id: 'posts.table.action.delete.success',
+        }),
+      );
+    },
+    [intl],
+  );
 
   /**
    * fetch posts list
    */
   const fetchPosts = useCallback(async () => {
-    const result = await db.posts.where('delete').equals(0).reverse().sortBy('id');
+    const result = await dbPostsAll();
     // console.log('result', result);
-    setPostsList(result);
+    if (result) {
+      setPostsList(result);
+    }
   }, []);
 
   const columns = [
@@ -60,7 +71,7 @@ export default () => {
       title: 'SUMMARY',
       dataIndex: 'summary',
       key: 'summary',
-      render: (val: string) => <span>{val.length >= 60 ? `${val.slice(0, 57)}...` : val}</span>,
+      render: (val: string) => <span>{strSlice(val, 40)}</span>,
     },
     {
       title: 'HASH',
@@ -71,10 +82,16 @@ export default () => {
         <span>
           {(isNaN(Number(record.post?.source)) && record.post?.source && (
             <>
-              <span>{record.post?.source?.slice(0, 6)}...</span>
+              <span>{strSlice(record.post?.source, 10)}</span>
               <CopyToClipboard
                 text={record.post?.source}
-                onCopy={() => message.info('已粘贴到剪切板')}
+                onCopy={() =>
+                  message.info(
+                    intl.formatMessage({
+                      id: 'messages.copy.success',
+                    }),
+                  )
+                }
               >
                 <CopyOutlined />
               </CopyToClipboard>
@@ -93,11 +110,19 @@ export default () => {
         <Tag key={record.id}>
           {record.post
             ? record.post.state === 'drafted'
-              ? '云端草稿'
+              ? intl.formatMessage({
+                  id: 'posts.table.status.cloudDraft',
+                })
               : record.post.state === 'pending'
-              ? '待发布'
-              : '本地草稿'
-            : '本地草稿'}
+              ? intl.formatMessage({
+                  id: 'posts.table.status.pending',
+                })
+              : intl.formatMessage({
+                  id: 'posts.table.status.localDraft',
+                })
+            : intl.formatMessage({
+                id: 'posts.table.status.localDraft',
+              })}
         </Tag>
       ),
     },
@@ -119,11 +144,15 @@ export default () => {
                 });
               }}
             >
-              编辑
+              {intl.formatMessage({
+                id: 'component.button.edit',
+              })}
             </Button>
           ) : null}
           <Popconfirm
-            title="确定删除?"
+            title={intl.formatMessage({
+              id: 'posts.table.action.delete.confirm',
+            })}
             onConfirm={async (e) => {
               e?.stopPropagation();
               console.log(record);
@@ -131,11 +160,17 @@ export default () => {
               await fetchPosts();
             }}
             onCancel={(e) => e?.stopPropagation()}
-            okText="Yes"
-            cancelText="No"
+            okText={intl.formatMessage({
+              id: 'component.button.yes',
+            })}
+            cancelText={intl.formatMessage({
+              id: 'component.button.no',
+            })}
           >
             <Button danger onClick={(e) => e.stopPropagation()}>
-              删除
+              {intl.formatMessage({
+                id: 'component.button.delete',
+              })}
             </Button>
           </Popconfirm>
         </Space>
@@ -150,15 +185,25 @@ export default () => {
   return (
     <PageContainer
       breadcrumb={{}}
-      title="Post"
-      content={<div className="text-info">用于管理本地的文章</div>}
+      title={intl.formatMessage({
+        id: 'posts.intro.title',
+      })}
+      content={
+        <div className="text-info">
+          {intl.formatMessage({
+            id: 'posts.intro.description',
+          })}
+        </div>
+      }
     >
       <Button
         style={{ marginBottom: 10 }}
         icon={<EditOutlined />}
         onClick={() => history.push('/post/edit')}
       >
-        创作
+        {intl.formatMessage({
+          id: 'component.button.create',
+        })}
       </Button>
       <Table
         rowKey={(record: Posts) => String(record.id)}

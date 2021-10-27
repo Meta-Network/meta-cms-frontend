@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Upload, message, notification } from 'antd';
 import { PlusOutlined, DeleteOutlined, FileImageOutlined } from '@ant-design/icons';
+import { useIntl } from 'umi';
 import styles from './uploadImage.less';
 import { UploadImageSize } from '../../../config/index';
 import { fetchTokenAPI } from '@/helpers';
@@ -23,6 +24,7 @@ interface Props {
 }
 
 const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
+  const intl = useIntl();
   // const [loading, setLoading] = useState<boolean>(false);
   const [token, setToken] = useState<string>('');
 
@@ -40,12 +42,28 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
         const type = 'JPG/PNG';
         if (!isJpgOrPng) {
-          message.info({ content: `您只能上传 ${type} 文件！` });
+          message.info({
+            content: intl.formatMessage(
+              {
+                id: 'messages.editor.upload.image.type',
+              },
+              {
+                type,
+              },
+            ),
+          });
         }
         const isLtMB = file.size / 1024 / 1024 < UploadImageSize;
         if (!isLtMB) {
           message.warning({
-            content: `图片必须小于${UploadImageSize}MB！`,
+            content: intl.formatMessage(
+              {
+                id: 'messages.editor.upload.image.size',
+              },
+              {
+                size: UploadImageSize,
+              },
+            ),
           });
         }
 
@@ -56,15 +74,23 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
           setToken(result);
 
           if (!result) {
-            message.info('认证失败');
+            message.info(
+              intl.formatMessage({
+                id: 'messages.editor.upload.image.token.not',
+              }),
+            );
             return false;
           }
 
           notification.open({
             key: keyUploadAvatar,
             className: 'custom-notification',
-            message: '图片上传',
-            description: `正在上传...`,
+            message: intl.formatMessage({
+              id: 'messages.editor.upload.image.notification.title',
+            }),
+            description: intl.formatMessage({
+              id: 'messages.editor.upload.image.notification.description',
+            }),
           });
         }
 
@@ -77,19 +103,27 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
         if (info.file.status === 'done') {
           console.log('info', info);
           if (info.file.response.statusCode === 201) {
-            message.info({ content: '上传成功' });
+            message.info({
+              content: intl.formatMessage({
+                id: 'messages.editor.upload.image.success',
+              }),
+            });
             asyncCoverToDB(info.file.response.data.publicUrl);
           }
           notification.close(keyUploadAvatar);
           // (`${info.file.name} file uploaded successfully`);
         } else if (info.file.status === 'error') {
           // (`${info.file.name} file upload failed.`);
-          message.info({ content: '上传失败' });
+          message.info({
+            content: intl.formatMessage({
+              id: 'messages.editor.upload.image.fail',
+            }),
+          });
           notification.close(keyUploadAvatar);
         }
       },
     }),
-    [token, asyncCoverToDB],
+    [token, asyncCoverToDB, intl],
   );
 
   return (
@@ -105,7 +139,11 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
         ) : (
           <section className={styles.featureTextUpload}>
             <PlusOutlined />
-            <span className={styles.featureText}>Add feature image</span>
+            <span className={styles.featureText}>
+              {intl.formatMessage({
+                id: 'editor.upload.cover.description',
+              })}
+            </span>
           </section>
         )}
       </Upload>

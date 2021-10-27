@@ -8,6 +8,7 @@ export default {
   'menu.manage.siteSetting': '信息',
   'menu.manage.storeSetting': '存储',
   'menu.manage.domainSetting': '域名',
+  'menu.localDraft': '本地草稿',
   'menu.invitation': '邀请码',
   'menu.user.profile': '个人中心',
   'menu.user.logout': '退出登录',

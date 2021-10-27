@@ -1,16 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
-
-import { history } from 'umi';
+import { history, useIntl } from 'umi';
 import { Input, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import Editor from '../../components/Editor';
+import Editor from '@/components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
-import { useMount } from 'ahooks';
-import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '../../models/db';
-import { PostTempData } from '../../models/Posts';
-import type { Query } from '../../typings/Posts.d';
+import { useMount, useThrottleFn } from 'ahooks';
+import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '@/db/db';
+import type { Posts } from '@/db/Posts.d';
+import { PostTempData } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
   getDefaultSiteConfigAPI,
@@ -27,6 +26,9 @@ import FullLoading from '@/components/FullLoading';
 const { confirm } = Modal;
 
 const Edit: React.FC = () => {
+  const intl = useIntl();
+  // post data
+  const [postData, setPostData] = useState<Posts>({} as Posts);
   // cover
   const [cover, setCover] = useState<string>('');
   // title
@@ -39,98 +41,121 @@ const Edit: React.FC = () => {
   const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
+  // 更新草稿开关
   const [flagUpdateDraft, setFlagUpdateDraft] = useState<boolean>(false);
-  // TODO: 好像没什么用
-  const [flagDB, setFlagDB] = useState<boolean>(false);
   // publish loading
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   /**
    * draft publish as post
    */
-  const draftPublishAsPost = useCallback(async (id: number) => {
-    setPublishLoading(true);
+  const draftPublishAsPost = useCallback(
+    async (id: number) => {
+      setPublishLoading(true);
 
-    const siteConfig = await getDefaultSiteConfigAPI();
-    if (!siteConfig) {
-      message.warning('获取默认配置失败');
+      const siteConfig = await getDefaultSiteConfigAPI();
+      if (!siteConfig) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.noDefaultConfig',
+          }),
+        );
+        setPublishLoading(false);
+        return;
+      }
+
+      const res = await publishPendingPostAPI(id, [siteConfig.id]);
+      if (res) {
+        // 发布文章， 更新最新 Post 数据
+        await dbPostsUpdate(Number(id), { post: res, draft: null });
+
+        message.success(
+          intl.formatMessage({
+            id: 'messages.editor.success',
+          }),
+        );
+      } else {
+        message.error(
+          intl.formatMessage({
+            id: 'messages.editor.fail',
+          }),
+        );
+      }
       setPublishLoading(false);
-      return;
-    }
 
-    const res = await publishPendingPostAPI(id, [siteConfig.id]);
-    if (res) {
-      // 发布文章， 更新最新 Post 数据
-      await dbPostsUpdate(Number(id), { post: res, draft: null });
-
-      message.success('发布成功');
-    } else {
-      message.error('发布失败');
-    }
-    setPublishLoading(false);
-
-    if (res) {
-      history.push('/posts');
-    }
-  }, []);
+      if (res) {
+        history.push('/posts');
+      }
+    },
+    [intl],
+  );
 
   /**
    * local draft as post
    */
-  const publishAsPost = useCallback(async (data: CMS.LocalDraft) => {
-    setPublishLoading(true);
+  const publishAsPost = useCallback(
+    async (data: CMS.LocalDraft) => {
+      setPublishLoading(true);
 
-    const res = await publishPostAPI(data);
-    if (res) {
-      // 发布文章 更新最新 Post 数据
-      const { id } = history.location.query as Query;
-      await dbPostsUpdate(Number(id), { post: res });
+      const res = await publishPostAPI(data);
+      if (res) {
+        // 发布文章 更新最新 Post 数据
+        const { id } = history.location.query as Router.PostQuery;
+        await dbPostsUpdate(Number(id), { post: res });
 
-      message.success('发布成功');
-    } else {
-      message.error('发布失败');
-    }
-    setPublishLoading(false);
+        message.success(
+          intl.formatMessage({
+            id: 'messages.editor.success',
+          }),
+        );
+      } else {
+        message.error(
+          intl.formatMessage({
+            id: 'messages.editor.fail',
+          }),
+        );
+      }
+      setPublishLoading(false);
 
-    if (res) {
-      history.push('/posts');
-    }
-  }, []);
+      if (res) {
+        history.push('/posts');
+      }
+    },
+    [intl],
+  );
 
   /**
    * update draft
+   * 在更新 title content cover 更新草稿
    */
-  const updateDraft = useCallback(async () => {
-    if (flagUpdateDraft) return;
+  const updateDraft = useCallback(
+    async (data: CMS.LocalDraft) => {
+      if (flagUpdateDraft) return;
 
-    setFlagUpdateDraft(true);
-    const { id } = history.location.query as Query;
-    if (!id) {
-      setFlagUpdateDraft(false);
-      return;
-    }
-    const result = await dbPostsGet(Number(id));
-    if (!result) {
-      setFlagUpdateDraft(false);
-      return;
-    }
-
-    // 更新草稿
-    if (result && result.draft) {
-      // console.log('updateDraft', result);
-      const res = await updatePostAPI(Number(result.draft.id), {
-        title: title,
-        cover: cover,
-        summary: generateSummary(),
-        content: content,
-      });
-      if (res) {
-        // 更新草稿信息
-        await dbPostsUpdate(Number(id), { draft: res });
+      setFlagUpdateDraft(true);
+      const { id } = history.location.query as Router.PostQuery;
+      if (!id) {
+        setFlagUpdateDraft(false);
+        return;
       }
-    }
-    setFlagUpdateDraft(false);
-  }, [title, cover, content, flagUpdateDraft]);
+      const result = await dbPostsGet(Number(id));
+      if (!result) {
+        setFlagUpdateDraft(false);
+        return;
+      }
+
+      // 更新草稿
+      if (result && result.draft) {
+        const res = await updatePostAPI(Number(result.draft.id), data);
+        if (res) {
+          // 更新草稿信息
+          await dbPostsUpdate(Number(id), { draft: res });
+        }
+      }
+      setFlagUpdateDraft(false);
+    },
+    [flagUpdateDraft],
+  );
 
   /**
    * post publish to post
@@ -142,12 +167,20 @@ const Edit: React.FC = () => {
       // post publish draft
       const _draft = await publishPostAsDraftAPI(Number(id));
       if (!_draft) {
-        message.error('转存失败');
+        message.error(
+          intl.formatMessage({
+            id: 'messages.editor.saveToDraftFail',
+          }),
+        );
         // setTransferDraftLoading(false);
         setPublishLoading(false);
         return;
       }
-      message.success('文章转存草稿成功');
+      message.success(
+        intl.formatMessage({
+          id: 'messages.editor.saveToDraftSuccess',
+        }),
+      );
 
       // update post(draft)
       const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
@@ -159,10 +192,14 @@ const Edit: React.FC = () => {
 
       // update local db draft data
       if (resultUpdatePost) {
-        const { id: _id } = history.location.query as Query;
+        const { id: _id } = history.location.query as Router.PostQuery;
         await dbPostsUpdate(Number(_id), { draft: resultUpdatePost });
       } else {
-        message.error('更新失败');
+        message.error(
+          intl.formatMessage({
+            id: 'messages.editor.draftUpdateFail',
+          }),
+        );
         setPublishLoading(false);
         return Promise.reject();
       }
@@ -171,7 +208,7 @@ const Edit: React.FC = () => {
 
       return Promise.resolve();
     },
-    [draftPublishAsPost, title, cover, content],
+    [draftPublishAsPost, title, cover, content, intl],
   );
 
   /**
@@ -180,15 +217,32 @@ const Edit: React.FC = () => {
   const handlePublish = useCallback(async () => {
     // console.log('publish');
 
-    const { id } = history.location.query as Query;
+    const { id } = history.location.query as Router.PostQuery;
     if (!id) {
-      message.warning('请先编辑文章');
+      message.warning(
+        intl.formatMessage({
+          id: 'messages.editor.tip.id',
+        }),
+      );
       return;
     }
 
     if (!title && !content) {
-      message.warning('文章或内容不能为空');
+      message.warning(
+        intl.formatMessage({
+          id: 'messages.editor.tip.titleOrContent',
+        }),
+      );
       return;
+    }
+
+    // check cover format
+    if (cover && !cover.includes(FLEEK_NAME)) {
+      message.success(
+        intl.formatMessage({
+          id: 'messages.editor.tip.coverFormat',
+        }),
+      );
     }
 
     const result = await dbPostsGet(Number(id));
@@ -197,9 +251,10 @@ const Edit: React.FC = () => {
       await draftPublishAsPost(result.draft.id);
     } else if (result && result.post) {
       confirm({
-        title: '提示',
         icon: <ExclamationCircleOutlined />,
-        content: '文章已发布，再次发布会覆盖文章的信息',
+        content: intl.formatMessage({
+          id: 'messages.editor.tip.postExists',
+        }),
         onOk() {
           postPublishToPost(result.post!.id);
         },
@@ -216,7 +271,7 @@ const Edit: React.FC = () => {
         content: content,
       });
     }
-  }, [title, cover, content, publishAsPost, draftPublishAsPost, postPublishToPost]);
+  }, [title, cover, content, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
 
   /**
    * handle history url state
@@ -234,7 +289,7 @@ const Edit: React.FC = () => {
       setContent(val);
       setDraftMode(1);
 
-      const { id } = history.location.query as Query;
+      const { id } = history.location.query as Router.PostQuery;
       const data = { content: val, summary: generateSummary() };
       if (id) {
         await dbPostsUpdate(Number(id), data);
@@ -290,7 +345,11 @@ const Edit: React.FC = () => {
         const result = await imageUploadByUrlAPI(ele.src);
         if (result) {
           // _vditor.tip('上传成功', 2000);
-          message.success('上传成功');
+          message.success(
+            intl.formatMessage({
+              id: 'editor.upload.image.success',
+            }),
+          );
           ele.src = result.publicUrl;
           ele.alt = result.key;
         }
@@ -308,7 +367,7 @@ const Edit: React.FC = () => {
     }
 
     setFlagImageUploadToIpfs(false);
-  }, [flagImageUploadToIpfs, asyncContentToDB]);
+  }, [flagImageUploadToIpfs, asyncContentToDB, intl]);
 
   /**
    * handle async content to db
@@ -317,19 +376,28 @@ const Edit: React.FC = () => {
     async (val: string) => {
       await asyncContentToDB(val);
       await handleImageUploadToIpfs();
+
+      // 更新草稿内容
+      await updateDraft({
+        content: val,
+        summary: generateSummary(),
+      });
     },
-    [asyncContentToDB, handleImageUploadToIpfs],
+    [asyncContentToDB, handleImageUploadToIpfs, updateDraft],
   );
 
   /**
    * fetch DB content
    */
   const fetchDBContent = useCallback(async () => {
-    const { id } = history.location.query as Query;
+    const { id } = history.location.query as Router.PostQuery;
     if (id) {
       const resultPost = await dbPostsGet(Number(id));
       if (resultPost) {
         // console.log('resultPost', resultPost);
+
+        setPostData(resultPost);
+
         setCover(resultPost.cover);
         setTitle(resultPost.title);
         setContent(resultPost.content);
@@ -352,7 +420,7 @@ const Edit: React.FC = () => {
       setCover(url);
       setDraftMode(1);
 
-      const { id } = history.location.query as Query;
+      const { id } = history.location.query as Router.PostQuery;
       const data = { cover: url };
       if (id) {
         await dbPostsUpdate(Number(id), data);
@@ -361,25 +429,22 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
+      // 更新草稿内容
+      await updateDraft({
+        cover: url,
+      });
+
       setDraftMode(2);
     },
-    [handleHistoryState],
+    [handleHistoryState, updateDraft],
   );
 
   /**
    * async title to DB
    */
-  const asyncTitleToDB = useCallback(
+  const { run: asyncTitleToDB } = useThrottleFn(
     async (val: string) => {
-      if (flagDB) {
-        return;
-      }
-      setFlagDB(true);
-
-      setTitle(val);
-      setDraftMode(1);
-
-      const { id } = history.location.query as Query;
+      const { id } = history.location.query as Router.PostQuery;
       const data = { title: val };
       if (id) {
         await dbPostsUpdate(Number(id), data);
@@ -389,10 +454,27 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      setDraftMode(2);
-      setFlagDB(false);
+      // 更新草稿内容
+      await updateDraft({
+        title: val,
+      });
     },
-    [handleHistoryState, flagDB],
+    { wait: 500 },
+  );
+
+  /**
+   * handle change title
+   */
+  const handleChangeTitle = useCallback(
+    async (val: string) => {
+      setTitle(val);
+      setDraftMode(1);
+
+      await asyncTitleToDB(val);
+
+      setDraftMode(2);
+    },
+    [asyncTitleToDB],
   );
 
   useMount(() => {
@@ -406,30 +488,28 @@ const Edit: React.FC = () => {
     }
 
     // 10s handle all image
-    const timer = setInterval(handleImageUploadToIpfs, 10000);
+    const timer = setInterval(handleImageUploadToIpfs, 1000 * 10);
     return () => clearInterval(timer);
   }, [vditor, handleImageUploadToIpfs]);
 
-  useEffect(() => {
-    // console.log('updateDraft useEffect');
-
-    updateDraft();
-    // watch title, content, cover
-    // TODO: modify
-  }, [title, content, cover]);
-
   return (
     <section className={styles.container}>
-      <EditorHeader draftMode={draftMode} handlePublish={handlePublish} />
+      <EditorHeader
+        post={postData.post || postData.draft}
+        draftMode={draftMode}
+        handlePublish={handlePublish}
+      />
       <section className={styles.edit}>
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />
         <Input
           type="text"
-          placeholder="Title"
+          placeholder={intl.formatMessage({
+            id: 'editor.title',
+          })}
           className={styles.title}
           maxLength={30}
           value={title}
-          onChange={(e) => asyncTitleToDB(e.target.value)}
+          onChange={(e) => handleChangeTitle(e.target.value)}
         />
         <Editor asyncContentToDB={handleAsyncContentToDB} bindVditor={setVditor} />
       </section>

@@ -1,9 +1,12 @@
+import React, { createRef, useCallback } from 'react';
+import Vditor from 'vditor';
 import { fetchTokenAPI } from '@/helpers';
+// 目前在 document 内导入
 // import '~vditor/src/assets/scss/index';
 // import '~vditor/dist/index.css';
+import { useIntl } from 'umi';
 import { message } from 'antd';
-import React, { useEffect, createRef, useCallback } from 'react';
-import Vditor from 'vditor';
+import { useMount } from 'ahooks';
 interface Props {
   asyncContentToDB: (val: string) => void;
   bindVditor?: (vditor: Vditor) => void;
@@ -22,6 +25,7 @@ const e = React.createElement;
 let _TOKEN = '';
 
 const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, bindVditor }) {
+  const intl = useIntl();
   const vditorRef = createRef<HTMLDivElement>();
 
   const fetchToken = useCallback(async () => {
@@ -47,7 +51,9 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
       },
       debugger: true,
       typewriterMode: true,
-      placeholder: '现在就开始编辑吧！',
+      placeholder: intl.formatMessage({
+        id: 'editor.edit.placeholder',
+      }),
       preview: {
         markdown: {
           toc: true,
@@ -83,7 +89,9 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
         // 'upload',
         {
           name: 'upload',
-          tip: '上传图片',
+          tip: intl.formatMessage({
+            id: 'editor.edit.tool.upload',
+          }),
         },
       ],
       toolbarConfig: {
@@ -95,7 +103,11 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
       },
       hint: {
         emojiPath: 'https://cdn.jsdelivr.net/npm/vditor@1.8.3/dist/images/emoji',
-        emojiTail: '<a href="https://ld246.com/settings/function" target="_blank">设置常用表情</a>',
+        emojiTail: `<a href="https://ld246.com/settings/function" target="_blank">${intl.formatMessage(
+          {
+            id: 'editor.edit.tool.emoji.setEmoji',
+          },
+        )}</a>`,
         emoji: {
           sd: '💔',
           j: 'https://unpkg.com/vditor@1.3.1/dist/images/emoji/j.png',
@@ -193,17 +205,19 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
               },
             } as UploadFormat);
           } else {
-            message.error('图片上传失败: ' + msg);
+            message.error(
+              `${intl.formatMessage({
+                id: 'messages.editor.edit.tool.upload.fail',
+              })}: ${msg}`,
+            );
             return '';
           }
         },
         error(msg: string): void {
-          console.log('error msg', msg);
-          message.error(`error ${msg}`);
+          message.error(msg);
         },
       },
       input(val: string) {
-        // console.log('val', val);
         asyncContentToDB(val);
       },
     });
@@ -214,19 +228,18 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
     if (!!bindVditor) {
       bindVditor(vditor);
     }
-  }, [asyncContentToDB, bindVditor]);
+  }, [asyncContentToDB, bindVditor, intl]);
 
-  useEffect(() => {
+  useMount(() => {
     fetchToken();
     init();
 
-    // TODO: 没有找到更好的办法获取 token 暂时 loop
+    // TODO: 没有找到更好的办法获取 token (最好在上传前获取一次)， 暂时 loop
     const timer = setInterval(fetchToken, 1000 * 30);
     return clearInterval(timer);
-    // only once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return e('div', { id: 'vditor', className: 'vditor-edit', ref: vditorRef });
 });
+
 export default Editor;

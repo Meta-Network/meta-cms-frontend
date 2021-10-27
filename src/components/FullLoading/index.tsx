@@ -1,5 +1,6 @@
 import React from 'react';
 import { Spin, Tooltip } from 'antd';
+import { useIntl } from 'umi';
 import styles from './index.less';
 import { LoadingOutlined, CloseOutlined } from '@ant-design/icons';
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const FullLoading: React.FC<Props> = ({ loading, setLoading }) => {
+  const intl = useIntl();
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
   return (
@@ -16,7 +18,11 @@ const FullLoading: React.FC<Props> = ({ loading, setLoading }) => {
       {loading ? (
         <div className={styles.wrapper}>
           <Spin indicator={antIcon} tip="Loading..." />
-          <Tooltip title="如遇到页面失去反馈，可手动关闭！">
+          <Tooltip
+            title={intl.formatMessage({
+              id: 'component.full.tip',
+            })}
+          >
             <CloseOutlined className={styles.close} onClick={() => setLoading(false)} />
           </Tooltip>
         </div>

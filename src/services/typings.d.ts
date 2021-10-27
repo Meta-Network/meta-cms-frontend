@@ -92,12 +92,12 @@ declare namespace CMS {
   };
 
   type LocalDraft = {
-    title: string;
-    cover: string;
-    summary: string;
+    title?: string;
+    cover?: string;
+    summary?: string;
     tags?: string[];
     categories?: string[];
-    content: string;
+    content?: string;
   };
 
   type Draft = {

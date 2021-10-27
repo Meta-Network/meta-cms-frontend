@@ -15,9 +15,9 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useCallback, useRef } from 'react';
 import syncPostsRequest from '../../utils/sync-posts-request';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/models/db';
+import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
-import { PostTempData } from '@/models/Posts';
+import { PostTempData } from '@/db/Posts.d';
 import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
 import styles from './SyncCenter.less';
 
@@ -112,75 +112,77 @@ export default () => {
   /**
    * transfer draft
    */
-  const transferDraft = useCallback(async (post: CMS.Post) => {
-    setTransferDraftLoading(true);
+  const transferDraft = useCallback(
+    async (post: CMS.Post) => {
+      setTransferDraftLoading(true);
 
-    // check save as draft
-    const isExist = await dbPostsWhereExist(post.id);
-    if (isExist) {
-      setTransferDraftLoading(false);
+      // check save as draft
+      const isExist = await dbPostsWhereExist(post.id);
+      if (isExist) {
+        setTransferDraftLoading(false);
 
-      const currentDraft = await dbPostsWhereByID(post.id);
-      console.log('currentDraft', currentDraft);
-      const _url = currentDraft ? `/post/edit?id=${currentDraft.id}` : `/posts`;
-      confirm({
-        title: '提示',
-        icon: <ExclamationCircleOutlined />,
-        content: '已经转存到本地,是否跳转编辑？',
-        async onOk() {
-          history.push(_url);
-        },
-        onCancel() {},
-      });
-      return;
-    }
-
-    // console.log('post', post);
-    const _post = cloneDeep(post);
-
-    // image transfer ipfs
-    if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
-      const result = await imageUploadByUrlAPI(_post.cover);
-      if (result) {
-        message.success('封面转存成功');
-        _post.cover = result.publicUrl;
+        const currentDraft = await dbPostsWhereByID(post.id);
+        console.log('currentDraft', currentDraft);
+        const _url = currentDraft ? `/post/edit?id=${currentDraft.id}` : `/posts`;
+        confirm({
+          icon: <ExclamationCircleOutlined />,
+          content: intl.formatMessage({ id: 'messages.syncCenter.draftSavedTips' }),
+          async onOk() {
+            history.push(_url);
+          },
+          onCancel() {},
+        });
+        return;
       }
-    }
 
-    // post publish draft
-    const _draft = await publishPostAsDraftAPI(Number(_post.id));
-    if (!_draft) {
-      message.error('转存失败');
+      // console.log('post', post);
+      const _post = cloneDeep(post);
+
+      // image transfer ipfs
+      if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
+        const result = await imageUploadByUrlAPI(_post.cover);
+        if (result) {
+          message.success(intl.formatMessage({ id: 'messages.syncCenter.coverSavedSuccess' }));
+          _post.cover = result.publicUrl;
+        }
+      }
+
+      // post publish draft
+      const _draft = await publishPostAsDraftAPI(Number(_post.id));
+      if (!_draft) {
+        message.error(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
+        setTransferDraftLoading(false);
+        return;
+      }
+      message.success(intl.formatMessage({ id: 'messages.syncCenter.savedSuccess' }));
+
+      // get draft content
+      const _draftData = await postByIdAPI(Number(_draft.id));
+      if (!_draftData) {
+        message.error(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
+        setTransferDraftLoading(false);
+        return;
+      }
+      message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentSuccess' }));
+
+      // send local
+      const resultID = await dbPostsAdd(
+        assign(PostTempData, {
+          cover: _post.cover,
+          title: _post.title,
+          summary: _post.summary || '',
+          content: _draftData.content,
+          post: _post,
+          draft: _draftData,
+        }),
+      );
+
+      history.push(`/post/edit?id=${resultID}`);
+
       setTransferDraftLoading(false);
-      return;
-    }
-    message.success('文章转存草稿成功');
-
-    // get draft content
-    const _draftData = await postByIdAPI(Number(_draft.id));
-    if (!_draftData) {
-      message.error('获取内容失败');
-      setTransferDraftLoading(false);
-      return;
-    }
-    message.success('成功获取内容');
-
-    // send local
-    const resultID = await dbPostsAdd(
-      assign(PostTempData, {
-        cover: _post.cover,
-        title: _post.title,
-        summary: _post.summary || '',
-        content: _draftData.content,
-        post: _post,
-        draft: _draftData,
-      }),
-    );
-
-    history.push(`/post/edit?id=${resultID}`);
-
-    setTransferDraftLoading(false);
-  }, []);
+    },
+    [intl],
+  );
 
   const columns: ProColumns<PostInfo>[] = [
     {
