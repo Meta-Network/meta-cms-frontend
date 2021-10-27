@@ -19,7 +19,7 @@ import {
   publishPostAsDraftAPI,
 } from '@/helpers';
 import { assign } from 'lodash';
-import type Vditor from 'vditor';
+// import type Vditor from 'vditor';
 import { generateSummary } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
@@ -38,7 +38,7 @@ const Edit: React.FC = () => {
   // draft mode
   const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
   // vditor
-  const [vditor, setVditor] = useState<Vditor>();
+  // const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
   // 更新草稿开关
@@ -388,33 +388,6 @@ const Edit: React.FC = () => {
   );
 
   /**
-   * fetch DB content
-   */
-  const fetchDBContent = useCallback(async () => {
-    const { id } = history.location.query as Router.PostQuery;
-    if (id) {
-      const resultPost = await dbPostsGet(Number(id));
-      if (resultPost) {
-        // console.log('resultPost', resultPost);
-
-        // setPostData(resultPost);
-
-        setCover(resultPost.cover);
-        setTitle(resultPost.title);
-        setContent(resultPost.content);
-        setTags(resultPost.tags);
-
-        // TODO：need modify
-        setTimeout(() => {
-          (window as any).vditor!.setValue(resultPost.content);
-          // handle all image
-          handleImageUploadToIpfs();
-        }, 1000);
-      }
-    }
-  }, [handleImageUploadToIpfs]);
-
-  /**
    * async cover to DB
    */
   const asyncCoverToDB = useCallback(
@@ -510,20 +483,42 @@ const Edit: React.FC = () => {
     [handleHistoryState, updateDraft],
   );
 
+  /**
+   * fetch DB post content
+   */
+  const fetchDBContent = useCallback(async () => {
+    const { id } = history.location.query as Router.PostQuery;
+    if (id) {
+      const resultPost = await dbPostsGet(Number(id));
+      if (resultPost) {
+        // console.log('resultPost', resultPost);
+
+        // setPostData(resultPost);
+
+        setCover(resultPost.cover);
+        setTitle(resultPost.title);
+        setContent(resultPost.content);
+        setTags(resultPost.tags);
+
+        // TODO：need modify
+        setTimeout(() => {
+          (window as any).vditor!.setValue(resultPost.content);
+          // handle all image
+          handleImageUploadToIpfs();
+        }, 1000);
+      }
+    }
+  }, [handleImageUploadToIpfs]);
+
   useMount(() => {
     fetchDBContent();
   });
 
   useEffect(() => {
-    // console.log('watch', vditor);
-    if (!!vditor) {
-      // console.log(`Update Default Vditor:`, vditor);
-    }
-
     // 10s handle all image
     const timer = setInterval(handleImageUploadToIpfs, 1000 * 10);
     return () => clearInterval(timer);
-  }, [vditor, handleImageUploadToIpfs]);
+  }, [handleImageUploadToIpfs]);
 
   return (
     <section className={styles.container}>
@@ -544,7 +539,7 @@ const Edit: React.FC = () => {
           value={title}
           onChange={(e) => handleChangeTitle(e.target.value)}
         />
-        <Editor asyncContentToDB={handleAsyncContentToDB} bindVditor={setVditor} />
+        <Editor asyncContentToDB={handleAsyncContentToDB} />
       </section>
 
       <FullLoading loading={publishLoading} setLoading={setPublishLoading} />
