@@ -12,13 +12,17 @@ interface Props {
 }
 
 const tagsList = [
+  { name: 'Meta' },
+  { name: 'MetaNetwork' },
+  { name: 'MetaCMS' },
+  { name: 'BTC' },
+  { name: 'ETH' },
   { name: '区块链' },
   { name: '虚拟货币' },
   { name: '数字货币' },
   { name: '加密货币' },
-  { name: '以太坊' },
-  { name: 'BTC' },
   { name: '比特币' },
+  { name: '以太坊' },
   { name: '空投' },
 ];
 
