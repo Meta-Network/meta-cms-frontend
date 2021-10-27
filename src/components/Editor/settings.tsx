@@ -39,7 +39,7 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
 
   return (
     <span className={styles.wrapper}>
-      <SettingOutlined onClick={showDrawer} />
+      <SettingOutlined onClick={showDrawer} className={styles.toggleIcon} />
       <Drawer
         title={intl.formatMessage({
           id: 'editor.header.settings.title',
