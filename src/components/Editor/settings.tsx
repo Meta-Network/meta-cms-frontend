@@ -11,6 +11,7 @@ interface Props {
   handleChangeTags: (val: string[]) => void;
 }
 
+// TODO: 暂时自定义 后续可换接口获取
 const tagsList = [
   { name: 'Meta' },
   { name: 'MetaNetwork' },
