@@ -47,9 +47,10 @@ const Edit: React.FC = () => {
 
   /**
    * draft publish as post
+   * post or draft ID
    */
   const draftPublishAsPost = useCallback(
-    async (id: number) => {
+    async (PostId: number) => {
       setPublishLoading(true);
 
       const siteConfig = await getDefaultSiteConfigAPI();
@@ -63,9 +64,10 @@ const Edit: React.FC = () => {
         return;
       }
 
-      const res = await publishPendingPostAPI(id, [siteConfig.id]);
+      const res = await publishPendingPostAPI(PostId, [siteConfig.id]);
       if (res) {
         // 发布文章， 更新最新 Post 数据
+        const { id } = history.location.query as Router.PostQuery;
         await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: res, draft: null }));
 
         message.success(
@@ -96,9 +98,13 @@ const Edit: React.FC = () => {
     async (data: CMS.LocalDraft) => {
       setPublishLoading(true);
 
-      const res = await publishPostAPI(data);
-      if (res) {
-        await draftPublishAsPost(res.id);
+      const resultDraft = await publishPostAPI(data);
+      if (resultDraft) {
+        // 发布文章 更新最新 Draft 数据, 如果第二次发送失败少增加一篇草稿
+        const { id } = history.location.query as Router.PostQuery;
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultDraft }));
+
+        await draftPublishAsPost(resultDraft.id);
       } else {
         message.error(
           intl.formatMessage({
