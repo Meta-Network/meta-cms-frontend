@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { history, useIntl } from 'umi';
+import { history, useIntl, useModel } from 'umi';
 import { Input, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import Editor from '@/components/Editor';
@@ -46,6 +46,8 @@ const Edit: React.FC = () => {
   // publish loading
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
+  const { setSiteNeedToDeploy } = useModel('storage');
+
   /**
    * draft publish as post
    */
@@ -74,6 +76,7 @@ const Edit: React.FC = () => {
             id: 'messages.editor.success',
           }),
         );
+        setSiteNeedToDeploy(true);
       } else {
         message.error(
           intl.formatMessage({
@@ -87,7 +90,7 @@ const Edit: React.FC = () => {
         history.push('/posts');
       }
     },
-    [intl],
+    [intl, setSiteNeedToDeploy],
   );
 
   /**
@@ -108,6 +111,7 @@ const Edit: React.FC = () => {
             id: 'messages.editor.success',
           }),
         );
+        setSiteNeedToDeploy(true);
       } else {
         message.error(
           intl.formatMessage({
@@ -121,7 +125,7 @@ const Edit: React.FC = () => {
         history.push('/posts');
       }
     },
-    [intl],
+    [intl, setSiteNeedToDeploy],
   );
 
   /**
@@ -206,10 +210,11 @@ const Edit: React.FC = () => {
       }
       // send
       await draftPublishAsPost(_draft.id);
+      setSiteNeedToDeploy(true);
 
       return Promise.resolve();
     },
-    [draftPublishAsPost, title, cover, content, tags, intl],
+    [draftPublishAsPost, title, cover, content, tags, intl, setSiteNeedToDeploy],
   );
 
   /**
@@ -272,7 +277,16 @@ const Edit: React.FC = () => {
         content: content,
       });
     }
-  }, [title, cover, content, tags, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
+  }, [
+    title,
+    cover,
+    content,
+    tags,
+    publishAsPost,
+    draftPublishAsPost,
+    postPublishToPost,
+    intl,
+  ]);
 
   /**
    * handle history url state

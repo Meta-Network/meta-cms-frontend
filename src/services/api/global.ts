@@ -24,33 +24,45 @@ export async function getGithubReposName(): Promise<string[]> {
     throw new ReferenceError('Unable to get GitHub OAuth token.');
   }
 
-  const res = await request<any>('https://api.github.com/user/repos', {
+  const res = await request<any[]>('https://api.github.com/user/repos', {
     method: 'GET',
     headers: {
+      accept: 'application/vnd.github.v3+json',
       Authorization: `token ${token}`,
     },
+    params: {
+      // max is 100, so user who has more than 100 repos, this doesn't work
+      per_page: 100,
+    },
   });
+  console.log(res);
 
   // return repos name
   return res.map((repo: any) => repo.name);
 }
 
 /** 获取 GitHub 用户名 */
-export async function getGithubUsername(): Promise<string> {
-  const token = (await getSocialAuthToken('github'))?.data?.token;
-  if (!token) {
-    throw new ReferenceError('Unable to get GitHub OAuth token.');
+export async function getUsernameOfStore(name: string): Promise<string> {
+  switch (name.toLowerCase()) {
+    case 'github': {
+      const token = (await getSocialAuthToken('github'))?.data?.token;
+      if (!token) {
+        throw new ReferenceError('Unable to get GitHub OAuth token.');
+      }
+
+      const res = await request<any>('https://api.github.com/user', {
+        method: 'GET',
+        headers: {
+          Authorization: `token ${token}`,
+        },
+      });
+
+      return res.login;
+    }
+    default: {
+      throw new ReferenceError('Name is not supported.');
+    }
   }
-
-  const res = await request<any>('https://api.github.com/user', {
-    method: 'GET',
-    headers: {
-      Authorization: `token ${token}`,
-    },
-  });
-
-  // return the username
-  return res.login;
 }
 
 /** 上传并更新用户头像 */
