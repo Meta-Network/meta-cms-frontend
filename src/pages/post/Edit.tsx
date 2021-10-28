@@ -50,7 +50,7 @@ const Edit: React.FC = () => {
    * post or draft ID
    */
   const draftPublishAsPost = useCallback(
-    async (PostId: number) => {
+    async (postId: number) => {
       setPublishLoading(true);
 
       const siteConfig = await getDefaultSiteConfigAPI();
@@ -64,7 +64,7 @@ const Edit: React.FC = () => {
         return;
       }
 
-      const res = await publishPendingPostAPI(PostId, [siteConfig.id]);
+      const res = await publishPendingPostAPI(postId, [siteConfig.id]);
       if (res) {
         // 发布文章， 更新最新 Post 数据
         const { id } = history.location.query as Router.PostQuery;
@@ -154,11 +154,11 @@ const Edit: React.FC = () => {
    * post publish to post
    */
   const postPublishToPost = useCallback(
-    async (id: number) => {
+    async (postId: number) => {
       setPublishLoading(true);
 
       // post publish draft
-      const _draft = await publishPostAsDraftAPI(Number(id));
+      const _draft = await publishPostAsDraftAPI(Number(postId));
       if (!_draft) {
         message.error(
           intl.formatMessage({
@@ -186,8 +186,8 @@ const Edit: React.FC = () => {
 
       // update local db draft data
       if (resultUpdatePost) {
-        const { id: _id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(_id), postDataMergedUpdateAt({ draft: resultUpdatePost }));
+        const { id } = history.location.query as Router.PostQuery;
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultUpdatePost }));
       } else {
         message.error(
           intl.formatMessage({
