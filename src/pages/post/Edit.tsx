@@ -66,7 +66,7 @@ const Edit: React.FC = () => {
       const res = await publishPendingPostAPI(id, [siteConfig.id]);
       if (res) {
         // 发布文章， 更新最新 Post 数据
-        await dbPostsUpdate(Number(id), { post: res, draft: null });
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: res, draft: null }));
 
         message.success(
           intl.formatMessage({
@@ -100,7 +100,7 @@ const Edit: React.FC = () => {
       if (res) {
         // 发布文章 更新最新 Post 数据
         const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), { post: res });
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: res }));
 
         message.success(
           intl.formatMessage({
@@ -148,7 +148,7 @@ const Edit: React.FC = () => {
         const res = await updatePostAPI(Number(result.draft.id), data);
         if (res) {
           // 更新草稿信息
-          await dbPostsUpdate(Number(id), { draft: res });
+          await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: res }));
         }
       }
       setFlagUpdateDraft(false);
@@ -193,7 +193,7 @@ const Edit: React.FC = () => {
       // update local db draft data
       if (resultUpdatePost) {
         const { id: _id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(_id), { draft: resultUpdatePost });
+        await dbPostsUpdate(Number(_id), postDataMergedUpdateAt({ draft: resultUpdatePost }));
       } else {
         message.error(
           intl.formatMessage({
@@ -215,8 +215,6 @@ const Edit: React.FC = () => {
    * publish
    */
   const handlePublish = useCallback(async () => {
-    // console.log('publish');
-
     const { id } = history.location.query as Router.PostQuery;
     if (!id) {
       message.warning(
