@@ -170,7 +170,7 @@ export default () => {
           if (storageSetting.message === 'Ok') {
             updateProcessing({
               message: intl.formatMessage({
-                id: 'messages.deployment.submitSettingSuccess',
+                id: 'messages.deployment.submitStoreSuccess',
               }),
               state: 'success',
             });
@@ -183,7 +183,7 @@ export default () => {
             updateProcessing({
               message: intl.formatMessage(
                 {
-                  id: 'messages.deployment.submitSettingFailed',
+                  id: 'messages.deployment.submitStoreFailed',
                 },
                 {
                   reason: storageSetting.message,

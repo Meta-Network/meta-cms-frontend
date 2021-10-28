@@ -2,7 +2,7 @@ export default {
   'guide.intro.title': '创建 Meta Space',
   'guide.intro.description': `
     Meta Space 是专属于您个人的数字空间，您有全部的控制权力
-    立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅
+    立即创建属于自己的 Meta Space，开始您的下一代社交网络的探索之旅
   `,
   'guide.domain.title': '域名',
   'guide.domain.description': `

@@ -114,7 +114,7 @@ export default {
   'messages.domain.isForbidden': '此域名被禁用或已存在，请重新设定',
   'messages.domain.isValid': '此域名可用！',
   'messages.domain.title': '域名配置',
-  'messages.domain.description': '您可以在这里设定您的 Meta Space 域名 ，当前仅支持设置为子域名',
+  'messages.domain.description': '您可以在这里设定您的 Meta Space 域名，当前仅支持设置为子域名',
   'messages.domain.form.label': '发布工具平台',
   'messages.domain.form.edit': '修改部署平台',
   'messages.domain.form.content': '域名设置',
@@ -124,7 +124,7 @@ export default {
   'messages.redeployment.taskSuccess.description': 'Meta Space 已经重新发布成功',
   'messages.redeployment.taskFailed.title': '任务失败',
   'messages.redeployment.taskFailed.description':
-    'Meta Space 发布失败 ，请重新尝试或向开发团队反馈',
+    'Meta Space 发布失败，请重新尝试或向开发团队反馈',
   'messages.redeployment.noSiteConfig': '您尚未创建 Meta Space',
   'messages.redeployment.button': '发布我的 Meta Space',
   'messages.copy.success': '已复制到剪贴板',
