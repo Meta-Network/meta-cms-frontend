@@ -348,7 +348,7 @@ const Edit: React.FC = () => {
           // _vditor.tip('上传成功', 2000);
           message.success(
             intl.formatMessage({
-              id: 'editor.upload.image.success',
+              id: 'messages.editor.upload.image.success',
             }),
           );
           ele.src = result.publicUrl;
