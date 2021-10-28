@@ -1,17 +1,19 @@
 import type { Table, Transaction } from 'dexie';
 import Dexie from 'dexie';
 import type { Posts } from './Posts';
+import moment from 'moment';
 
 export class StoreDB extends Dexie {
   posts!: Table<Posts, number>;
   constructor() {
     super('StoreDB');
-    this.version(5)
+    this.version(6)
       .stores({
         posts:
-          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags',
+          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, createdAt, updatedAt',
       })
       .upgrade((tx: Transaction | any) => {
+        const time = moment().toISOString();
         // TODO: modify typescript
         return tx.posts.toCollection().modify((post: Posts) => {
           console.log('post', post);
@@ -26,6 +28,8 @@ export class StoreDB extends Dexie {
           post.post = post.post || null;
           post.draft = post.draft || null;
           post.tags = post.tags || [];
+          post.createdAt = post.createdAt || time;
+          post.updatedAt = post.updatedAt || time;
         });
       });
   }
@@ -90,3 +94,20 @@ export const dbPostsWhereByID = async (id: number): Promise<Posts | undefined> =
   const result = await db.posts.where('delete').equals(0).reverse().sortBy('id');
   return result.find((post) => post.post && Number(post.post.id) === id);
 };
+
+// post data temp
+export const PostTempData = (): Posts => ({
+  cover: '',
+  title: '',
+  summary: '',
+  content: '',
+  hash: '',
+  status: 'pending',
+  timestamp: Date.now(),
+  delete: 0,
+  post: null,
+  draft: null,
+  tags: [],
+  createdAt: moment().toISOString(),
+  updatedAt: moment().toISOString(),
+});

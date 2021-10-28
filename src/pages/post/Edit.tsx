@@ -7,9 +7,8 @@ import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
-import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '@/db/db';
+import { dbPostsUpdate, dbPostsAdd, dbPostsGet, PostTempData } from '@/db/db';
 // import type { Posts } from '@/db/Posts.d';
-import { PostTempData } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
   getDefaultSiteConfigAPI,
@@ -20,7 +19,7 @@ import {
 } from '@/helpers';
 import { assign } from 'lodash';
 // import type Vditor from 'vditor';
-import { generateSummary } from '@/utils/editor';
+import { generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 
@@ -291,11 +290,14 @@ const Edit: React.FC = () => {
       setDraftMode(1);
 
       const { id } = history.location.query as Router.PostQuery;
-      const data = { content: val, summary: generateSummary() };
+      const data = postDataMergedUpdateAt({
+        content: val,
+        summary: generateSummary(),
+      });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 
@@ -396,11 +398,11 @@ const Edit: React.FC = () => {
       setDraftMode(1);
 
       const { id } = history.location.query as Router.PostQuery;
-      const data = { cover: url };
+      const data = postDataMergedUpdateAt({ cover: url });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 
@@ -420,12 +422,11 @@ const Edit: React.FC = () => {
   const { run: asyncTitleToDB } = useThrottleFn(
     async (val: string) => {
       const { id } = history.location.query as Router.PostQuery;
-      const data = { title: val };
+      const data = postDataMergedUpdateAt({ title: val });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        assign(PostTempData, data);
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 
@@ -465,11 +466,11 @@ const Edit: React.FC = () => {
       setDraftMode(1);
 
       const { id } = history.location.query as Router.PostQuery;
-      const data = { tags: val };
+      const data = postDataMergedUpdateAt({ tags: val });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 
