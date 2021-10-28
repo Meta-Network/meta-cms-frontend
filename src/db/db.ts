@@ -77,7 +77,7 @@ export const dbPostsDelete = async (id: number): Promise<void> => {
  * @returns
  */
 export const dbPostsAll = async (): Promise<Posts[] | undefined> => {
-  return await db.posts.where('delete').equals(0).reverse().sortBy('id');
+  return await db.posts.where('delete').equals(0).reverse().sortBy('updatedAt');
 };
 
 /**
