@@ -81,6 +81,14 @@ export const dbPostsAll = async (): Promise<Posts[] | undefined> => {
 };
 
 /**
+ * db posts all counter
+ * @returns
+ */
+export const dbPostsAllCount = async (): Promise<number> => {
+  return await db.posts.where('delete').equals(0).count();
+};
+
+/**
  * db posts where exist by id
  */
 export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
