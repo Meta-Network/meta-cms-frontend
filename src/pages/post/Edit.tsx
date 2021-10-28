@@ -98,29 +98,17 @@ const Edit: React.FC = () => {
 
       const res = await publishPostAPI(data);
       if (res) {
-        // 发布文章 更新最新 Post 数据
-        const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: res }));
-
-        message.success(
-          intl.formatMessage({
-            id: 'messages.editor.success',
-          }),
-        );
+        await draftPublishAsPost(res.id);
       } else {
         message.error(
           intl.formatMessage({
             id: 'messages.editor.fail',
           }),
         );
-      }
-      setPublishLoading(false);
-
-      if (res) {
-        history.push('/posts');
+        setPublishLoading(false);
       }
     },
-    [intl],
+    [intl, draftPublishAsPost],
   );
 
   /**
