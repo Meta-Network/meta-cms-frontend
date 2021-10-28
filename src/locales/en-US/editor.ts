@@ -4,6 +4,8 @@ export default {
   'editor.header.draft.saving': '保存中...',
   'editor.header.draft.saved': '已保存',
   'editor.header.publish': '发布',
+  'editor.header.settings.title': '文章设置',
+  'editor.header.settings.tags': '标签',
   'editor.upload.cover.description': '添加封面',
   'editor.title': '标题',
   'editor.edit.placeholder': '现在就开始编辑吧！',

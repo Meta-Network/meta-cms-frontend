@@ -10,18 +10,7 @@ export interface Posts {
   delete: 0 | 1;
   post: CMS.Post | null;
   draft: CMS.Draft | null;
-}
-
-export interface PostsTemp {
-  id?: number;
-  cover?: string;
-  title?: string;
-  summary?: string;
-  content?: string;
-  hash?: string;
-  status?: 'pending' | 'publish';
-  timestamp?: number;
-  delete?: 0 | 1;
+  tags: string[];
 }
 
 export const PostTempData: Posts = {
@@ -35,4 +24,5 @@ export const PostTempData: Posts = {
   delete: 0,
   post: null,
   draft: null,
+  tags: [],
 };

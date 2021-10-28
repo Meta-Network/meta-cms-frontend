@@ -9,7 +9,6 @@ import { message } from 'antd';
 import { useMount } from 'ahooks';
 interface Props {
   asyncContentToDB: (val: string) => void;
-  bindVditor?: (vditor: Vditor) => void;
 }
 
 interface UploadFormat {
@@ -24,7 +23,7 @@ interface UploadFormat {
 const e = React.createElement;
 let _TOKEN = '';
 
-const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, bindVditor }) {
+const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB }) {
   const intl = useIntl();
   const vditorRef = createRef<HTMLDivElement>();
 
@@ -184,7 +183,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
             .replace('/\\s/g', '');
         },
         format(files: File[], responseText: string): string {
-          console.log('format');
+          // console.log('format');
           // console.log('files', files);
           // console.log('responseText', responseText);
           const {
@@ -224,11 +223,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB, b
 
     // TODO: need modify
     (window as any).vditor = vditor;
-
-    if (!!bindVditor) {
-      bindVditor(vditor);
-    }
-  }, [asyncContentToDB, bindVditor, intl]);
+  }, [asyncContentToDB, intl]);
 
   useMount(() => {
     fetchToken();

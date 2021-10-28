@@ -6,9 +6,10 @@ export class StoreDB extends Dexie {
   posts!: Table<Posts, number>;
   constructor() {
     super('StoreDB');
-    this.version(4)
+    this.version(5)
       .stores({
-        posts: '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft',
+        posts:
+          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags',
       })
       .upgrade((tx: Transaction | any) => {
         // TODO: modify typescript
@@ -24,6 +25,7 @@ export class StoreDB extends Dexie {
           post.delete = post.delete || 0;
           post.post = post.post || null;
           post.draft = post.draft || null;
+          post.tags = post.tags || [];
         });
       });
   }
