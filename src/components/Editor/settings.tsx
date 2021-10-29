@@ -75,9 +75,7 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
       return;
     }
 
-    // TODO: 暂时使用 life 域名
-    const url = resultDefaultSiteConfig.domain.replace('.metaspaces.me', '.metaspaces.life');
-    const resulSpaceTags = await spaceTagsAPI(url);
+    const resulSpaceTags = await spaceTagsAPI(resultDefaultSiteConfig.domain);
 
     if (resulSpaceTags) {
       setSpaceTags(resulSpaceTags);
