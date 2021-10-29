@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Drawer, Select } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 import styles from './settings.less';
+import { useMount } from 'ahooks';
+import { getDefaultSiteConfigAPI } from '@/helpers';
+import { spaceTagsAPI } from '@/services/api/space';
+import { storeGet, storeSet } from '@/utils/store';
+import { uniqBy } from 'lodash';
 
 const { Option } = Select;
+const KEY_META_CMS_HISTORY_TAGS = 'metaCmsHistoryTags';
 
 interface Props {
   readonly tags: string[];
   handleChangeTags: (val: string[]) => void;
 }
 
-// TODO: 暂时自定义 后续可换接口获取
-const tagsList = [
+// TODO: 暂时自定义 后续可自定义
+const tagsDefaultList = [
   { name: 'Meta' },
   { name: 'MetaNetwork' },
   { name: 'MetaCMS' },
@@ -29,14 +35,100 @@ const tagsList = [
 
 const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
   const intl = useIntl();
-
   const [visible, setVisible] = useState(false);
+  const [spaceTags, setSpaceTags] = useState<Space.Tags[]>([]);
+  const [historyTags, setHistoryTags] = useState<string[]>([]);
+
+  // tags list
+  const tagsList = useMemo(() => {
+    // space tags, max 20 tags
+    const spaceTagsSortFn = (a: Space.Tags, b: Space.Tags) => b.count - a.count;
+    const _spaceTagsSortResult = spaceTags.sort(spaceTagsSortFn);
+    const _spaceTagsResult = _spaceTagsSortResult.map((i) => ({ name: i.name })).slice(0, 20);
+
+    // history tags, max 10 tags
+    const _historyTagsResult = historyTags.map((i) => ({ name: i })).slice(0, 10);
+
+    // default tags
+
+    return uniqBy([..._spaceTagsResult, ..._historyTagsResult, ...tagsDefaultList], 'name');
+  }, [spaceTags, historyTags]);
+
   const showDrawer = () => {
     setVisible(true);
   };
   const onClose = () => {
     setVisible(false);
   };
+
+  /**
+   * fetch space tags
+   */
+  const fetchTags = useCallback(async () => {
+    const resultDefaultSiteConfig = await getDefaultSiteConfigAPI();
+    if (!resultDefaultSiteConfig) {
+      return;
+    }
+
+    // TODO: 暂时使用 life 域名
+    const url = resultDefaultSiteConfig.domain.replace('.metaspaces.me', '.metaspaces.life');
+    const resulSpaceTags = await spaceTagsAPI(url);
+    console.log('resulSpaceTags', resulSpaceTags);
+
+    if (resulSpaceTags) {
+      setSpaceTags(resulSpaceTags);
+    }
+  }, []);
+
+  /**
+   * fetch history tags
+   */
+  const fetchHistoryTags = useCallback(async () => {
+    const _historyTags = storeGet(KEY_META_CMS_HISTORY_TAGS);
+    const _historyTagsResult: string[] = _historyTags ? JSON.parse(_historyTags) : [];
+
+    setHistoryTags(_historyTagsResult);
+  }, []);
+
+  /**
+   * merged history tags
+   */
+  const mergedHistoryTags = useCallback((val: string) => {
+    const _historyTags = storeGet(KEY_META_CMS_HISTORY_TAGS);
+    const _historyTagsResult: string[] = _historyTags ? JSON.parse(_historyTags) : [];
+
+    _historyTagsResult.unshift(val);
+
+    // max 10 tags
+    storeSet(
+      KEY_META_CMS_HISTORY_TAGS,
+      JSON.stringify([...new Set(_historyTagsResult.slice(0, 10))]),
+    );
+  }, []);
+
+  /**
+   * handle select change tags
+   */
+  const handleSelectChangeTags = useCallback(
+    (val: string[]) => {
+      if (val.length > 10) {
+        return;
+      }
+      handleChangeTags(val);
+
+      // new add tag
+      if (val.length > tags.length) {
+        const currentTag = val.slice(val.length - 1)[0];
+        mergedHistoryTags(currentTag);
+      }
+    },
+    [tags, handleChangeTags, mergedHistoryTags],
+  );
+
+  useMount(() => {
+    fetchTags();
+    fetchHistoryTags();
+  });
 
   return (
     <span className={styles.wrapper}>
@@ -62,7 +154,7 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
               allowClear
               style={{ width: '100%' }}
               value={tags}
-              onChange={handleChangeTags}
+              onChange={handleSelectChangeTags}
             >
               {tagsList.map((i) => (
                 <Option key={i.name} value={i.name}>

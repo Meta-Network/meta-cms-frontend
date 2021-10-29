@@ -450,10 +450,6 @@ const Edit: React.FC = () => {
    */
   const handleChangeTags = useCallback(
     async (val: string[]) => {
-      // console.log('val', val);
-      if (val.length > 10) {
-        return;
-      }
       setTags(val);
       setDraftMode(1);
 
