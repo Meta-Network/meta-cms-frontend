@@ -94,6 +94,10 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
    * merged history tags
    */
   const mergedHistoryTags = useCallback((val: string) => {
+    if (!val) {
+      return;
+    }
+
     const _historyTags = storeGet(KEY_META_CMS_HISTORY_TAGS);
     const _historyTagsResult: string[] = _historyTags ? JSON.parse(_historyTags) : [];
 
