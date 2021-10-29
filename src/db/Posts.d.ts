@@ -11,18 +11,6 @@ export interface Posts {
   post: CMS.Post | null;
   draft: CMS.Draft | null;
   tags: string[];
+  createdAt: string;
+  updatedAt: string;
 }
-
-export const PostTempData: Posts = {
-  cover: '',
-  title: '',
-  summary: '',
-  content: '',
-  hash: '',
-  status: 'pending',
-  timestamp: Date.now(),
-  delete: 0,
-  post: null,
-  draft: null,
-  tags: [],
-};
