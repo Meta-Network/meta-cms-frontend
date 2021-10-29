@@ -24,7 +24,7 @@ export async function getGithubReposName(): Promise<string[]> {
     throw new ReferenceError('Unable to get GitHub OAuth token.');
   }
 
-  const res = await request<any[]>('https://api.github.com/user/repos', {
+  const res = await request<{ repo: { name: string } }[]>('https://api.github.com/user/repos', {
     method: 'GET',
     headers: {
       accept: 'application/vnd.github.v3+json',
@@ -50,7 +50,7 @@ export async function getUsernameOfStore(name: string): Promise<string> {
         throw new ReferenceError('Unable to get GitHub OAuth token.');
       }
 
-      const res = await request<any>('https://api.github.com/user', {
+      const res = await request<{ login: string }>('https://api.github.com/user', {
         method: 'GET',
         headers: {
           Authorization: `token ${token}`,
