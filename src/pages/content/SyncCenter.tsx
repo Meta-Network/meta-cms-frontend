@@ -15,9 +15,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useCallback, useRef } from 'react';
 import syncPostsRequest from '../../utils/sync-posts-request';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist } from '@/db/db';
+import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist, PostTempData } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
-import { PostTempData } from '@/db/Posts.d';
 import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
 import styles from './SyncCenter.less';
 
@@ -167,7 +166,7 @@ export default () => {
 
       // send local
       const resultID = await dbPostsAdd(
-        assign(PostTempData, {
+        assign(PostTempData(), {
           cover: _post.cover,
           title: _post.title,
           summary: _post.summary || '',

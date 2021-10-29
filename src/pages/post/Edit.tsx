@@ -7,9 +7,8 @@ import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
-import { dbPostsUpdate, dbPostsAdd, dbPostsGet } from '@/db/db';
+import { dbPostsUpdate, dbPostsAdd, dbPostsGet, PostTempData } from '@/db/db';
 // import type { Posts } from '@/db/Posts.d';
-import { PostTempData } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
   getDefaultSiteConfigAPI,
@@ -20,7 +19,7 @@ import {
 } from '@/helpers';
 import { assign } from 'lodash';
 // import type Vditor from 'vditor';
-import { generateSummary } from '@/utils/editor';
+import { generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 
@@ -48,9 +47,10 @@ const Edit: React.FC = () => {
 
   /**
    * draft publish as post
+   * post or draft ID
    */
   const draftPublishAsPost = useCallback(
-    async (id: number) => {
+    async (postId: number) => {
       setPublishLoading(true);
 
       const siteConfig = await getDefaultSiteConfigAPI();
@@ -64,10 +64,11 @@ const Edit: React.FC = () => {
         return;
       }
 
-      const res = await publishPendingPostAPI(id, [siteConfig.id]);
+      const res = await publishPendingPostAPI(postId, [siteConfig.id]);
       if (res) {
         // 发布文章， 更新最新 Post 数据
-        await dbPostsUpdate(Number(id), { post: res, draft: null });
+        const { id } = history.location.query as Router.PostQuery;
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: res, draft: null }));
 
         message.success(
           intl.formatMessage({
@@ -97,31 +98,23 @@ const Edit: React.FC = () => {
     async (data: CMS.LocalDraft) => {
       setPublishLoading(true);
 
-      const res = await publishPostAPI(data);
-      if (res) {
-        // 发布文章 更新最新 Post 数据
+      const resultDraft = await publishPostAPI(data);
+      if (resultDraft) {
+        // 发布文章 更新最新 Draft 数据, 如果第二次发送失败少增加一篇草稿
         const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), { post: res });
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultDraft }));
 
-        message.success(
-          intl.formatMessage({
-            id: 'messages.editor.success',
-          }),
-        );
+        await draftPublishAsPost(resultDraft.id);
       } else {
         message.error(
           intl.formatMessage({
             id: 'messages.editor.fail',
           }),
         );
-      }
-      setPublishLoading(false);
-
-      if (res) {
-        history.push('/posts');
+        setPublishLoading(false);
       }
     },
-    [intl],
+    [intl, draftPublishAsPost],
   );
 
   /**
@@ -149,7 +142,7 @@ const Edit: React.FC = () => {
         const res = await updatePostAPI(Number(result.draft.id), data);
         if (res) {
           // 更新草稿信息
-          await dbPostsUpdate(Number(id), { draft: res });
+          await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: res }));
         }
       }
       setFlagUpdateDraft(false);
@@ -161,11 +154,11 @@ const Edit: React.FC = () => {
    * post publish to post
    */
   const postPublishToPost = useCallback(
-    async (id: number) => {
+    async (postId: number) => {
       setPublishLoading(true);
 
       // post publish draft
-      const _draft = await publishPostAsDraftAPI(Number(id));
+      const _draft = await publishPostAsDraftAPI(Number(postId));
       if (!_draft) {
         message.error(
           intl.formatMessage({
@@ -193,8 +186,8 @@ const Edit: React.FC = () => {
 
       // update local db draft data
       if (resultUpdatePost) {
-        const { id: _id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(_id), { draft: resultUpdatePost });
+        const { id } = history.location.query as Router.PostQuery;
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultUpdatePost }));
       } else {
         message.error(
           intl.formatMessage({
@@ -216,8 +209,6 @@ const Edit: React.FC = () => {
    * publish
    */
   const handlePublish = useCallback(async () => {
-    // console.log('publish');
-
     const { id } = history.location.query as Router.PostQuery;
     if (!id) {
       message.warning(
@@ -291,11 +282,14 @@ const Edit: React.FC = () => {
       setDraftMode(1);
 
       const { id } = history.location.query as Router.PostQuery;
-      const data = { content: val, summary: generateSummary() };
+      const data = postDataMergedUpdateAt({
+        content: val,
+        summary: generateSummary(),
+      });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 
@@ -348,7 +342,7 @@ const Edit: React.FC = () => {
           // _vditor.tip('上传成功', 2000);
           message.success(
             intl.formatMessage({
-              id: 'editor.upload.image.success',
+              id: 'messages.editor.upload.image.success',
             }),
           );
           ele.src = result.publicUrl;
@@ -396,11 +390,11 @@ const Edit: React.FC = () => {
       setDraftMode(1);
 
       const { id } = history.location.query as Router.PostQuery;
-      const data = { cover: url };
+      const data = postDataMergedUpdateAt({ cover: url });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 
@@ -420,12 +414,11 @@ const Edit: React.FC = () => {
   const { run: asyncTitleToDB } = useThrottleFn(
     async (val: string) => {
       const { id } = history.location.query as Router.PostQuery;
-      const data = { title: val };
+      const data = postDataMergedUpdateAt({ title: val });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        assign(PostTempData, data);
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 
@@ -465,11 +458,11 @@ const Edit: React.FC = () => {
       setDraftMode(1);
 
       const { id } = history.location.query as Router.PostQuery;
-      const data = { tags: val };
+      const data = postDataMergedUpdateAt({ tags: val });
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData, data));
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
 

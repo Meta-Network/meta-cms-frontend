@@ -1,3 +1,6 @@
+import { assign } from 'lodash';
+import moment from 'moment';
+
 /**
  * generate summary
  * @returns
@@ -17,3 +20,9 @@ export const generateSummary = (): string => {
     return '';
   }
 };
+
+/**
+ * post data merged updateAt
+ */
+export const postDataMergedUpdateAt = (data: any) =>
+  assign(data, { updatedAt: moment().toISOString() });

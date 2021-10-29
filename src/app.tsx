@@ -16,6 +16,7 @@ import MenuItemWithBadge from './components/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/MenuLanguageSwitch';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
+import { dbPostsAllCount } from './db/db';
 
 const { Text } = Typography;
 
@@ -163,6 +164,7 @@ export async function getInitialState(): Promise<{
   fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
   invitationsCount?: number;
   publishedCount?: number;
+  localDraftCount?: number;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -182,10 +184,14 @@ export async function getInitialState(): Promise<{
   const publishedCountRequest = await fetchPostsPublished(1, 10);
   const publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
 
+  // local draft count
+  const localDraftCount = await dbPostsAllCount();
+
   const states: any = {
     fetchUserInfo,
     invitationsCount,
     publishedCount,
+    localDraftCount,
   };
 
   if (history.location.pathname !== loginPath) {
@@ -205,6 +211,16 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     headerContentRender: () => false,
     menuItemRender: (menuItemProps, defaultDom) => {
       switch (menuItemProps.path) {
+        // local draft counter
+        case '/posts': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.localDraftCount || 0}
+            />
+          );
+        }
         // 邀请码数量
         case '/invitation': {
           return (
