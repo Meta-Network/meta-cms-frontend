@@ -11,6 +11,9 @@ import { uniqBy } from 'lodash';
 
 const { Option } = Select;
 const KEY_META_CMS_HISTORY_TAGS = 'metaCmsHistoryTags';
+const HISTORY_TAGS_MAX = 10;
+const SPACE_TAGS_MAX = 20;
+const SELECT_TAGS_MAX = 10;
 
 interface Props {
   readonly tags: string[];
@@ -44,10 +47,12 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
     // space tags, max 20 tags
     const spaceTagsSortFn = (a: Space.Tags, b: Space.Tags) => b.count - a.count;
     const _spaceTagsSortResult = spaceTags.sort(spaceTagsSortFn);
-    const _spaceTagsResult = _spaceTagsSortResult.map((i) => ({ name: i.name })).slice(0, 20);
+    const _spaceTagsResult = _spaceTagsSortResult
+      .map((i) => ({ name: i.name }))
+      .slice(0, SPACE_TAGS_MAX);
 
     // history tags, max 10 tags
-    const _historyTagsResult = historyTags.map((i) => ({ name: i })).slice(0, 10);
+    const _historyTagsResult = historyTags.map((i) => ({ name: i })).slice(0, HISTORY_TAGS_MAX);
 
     // default tags
 
@@ -73,7 +78,6 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
     // TODO: 暂时使用 life 域名
     const url = resultDefaultSiteConfig.domain.replace('.metaspaces.me', '.metaspaces.life');
     const resulSpaceTags = await spaceTagsAPI(url);
-    console.log('resulSpaceTags', resulSpaceTags);
 
     if (resulSpaceTags) {
       setSpaceTags(resulSpaceTags);
@@ -106,7 +110,7 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
     // max 10 tags
     storeSet(
       KEY_META_CMS_HISTORY_TAGS,
-      JSON.stringify([...new Set(_historyTagsResult.slice(0, 10))]),
+      JSON.stringify([...new Set(_historyTagsResult.slice(0, HISTORY_TAGS_MAX))]),
     );
   }, []);
 
@@ -115,7 +119,7 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
    */
   const handleSelectChangeTags = useCallback(
     (val: string[]) => {
-      if (val.length > 10) {
+      if (val.length > SELECT_TAGS_MAX) {
         return;
       }
       handleChangeTags(val);
