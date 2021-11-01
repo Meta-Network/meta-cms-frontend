@@ -90,7 +90,7 @@ export default {
   'messages.syncCenter.publishPost': '文章提交中…请稍后',
   'messages.syncCenter.publishPostSuccess': '已成功提交此文章到存储仓库',
   'messages.syncCenter.publishMultiPosts': '文章批量提交中…请稍后',
-  'messages.syncCenter.publishMultiPostsSuccess': '已成功批量提交问上到存储仓库',
+  'messages.syncCenter.publishMultiPostsSuccess': '已成功批量提交到存储仓库',
   'messages.syncCenter.discardPost': '移除文章中…请稍候',
   'messages.syncCenter.discardPostSuccess': '已成功移除此文章',
   'messages.syncCenter.table.cover': '封面图片',
@@ -123,8 +123,7 @@ export default {
   'messages.redeployment.taskSuccess.title': '任务完成',
   'messages.redeployment.taskSuccess.description': 'Meta Space 已经重新发布成功',
   'messages.redeployment.taskFailed.title': '任务失败',
-  'messages.redeployment.taskFailed.description':
-    'Meta Space 发布失败，请重新尝试或向开发团队反馈',
+  'messages.redeployment.taskFailed.description': 'Meta Space 发布失败，请重新尝试或向开发团队反馈',
   'messages.redeployment.noSiteConfig': '您尚未创建 Meta Space',
   'messages.redeployment.button': '发布我的 Meta Space',
   'messages.copy.success': '已复制到剪贴板',
