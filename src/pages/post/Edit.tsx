@@ -107,11 +107,6 @@ const Edit: React.FC = () => {
         const { id } = history.location.query as Router.PostQuery;
         await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultDraft }));
 
-        message.success(
-          intl.formatMessage({
-            id: 'messages.editor.success',
-          }),
-        );
         setSiteNeedToDeploy(true);
         await draftPublishAsPost(resultDraft.id);
       } else {
@@ -123,7 +118,7 @@ const Edit: React.FC = () => {
         setPublishLoading(false);
       }
     },
-    [intl, draftPublishAsPost，setSiteNeedToDeploy],
+    [intl, draftPublishAsPost, setSiteNeedToDeploy],
   );
 
   /**

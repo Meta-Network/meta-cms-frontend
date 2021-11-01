@@ -1,21 +1,7 @@
+import { extendWithErrorHandler } from '@/services/api/base-request';
 import { getSocialAuthToken } from '@/services/api/meta-ucenter';
-import { notification } from 'antd';
-import { extend } from 'umi-request';
 
-const request = extend({
-  errorHandler: (error: any) => {
-    // eslint-disable-next-line no-console
-    console.log(error.data);
-    const { data, response } = error;
-    if (!response) {
-      notification.error({
-        description: '您的网络发生异常，无法连接服务器',
-        message: '网络异常',
-      });
-    }
-    return data;
-  },
-});
+const request = extendWithErrorHandler();
 
 /** 获取本用户 GitHub 的所有 repo 名称  */
 export async function getGithubReposName(): Promise<string[]> {
@@ -35,7 +21,6 @@ export async function getGithubReposName(): Promise<string[]> {
       per_page: 100,
     },
   });
-  console.log(res);
 
   // return repos name
   return res.map((repo: any) => repo.name);

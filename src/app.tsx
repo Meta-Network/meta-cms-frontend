@@ -38,7 +38,7 @@ function CustomSiderMenu({
 
   useEffect(() => {
     getDefaultSiteConfig().then((response) => {
-      if (response.statusCode === 200) {
+      if (response?.statusCode === 200) {
         setDeployedSite({
           title: response.data.siteInfo.title,
           domain: response.data.domain,
