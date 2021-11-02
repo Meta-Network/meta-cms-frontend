@@ -257,3 +257,11 @@ declare namespace Storage {
     publicUrl: string;
   };
 }
+
+declare namespace Space {
+  type Tags = {
+    name: string;
+    path: string;
+    count: number;
+  };
+}
