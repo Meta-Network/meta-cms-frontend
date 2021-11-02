@@ -1,3 +1,9 @@
+import { extendWithErrorHandler } from '@/services/api/base-request';
+
+const request = extendWithErrorHandler({
+  headers: {},
+});
+
 /**
  * get space tags api
  * @param url
@@ -5,8 +11,9 @@
  */
 export const spaceTagsAPI = async (url: string): Promise<Space.Tags[] | undefined> => {
   try {
-    const response = await fetch(`https://${url}/api/tags.json`);
-    return await response.json();
+    return await request(`https://${url}/api/tags.json`, {
+      method: 'GET',
+    });
   } catch (e) {
     console.log(e);
     return;
