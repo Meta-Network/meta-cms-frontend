@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Upload, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import FormattedInfo from '@/components/FormattedDescription';
+import FormattedDescription from '@/components/FormattedDescription';
 import { updateUserInfo } from '@/services/api/meta-ucenter';
 import uploadImageRequest from '@/utils/upload-image-request';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
@@ -50,7 +50,7 @@ const BaseView: React.FC = () => {
     <PageContainer
       breadcrumb={{}}
       title={intl.formatMessage({ id: 'messages.profile.personalInfo' })}
-      content={<FormattedInfo id="messages.profile.editInfoHere" />}
+      content={<FormattedDescription id="messages.profile.editInfoHere" />}
     >
       <Card>
         <div className={styles.information}>

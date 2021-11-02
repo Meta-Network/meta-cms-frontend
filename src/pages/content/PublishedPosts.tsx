@@ -5,7 +5,7 @@ import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import { fetchPostsPublished } from '@/services/api/meta-cms';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import FormattedInfo from '@/components/FormattedDescription';
+import FormattedDescription from '@/components/FormattedDescription';
 
 type PostsInfo = CMS.ExistsPostsResponse['items'][number];
 
@@ -117,7 +117,7 @@ export default () => {
     <PageContainer
       breadcrumb={{}}
       title={intl.formatMessage({ id: 'messages.published.table.title' })}
-      content={<FormattedInfo id="messages.published.description" />}
+      content={<FormattedDescription id="messages.published.description" />}
     >
       <ProTable<PostsInfo>
         columns={columns}

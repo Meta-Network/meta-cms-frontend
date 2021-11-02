@@ -8,7 +8,6 @@ import {
 } from '@/services/api/meta-cms';
 import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
-import type { MessageType } from 'antd/lib/message';
 import generateTaggedInfo from './generateTaggedInfo';
 import { message, Button, Card, notification } from 'antd';
 import { DeployStages, Storages } from '@/services/constants';
@@ -16,8 +15,6 @@ import { validator } from './validator';
 import styles from './index.less';
 
 export default () => {
-  let processDone: MessageType;
-
   const { siteSetting, storeSetting, themeSetting, domainSetting, setDeployedSite } =
     useModel('storage');
   const {
@@ -87,10 +84,7 @@ export default () => {
       }
       case DeployStages.submitting: {
         const submitting = async () => {
-          processDone = message.loading(
-            intl.formatMessage({ id: 'messages.deployment.deploying' }),
-            0,
-          );
+          message.loading(intl.formatMessage({ id: 'messages.deployment.deploying' }), 10);
 
           const infoSetting = await newSiteInfoSetting({
             title: siteSetting.title,
@@ -176,7 +170,7 @@ export default () => {
           if (storageSetting.message === 'Ok') {
             updateProcessing({
               message: intl.formatMessage({
-                id: 'messages.deployment.submitSettingSuccess',
+                id: 'messages.deployment.submitStoreSuccess',
               }),
               state: 'success',
             });
@@ -189,7 +183,7 @@ export default () => {
             updateProcessing({
               message: intl.formatMessage(
                 {
-                  id: 'messages.deployment.submitSettingFailed',
+                  id: 'messages.deployment.submitStoreFailed',
                 },
                 {
                   reason: storageSetting.message,
@@ -293,7 +287,6 @@ export default () => {
           });
         };
         deploying().then(() => {
-          processDone();
           notification.success({
             message: intl.formatMessage({
               id: 'messages.deployment.taskFinished.title',

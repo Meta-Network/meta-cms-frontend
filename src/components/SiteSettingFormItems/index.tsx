@@ -130,10 +130,9 @@ export default ({
           },
         ]}
         valueEnum={{
-          zh: '中文',
+          'zh-CN': '中文（简体）',
+          'zh-TW': '中文（繁體）',
           en: 'English',
-          jp: '日本語',
-          es: 'Español',
         }}
       />
       <ProFormSelect

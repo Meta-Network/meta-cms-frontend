@@ -5,7 +5,7 @@ import { getGithubReposName } from '@/services/api/global';
 import StoragePicker from '@/components/StorePicker';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
-import FormattedInfo from '../FormattedDescription';
+import FormattedDescription from '../FormattedDescription';
 
 export default () => {
   const intl = useIntl();
@@ -39,7 +39,7 @@ export default () => {
 
       <Divider />
 
-      <FormattedInfo id="guide.repo.description" />
+      <FormattedDescription id="guide.repo.description" />
       <ProForm
         style={{ width: 500 }}
         name="site-info"

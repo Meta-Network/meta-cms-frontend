@@ -1,4 +1,4 @@
-import { getGithubUsername } from '@/services/api/global';
+import { getUsernameOfStore } from '@/services/api/global';
 import { useModel, useIntl, FormattedMessage } from 'umi';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
@@ -38,7 +38,7 @@ export default () => {
           case 'GitHub': {
             let username: string;
             try {
-              username = await getGithubUsername();
+              username = await getUsernameOfStore('GitHub');
             } catch {
               throw new Error(intl.formatMessage({ id: 'guide.storage.noAuthToken' }));
             }

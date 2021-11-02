@@ -1,57 +1,58 @@
+import { getDefaultSiteConfig } from '@/services/api/meta-cms';
+import { Card, Form } from 'antd';
+import { useEffect } from 'react';
 import { useIntl } from 'umi';
-import { useState } from 'react';
-import { Button, Card } from 'antd';
-import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
-import FormattedInfo from '@/components/FormattedDescription';
+import FormattedDescription from '@/components/FormattedDescription';
+
+const platformsAliases = {
+  GITHUB: 'GitHub',
+  GITEE: 'Gitee',
+};
 
 export default () => {
   const intl = useIntl();
-  const [isPlatformEditable, setIsPlatformEditable] = useState<boolean>(false);
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    getDefaultSiteConfig().then((config) => {
+      form.setFieldsValue({
+        domain: config.data.domain,
+        platform: platformsAliases[config.data.storeType],
+      });
+    });
+  }, [form]);
 
   return (
     <PageContainer
       breadcrumb={{}}
       title={intl.formatMessage({ id: 'messages.domain.title' })}
-      content={<FormattedInfo id="messages.domain.description" />}
+      content={<FormattedDescription id="messages.domain.description" />}
     >
       <Card>
         <ProForm
+          form={form}
           name="domain-setting"
           labelAlign="left"
-          initialValues={{ domain: 'metaspace.federarks.xyz', platform: 'github' }}
-          onFinish={async (values) => console.log(values)}
           submitter={{
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             render: (props, doms) => {
-              doms.reverse();
-              return [
-                ...doms,
-                <Button
-                  key="change-platform"
-                  type="primary"
-                  danger
-                  onClick={() => setIsPlatformEditable(true)}
-                >
-                  {intl.formatMessage({ id: 'messages.domain.form.edit' })}
-                </Button>,
-              ];
+              return null;
             },
           }}
         >
           <ProForm.Group>
-            <ProFormSelect
-              width="md"
+            <ProFormText
+              width="sm"
               name="platform"
+              readonly={true}
               label={intl.formatMessage({ id: 'messages.domain.form.label' })}
-              valueEnum={{
-                github: 'GitHub',
-                gitee: 'Gitee',
-              }}
-              disabled={!isPlatformEditable}
             />
             <ProFormText
               width="md"
               name="domain"
+              readonly={true}
               label={intl.formatMessage({ id: 'messages.domain.form.content' })}
               placeholder={intl.formatMessage({ id: 'messages.domain.form.placeholder' })}
             />

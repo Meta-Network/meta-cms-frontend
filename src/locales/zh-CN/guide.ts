@@ -2,7 +2,7 @@ export default {
   'guide.intro.title': '创建 Meta Space',
   'guide.intro.description': `
     Meta Space 是专属于您个人的数字空间，您有全部的控制权力
-    立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅
+    立即创建属于自己的 Meta Space，开始您的下一代社交网络的探索之旅
   `,
   'guide.domain.title': '域名',
   'guide.domain.description': `
@@ -43,10 +43,10 @@ export default {
     未来您可以自由接入第三方的个性化 CDN 服务
     为了建站流程简单直接，我们暂时对此配置项应用默认配置
   `,
-  'guide.deploy.title': '部署',
+  'guide.deploy.title': '发布',
   'guide.deploy.description': `
-    完成设置后，请点击下方的按钮开始部署您的 Meta Space
-    您可以在下方看到部署的的进度
+    完成设置后，请点击下方的按钮开始发布您的 Meta Space
+    您可以在下方看到发布的进度
   `,
   'guide.authorization.title': '授权使用 {platform} 作为 Meta Space 存储仓库（免费）',
   'guide.authorization.subtitle': '授权流程：',
@@ -62,7 +62,7 @@ export default {
   'guide.config.form.subtitle': '副标题',
   'guide.config.form.subtitlePlaceholder': '你的 Meta Space 副标题',
   'guide.config.form.author': '作者',
-  'guide.config.form.authorPlaceholder': '作为 Meta Space 拥有者的名称',
+  'guide.config.form.authorPlaceholder': '作为 Meta Space 作者的名称',
   'guide.config.form.description': '描述',
   'guide.config.form.descriptionPlaceholder': '你的 Meta Space 描述',
   'guide.config.form.keywords': '关键词',
