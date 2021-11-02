@@ -22,6 +22,7 @@ import { assign } from 'lodash';
 import { generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
+import Submit from '@/components/Editor/submit';
 
 const { confirm } = Modal;
 
@@ -513,8 +514,8 @@ const Edit: React.FC = () => {
     <section className={styles.container}>
       <EditorHeader
         draftMode={draftMode}
-        handlePublish={handlePublish}
         settings={<Settings tags={tags} handleChangeTags={handleChangeTags} />}
+        submit={<Submit handlePublish={handlePublish} />}
       />
       <section className={styles.edit}>
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />

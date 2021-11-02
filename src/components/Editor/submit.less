@@ -1,0 +1,96 @@
+@space: 20px;
+@colorDone: #7ee787;
+@colorUnDone: #f85149;
+
+.done,
+.undone {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 100%;
+}
+.done {
+  background-color: @colorDone;
+}
+
+.undone {
+  background-color: @colorUnDone;
+}
+
+.item {
+  margin: @space;
+  padding: 0 @space;
+  :global {
+    .ant-form-item-label {
+      padding-bottom: 4px;
+      padding-left: 24px;
+    }
+  }
+}
+.itemRepo {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+.itemStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+.itemRepoName {
+  margin-left: 8px;
+  color: #6b6b6b;
+}
+.itemType {
+  font-weight: bold;
+  font-size: 16px;
+}
+.flexAlignItemCenter {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.itemForm {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-left: 8px;
+  border-bottom: 1px solid #ebebeb;
+}
+.input {
+  border: none;
+  &:focus {
+    border-color: #ebebeb;
+    box-shadow: none;
+  }
+}
+
+.btn {
+  margin-left: 10px;
+  color: #1890ff;
+  word-break: keep-all;
+  cursor: pointer;
+}
+
+.key {
+  margin: @space;
+  padding: 10px @space;
+  color: #414141;
+  font-size: 14px;
+  line-height: 1.2;
+  background-color: #eee;
+}
+.keyVal {
+  word-break: break-word;
+}
+.keyGenerate {
+  margin-top: 4px;
+}
+
+.footer {
+  padding: @space 0 0;
+  border-top: 1px solid #f0f0f0;
+}
