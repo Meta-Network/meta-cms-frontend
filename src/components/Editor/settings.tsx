@@ -4,6 +4,10 @@ import { SettingOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 import styles from './settings.less';
 import SettingsTags from './settingsTags';
+import SettingsOriginalLink from './settingsOriginalLink';
+import SettingsCopyrightNotice from './settingsCopyrightNotice';
+import SettingsTips from './settingsTips';
+import SettingsLearnMore from './settingsLearnMore';
 
 interface Props {
   readonly tags: string[];
@@ -31,9 +35,15 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
         placement="right"
         onClose={onClose}
         visible={visible}
-        width={300}
+        width={340}
       >
-        <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
+        <section className={styles.container}>
+          <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
+          <SettingsOriginalLink />
+          <SettingsCopyrightNotice />
+          <SettingsTips />
+          <SettingsLearnMore />
+        </section>
       </Drawer>
     </span>
   );
