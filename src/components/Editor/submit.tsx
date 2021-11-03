@@ -1,17 +1,30 @@
 import type { FC } from 'react';
-import React, { useCallback } from 'react';
-import { Modal, Card, Form, Input, Button, Checkbox, Radio, Select, Space } from 'antd';
-import { KeyOutlined, EyeOutlined, CaretDownOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import React, { Fragment, useCallback, useState } from 'react';
+import { Modal, Card, Form, Input, Button, Checkbox, Radio, Select, Space, message } from 'antd';
+import {
+  KeyOutlined,
+  EyeOutlined,
+  CaretDownOutlined,
+  ArrowRightOutlined,
+  EyeInvisibleOutlined,
+} from '@ant-design/icons';
 import styles from './submit.less';
+import { sleep } from '@/utils';
 
 interface Props {
   handlePublish: () => void;
 }
 
 const { Option } = Select;
-const { confirm } = Modal;
 
 const Submit: FC<Props> = ({ handlePublish }) => {
+  const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
+  const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
+  const [signatureLoading, setSignatureLoading] = useState<boolean>(false);
+  const [signature, setSignature] = useState<string>('');
+
+  const [gatewayLoading, setGatewayLoading] = useState<boolean>(false);
+
   const onFinish = (values: any) => {
     console.log('Success:', values);
     if (false) {
@@ -23,22 +36,43 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     console.log('Failed:', errorInfo);
   };
 
-  const showConfirmKey = useCallback(() => {
-    confirm({
-      title: '生成非金融 KEY',
-      icon: <KeyOutlined />,
-      content: (
-        <div>
-          <p>检测到您当前还未生成 非金融 KEY</p>
-          <p>(存储在浏览器中，用户产生加密签名)</p>
-          <Input placeholder="KEY" />
-        </div>
-      ),
-      okText: '管理',
-      cancelText: '立即生成',
-      closable: true,
-      zIndex: 1051,
-    });
+  /**
+   * handle generate key
+   */
+  const handleGenerateKey = useCallback(async () => {
+    setSignatureLoading(true);
+    // const result = await something()
+    await sleep(2000);
+    const result = true;
+    if (result) {
+      message.success('生成成功');
+      setSignature('0x3484040A7c337A95d0eD7779769ffe3e14ecCcA6');
+
+      // 更新本地数据
+
+      setSignatureLoading(false);
+      return Promise.resolve();
+    } else {
+      message.error('生成失败');
+      setSignatureLoading(false);
+      return Promise.reject();
+    }
+  }, []);
+
+  /**
+   * handle set gateway
+   */
+  const handleSetGateway = useCallback(async () => {
+    setGatewayLoading(true);
+    // const result = await something()
+    await sleep(2000);
+    const result = true;
+    if (result) {
+      message.success('设置成功');
+    } else {
+      message.error('设置失败');
+    }
+    setGatewayLoading(false);
   }, []);
 
   return (
@@ -81,40 +115,57 @@ const Submit: FC<Props> = ({ handlePublish }) => {
               <span className={styles.done} />
             </div>
             <div className={styles.itemForm}>
-              <Select placeholder="网关未选定" bordered={false} showArrow={false}>
+              <Select
+                placeholder="网关未选定"
+                bordered={false}
+                showArrow={false}
+                disabled={gatewayLoading}
+              >
                 <Option value="ipfs">IPFS</Option>
                 <Option value="github">GITHUB</Option>
               </Select>
               <CaretDownOutlined />
             </div>
-            <span className={styles.btn}>设置</span>
+            <span onClick={handleSetGateway} className={styles.btn}>
+              设置
+            </span>
           </div>
         </Form.Item>
 
         <Form.Item name="select-multiple" label="" className={styles.item}>
           <div className={styles.flexAlignItemCenter}>
             <div className={styles.itemStatus}>
-              <span className={styles.done} />
+              <span className={styles.undone} />
             </div>
             <div className={styles.itemForm}>
-              <Input placeholder="签名未设置" className={styles.input} />
-              <EyeOutlined />
-              {/* <EyeInvisibleOutlined /> */}
+              <Input
+                placeholder="签名未设置"
+                className={styles.input}
+                value={signature}
+                disabled={signatureLoading}
+              />
+              {visibleSignature ? (
+                <EyeOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
+              ) : (
+                <EyeInvisibleOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
+              )}
             </div>
-            <span className={styles.btn} onClick={showConfirmKey}>
+            <span className={styles.btn} onClick={() => setVisibleSignatureGenerate(true)}>
               生成
             </span>
           </div>
         </Form.Item>
-        <div className={styles.key}>
-          <div className={styles.keyVal}>0x3484040A7c337A95d0eD7779769ffe3e14ecCcA6</div>
-          <div className={styles.keyGenerate}>
-            生成自你的非金融 KEY{' '}
-            <a href="#">
-              <ArrowRightOutlined />
-            </a>
+        {visibleSignature && (
+          <div className={styles.key}>
+            <div className={styles.keyVal}>{signature || '暂无'}</div>
+            <div className={styles.keyGenerate}>
+              生成自你的非金融 KEY{' '}
+              <a href="#">
+                <ArrowRightOutlined />
+              </a>
+            </div>
           </div>
-        </div>
+        )}
         <Form.Item wrapperCol={{ offset: 8, span: 16 }} className={styles.footer}>
           <Space>
             <Button>取消</Button>
@@ -124,6 +175,28 @@ const Submit: FC<Props> = ({ handlePublish }) => {
           </Space>
         </Form.Item>
       </Form>
+      <Modal
+        visible={visibleSignatureGenerate}
+        title={
+          <Fragment>
+            <KeyOutlined />
+            &nbsp;生成非金融 KEY
+          </Fragment>
+        }
+        onCancel={() => setVisibleSignatureGenerate(false)}
+        footer={[
+          <Button onClick={() => window.open('http://metaspaces.life', '_blank')}>管理</Button>,
+          <Button type="primary" loading={signatureLoading} onClick={handleGenerateKey}>
+            立即生成
+          </Button>,
+        ]}
+      >
+        <Space direction="vertical">
+          <div>检测到您当前还未生成 非金融 KEY</div>
+          <div>(存储在浏览器中，用户产生加密签名)</div>
+          <Input value={signature} placeholder="KEY" />
+        </Space>
+      </Modal>
     </Card>
   );
 };

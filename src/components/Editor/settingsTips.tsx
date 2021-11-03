@@ -1,10 +1,11 @@
+import type { FC } from 'react';
 import React from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import styles from './settings.less';
 
 // interface Props {}
 
-const SettingsTips: React.FC = () => {
+const SettingsTips: FC = () => {
   return (
     <section className={styles.tips}>
       <InfoCircleOutlined />{' '}
