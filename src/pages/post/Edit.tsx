@@ -23,6 +23,8 @@ import { generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 import Submit from '@/components/Editor/submit';
+import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
+import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
 
 const { confirm } = Modal;
 
@@ -514,6 +516,8 @@ const Edit: React.FC = () => {
     <section className={styles.container}>
       <EditorHeader
         draftMode={draftMode}
+        headerCloudDraftUpload={<HeaderCloudDraftUpload />}
+        headerCloudDraftDownload={<HeaderCloudDraftDownload />}
         settings={<Settings tags={tags} handleChangeTags={handleChangeTags} />}
         submit={<Submit handlePublish={handlePublish} />}
       />

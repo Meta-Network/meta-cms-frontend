@@ -81,7 +81,7 @@ const SettingsCopyrightNotice: FC = () => {
                   </Radio>
                 </Space>
               </Radio.Group>
-              <Checkbox onChange={onChangeCheckbox}>Checkbox</Checkbox>
+              <Checkbox onChange={onChangeCheckbox}>允许商业性使用</Checkbox>
             </Space>
 
             <div className={styles.originalTerms}>则授权条款为：署名-非商业性使用-禁止演绎</div>

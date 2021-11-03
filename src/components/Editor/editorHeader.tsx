@@ -1,77 +1,30 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import { history, useIntl } from 'umi';
-import { Tooltip, Modal, Dropdown, message, Button, Space } from 'antd';
+import { Tooltip, Dropdown } from 'antd';
 import styles from './editorHeader.less';
-import {
-  LeftOutlined,
-  CloudUploadOutlined,
-  CloudDownloadOutlined,
-  DownOutlined,
-} from '@ant-design/icons';
-import { sleep } from '@/utils';
+import { LeftOutlined, DownOutlined } from '@ant-design/icons';
 
 interface Props {
   readonly draftMode: 0 | 1 | 2;
   settings: JSX.Element;
   submit: JSX.Element;
+  headerCloudDraftUpload: JSX.Element;
+  headerCloudDraftDownload: JSX.Element;
 }
 
-const EditorHeader: React.FC<Props> = ({ draftMode, submit, settings }) => {
+const EditorHeader: React.FC<Props> = ({
+  draftMode,
+  headerCloudDraftUpload,
+  headerCloudDraftDownload,
+  submit,
+  settings,
+}) => {
   const intl = useIntl();
-  const [cloudDraftUploadVisible, setCloudDraftUploadVisible] = useState<boolean>(false);
-  const [cloudDraftUploadLoading, setCloudDraftUploadLoading] = useState<boolean>(false);
-
-  const [cloudDraftDownloadVisible, setCloudDraftDownloadVisible] = useState<boolean>(false);
-  const [cloudDraftDownloadLoading, setCloudDraftDownloadLoading] = useState<boolean>(false);
   /**
    * back page
    */
   const handleBack = useCallback(() => {
     history.goBack();
-  }, []);
-  /**
-   * handle upload cloud draft
-   */
-  const handleCloudDraftUpload = useCallback(async () => {
-    setCloudDraftUploadLoading(true);
-    // const result = await something()
-    await sleep(2000);
-    const result = true;
-    if (result) {
-      message.success('同步成功');
-
-      // 更新本地数据
-
-      setCloudDraftUploadLoading(false);
-      return Promise.resolve();
-    } else {
-      message.error('同步失败');
-
-      setCloudDraftUploadLoading(false);
-      return Promise.reject();
-    }
-  }, []);
-
-  /**
-   * handle cloud draft download
-   */
-  const handleCloudDraftDownload = useCallback(async () => {
-    setCloudDraftDownloadLoading(true);
-    // const result = await something()
-    await sleep(2000);
-    const result = true;
-    if (result) {
-      message.success('下载成功');
-
-      // 覆盖内容
-
-      setCloudDraftDownloadLoading(false);
-      return Promise.resolve();
-    } else {
-      message.error('下载失败');
-      setCloudDraftDownloadLoading(false);
-      return Promise.reject();
-    }
   }, []);
 
   return (
@@ -100,24 +53,8 @@ const EditorHeader: React.FC<Props> = ({ draftMode, submit, settings }) => {
                 : ''}
             </span>
           </Tooltip>
-          <Tooltip
-            placement="bottom"
-            title={'手动在您的私密存储仓库中云端保存草稿，实现云端同步。'}
-          >
-            <span onClick={() => setCloudDraftUploadVisible(true)} className={styles.headerUpload}>
-              <CloudUploadOutlined />
-              <span className={styles.headerIconText}>10分钟前</span>
-            </span>
-          </Tooltip>
-          <Tooltip placement="bottom" title={'云端下载后会覆盖当前编辑器中的内容。'}>
-            <span
-              onClick={() => setCloudDraftDownloadVisible(true)}
-              className={styles.headerDownload}
-            >
-              <CloudDownloadOutlined />
-              <span className={styles.headerIconText}>下载</span>
-            </span>
-          </Tooltip>
+          {headerCloudDraftUpload}
+          {headerCloudDraftDownload}
         </span>
         <span>
           <Tooltip placement="left" title={'无需经过平台直接提交至存储仓库'}>
@@ -132,54 +69,6 @@ const EditorHeader: React.FC<Props> = ({ draftMode, submit, settings }) => {
           {settings}
         </span>
       </section>
-      <Modal
-        visible={cloudDraftUploadVisible}
-        title={
-          <Fragment>
-            <CloudUploadOutlined />
-            &nbsp;上传
-          </Fragment>
-        }
-        onCancel={() => setCloudDraftUploadVisible(false)}
-        footer={[
-          <Button onClick={() => setCloudDraftUploadVisible(false)}>取消</Button>,
-          <Button type="primary" loading={cloudDraftUploadLoading} onClick={handleCloudDraftUpload}>
-            上传
-          </Button>,
-        ]}
-      >
-        <Space direction="vertical">
-          <div>在私密存储仓库中云端保存草稿，实现云端同步。</div>
-          <div>云端最新版本上传时间：2021-10-30 12:00:00</div>
-        </Space>
-      </Modal>
-      <Modal
-        visible={cloudDraftDownloadVisible}
-        title={
-          <Fragment>
-            <CloudUploadOutlined />
-            &nbsp;下载
-          </Fragment>
-        }
-        onCancel={() => setCloudDraftDownloadVisible(false)}
-        footer={[
-          <Button onClick={() => window.open('https://www.metaspaces.life', '_blank')}>
-            查看云端内容
-          </Button>,
-          <Button
-            type="primary"
-            loading={cloudDraftDownloadLoading}
-            onClick={handleCloudDraftDownload}
-          >
-            下载
-          </Button>,
-        ]}
-      >
-        <Space direction="vertical">
-          <div>云端下载后会覆盖当前编辑器中的内容。</div>
-          <div>云端最新版本上传时间：2021-10-30 12:00:00</div>
-        </Space>
-      </Modal>
     </Fragment>
   );
 };
