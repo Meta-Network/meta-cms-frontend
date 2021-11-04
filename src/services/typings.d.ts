@@ -233,7 +233,10 @@ declare namespace GLOBAL {
   type StoreSetting = {
     storage: string;
     username: string;
-    repo?: string;
+    repos?: {
+      storeRepo: string;
+      publishRepo: string;
+    };
   };
 
   type SourcePlatformProperties = {

@@ -4,15 +4,23 @@ import { StorageKeys } from '@/services/constants';
 
 type ValueOf<T> = T[keyof T];
 
+const cache = {};
+
 export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
-  // only if key is not empty and no values return false
-  // otherwise (whether there's value exist, or key is just empty)
-  // gives true (controlled by case down blow)
-  if (!values && key !== '') return false;
+  // return false when the key is not empty and no values
+  // otherwise (whether there's value exists, or the key is empty) it's controlled by the following cases
+  if (key !== '' && !values) return false;
+  let result: boolean = false;
+
+  // return cached result if the values are the same
+  if (cache[key as string]?.value === values) {
+    return cache[key as string].result;
+  }
 
   switch (key) {
     case StorageKeys.DomainSetting: {
-      return !(await isDomainForbidden(JSON.parse(values)));
+      result = !(await isDomainForbidden(JSON.parse(values)));
+      break;
     }
     case StorageKeys.SiteSetting: {
       const keys: (keyof GLOBAL.SiteSetting)[] = [
@@ -24,24 +32,40 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
         'keywords',
         'favicon',
       ];
-      return keys.every((setting) => JSON.parse(values || '{}')[setting]);
+      result = keys.every((setting) => JSON.parse(values || '{}')[setting]);
+      break;
     }
     case StorageKeys.ThemeSetting: {
-      return JSON.parse(values) > 0;
+      result = JSON.parse(values) > 0;
+      break;
     }
     case StorageKeys.StoreSetting: {
-      const { storage, username, repo } = JSON.parse(values || '{}');
+      const { storage, username, repos } = JSON.parse(values || '{}');
       const providers: GLOBAL.StoreProvider[] = ['GitHub', 'Gitee'];
 
       const repoNamesRequest = await getGithubReposName();
       const repoNames = repoNamesRequest.map((name) => name.toLowerCase());
 
-      return providers.includes(storage) && username && repo && !repoNames.includes(repo);
+      result =
+        providers.includes(storage) &&
+        username &&
+        repos &&
+        !repoNames.includes(repos.storeRepo) &&
+        !repoNames.includes(repos.publishRepo);
+      break;
     }
     case '': {
-      return true;
+      result = true;
+      break;
     }
-    default:
-      return false;
+    default: {
+      result = false;
+      break;
+    }
   }
+  cache[key as string] = {
+    value: values,
+    result: result,
+  };
+  return result;
 };

@@ -1,6 +1,5 @@
+import { extendWithErrorHandler } from '@/services/api/base-request';
 import { getSocialAuthToken } from '@/services/api/meta-ucenter';
-import { notification } from 'antd';
-import { extend } from 'umi-request';
 
 const request = extendWithErrorHandler();
 

@@ -1,9 +1,8 @@
-import { useIntl } from 'umi';
+import { useIntl, useRequest } from 'umi';
 import { CopyOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { List, Badge, Card, Divider, notification } from 'antd';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { useRequest } from '@@/plugin-request/request';
 import FormattedDescription from '@/components/FormattedDescription';
 import { queryInvitations, updateInvitation } from '@/services/api/meta-ucenter';
 

@@ -78,6 +78,8 @@ function CustomSiderMenu({
     setPublishLoading(false);
   };
 
+  // If publishButtonDisplay is true, display the button when scrolling
+  // but hide it if is scrolled to the bottom
   useEffect(() => {
     if (siteNeedToDeploy && window.innerHeight + window.scrollY >= document.body.scrollHeight) {
       setPublishButtonDisplay(true);
