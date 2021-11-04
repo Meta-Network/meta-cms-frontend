@@ -5,11 +5,11 @@
  * @param {boolean} param.Noncommercial 可以自由复制、散布、展示及演出本作品；您不得为商业目的而使用本作品。
  * @param {boolean} param.NoDerivativeWorks 可以自由复制、散布、展示及演出本作品；您不得改变、转变或更改本作品
  */
-function CreativeCommonsLicenseGenerator({
+export const creativeCommonsLicenseGenerator = ({
   ShareAlike = false,
   Noncommercial = false,
   NoDerivativeWorks = false,
-}) {
+}) => {
   if (ShareAlike && NoDerivativeWorks)
     throw new Error("You can't use ShareAlike and NoDerivativeWorks at the same time.");
   const result = ['BY']; // 自2004年以来，当前所有的许可协议要求必须原作者署名
@@ -17,9 +17,9 @@ function CreativeCommonsLicenseGenerator({
   if (NoDerivativeWorks) result.push('ND');
   if (ShareAlike) result.push('SA');
   return result.join('-');
-}
+};
 
-function convertLicenseToChinese(str: string) {
+export const convertLicenseToChinese = (str: string) => {
   const splitted = str.split('-');
   return splitted
     .map((item) => {
@@ -37,10 +37,7 @@ function convertLicenseToChinese(str: string) {
       }
     })
     .join('-');
-}
+};
 
-const licenseDetailLink = (license: string) =>
+export const licenseDetailLink = (license: string) =>
   `https://creativecommons.org/licenses/${license.toLowerCase()}/4.0/deed.zh`;
-
-export { convertLicenseToChinese, CreativeCommonsLicenseGenerator, licenseDetailLink };
-export default CreativeCommonsLicenseGenerator;

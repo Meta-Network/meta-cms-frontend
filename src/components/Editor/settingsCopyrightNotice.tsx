@@ -3,7 +3,11 @@ import { Fragment, useState, useEffect, useMemo } from 'react';
 import { Tooltip, Radio, Checkbox, Modal, Space, Typography } from 'antd';
 import { QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import styles from './settings.less';
-import CreativeCommonsLicenseGenerator, { convertLicenseToChinese } from '@/utils/creative_commons';
+import {
+  creativeCommonsLicenseGenerator,
+  convertLicenseToChinese,
+  licenseDetailLink,
+} from '@/utils/creative_commons';
 
 const { Link } = Typography;
 
@@ -15,20 +19,20 @@ const SettingsCopyrightNotice: FC = () => {
 
   const CCLicenseCredit = useMemo(() => {
     if (!originalCheckbox) return {}; // 非原创不适用
-    const license = CreativeCommonsLicenseGenerator({
+    const license = creativeCommonsLicenseGenerator({
       ShareAlike: licenseRadioValue === 'sa',
       Noncommercial: !licenseCheckboxValue,
       NoDerivativeWorks: licenseRadioValue === 'nd',
     });
     const chinese = convertLicenseToChinese(license);
-    const url = `https://creativecommons.org/licenses/${license.toLowerCase()}/4.0/deed.zh`;
+    const url = licenseDetailLink(license);
     return { license, chinese, url };
   }, [originalCheckbox, licenseCheckboxValue, licenseRadioValue]);
 
   useEffect(() => {
     console.log('originalCheckbox', originalCheckbox);
     if (originalCheckbox) {
-      // setOriginalNoticeVisible(true);
+      setOriginalNoticeVisible(true);
     }
   }, [originalCheckbox]);
 
