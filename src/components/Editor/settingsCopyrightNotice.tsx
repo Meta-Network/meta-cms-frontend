@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Fragment, useState, useEffect, useMemo } from 'react';
+import { Fragment, useState, useEffect, useMemo, useCallback } from 'react';
 import { Tooltip, Radio, Checkbox, Modal, Space, Typography } from 'antd';
 import { QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import styles from './settings.less';
@@ -7,34 +7,118 @@ import {
   creativeCommonsLicenseGenerator,
   convertLicenseToChinese,
   licenseDetailLink,
-} from '@/utils/creative_commons';
+} from '@/utils/creative-commons';
+import { useMount } from 'ahooks';
 
 const { Link } = Typography;
 
-const SettingsCopyrightNotice: FC = () => {
-  const [licenseRadioValue, setLicenseRadioValue] = useState<'' | 'nd' | 'sa'>('');
+interface Props {
+  readonly license: string;
+  handleChangeLicense: (val: string) => Promise<void>;
+}
+
+type LicenseRadioValueType = '' | 'nd' | 'sa';
+
+const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) => {
+  const [licenseRadioValue, setLicenseRadioValue] = useState<LicenseRadioValueType>('');
   const [licenseCheckboxValue, setLicenseCheckboxValue] = useState<boolean>(false);
   const [originalNoticeVisible, setOriginalNoticeVisible] = useState(false);
   const [originalCheckbox, setOriginalCheckbox] = useState(true);
 
   const CCLicenseCredit = useMemo(() => {
     if (!originalCheckbox) return {}; // 非原创不适用
-    const license = creativeCommonsLicenseGenerator({
+    const _license = creativeCommonsLicenseGenerator({
       ShareAlike: licenseRadioValue === 'sa',
       Noncommercial: !licenseCheckboxValue,
       NoDerivativeWorks: licenseRadioValue === 'nd',
     });
-    const chinese = convertLicenseToChinese(license);
-    const url = licenseDetailLink(license);
-    return { license, chinese, url };
+    const chinese = convertLicenseToChinese(_license);
+    const url = licenseDetailLink(_license);
+    return { license: _license, chinese, url };
   }, [originalCheckbox, licenseCheckboxValue, licenseRadioValue]);
 
+  /**
+   * set license
+   */
+  const setCCLicense = useCallback((_license: string) => {
+    switch (_license) {
+      case 'BY-NC':
+        setLicenseRadioValue('');
+        setLicenseCheckboxValue(false);
+        break;
+      case 'BY-NC-ND':
+        setLicenseRadioValue('nd');
+        setLicenseCheckboxValue(false);
+        break;
+      case 'BY-NC-SA':
+        setLicenseRadioValue('sa');
+        setLicenseCheckboxValue(false);
+        break;
+      case 'BY':
+        setLicenseRadioValue('');
+        setLicenseCheckboxValue(true);
+        break;
+      case 'BY-ND':
+        setLicenseRadioValue('nd');
+        setLicenseCheckboxValue(true);
+        break;
+      case 'BY-SA':
+        setLicenseRadioValue('sa');
+        setLicenseCheckboxValue(true);
+        break;
+      default:
+        console.log('未知协议不处理', _license);
+        break;
+    }
+
+    // console.log('当前协议', _license);
+  }, []);
+
+  /**
+   * handle license radio change
+   */
+  const handleLicenseRadioChange = useCallback(
+    (val: LicenseRadioValueType) => {
+      const _license = creativeCommonsLicenseGenerator({
+        ShareAlike: val === 'sa',
+        Noncommercial: !licenseCheckboxValue,
+        NoDerivativeWorks: val === 'nd',
+      });
+
+      setLicenseRadioValue(val);
+      handleChangeLicense(_license);
+    },
+    [licenseCheckboxValue, handleChangeLicense],
+  );
+
+  /**
+   * handle license checkbox change
+   */
+  const handleLicenseCheckboxChange = useCallback(
+    (val: boolean) => {
+      const _license = creativeCommonsLicenseGenerator({
+        ShareAlike: licenseRadioValue === 'sa',
+        Noncommercial: !val,
+        NoDerivativeWorks: licenseRadioValue === 'nd',
+      });
+
+      setLicenseCheckboxValue(val);
+      handleChangeLicense(_license);
+    },
+    [licenseRadioValue, handleChangeLicense],
+  );
+
   useEffect(() => {
-    console.log('originalCheckbox', originalCheckbox);
     if (originalCheckbox) {
       setOriginalNoticeVisible(true);
     }
   }, [originalCheckbox]);
+
+  useMount(() => {
+    if (license) {
+      setCCLicense(license);
+    }
+  });
 
   return (
     <Fragment>
@@ -69,7 +153,7 @@ const SettingsCopyrightNotice: FC = () => {
               </div>
               <Space direction="vertical">
                 <Radio.Group
-                  onChange={(e) => setLicenseRadioValue(e.target.value)}
+                  onChange={(e) => handleLicenseRadioChange(e.target.value)}
                   value={licenseRadioValue}
                 >
                   <Space direction="vertical">
@@ -95,15 +179,15 @@ const SettingsCopyrightNotice: FC = () => {
                   </Space>
                 </Radio.Group>
                 <Checkbox
-                  onChange={(e) => setLicenseCheckboxValue(e.target.checked)}
-                  value={licenseCheckboxValue}
+                  onChange={(e) => handleLicenseCheckboxChange(e.target.checked)}
+                  checked={licenseCheckboxValue}
                 >
                   允许商业性使用
                 </Checkbox>
               </Space>
 
               <Link
-                href={CCLicenseCredit.url}
+                href={CCLicenseCredit?.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.originalTerms}

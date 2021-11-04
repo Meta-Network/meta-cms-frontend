@@ -11,6 +11,7 @@ export interface Posts {
   post: CMS.Post | null;
   draft: CMS.Draft | null;
   tags: string[];
+  license: string;
   createdAt: string;
   updatedAt: string;
 }

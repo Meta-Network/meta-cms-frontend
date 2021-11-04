@@ -41,6 +41,7 @@ const Edit: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
+  const [license, setLicense] = useState<string>('');
 
   // draft mode
   const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
@@ -481,6 +482,33 @@ const Edit: React.FC = () => {
   );
 
   /**
+   * handle change license
+   */
+  const handleChangeLicense = useCallback(
+    async (val: string) => {
+      setLicense(val);
+      setDraftMode(1);
+
+      const { id } = history.location.query as Router.PostQuery;
+      const data = postDataMergedUpdateAt({ license: val });
+      if (id) {
+        await dbPostsUpdate(Number(id), data);
+      } else {
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        handleHistoryState(String(resultID));
+      }
+
+      // 更新草稿内容
+      // await updateDraft({
+      //   tags: val,
+      // });
+
+      setDraftMode(2);
+    },
+    [handleHistoryState],
+  );
+
+  /**
    * fetch DB post content
    */
   const fetchDBContent = useCallback(async () => {
@@ -496,6 +524,7 @@ const Edit: React.FC = () => {
         setTitle(resultPost.title);
         setContent(resultPost.content);
         setTags(resultPost.tags);
+        setLicense(resultPost.license);
 
         // TODO：need modify
         setTimeout(() => {
@@ -528,7 +557,10 @@ const Edit: React.FC = () => {
             <Fragment>
               <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
               <SettingsOriginalLink hash={postData.post?.source || postData.draft?.source || ''} />
-              <SettingsCopyrightNotice />
+              <SettingsCopyrightNotice
+                license={license}
+                handleChangeLicense={handleChangeLicense}
+              />
               <SettingsTips />
               <SettingsLearnMore />
             </Fragment>

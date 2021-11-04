@@ -2,15 +2,16 @@ import type { Table, Transaction } from 'dexie';
 import Dexie from 'dexie';
 import type { Posts } from './Posts';
 import moment from 'moment';
+import { License } from '../../config';
 
 export class StoreDB extends Dexie {
   posts!: Table<Posts, number>;
   constructor() {
     super('StoreDB');
-    this.version(6)
+    this.version(7)
       .stores({
         posts:
-          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, createdAt, updatedAt',
+          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, createdAt, updatedAt',
       })
       .upgrade((tx: Transaction | any) => {
         const time = moment().toISOString();
@@ -28,6 +29,7 @@ export class StoreDB extends Dexie {
           post.post = post.post || null;
           post.draft = post.draft || null;
           post.tags = post.tags || [];
+          post.license = post.license || License;
           post.createdAt = post.createdAt || time;
           post.updatedAt = post.updatedAt || time;
         });
@@ -116,6 +118,7 @@ export const PostTempData = (): Posts => ({
   post: null,
   draft: null,
   tags: [],
+  license: License,
   createdAt: moment().toISOString(),
   updatedAt: moment().toISOString(),
 });
