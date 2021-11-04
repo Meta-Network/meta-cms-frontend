@@ -1,35 +1,34 @@
 import type { FC } from 'react';
-import { Fragment, useState, useEffect } from 'react';
-import { Tooltip, Radio, Checkbox, Modal, Space } from 'antd';
+import { Fragment, useState, useEffect, useMemo } from 'react';
+import { Tooltip, Radio, Checkbox, Modal, Space, Typography } from 'antd';
 import { QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import styles from './settings.less';
+import CreativeCommonsLicenseGenerator, { convertLicenseToChinese } from '@/utils/creative_commons';
+
+const { Link } = Typography;
 
 const SettingsCopyrightNotice: FC = () => {
-  const [value, setValue] = useState(1);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [originalCheckbox, setOriginalCheckbox] = useState(false);
+  const [licenseRadioValue, setLicenseRadioValue] = useState<'' | 'nd' | 'sa'>('');
+  const [licenseCheckboxValue, setLicenseCheckboxValue] = useState<boolean>(false);
+  const [originalNoticeVisible, setOriginalNoticeVisible] = useState(false);
+  const [originalCheckbox, setOriginalCheckbox] = useState(true);
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const onChange = (e: any) => {
-    console.log('radio checked', e.target.value);
-    setValue(e.target.value);
-  };
-
-  function onChangeCheckbox(e: any) {
-    console.log(`checked = ${e.target.checked}`);
-  }
+  const CCLicenseCredit = useMemo(() => {
+    if (!originalCheckbox) return {}; // 非原创不适用
+    const license = CreativeCommonsLicenseGenerator({
+      ShareAlike: licenseRadioValue === 'sa',
+      Noncommercial: !licenseCheckboxValue,
+      NoDerivativeWorks: licenseRadioValue === 'nd',
+    });
+    const chinese = convertLicenseToChinese(license);
+    const url = `https://creativecommons.org/licenses/${license.toLowerCase()}/4.0/deed.zh`;
+    return { license, chinese, url };
+  }, [originalCheckbox, licenseCheckboxValue, licenseRadioValue]);
 
   useEffect(() => {
     console.log('originalCheckbox', originalCheckbox);
     if (originalCheckbox) {
-      setIsModalVisible(true);
+      // setOriginalNoticeVisible(true);
     }
   }, [originalCheckbox]);
 
@@ -53,42 +52,70 @@ const SettingsCopyrightNotice: FC = () => {
             </Checkbox>
           </div>
 
-          <Fragment>
-            <div className={styles.originalTips}>
-              Creative Commons 授权许可协议&nbsp;
-              <Tooltip title="Creative Commons 授权许可协议" placement="top">
-                <QuestionCircleOutlined />
-              </Tooltip>
-            </div>
-            <div className={styles.originalTips}>
-              请问您允许作品被别人转载、节选、混编、二次创作吗？
-            </div>
-            <Space direction="vertical">
-              <Radio.Group onChange={onChange} value={value}>
-                <Space direction="vertical">
-                  <Radio value={1}>允许</Radio>
-                  <Radio value={2}>
-                    不允许&nbsp;
-                    <Tooltip title="不允许" placement="top">
-                      <InfoCircleOutlined />
-                    </Tooltip>
-                  </Radio>
-                  <Radio value={3}>
-                    仅允许采用本协议授权的二次创作&nbsp;
-                    <Tooltip title="仅允许采用本协议授权的二次创作" placement="top">
-                      <InfoCircleOutlined />
-                    </Tooltip>
-                  </Radio>
-                </Space>
-              </Radio.Group>
-              <Checkbox onChange={onChangeCheckbox}>允许商业性使用</Checkbox>
-            </Space>
+          {originalCheckbox && (
+            <Fragment>
+              <div className={styles.originalTips}>
+                Creative Commons 授权许可协议&nbsp;
+                <Tooltip title="Creative Commons 授权许可协议" placement="top">
+                  <QuestionCircleOutlined />
+                </Tooltip>
+              </div>
+              <div className={styles.originalTips}>
+                请问您允许作品被别人转载、节选、混编、二次创作吗？
+              </div>
+              <Space direction="vertical">
+                <Radio.Group
+                  onChange={(e) => setLicenseRadioValue(e.target.value)}
+                  value={licenseRadioValue}
+                >
+                  <Space direction="vertical">
+                    <Radio value={''}>允许</Radio>
+                    <Radio value={'nd'}>
+                      不允许&nbsp;
+                      <Tooltip
+                        title="他人不能再混合、转换、或者基于该作品创作，且不能分发修改后的作品"
+                        placement="top"
+                      >
+                        <InfoCircleOutlined />
+                      </Tooltip>
+                    </Radio>
+                    <Radio value={'sa'}>
+                      仅允许采用本协议授权的二次创作&nbsp;
+                      <Tooltip
+                        title="他人再混合、转换或者基于本作品进行创作，必须基于与原先许可协议相同的许可协议分发作品。"
+                        placement="top"
+                      >
+                        <InfoCircleOutlined />
+                      </Tooltip>
+                    </Radio>
+                  </Space>
+                </Radio.Group>
+                <Checkbox
+                  onChange={(e) => setLicenseCheckboxValue(e.target.checked)}
+                  value={licenseCheckboxValue}
+                >
+                  允许商业性使用
+                </Checkbox>
+              </Space>
 
-            <div className={styles.originalTerms}>则授权条款为：署名-非商业性使用-禁止演绎</div>
-          </Fragment>
+              <Link
+                href={CCLicenseCredit.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.originalTerms}
+              >
+                则授权条款为：{CCLicenseCredit?.chinese}
+              </Link>
+            </Fragment>
+          )}
         </section>
       </section>
-      <Modal title="原创声明" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal
+        title="原创声明"
+        visible={originalNoticeVisible}
+        onOk={() => setOriginalNoticeVisible(false)}
+        onCancel={() => setOriginalNoticeVisible(false)}
+      >
         <Space direction="vertical">
           <div>
             勾选本原创声明，即代表您确认并承诺该文章，包括文章中的使用的图片等其他元素，是由您本人（或持有该账号之组织）独立创作完成，或者已取得原作权利人的使用许可。有如下情况的文章请勿勾选本原创声明：
