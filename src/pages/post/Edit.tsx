@@ -27,6 +27,9 @@ import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
 import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
 import SettingsTags from '@/components/Editor/settingsTags';
 import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
+import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
+import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
+import SettingsTips from '@/components/Editor/settingsTips';
 
 const { confirm } = Modal;
 
@@ -525,6 +528,9 @@ const Edit: React.FC = () => {
             <Fragment>
               <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
               <SettingsOriginalLink hash={postData.post?.source || postData.draft?.source || ''} />
+              <SettingsCopyrightNotice />
+              <SettingsTips />
+              <SettingsLearnMore />
             </Fragment>
           </Settings>
         }

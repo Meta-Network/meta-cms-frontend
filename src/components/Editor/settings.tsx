@@ -3,9 +3,6 @@ import { Drawer } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 import styles from './settings.less';
-import SettingsCopyrightNotice from './settingsCopyrightNotice';
-import SettingsTips from './settingsTips';
-import SettingsLearnMore from './settingsLearnMore';
 
 const Settings: React.FC = ({ children }) => {
   const intl = useIntl();
@@ -30,12 +27,7 @@ const Settings: React.FC = ({ children }) => {
         visible={visible}
         width={340}
       >
-        <section className={styles.container}>
-          {children}
-          <SettingsCopyrightNotice />
-          <SettingsTips />
-          <SettingsLearnMore />
-        </section>
+        <section className={styles.container}>{children}</section>
       </Drawer>
     </span>
   );
