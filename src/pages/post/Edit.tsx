@@ -109,6 +109,7 @@ const Edit: React.FC = () => {
 
         setSiteNeedToDeploy(true);
         await draftPublishAsPost(resultDraft.id);
+        setSiteNeedToDeploy(true);
       } else {
         message.error(
           intl.formatMessage({

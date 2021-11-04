@@ -38,12 +38,14 @@ function CustomSiderMenu({
 
   useEffect(() => {
     getDefaultSiteConfig().then((response) => {
-      if (response?.statusCode === 200) {
+      if (response?.data) {
         setDeployedSite({
           title: response.data.siteInfo.title,
           domain: response.data.domain,
           configId: response.data.id,
         });
+      } else {
+        setDeployedSite({});
       }
     });
   }, [setDeployedSite]);
@@ -76,6 +78,8 @@ function CustomSiderMenu({
     setPublishLoading(false);
   };
 
+  // If publishButtonDisplay is true, display the button when scrolling
+  // but hide it if is scrolled to the bottom
   useEffect(() => {
     if (siteNeedToDeploy && window.innerHeight + window.scrollY >= document.body.scrollHeight) {
       setPublishButtonDisplay(true);

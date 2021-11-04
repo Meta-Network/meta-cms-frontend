@@ -1,16 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useIntl, useModel } from 'umi';
+import type { SetStateAction, Dispatch } from 'react';
 import { useEffect, useState } from 'react';
 import { getGithubReposName } from '@/services/api/global';
 import StoragePicker from '@/components/StorePicker';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
 import FormattedDescription from '../FormattedDescription';
+import type { StoreValue } from 'antd/es/form/interface';
+import type { RuleObject } from 'antd/lib/form';
 
 export default () => {
   const intl = useIntl();
   const [userRepos, setUserRepos] = useState<string[]>([]);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [storeRepoIsValid, setStoreRepoIsValid] = useState<boolean>(false);
+  const [publishRepoIsValid, setPublishRepoIsValid] = useState<boolean>(false);
   const { storeSetting, setStoreSetting } = useModel('storage');
 
   useEffect(() => {
@@ -27,60 +31,79 @@ export default () => {
     }
   }, [setStoreSetting, storeSetting]);
 
-  const updateRepoSettings = async (values: { repoName: string }) => {
-    const repo = values.repoName;
-    setStoreSetting((prev) => ({ ...prev, repo }));
-    message.success(intl.formatMessage({ id: 'messages.store.setRepoName' }, { repo }));
+  const validator =
+    (setState: Dispatch<SetStateAction<boolean>>) => (_: RuleObject, value: StoreValue) => {
+      if (!userRepos) {
+        setState(false);
+        return Promise.reject(
+          new Error(intl.formatMessage({ id: 'messages.store.noRepoTokenFirstSelect' })),
+        );
+      }
+      if (!value) {
+        setState(false);
+        return Promise.reject(
+          new Error(intl.formatMessage({ id: 'messages.store.repoNameCanNotBeEmpty' })),
+        );
+      }
+      if (userRepos?.includes(value.toLowerCase())) {
+        setState(false);
+        return Promise.reject(
+          new Error(intl.formatMessage({ id: 'messages.store.repoNameAlreadyExists' })),
+        );
+      }
+      setState(true);
+      return Promise.resolve();
+    };
+  const updateRepoSettings = async (values: { storeRepo: string; publishRepo: string }) => {
+    setStoreSetting((prev) => ({ ...prev, repos: values }));
+    message.success(intl.formatMessage({ id: 'messages.store.setRepoName' }, values));
   };
 
   return (
     <div>
       <StoragePicker />
-
       <Divider />
-
       <FormattedDescription id="guide.repo.description" />
       <ProForm
         style={{ width: 500 }}
         name="site-info"
-        initialValues={{ repoName: storeSetting?.repo ?? 'meta-space' }}
+        initialValues={{
+          storeRepo: storeSetting?.repos?.storeRepo ?? 'meta-space',
+          publishRepo: storeSetting?.repos?.publishRepo ?? 'meta-space-published',
+        }}
         onFinish={updateRepoSettings}
-        requiredMark="optional"
       >
         <ProFormText
-          width="md"
-          name="repoName"
+          label={intl.formatMessage({ id: 'guide.repo.store' })}
+          width="sm"
+          name="storeRepo"
           placeholder={intl.formatMessage({ id: 'messages.store.form.repoName' })}
-          validateStatus={isSuccess ? 'success' : undefined}
+          validateStatus={storeRepoIsValid ? 'success' : undefined}
           help={
-            isSuccess
+            storeRepoIsValid
               ? intl.formatMessage({ id: 'messages.store.form.repoNameAvailable' })
               : undefined
           }
           rules={[
             {
-              validator: (_, value) => {
-                if (!userRepos) {
-                  setIsSuccess(false);
-                  return Promise.reject(
-                    new Error(intl.formatMessage({ id: 'messages.store.noRepoTokenFirstSelect' })),
-                  );
-                }
-                if (!value) {
-                  setIsSuccess(false);
-                  return Promise.reject(
-                    new Error(intl.formatMessage({ id: 'messages.store.repoNameCanNotBeEmpty' })),
-                  );
-                }
-                if (userRepos?.includes(value.toLowerCase())) {
-                  setIsSuccess(false);
-                  return Promise.reject(
-                    new Error(intl.formatMessage({ id: 'messages.store.repoNameAlreadyExists' })),
-                  );
-                }
-                setIsSuccess(true);
-                return Promise.resolve();
-              },
+              validator: validator(setStoreRepoIsValid),
+            },
+          ]}
+        />
+        <ProFormText
+          label={intl.formatMessage({ id: 'guide.repo.publish' })}
+          width="sm"
+          name="publishRepo"
+          placeholder={intl.formatMessage({ id: 'messages.store.form.repoName' })}
+          validateStatus={publishRepoIsValid ? 'success' : undefined}
+          help={
+            publishRepoIsValid
+              ? intl.formatMessage({ id: 'messages.store.form.repoNameAvailable' })
+              : undefined
+          }
+          rules={[
+            {
+              validator: validator(setPublishRepoIsValid),
             },
           ]}
         />

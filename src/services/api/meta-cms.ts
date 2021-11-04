@@ -256,6 +256,15 @@ export async function waitUntilSyncFinish(platform: string) {
   return true;
 }
 
+/** 等待一个平台文章同步完成 GET /tasks/workspaces/{siteConfigId}/locked */
+export async function IsSiteWorkspaceLocked(siteConfigId: number) {
+  return (
+    await request<GLOBAL.GeneralResponse<boolean>>(`/tasks/workspaces/${siteConfigId}/locked`, {
+      method: 'GET',
+    })
+  )?.data;
+}
+
 /**
  * image upload by url
  */

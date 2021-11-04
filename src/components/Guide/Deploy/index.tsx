@@ -160,7 +160,7 @@ export default () => {
             storeSetting.storage.toLowerCase(),
             {
               userName: storeSetting.username,
-              repoName: storeSetting.repo,
+              repoName: storeSetting.repos!.storeRepo,
               branchName: 'master',
               dataType: 'HEXO',
               useGitProvider: true,
@@ -200,7 +200,7 @@ export default () => {
             storeSetting.storage.toLowerCase(),
             {
               userName: storeSetting.username,
-              repoName: storeSetting.repo,
+              repoName: storeSetting.repos!.publishRepo,
               branchName: 'gh-pages',
               dataType: 'HEXO',
               useGitProvider: true,
@@ -277,7 +277,7 @@ export default () => {
               state: 'error',
             });
             setOnError(true);
-            return;
+            throw new Error(deployAndPublish.message);
           }
           updateProcessing({
             message: intl.formatMessage({
@@ -286,21 +286,33 @@ export default () => {
             state: 'success',
           });
         };
-        deploying().then(() => {
-          notification.success({
-            message: intl.formatMessage({
-              id: 'messages.deployment.taskFinished.title',
-            }),
-            description: intl.formatMessage({
-              id: 'messages.deployment.taskFinished.description',
-            }),
-            duration: 0,
+        deploying()
+          .then(() => {
+            notification.success({
+              message: intl.formatMessage({
+                id: 'messages.deployment.taskFinished.title',
+              }),
+              description: intl.formatMessage({
+                id: 'messages.deployment.taskFinished.description',
+              }),
+              duration: 0,
+            });
+            setDeployedSite({
+              title: siteSetting.title,
+              domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
+            });
+          })
+          .catch(() => {
+            notification.error({
+              message: intl.formatMessage({
+                id: 'messages.deployment.taskFailed.title',
+              }),
+              description: intl.formatMessage({
+                id: 'messages.deployment.taskFailed.description',
+              }),
+              duration: 0,
+            });
           });
-          setDeployedSite({
-            title: siteSetting.title,
-            domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
-          });
-        });
         break;
       }
       default:

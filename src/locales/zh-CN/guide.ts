@@ -27,7 +27,6 @@ export default {
     未来您将可以更换或个性化存储方案，包括去中心化存储和自部署
   `,
   'guide.storage.currentStorage': '当前选择的存储服务：',
-  'guide.repo.description': '请在下方输入 Meta Space 存储仓库的名称（仅用于创建，不影响使用）',
   'guide.publish.title': '发布',
   'guide.publish.description': '管理您的 Meta Space 的内容发布方案',
   'guide.publish.message': '此高级功能暂时采用默认配置',
@@ -83,4 +82,8 @@ export default {
   'guide.storage.unknownStorage': '未知的仓储',
   'guide.storage.selectStorageFailed': '存储仓库选择失败。原因：{reason}',
   'guide.storage.unselected': '未选择',
+  'guide.repo.description':
+    '请在下方输入 Meta Space 存储仓库和发布仓库的名称（仅用于创建，不影响使用）',
+  'guide.repo.publish': '发布仓库（公开）',
+  'guide.repo.store': '存储仓库（私密）',
 };
