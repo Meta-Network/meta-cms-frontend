@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { Fragment, useState, useCallback, useEffect } from 'react';
 import { history, useIntl } from 'umi';
 import { Input, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet, PostTempData } from '@/db/db';
-// import type { Posts } from '@/db/Posts.d';
+import type { Posts } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
   getDefaultSiteConfigAPI,
@@ -25,13 +25,15 @@ import Settings from '@/components/Editor/settings';
 import Submit from '@/components/Editor/submit';
 import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
 import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
+import SettingsTags from '@/components/Editor/settingsTags';
+import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
 
 const { confirm } = Modal;
 
 const Edit: React.FC = () => {
   const intl = useIntl();
   // post data
-  // const [postData, setPostData] = useState<Posts>({} as Posts);
+  const [postData, setPostData] = useState<Posts>({} as Posts);
   const [cover, setCover] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
@@ -485,7 +487,7 @@ const Edit: React.FC = () => {
       if (resultPost) {
         // console.log('resultPost', resultPost);
 
-        // setPostData(resultPost);
+        setPostData(resultPost);
 
         setCover(resultPost.cover);
         setTitle(resultPost.title);
@@ -518,7 +520,14 @@ const Edit: React.FC = () => {
         draftMode={draftMode}
         headerCloudDraftUpload={<HeaderCloudDraftUpload />}
         headerCloudDraftDownload={<HeaderCloudDraftDownload />}
-        settings={<Settings tags={tags} handleChangeTags={handleChangeTags} />}
+        settings={
+          <Settings>
+            <Fragment>
+              <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
+              <SettingsOriginalLink hash={postData.post?.source || postData.draft?.source || ''} />
+            </Fragment>
+          </Settings>
+        }
         submit={<Submit handlePublish={handlePublish} />}
       />
       <section className={styles.edit}>
