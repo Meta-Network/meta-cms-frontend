@@ -26,7 +26,7 @@ export default () => {
           {record.cover ? (
             <Image width={100} src={record.cover} />
           ) : (
-            intl.formatMessage({ id: 'messages.published.table.noCoverExists' })
+            intl.formatMessage({ id: 'messages.table.noCoverExists' })
           )}
         </Space>
       ),

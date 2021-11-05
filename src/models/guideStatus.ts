@@ -5,9 +5,7 @@ export default () => {
   const [onError, setOnError] = useState<boolean | string>(false);
   const [stageCompleted, setStageCompleted] = useState(false);
   const [currentStage, setCurrentStage] = useState<DeployStages>(DeployStages.pending);
-  const [processing, setProcessing] = useState<GLOBAL.LogMessagesTemplate[]>([
-    { message: '准备开始...', state: 'info' },
-  ]);
+  const [processing, setProcessing] = useState<GLOBAL.LogMessagesTemplate[]>([]);
 
   const updateProcessing = useCallback((info: GLOBAL.LogMessagesTemplate) => {
     setProcessing((prev) => [...prev, info]);
