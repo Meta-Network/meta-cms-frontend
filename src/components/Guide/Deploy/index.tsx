@@ -31,6 +31,13 @@ export default () => {
   const intl = useIntl();
   const [configId, setConfigId] = useState<number>();
 
+  useEffect(() => {
+    updateProcessing({
+      message: intl.formatMessage({ id: 'messages.deployment.readyToStart' }),
+      state: 'info',
+    });
+  }, [updateProcessing]);
+
   // after the current stage work is done, continue to the next stage
   useEffect(() => {
     if (stageCompleted) {

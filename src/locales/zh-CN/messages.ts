@@ -1,4 +1,5 @@
 export default {
+  'messages.table.noCoverExists': '无封面图',
   'messages.domain.enterPrefixDomain': '设定个性化域名（他人访问的网址）',
   'messages.publish.currentStore': '当前选择的存储服务',
   'messages.publish.noStoreSelected': '尚未选择存储服务',
@@ -68,7 +69,6 @@ export default {
   'messages.storeSetting.title': '存储仓库配置',
   'messages.storeSetting.description': '您可以在这里配置您的 Meta Space 存储源',
   'messages.published.table.cover': '封面图片',
-  'messages.published.table.noCoverExists': '无封面图',
   'messages.published.table.title': '标题',
   'messages.published.table.category': '分类',
   'messages.published.table.tags': '标签',

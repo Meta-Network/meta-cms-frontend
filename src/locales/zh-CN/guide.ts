@@ -76,7 +76,7 @@ export default {
   'guide.config.form.uploadFavicon': '上传站点图标',
   'guide.storage.githubDescription': '世界上最大的代码存放网站和开源社区',
   'guide.storage.giteeDescription': '提供中国本土化的代码仓库托管服务',
-  'guide.storage.noAuthToken': '未获取到 token，请进行授权。',
+  'guide.storage.noAuthToken': '授权失败，请重新绑定存储仓库服务',
   'guide.storage.canNotGetUsername': '未成功获取到用户名',
   'guide.storage.setStorageAs': '已成功选择仓储为 {storage}',
   'guide.storage.unknownStorage': '未知的仓储',
