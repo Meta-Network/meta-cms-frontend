@@ -244,6 +244,7 @@ const Edit: React.FC = () => {
           id: 'messages.editor.tip.coverFormat',
         }),
       );
+      return;
     }
 
     const result = await dbPostsGet(Number(id));
