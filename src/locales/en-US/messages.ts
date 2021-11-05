@@ -166,4 +166,5 @@ export default {
   'messages.editor.upload.image.success': 'Uploaded successfully',
   'messages.editor.upload.image.fail': 'Upload failed',
   'messages.editor.edit.tool.upload.fail': 'Image upload failed',
+  'messages.invitation.card.title': 'Invitation code #{codeId}',
 };

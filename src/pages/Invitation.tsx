@@ -40,8 +40,8 @@ export default () => {
               >
                 <Card
                   title={intl.formatMessage(
-                    { id: 'component.badge.invitationAvailable' },
-                    { id: item.id },
+                    { id: 'messages.invitation.card.title' },
+                    { codeId: item.id },
                   )}
                   hoverable
                   bordered={false}
@@ -53,8 +53,7 @@ export default () => {
                       message: item.message,
                     }}
                     labelAlign="left"
-                    layout="horizontal"
-                    labelCol={{ span: 4 }}
+                    layout="vertical"
                     onFinish={async (values) => {
                       const body = {
                         sub: values.sub,
