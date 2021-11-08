@@ -8,7 +8,6 @@ import {
 } from '@/services/api/meta-cms';
 import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
-import type { MessageType } from 'antd/lib/message';
 import generateTaggedInfo from './generateTaggedInfo';
 import { message, Button, Card, notification } from 'antd';
 import { DeployStages, Storages } from '@/services/constants';
@@ -16,8 +15,6 @@ import { validator } from './validator';
 import styles from './index.less';
 
 export default () => {
-  let processDone: MessageType;
-
   const { siteSetting, storeSetting, themeSetting, domainSetting, setDeployedSite } =
     useModel('storage');
   const {
@@ -33,6 +30,13 @@ export default () => {
 
   const intl = useIntl();
   const [configId, setConfigId] = useState<number>();
+
+  useEffect(() => {
+    updateProcessing({
+      message: intl.formatMessage({ id: 'messages.deployment.readyToStart' }),
+      state: 'info',
+    });
+  }, [updateProcessing]);
 
   // after the current stage work is done, continue to the next stage
   useEffect(() => {
@@ -87,10 +91,7 @@ export default () => {
       }
       case DeployStages.submitting: {
         const submitting = async () => {
-          processDone = message.loading(
-            intl.formatMessage({ id: 'messages.deployment.deploying' }),
-            0,
-          );
+          message.loading(intl.formatMessage({ id: 'messages.deployment.deploying' }), 10);
 
           const infoSetting = await newSiteInfoSetting({
             title: siteSetting.title,
@@ -166,7 +167,7 @@ export default () => {
             storeSetting.storage.toLowerCase(),
             {
               userName: storeSetting.username,
-              repoName: storeSetting.repo,
+              repoName: storeSetting.repos!.storeRepo,
               branchName: 'master',
               dataType: 'HEXO',
               useGitProvider: true,
@@ -176,7 +177,7 @@ export default () => {
           if (storageSetting.message === 'Ok') {
             updateProcessing({
               message: intl.formatMessage({
-                id: 'messages.deployment.submitSettingSuccess',
+                id: 'messages.deployment.submitStoreSuccess',
               }),
               state: 'success',
             });
@@ -189,7 +190,7 @@ export default () => {
             updateProcessing({
               message: intl.formatMessage(
                 {
-                  id: 'messages.deployment.submitSettingFailed',
+                  id: 'messages.deployment.submitStoreFailed',
                 },
                 {
                   reason: storageSetting.message,
@@ -206,7 +207,7 @@ export default () => {
             storeSetting.storage.toLowerCase(),
             {
               userName: storeSetting.username,
-              repoName: storeSetting.repo,
+              repoName: storeSetting.repos!.publishRepo,
               branchName: 'gh-pages',
               dataType: 'HEXO',
               useGitProvider: true,
@@ -283,7 +284,7 @@ export default () => {
               state: 'error',
             });
             setOnError(true);
-            return;
+            throw new Error(deployAndPublish.message);
           }
           updateProcessing({
             message: intl.formatMessage({
@@ -292,22 +293,33 @@ export default () => {
             state: 'success',
           });
         };
-        deploying().then(() => {
-          processDone();
-          notification.success({
-            message: intl.formatMessage({
-              id: 'messages.deployment.taskFinished.title',
-            }),
-            description: intl.formatMessage({
-              id: 'messages.deployment.taskFinished.description',
-            }),
-            duration: 0,
+        deploying()
+          .then(() => {
+            notification.success({
+              message: intl.formatMessage({
+                id: 'messages.deployment.taskFinished.title',
+              }),
+              description: intl.formatMessage({
+                id: 'messages.deployment.taskFinished.description',
+              }),
+              duration: 0,
+            });
+            setDeployedSite({
+              title: siteSetting.title,
+              domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
+            });
+          })
+          .catch(() => {
+            notification.error({
+              message: intl.formatMessage({
+                id: 'messages.deployment.taskFailed.title',
+              }),
+              description: intl.formatMessage({
+                id: 'messages.deployment.taskFailed.description',
+              }),
+              duration: 0,
+            });
           });
-          setDeployedSite({
-            title: siteSetting.title,
-            domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
-          });
-        });
         break;
       }
       default:

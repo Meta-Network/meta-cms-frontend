@@ -5,14 +5,12 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
 import Deploy from '@/components/Guide/Deploy';
-import CDNSetting from '@/components/Guide/CDNSetting';
-import FormattedDescription from '@/components/FormattedDescription';
 import AnchoredTitle from '@/components/AnchoredTitle';
 import SiteSetting from '@/components/Guide/SiteSetting';
 import ThemeSetting from '@/components/Guide/ThemeSetting';
 import StoreSetting from '@/components/Guide/StoreSetting';
 import DomainSetting from '@/components/Guide/DomainSetting';
-import PublisherSetting from '@/components/Guide/PublisherSetting';
+import FormattedDescription from '@/components/FormattedDescription';
 import styles from './Guide.less';
 
 const { Step } = Steps;
@@ -42,16 +40,16 @@ export default () => {
         description: <FormattedDescription id="guide.storage.description" />,
         component: <StoreSetting />,
       },
-      {
-        title: intl.formatMessage({ id: 'guide.publish.title' }),
-        description: <FormattedDescription id="guide.publish.description" />,
-        component: <PublisherSetting />,
-      },
-      {
-        title: intl.formatMessage({ id: 'guide.cdn.title' }),
-        description: <FormattedDescription id="guide.cdn.description" />,
-        component: <CDNSetting />,
-      },
+      // {
+      //   title: intl.formatMessage({ id: 'guide.publish.title' }),
+      //   description: <FormattedDescription id="guide.publish.description" />,
+      //   component: <PublisherSetting />,
+      // },
+      // {
+      //   title: intl.formatMessage({ id: 'guide.cdn.title' }),
+      //   description: <FormattedDescription id="guide.cdn.description" />,
+      //   component: <CDNSetting />,
+      // },
       {
         title: intl.formatMessage({ id: 'guide.deploy.title' }),
         description: <FormattedDescription id="guide.deploy.description" />,

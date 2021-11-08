@@ -2,7 +2,7 @@ export default {
   'guide.intro.title': '创建 Meta Space',
   'guide.intro.description': `
     Meta Space 是专属于您个人的数字空间，您有全部的控制权力
-    立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅
+    立即创建属于自己的 Meta Space，开始您的下一代社交网络的探索之旅
   `,
   'guide.domain.title': '域名',
   'guide.domain.description': `
@@ -27,7 +27,6 @@ export default {
     未来您将可以更换或个性化存储方案，包括去中心化存储和自部署
   `,
   'guide.storage.currentStorage': '当前选择的存储服务：',
-  'guide.repo.description': '请在下方输入 Meta Space 存储仓库的名称（仅用于创建，不影响使用）',
   'guide.publish.title': '发布',
   'guide.publish.description': '管理您的 Meta Space 的内容发布方案',
   'guide.publish.message': '此高级功能暂时采用默认配置',
@@ -43,10 +42,10 @@ export default {
     未来您可以自由接入第三方的个性化 CDN 服务
     为了建站流程简单直接，我们暂时对此配置项应用默认配置
   `,
-  'guide.deploy.title': '部署',
+  'guide.deploy.title': '发布',
   'guide.deploy.description': `
-    完成设置后，请点击下方的按钮开始部署您的 Meta Space
-    您可以在下方看到部署的的进度
+    完成设置后，请点击下方的按钮开始发布您的 Meta Space
+    您可以在下方看到发布的进度
   `,
   'guide.authorization.title': '授权使用 {platform} 作为 Meta Space 存储仓库（免费）',
   'guide.authorization.subtitle': '授权流程：',
@@ -62,7 +61,7 @@ export default {
   'guide.config.form.subtitle': '副标题',
   'guide.config.form.subtitlePlaceholder': '你的 Meta Space 副标题',
   'guide.config.form.author': '作者',
-  'guide.config.form.authorPlaceholder': '作为 Meta Space 拥有者的名称',
+  'guide.config.form.authorPlaceholder': '作为 Meta Space 作者的名称',
   'guide.config.form.description': '描述',
   'guide.config.form.descriptionPlaceholder': '你的 Meta Space 描述',
   'guide.config.form.keywords': '关键词',
@@ -77,10 +76,14 @@ export default {
   'guide.config.form.uploadFavicon': '上传站点图标',
   'guide.storage.githubDescription': '世界上最大的代码存放网站和开源社区',
   'guide.storage.giteeDescription': '提供中国本土化的代码仓库托管服务',
-  'guide.storage.noAuthToken': '未获取到 token，请进行授权。',
+  'guide.storage.noAuthToken': '授权失败，请重新绑定存储仓库服务',
   'guide.storage.canNotGetUsername': '未成功获取到用户名',
   'guide.storage.setStorageAs': '已成功选择仓储为 {storage}',
   'guide.storage.unknownStorage': '未知的仓储',
   'guide.storage.selectStorageFailed': '存储仓库选择失败。原因：{reason}',
   'guide.storage.unselected': '未选择',
+  'guide.repo.description':
+    '请在下方输入 Meta Space 存储仓库和发布仓库的名称（仅用于创建，不影响使用）',
+  'guide.repo.publish': '发布仓库（公开）',
+  'guide.repo.store': '存储仓库（私密）',
 };

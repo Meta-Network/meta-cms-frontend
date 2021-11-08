@@ -1,23 +1,28 @@
-import { useIntl } from 'umi';
-import { Fragment } from 'react';
-import { Button, List, Tag } from 'antd';
+import { getUsernameOfStore } from '@/services/api/global';
+import { requestSocialAuth } from '@/services/api/meta-ucenter';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
+import { useIntl } from 'umi';
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Spin, Button, List, Tag } from 'antd';
 import styles from './index.less';
 
 export default () => {
   const intl = useIntl();
-  const stores = [
+  const storeNames: string[] = useMemo(() => ['GitHub'], []);
+  const [stores, setStores] = useState<
     {
-      title: [
-        'GitHub',
-        <Tag className="status" color="red">
-          {intl.formatMessage({ id: 'component.status.notBound' })}
-        </Tag>,
-      ],
+      name: string;
+      description: string;
+      actions: any[];
+      title: any;
+      avatar: any;
+    }[]
+  >([
+    {
+      name: 'GitHub',
       description: intl.formatMessage({ id: 'guide.storage.githubDescription' }),
-      actions: [
-        <Button type="primary">{intl.formatMessage({ id: 'component.button.bind' })}</Button>,
-      ],
+      actions: [],
+      title: [],
       avatar: (
         <img
           className="icon"
@@ -26,24 +31,69 @@ export default () => {
         />
       ),
     },
-    {
-      title: [
-        'Gitee',
-        <Tag className="status" color="blue">
-          {intl.formatMessage({ id: 'component.status.alreadyBound' })}
-        </Tag>,
-      ],
-      actions: [<Button danger>{intl.formatMessage({ id: 'component.button.unbind' })}</Button>],
-      description: intl.formatMessage({ id: 'guide.storage.giteeDescription' }),
-      avatar: (
-        <img
-          className="icon"
-          src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/9357cf7a0529738c587b"
-          alt="gitee icon"
-        />
-      ),
+  ]);
+
+  const bindRequest = async (name: string) => {
+    const request = await requestSocialAuth(name.toLowerCase(), window.location.href);
+    window.open(request.data, '_blank');
+  };
+
+  const getActionsAndTitle = useMemo(
+    () => (store: typeof storeNames[number], username: string) => {
+      if (username) {
+        return {
+          title: [
+            store,
+            <Tag className="status" color="blue">
+              {intl.formatMessage({ id: 'component.status.alreadyBound' })}
+            </Tag>,
+            `(${username})`,
+          ],
+          actions: [
+            <Button danger>{intl.formatMessage({ id: 'component.button.unbind' })}</Button>,
+          ],
+        };
+      }
+      return {
+        title: [
+          store,
+          <Tag className="status" color="red">
+            {intl.formatMessage({ id: 'component.status.notBound' })}
+          </Tag>,
+        ],
+        actions: [
+          <Button onClick={() => bindRequest(store)} type="primary">
+            {intl.formatMessage({ id: 'component.button.bind' })}
+          </Button>,
+        ],
+      };
     },
-  ];
+    [intl],
+  );
+
+  useEffect(() => {
+    storeNames.forEach((name) => {
+      getUsernameOfStore(name)
+        .then((username) => {
+          const { actions, title } = getActionsAndTitle(name, username);
+          setStores((previous) => {
+            const store = previous.find((e) => e.name === name);
+            if (!store) {
+              return previous;
+            }
+            const copy = previous.slice();
+            const index = previous.findIndex((e) => e.name === name);
+            store.actions = actions;
+            store.title = title;
+
+            copy[index] = store;
+            return copy;
+          });
+        })
+        .catch(() => null);
+    });
+  }, [getActionsAndTitle, storeNames]);
+
   return (
     <PageContainer
       title={intl.formatMessage({ id: 'messages.storeSetting.title' })}
@@ -56,15 +106,20 @@ export default () => {
             <List
               itemLayout="horizontal"
               dataSource={stores}
-              renderItem={(item) => (
-                <List.Item actions={item.actions}>
-                  <List.Item.Meta
-                    avatar={item.avatar}
-                    title={item.title}
-                    description={item.description}
-                  />
-                </List.Item>
-              )}
+              renderItem={(store) => {
+                if (store.actions.length && store.title.length) {
+                  return (
+                    <List.Item actions={store.actions}>
+                      <List.Item.Meta
+                        avatar={store.avatar}
+                        title={store.title}
+                        description={store.description}
+                      />
+                    </List.Item>
+                  );
+                }
+                return <Spin />;
+              }}
             />
           </Fragment>
         </div>

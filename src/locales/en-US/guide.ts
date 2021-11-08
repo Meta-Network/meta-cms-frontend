@@ -1,86 +1,74 @@
 export default {
-  'guide.intro.title': '创建 Meta Space',
-  'guide.intro.description': `
-    Meta Space 是专属于您个人的数字空间，您有全部的控制权力
-    立即创建属于自己的 Meta Space ，开始您的下一代社交网络的探索之旅
-  `,
-  'guide.domain.title': '域名',
-  'guide.domain.description': `
-    先为您的 Meta Space 创建一个易于访问的子域名
-    未来您将可以使用更加个性化的域名配置，包括使用自定义域名
-  `,
-  'guide.config.title': '信息',
-  'guide.config.description': `
-    定制您的 Meta Space 需要填写一些基础信息
-    这些信息会公开展示给来访者
-  `,
-  'guide.theme.title': '主题',
-  'guide.theme.description': `
-    为您的 Meta Space 挑选一个喜欢的主题
-    未来您将可以更换或个性化主题配置，包括使用社区开发主题
-  `,
-  'guide.theme.selectedTheme': '选择了主题 {selectedTheme}',
-  'guide.storage.title': '存储',
-  'guide.storage.description': `
-    选择一个可信第三方存存储平台以托管您的 Meta Space 配置和内容
-    我们只会在您授权的情况下帮您创建和修改
-    未来您将可以更换或个性化存储方案，包括去中心化存储和自部署
-  `,
-  'guide.storage.currentStorage': '当前选择的存储服务：',
-  'guide.repo.description': '请在下方输入 Meta Space 存储仓库的名称（仅用于创建，不影响使用）',
-  'guide.publish.title': '发布',
-  'guide.publish.description': '管理您的 Meta Space 的内容发布方案',
-  'guide.publish.message': '此高级功能暂时采用默认配置',
-  'guide.publish.content': `
-    未来您将可以手动配置详细的发布方案，甚至可以共享给他人使用以获得回报
-    我们会根据您选择的存储平台自动提供其对应的发布方式
-  `,
-  'guide.publish.currentStorage': '当前选择的存储服务：',
+  'guide.intro.title': 'Create Meta Space',
+  'guide.intro.description':
+    'Meta Space is your personal digital space. You have total control.\nCreate your own Meta Space now, and start your journey of exploring the next generation of social networks.',
+  'guide.domain.title': 'Domain name',
+  'guide.domain.description':
+    'First create an easily accessible subdomain for your Meta Space.\nIn the future, you will be able to use more personalized domain configuration, including custom domain names.',
+  'guide.config.title': 'Information',
+  'guide.config.description':
+    'To customize your Meta Space, you need to fill in some basic information.\nThis information will be publicly displayed to visitors.',
+  'guide.theme.title': 'Themes',
+  'guide.theme.description':
+    'Choose a theme you like for your Meta Space.\nIn the future, you will be able to change or personalize the theme configuration, including the use of community-developed themes.',
+  'guide.theme.selectedTheme': 'Selected theme {selectedTheme}',
+  'guide.storage.title': 'Storage',
+  'guide.storage.description':
+    'Choose a trusted third-party storage and storage platform to host your Meta Space configuration and content.\nWe will only help you create and modify it with your authorization.\nIn the future, you will be able to replace or personalize storage solutions, including decentralized storage and Self-deployment',
+  'guide.storage.currentStorage': 'The currently selected storage service: ',
+  'guide.repo.description':
+    'Please enter the name of the Meta Space storage repository below (only for creation, does not affect the use)',
+  'guide.publish.title': 'Publish',
+  'guide.publish.description': 'Manage your Meta Space content publishing plan',
+  'guide.publish.message': 'This advanced feature temporarily uses the default configuration',
+  'guide.publish.content':
+    'In the future, you will be able to manually configure the detailed publishing plan, and even share it with others to get rewards. We will automatically provide the corresponding publishing method according to the storage platform you choose.',
+  'guide.publish.currentStorage': 'The currently selected storage service: ',
   'guide.cdn.title': 'CDN',
-  'guide.cdn.description': '管理您的 Meta Space 的 CDN （内容分发网络）方案',
-  'guide.cdn.message': '此高级功能暂时采用默认配置',
-  'guide.cdn.content': `
-    未来您可以自由接入第三方的个性化 CDN 服务
-    为了建站流程简单直接，我们暂时对此配置项应用默认配置
-  `,
-  'guide.deploy.title': '部署',
-  'guide.deploy.description': `
-    完成设置后，请点击下方的按钮开始部署您的 Meta Space
-    您可以在下方看到部署的的进度
-  `,
-  'guide.authorization.title': '授权使用 {platform} 作为 Meta Space 存储仓库（免费）',
-  'guide.authorization.subtitle': '授权流程：',
-  'guide.authorization.description': `
-    1. 点击下方按钮前往 {platform} 的授权页面（若无账号则可以注册）
-    2. 点击授权页面中的绿色按钮（Authorize Meta Network）
-  `,
-  'guide.result.titleWithPlatform': '您已成功授权 {platform} 作为存储仓库',
-  'guide.result.titleNoPlatform': '您已成功授权存储仓库',
-  'guide.result.description': '现在您可以关闭此浏览器页面',
-  'guide.config.form.title': '标题',
-  'guide.config.form.titlePlaceholder': '您的 Meta Space 标题',
-  'guide.config.form.subtitle': '副标题',
-  'guide.config.form.subtitlePlaceholder': '你的 Meta Space 副标题',
-  'guide.config.form.author': '作者',
-  'guide.config.form.authorPlaceholder': '作为 Meta Space 拥有者的名称',
-  'guide.config.form.description': '描述',
-  'guide.config.form.descriptionPlaceholder': '你的 Meta Space 描述',
-  'guide.config.form.keywords': '关键词',
-  'guide.config.form.keywordsExtra': '其他人在搜索引擎中输入这些关键词会更容易找到你的站点',
-  'guide.config.form.language': '语言',
-  'guide.config.form.languagePleaseEnter': '请选择您的 Meta Space 语言',
-  'guide.config.form.timezone': '时区',
-  'guide.config.form.timezonePleaseEnter': '请选择您的 Meta Space 时区',
-  'guide.config.form.favicon': '网站图标',
-  'guide.config.form.faviconExtra': '可上传.ico .jpg .png 格式图片，展示在页面标签上',
-  'guide.config.form.faviconPleaseEnter': '请上传一个站点图标',
-  'guide.config.form.uploadFavicon': '上传站点图标',
-  'guide.storage.githubDescription': '世界上最大的代码存放网站和开源社区',
-  'guide.storage.giteeDescription': '提供中国本土化的代码仓库托管服务',
-  'guide.storage.noAuthToken': '未获取到 token，请进行授权。',
-  'guide.storage.canNotGetUsername': '未成功获取到用户名',
-  'guide.storage.setStorageAs': '已成功选择仓储为 {storage}',
-  'guide.storage.unknownStorage': '未知的仓储',
-  'guide.storage.selectStorageFailed': '存储仓库选择失败。原因：{reason}',
-  'guide.storage.unselected': '未选择',
+  'guide.cdn.description': 'Manage your Meta Space CDN (Content Delivery Network) plan',
+  'guide.cdn.message': 'This advanced feature temporarily uses the default configuration',
+  'guide.cdn.content':
+    'In the future, you can freely access third-party personalized CDN services.\nTo simplify the website construction process, we temporarily apply the default configuration to this configuration item',
+  'guide.deploy.title': 'Publish',
+  'guide.deploy.description':
+    'After completing the settings, please click the button below to start publishing your Meta Space.\nYou can see the progress of the publishing below',
+  'guide.authorization.title': 'Authorize {platform} as a Meta Space storage repository (free)',
+  'guide.authorization.subtitle': 'Authorization process:',
+  'guide.authorization.description':
+    "1. Click the button below to go to the authorization page of {platform} (if you don't have an account, you can register)\n2. Click the green button (Authorize Meta Network) in the authorization page",
+  'guide.result.titleWithPlatform':
+    'You have successfully authorized {platform} as a storage repository',
+  'guide.result.titleNoPlatform': 'You have successfully authorized the storage repository',
+  'guide.result.description': 'Now you can close this browser page',
+  'guide.config.form.title': 'Title',
+  'guide.config.form.titlePlaceholder': 'Your Meta Space title',
+  'guide.config.form.subtitle': 'Subtitle',
+  'guide.config.form.subtitlePlaceholder': 'Your Meta Space subtitle',
+  'guide.config.form.author': 'Author',
+  'guide.config.form.authorPlaceholder': 'As the name of the author of Meta Space',
+  'guide.config.form.description': 'Describe',
+  'guide.config.form.descriptionPlaceholder': 'Your Meta Space description',
+  'guide.config.form.keywords': 'Key words',
+  'guide.config.form.keywordsExtra':
+    'It will be easier for others to find your Meta Space if they enter these keywords in the search engine',
+  'guide.config.form.language': 'Language',
+  'guide.config.form.languagePleaseEnter': 'Please select your Meta Space language',
+  'guide.config.form.timezone': 'Time zone',
+  'guide.config.form.timezonePleaseEnter': 'Please select your Meta Space time zone',
+  'guide.config.form.favicon': 'Website icon',
+  'guide.config.form.faviconExtra':
+    'You can upload pictures in .ico .jpg .png format and display them on the page label',
+  'guide.config.form.faviconPleaseEnter': 'Please upload an icon for Meta Space',
+  'guide.config.form.uploadFavicon': 'Upload Meta Space icon',
+  'guide.storage.githubDescription':
+    "The world's largest code storage website with open source community",
+  'guide.storage.giteeDescription': 'Provide Chinese localized code storage hosting services',
+  'guide.storage.noAuthToken': 'Authorization failed, please rebind the storage repository service',
+  'guide.storage.canNotGetUsername': 'Username was not successfully obtained',
+  'guide.storage.setStorageAs': 'Successfully selected storage as {storage}',
+  'guide.storage.unknownStorage': 'Unknown storage repository',
+  'guide.storage.selectStorageFailed': 'Storage repository selection failed. Reason: {reason}',
+  'guide.repo.store': 'Storage repository(private)',
+  'guide.repo.publish': 'Publish repository(public)',
+  'guide.storage.unselected': 'Not selected',
 };

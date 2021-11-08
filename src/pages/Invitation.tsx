@@ -1,10 +1,9 @@
-import { useIntl } from 'umi';
+import { useIntl, useRequest } from 'umi';
 import { CopyOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { List, Badge, Card, Divider, notification } from 'antd';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { useRequest } from '@@/plugin-request/request';
-import FormattedInfo from '@/components/FormattedDescription';
+import FormattedDescription from '@/components/FormattedDescription';
 import { queryInvitations, updateInvitation } from '@/services/api/meta-ucenter';
 
 export default () => {
@@ -16,7 +15,7 @@ export default () => {
     <PageContainer
       breadcrumb={{}}
       title={intl.formatMessage({ id: 'messages.invitation.title' })}
-      content={<FormattedInfo id="messages.invitation.description" />}
+      content={<FormattedDescription id="messages.invitation.description" />}
     >
       <List
         rowKey="id"

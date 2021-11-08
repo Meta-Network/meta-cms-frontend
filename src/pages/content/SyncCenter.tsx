@@ -194,7 +194,13 @@ export default () => {
       title: intl.formatMessage({ id: 'messages.syncCenter.table.cover' }),
       search: false,
       render: (_, record) => (
-        <Space>{record.cover ? <Image width={100} src={record.cover} /> : '无封面图'}</Space>
+        <Space>
+          {record.cover ? (
+            <Image width={100} src={record.cover} />
+          ) : (
+            intl.formatMessage({ id: 'messages.table.noCoverExists' })
+          )}
+        </Space>
       ),
     },
     {

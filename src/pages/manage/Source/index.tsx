@@ -5,7 +5,7 @@ import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { getSourceStatus, syncPostsByPlatform } from '@/services/api/meta-cms';
 import styles from './index.less';
 import { useIntl } from 'umi';
-import FormattedInfo from '@/components/FormattedDescription';
+import FormattedDescription from '@/components/FormattedDescription';
 
 const status: GLOBAL.SourcePlatforms = {
   matataki: {
@@ -129,7 +129,7 @@ export default () => {
   return (
     <PageContainer
       title={intl.formatMessage({ id: 'messages.source.title' })}
-      content={<FormattedInfo id="messages.source.description" />}
+      content={<FormattedDescription id="messages.source.description" />}
       breadcrumb={{}}
     >
       <GridContent>
