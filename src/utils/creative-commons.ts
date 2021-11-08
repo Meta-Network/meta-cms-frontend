@@ -1,5 +1,8 @@
 import { getLocale } from 'umi';
 
+const CreativeCommons = 'CC';
+const Version = '4.0';
+
 /**
  * CreativeCommons License Generator
  * @param {object} param 包含了 ShareAlike Noncommercial NoDerivativeWorks 三个属性的 object
@@ -19,8 +22,8 @@ export const creativeCommonsLicenseGenerator = ({
   if (NoDerivativeWorks) result.push('ND');
   if (ShareAlike) result.push('SA');
 
-  result.unshift('CC');
-  result.push('4.0');
+  result.unshift(CreativeCommons);
+  result.push(Version);
   return result.join('-');
 };
 
