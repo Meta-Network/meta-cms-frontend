@@ -1,14 +1,16 @@
 import type { FC } from 'react';
-import { Fragment, useState, useEffect, useMemo, useCallback } from 'react';
+import { Fragment, useState, useMemo, useCallback } from 'react';
+import { getLocale, getAllLocales } from 'umi';
 import { Tooltip, Radio, Checkbox, Modal, Space, Typography } from 'antd';
 import { QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import styles from './settings.less';
 import {
   creativeCommonsLicenseGenerator,
-  convertLicenseToChinese,
   licenseDetailLink,
+  extractLicense,
 } from '@/utils/creative-commons';
 import { useMount } from 'ahooks';
+import useCreativeCommons from '@/hooks/useCreativeCommons';
 
 const { Link } = Typography;
 
@@ -22,8 +24,9 @@ type LicenseRadioValueType = '' | 'nd' | 'sa';
 const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) => {
   const [licenseRadioValue, setLicenseRadioValue] = useState<LicenseRadioValueType>('');
   const [licenseCheckboxValue, setLicenseCheckboxValue] = useState<boolean>(false);
-  const [originalNoticeVisible, setOriginalNoticeVisible] = useState(false);
-  const [originalCheckbox, setOriginalCheckbox] = useState(true);
+  const [originalNoticeVisible, setOriginalNoticeVisible] = useState<boolean>(false);
+  const [originalCheckbox, setOriginalCheckbox] = useState<boolean>(false);
+  const { convertLicenseToDeedTitle } = useCreativeCommons();
 
   const CCLicenseCredit = useMemo(() => {
     if (!originalCheckbox) return {}; // 非原创不适用
@@ -32,16 +35,18 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
       Noncommercial: !licenseCheckboxValue,
       NoDerivativeWorks: licenseRadioValue === 'nd',
     });
-    const chinese = convertLicenseToChinese(_license);
-    const url = licenseDetailLink(_license);
+
+    const _extractLicenseResult = extractLicense(_license);
+    const chinese = convertLicenseToDeedTitle(extractLicense(_extractLicenseResult));
+    const url = licenseDetailLink(_extractLicenseResult);
     return { license: _license, chinese, url };
-  }, [originalCheckbox, licenseCheckboxValue, licenseRadioValue]);
+  }, [originalCheckbox, licenseCheckboxValue, licenseRadioValue, convertLicenseToDeedTitle]);
 
   /**
    * set license
    */
   const setCCLicense = useCallback((_license: string) => {
-    switch (_license) {
+    switch (extractLicense(_license)) {
       case 'BY-NC':
         setLicenseRadioValue('');
         setLicenseCheckboxValue(false);
@@ -108,16 +113,32 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
     [licenseRadioValue, handleChangeLicense],
   );
 
-  useEffect(() => {
-    if (originalCheckbox) {
-      setOriginalNoticeVisible(true);
-    }
-  }, [originalCheckbox]);
+  /**
+   * handle original checkbox
+   */
+  const handleOriginalCheckbox = useCallback(
+    (val: boolean) => {
+      setOriginalCheckbox(val);
+
+      // true show tips
+      if (val) {
+        setOriginalNoticeVisible(true);
+      }
+
+      // set license
+      handleLicenseRadioChange('');
+    },
+    [handleLicenseRadioChange],
+  );
 
   useMount(() => {
     if (license) {
       setCCLicense(license);
+      setOriginalCheckbox(true);
     }
+
+    console.log(getAllLocales());
+    console.log(getLocale());
   });
 
   return (
@@ -134,7 +155,7 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
           <div>
             <Checkbox
               checked={originalCheckbox}
-              onChange={(e) => setOriginalCheckbox(e.target.checked)}
+              onChange={(e) => handleOriginalCheckbox(e.target.checked)}
             >
               我声明此文章为本人原创
             </Checkbox>

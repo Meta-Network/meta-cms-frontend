@@ -1,3 +1,5 @@
+import { getLocale } from 'umi';
+
 /**
  * CreativeCommons License Generator
  * @param {object} param 包含了 ShareAlike Noncommercial NoDerivativeWorks 三个属性的 object
@@ -16,6 +18,9 @@ export const creativeCommonsLicenseGenerator = ({
   if (Noncommercial) result.push('NC');
   if (NoDerivativeWorks) result.push('ND');
   if (ShareAlike) result.push('SA');
+
+  result.unshift('CC');
+  result.push('4.0');
   return result.join('-');
 };
 
@@ -39,5 +44,37 @@ export const convertLicenseToChinese = (str: string) => {
     .join('-');
 };
 
-export const licenseDetailLink = (license: string) =>
-  `https://creativecommons.org/licenses/${license.toLowerCase()}/4.0/deed.zh`;
+/**
+ * extract license
+ * CC-BY-4.0
+ * return BY
+ * @param license license string
+ * @returns license
+ */
+export const extractLicense = (license: string) => {
+  const reg = /^CC\-.*?\-4\.0/g;
+  const include = reg.test(license);
+  reg.lastIndex = 0;
+  if (include) {
+    // CC-**-4.0
+    return license.slice(3, license.length - 4);
+  } else {
+    return license;
+  }
+};
+
+/**
+ * license link
+ * @param license
+ * @returns
+ */
+export const licenseDetailLink = (license: string) => {
+  const language = {
+    'zh-CN': 'zh',
+    'en-US': 'en',
+  };
+  console.log('getLocale', getLocale());
+  return `https://creativecommons.org/licenses/${license.toLowerCase()}/4.0/deed.${
+    language[getLocale()] || language['zh-CN']
+  }`;
+};

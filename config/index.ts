@@ -2,4 +2,4 @@
 export const UploadImageSize = 5;
 
 // default license
-export const License = 'BY-NC';
+export const License = '';
