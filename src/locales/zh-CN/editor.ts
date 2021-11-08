@@ -10,4 +10,8 @@ export default {
   'editor.edit.placeholder': '现在就开始编辑吧！',
   'editor.edit.tool.upload': '上传图片',
   'editor.edit.tool.emoji.setEmoji': '设置常用表情',
+  'editor.creativeCommons.attribution': '署名',
+  'editor.creativeCommons.nonCommercial': '非商业性使用',
+  'editor.creativeCommons.noDerivatives': '禁止演绎',
+  'editor.creativeCommons.shareAlike': '相同方式共享',
 };

@@ -24,26 +24,6 @@ export const creativeCommonsLicenseGenerator = ({
   return result.join('-');
 };
 
-export const convertLicenseToChinese = (str: string) => {
-  const splitted = str.split('-');
-  return splitted
-    .map((item) => {
-      switch (item) {
-        case 'BY':
-          return '署名';
-        case 'NC':
-          return '非商业性使用';
-        case 'ND':
-          return '禁止演绎';
-        case 'SA':
-          return '相同方式共享';
-        default:
-          return '';
-      }
-    })
-    .join('-');
-};
-
 /**
  * extract license
  * CC-BY-4.0
