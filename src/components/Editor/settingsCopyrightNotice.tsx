@@ -123,12 +123,19 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
       // true show tips
       if (val) {
         setOriginalNoticeVisible(true);
-      }
 
-      // set license
-      handleLicenseRadioChange('');
+        // set default license
+        handleLicenseRadioChange('');
+      } else {
+        // remove license
+        handleLicenseRadioChange('');
+        setLicenseCheckboxValue(false);
+
+        // No original statement, remove license
+        handleChangeLicense('');
+      }
     },
-    [handleLicenseRadioChange],
+    [handleLicenseRadioChange, handleChangeLicense],
   );
 
   useMount(() => {
