@@ -196,6 +196,7 @@ const Edit: React.FC = () => {
         summary: generateSummary(),
         content: content,
         tags: tags,
+        license: license,
       });
 
       // update local db draft data
@@ -217,7 +218,7 @@ const Edit: React.FC = () => {
 
       return Promise.resolve();
     },
-    [draftPublishAsPost, title, cover, content, tags, intl, setSiteNeedToDeploy],
+    [draftPublishAsPost, title, cover, content, tags, license, intl, setSiteNeedToDeploy],
   );
 
   /**
@@ -277,9 +278,20 @@ const Edit: React.FC = () => {
         tags: tags,
         categories: [],
         content: content,
+        license: license,
       });
     }
-  }, [title, cover, content, tags, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
+  }, [
+    title,
+    cover,
+    content,
+    tags,
+    license,
+    publishAsPost,
+    draftPublishAsPost,
+    postPublishToPost,
+    intl,
+  ]);
 
   /**
    * handle history url state
@@ -388,7 +400,7 @@ const Edit: React.FC = () => {
       await asyncContentToDB(val);
       await handleImageUploadToIpfs();
 
-      // 更新草稿内容
+      // update draft license
       await updateDraft({
         content: val,
         summary: generateSummary(),
@@ -414,7 +426,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // 更新草稿内容
+      // update draft license
       await updateDraft({
         cover: url,
       });
@@ -438,7 +450,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // 更新草稿内容
+      // update draft license
       await updateDraft({
         title: val,
       });
@@ -478,7 +490,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // 更新草稿内容
+      // update draft license
       await updateDraft({
         tags: val,
       });
@@ -505,14 +517,14 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // 更新草稿内容
-      // await updateDraft({
-      //   tags: val,
-      // });
+      // update draft license
+      await updateDraft({
+        license: val,
+      });
 
       setDraftMode(2);
     },
-    [handleHistoryState],
+    [handleHistoryState, updateDraft],
   );
 
   /**

@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { Fragment, useState, useMemo, useCallback } from 'react';
-import { getLocale, getAllLocales } from 'umi';
 import { Tooltip, Radio, Checkbox, Modal, Space, Typography } from 'antd';
 import { QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import styles from './settings.less';
@@ -143,9 +142,6 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
       setCCLicense(license);
       setOriginalCheckbox(true);
     }
-
-    console.log(getAllLocales());
-    console.log(getLocale());
   });
 
   return (

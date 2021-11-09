@@ -178,6 +178,7 @@ export default () => {
           post: _post,
           draft: _draftData,
           tags: _draftData.tags || _post.tags || [],
+          license: _draftData.license || _post.license || '',
         }),
       );
 
