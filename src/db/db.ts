@@ -17,7 +17,7 @@ export class StoreDB extends Dexie {
         const time = moment().toISOString();
         // TODO: modify typescript
         return tx.posts.toCollection().modify((post: Posts) => {
-          console.log('post', post);
+          // console.log('post', post);
           post.cover = post.cover || '';
           post.title = post.title || '';
           post.summary = post.summary || '';
@@ -72,6 +72,14 @@ export const dbPostsGet = async (id: number): Promise<Posts | undefined> => {
  */
 export const dbPostsDelete = async (id: number): Promise<void> => {
   return await db.posts.delete(id);
+};
+
+/**
+ * db posts delete all
+ * @returns
+ */
+export const dbPostsDeleteAll = async (): Promise<number> => {
+  return await db.posts.where('delete').anyOf(0, 1).delete();
 };
 
 /**

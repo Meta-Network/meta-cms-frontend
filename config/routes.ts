@@ -92,6 +92,12 @@
     component: './Invitation',
   },
   {
+    path: '/settings',
+    name: 'settings',
+    icon: 'setting',
+    component: './settings/Index',
+  },
+  {
     path: '/result/store-setting-success',
     hideInMenu: true,
     component: './result/StoreSettingSuccess',

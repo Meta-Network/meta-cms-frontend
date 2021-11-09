@@ -20,4 +20,5 @@ export default {
   'menu.moreInfo.privacyPolicy': '隐私政策',
   'menu.moreInfo.versions': '版本记录',
   'menu.post.create': '创作',
+  'menu.settings': '设置',
 };
