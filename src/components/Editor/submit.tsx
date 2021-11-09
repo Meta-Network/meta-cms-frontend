@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useState, useEffect } from 'react';
 import { Modal, Card, Form, Input, Button, Checkbox, Radio, Select, Space, message } from 'antd';
 import {
   KeyOutlined,
@@ -10,6 +10,22 @@ import {
 } from '@ant-design/icons';
 import styles from './submit.less';
 import { sleep } from '@/utils';
+import {
+  generateSeed,
+  generateKeys,
+  // generatePostDigestRequestMetadata,
+  // generateAuthorDigestSignMetadata,
+  uint8ToHexString,
+} from '@metaio/meta-signature-util';
+// import * as utils from '@metaio/meta-signature-util';
+import type {
+  KeyPair,
+  // AuthorDigestRequestMetadata,
+  // AuthorSignatureMetadata,
+} from '@metaio/meta-signature-util/type/types.d';
+import { storeGet, storeSet } from '@/utils/store';
+import { KEY_META_CMS_METADATA_PUBLIC_KEYS, KEY_META_CMS_METADATA_SEED } from '../../../config';
+import { isEmpty } from 'lodash';
 
 interface Props {
   handlePublish: () => void;
@@ -21,8 +37,9 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
   const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
   const [signatureLoading, setSignatureLoading] = useState<boolean>(false);
-  const [signature, setSignature] = useState<string>('');
+  const [publicKey, setPublicKey] = useState<string>('');
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [gatewayLoading, setGatewayLoading] = useState<boolean>(false);
 
   const onFinish = (values: any) => {
@@ -38,27 +55,98 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   };
 
   /**
-   * handle generate key
+   * get seed and key
    */
-  const handleGenerateKey = useCallback(async () => {
-    setSignatureLoading(true);
-    // const result = await something()
-    await sleep(2000);
-    const result = true;
-    if (result) {
-      message.success('生成成功');
-      setSignature('0x3484040A7c337A95d0eD7779769ffe3e14ecCcA6');
+  const getSeedAndKey = useCallback(() => {
+    const seedStore = JSON.parse(storeGet(KEY_META_CMS_METADATA_SEED) || '[]');
+    const publicKeyStore = storeGet(KEY_META_CMS_METADATA_PUBLIC_KEYS) || '';
 
-      // 更新本地数据
-
-      setSignatureLoading(false);
-      return Promise.resolve();
-    } else {
-      message.error('生成失败');
-      setSignatureLoading(false);
-      return Promise.reject();
+    if (isEmpty(seedStore) || !publicKeyStore) {
+      setPublicKey('');
+      return;
     }
+
+    const keys: KeyPair = generateKeys(seedStore);
+    const seedGeneratePublicKey = uint8ToHexString(keys.public);
+
+    // Verify that the seed and key match
+    if (publicKeyStore === seedGeneratePublicKey) {
+      setPublicKey(publicKeyStore);
+    } else {
+      setPublicKey('');
+    }
+  }, [setPublicKey]);
+
+  /**
+   * generate Seed and Key
+   */
+  const generateSeedAndKey = useCallback(() => {
+    // test
+    // const seed: string[] = generateSeed();
+    // console.log('seed', seed);
+
+    // const keys: KeyPair = generateKeys(seed);
+    // console.log('keys', keys);
+
+    // const payload = {
+    //   title: 'One testing post',
+    //   categories: 'Meta Network,Testing',
+    //   content: 'Some post content here...May be very long...',
+    //   cover: 'https://cover.url.com/',
+    //   licence: 'CC BY 4.0',
+    //   summary: 'Some post content here...',
+    //   tags: 'Testing Tag, UnitTest',
+    // };
+    // const digestMetadata: AuthorDigestRequestMetadata = generatePostDigestRequestMetadata(payload);
+    // console.log('digestMetadata', digestMetadata);
+
+    // const authorSignatureMetadata: AuthorSignatureMetadata = generateAuthorDigestSignMetadata(
+    //   keys,
+    //   'metaspace.life',
+    //   digestMetadata.digest,
+    // );
+    // console.log('authorSignatureMetadata', authorSignatureMetadata);
+
+    // // test
+    // return {
+    //   authorDigestSignatureMetadataStorageType: 'ipfs',
+    //   authorDigestSignatureMetadataRefer: authorSignatureMetadata.signature,
+    // };
+
+    // const seed = JSON.parse(storeGet(KEY_META_CMS_METADATA_SEED) || '[]');
+    // const publicKey = JSON.parse(storeGet(KEY_META_CMS_METADATA_PUBLIC_KEYS) || '""');
+    // const privateKey = JSON.parse(storeGet(KEY_META_CMS_METADATA_PRIVATE_KEYS || '""');
+
+    const seed: string[] = generateSeed();
+    const keys: KeyPair = generateKeys(seed);
+    const _publicKey = uint8ToHexString(keys.public);
+
+    storeSet(KEY_META_CMS_METADATA_SEED, JSON.stringify(seed));
+    storeSet(KEY_META_CMS_METADATA_PUBLIC_KEYS, _publicKey);
+
+    return {
+      publicKey: _publicKey,
+    };
   }, []);
+
+  /**
+   * handle generate publicKey
+   */
+  const handleGeneratePublicKey = useCallback(async () => {
+    setSignatureLoading(true);
+
+    try {
+      const { publicKey: _publicKey } = generateSeedAndKey();
+      setPublicKey(_publicKey);
+
+      message.success('生成成功');
+    } catch (error) {
+      console.log('error', error);
+      message.error('生成失败');
+    }
+
+    setSignatureLoading(false);
+  }, [generateSeedAndKey, setPublicKey]);
 
   /**
    * handle set gateway
@@ -75,6 +163,11 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     }
     setGatewayLoading(false);
   }, []);
+
+  useEffect(() => {
+    // (window as any).utils = utils;
+    getSeedAndKey();
+  }, [getSeedAndKey]);
 
   return (
     <Card title="准备好提交文章到仓储仓库了？" bodyStyle={{ padding: 0 }} style={{ width: 340 }}>
@@ -120,7 +213,9 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                 placeholder="网关未选定"
                 bordered={false}
                 showArrow={false}
-                disabled={gatewayLoading}
+                // disabled={gatewayLoading}
+                disabled={true}
+                defaultValue="ipfs"
               >
                 <Option value="ipfs">IPFS</Option>
                 <Option value="github">GITHUB</Option>
@@ -133,17 +228,17 @@ const Submit: FC<Props> = ({ handlePublish }) => {
           </div>
         </Form.Item>
 
-        <Form.Item name="select-multiple" label="" className={styles.item}>
+        <Form.Item name="publicKey" label="" className={styles.item}>
           <div className={styles.flexAlignItemCenter}>
             <div className={styles.itemStatus}>
-              <span className={styles.undone} />
+              {publicKey ? <span className={styles.done} /> : <span className={styles.undone} />}
             </div>
             <div className={styles.itemForm}>
               <Input
                 placeholder="签名未设置"
                 className={styles.input}
-                value={signature}
-                disabled={signatureLoading}
+                value={publicKey}
+                disabled={true}
               />
               {visibleSignature ? (
                 <EyeOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
@@ -158,10 +253,10 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         </Form.Item>
         {visibleSignature && (
           <div className={styles.key}>
-            <div className={styles.keyVal}>{signature || '暂无'}</div>
+            <div className={styles.keyVal}>{publicKey || '暂无'}</div>
             <div className={styles.keyGenerate}>
               生成自你的非金融 KEY{' '}
-              <a href="#">
+              <a href="javascript:;" onClick={() => setVisibleSignatureGenerate(true)}>
                 <ArrowRightOutlined />
               </a>
             </div>
@@ -186,16 +281,16 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         }
         onCancel={() => setVisibleSignatureGenerate(false)}
         footer={[
-          <Button onClick={() => window.open('http://metaspaces.life', '_blank')}>管理</Button>,
-          <Button type="primary" loading={signatureLoading} onClick={handleGenerateKey}>
-            立即生成
+          <Button onClick={() => setVisibleSignatureGenerate(false)}>取消</Button>,
+          <Button type="primary" loading={signatureLoading} onClick={handleGeneratePublicKey}>
+            {publicKey ? '重新生成' : '立即生成'}
           </Button>,
         ]}
       >
         <Space direction="vertical">
-          <div>检测到您当前还未生成 非金融 KEY</div>
+          <div>{publicKey ? '您已生成 非金融 KEY' : '检测到您当前还未生成 非金融 KEY'}</div>
           <div>(存储在浏览器中，用户产生加密签名)</div>
-          <Input value={signature} placeholder="KEY" />
+          <Input value={publicKey} placeholder="KEY" disabled />
         </Space>
       </Modal>
     </Card>
