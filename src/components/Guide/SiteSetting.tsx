@@ -21,8 +21,10 @@ export default () => {
   const [faviconUrl, setFaviconUrl] = useState<string>(siteSetting.favicon || '');
 
   const author = initialState?.currentUser?.nickname || '';
+  let defaultLanguage = getLocale().split('-')[0];
+  if (defaultLanguage === 'zh') defaultLanguage = 'zh-CN';
   const initialValues = {
-    language: getLocale().split('-')[0],
+    language: defaultLanguage,
     timezone: momentTimezone.tz.guess(),
     author,
     ...siteSetting,

@@ -216,7 +216,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     menuItemRender: (menuItemProps, defaultDom) => {
       switch (menuItemProps.path) {
         // local draft counter
-        case '/posts': {
+        case '/content/drafts': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}

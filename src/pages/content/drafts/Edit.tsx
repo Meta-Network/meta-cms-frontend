@@ -269,16 +269,7 @@ const Edit: React.FC = () => {
         content: content,
       });
     }
-  }, [
-    title,
-    cover,
-    content,
-    tags,
-    publishAsPost,
-    draftPublishAsPost,
-    postPublishToPost,
-    intl,
-  ]);
+  }, [title, cover, content, tags, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
 
   /**
    * handle history url state

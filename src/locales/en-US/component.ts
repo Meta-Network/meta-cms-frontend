@@ -12,7 +12,6 @@ export default {
   'component.button.finish': 'Completed',
   'component.button.publish': 'Publish',
   'component.button.edit': 'Edit',
-  'component.button.editLocally': 'Local Edit',
   'component.button.discard': 'Discard',
   'component.button.delete': 'Delete',
   'component.button.yes': 'Yes',
