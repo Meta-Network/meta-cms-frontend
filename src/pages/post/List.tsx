@@ -2,30 +2,16 @@ import { useState, useCallback } from 'react';
 import { history, useIntl } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
-import { Table, Tag, Button, Image, Space, Popconfirm, message, Tooltip } from 'antd';
-import { CopyOutlined, EditOutlined } from '@ant-design/icons';
+import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
+import { CopyOutlined } from '@ant-design/icons';
 import { dbPostsUpdate, dbPostsAll } from '@/db/db';
 import type { Posts } from '@/db/Posts.d';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { strSlice } from '@/utils';
-import { getDefaultSiteConfigAPI } from '@/helpers';
 
 export default () => {
   const intl = useIntl();
   const [postsList, setPostsList] = useState<Posts[]>([]);
-  const [siteConfiguration, setSiteConfiguration] = useState<CMS.SiteConfiguration>(
-    {} as CMS.SiteConfiguration,
-  );
-
-  /**
-   * fetch default site configuration
-   */
-  const fetchDefaultSiteConfiguration = useCallback(async () => {
-    const siteConfigResult = await getDefaultSiteConfigAPI();
-    if (siteConfigResult) {
-      setSiteConfiguration(siteConfigResult);
-    }
-  }, []);
 
   /**
    * handle delete
@@ -194,7 +180,6 @@ export default () => {
 
   useMount(() => {
     fetchPosts();
-    fetchDefaultSiteConfiguration();
   });
 
   return (
@@ -211,22 +196,6 @@ export default () => {
         </div>
       }
     >
-      <Tooltip
-        placement="top"
-        title={siteConfiguration.domain ? '立即创作' : '请先创建 Meta Space'}
-      >
-        <Button
-          style={{ marginBottom: 10 }}
-          icon={<EditOutlined />}
-          onClick={() => history.push('/post/edit')}
-          disabled={!siteConfiguration.domain}
-        >
-          {intl.formatMessage({
-            id: 'component.button.create',
-          })}
-        </Button>
-      </Tooltip>
-
       <Table
         rowKey={(record: Posts) => String(record.id)}
         onRow={() => {

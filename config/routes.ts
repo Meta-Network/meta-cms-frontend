@@ -28,6 +28,13 @@
     ],
   },
   {
+    path: '/post/edit',
+    component: './post/Edit',
+    name: '创作',
+    icon: 'plus',
+    layout: false,
+  },
+  {
     path: '/content',
     name: 'content',
     icon: 'edit',
@@ -77,11 +84,6 @@
     name: 'localDraft',
     icon: 'edit',
     component: './post/List',
-  },
-  {
-    path: '/post/edit',
-    component: './post/Edit',
-    layout: false,
   },
   {
     path: '/invitation',
