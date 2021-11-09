@@ -19,7 +19,7 @@ import {
 } from '@/helpers';
 import { assign } from 'lodash';
 // import type Vditor from 'vditor';
-import { generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
+import { generateSignature, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 import Submit from '@/components/Editor/submit';
@@ -30,6 +30,7 @@ import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
 import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
+import type { PostMetadata } from '@metaio/meta-signature-util/type/types.d';
 
 const { confirm } = Modal;
 
@@ -190,13 +191,30 @@ const Edit: React.FC = () => {
       );
 
       // update post(draft)
-      const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
+      const data = {
         title: title,
         cover: cover,
         summary: generateSummary(),
         content: content,
-        tags: tags,
+        // tags: tags,
         license: license,
+      };
+
+      const payload: PostMetadata = {
+        title: title,
+        cover: cover,
+        summary: generateSummary(),
+        content: content,
+        categories: '',
+        tags: tags.join(),
+        licence: license,
+      };
+      const metadata = generateSignature({ payload });
+      const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
+        ...data,
+        tags: tags,
+        authorDigestSignatureMetadataStorageType: metadata.authorDigestSignatureMetadataStorageType,
+        authorDigestSignatureMetadataRefer: metadata.authorDigestSignatureMetadataRefer,
       });
 
       // update local db draft data
@@ -271,6 +289,17 @@ const Edit: React.FC = () => {
       });
     } else {
       // 本地编辑发布
+      const payload: PostMetadata = {
+        title: title,
+        cover: cover,
+        summary: generateSummary(),
+        content: content,
+        categories: '',
+        tags: tags.join(),
+        licence: license,
+      };
+
+      const metadata = generateSignature({ payload });
       await publishAsPost({
         title: title,
         cover: cover,
@@ -279,6 +308,8 @@ const Edit: React.FC = () => {
         categories: [],
         content: content,
         license: license,
+        authorDigestSignatureMetadataStorageType: metadata.authorDigestSignatureMetadataStorageType,
+        authorDigestSignatureMetadataRefer: metadata.authorDigestSignatureMetadataRefer,
       });
     }
   }, [
@@ -400,7 +431,7 @@ const Edit: React.FC = () => {
       await asyncContentToDB(val);
       await handleImageUploadToIpfs();
 
-      // update draft license
+      // update draft content and sumary
       await updateDraft({
         content: val,
         summary: generateSummary(),
@@ -426,7 +457,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // update draft license
+      // update draft cover
       await updateDraft({
         cover: url,
       });
@@ -450,7 +481,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // update draft license
+      // update draft title
       await updateDraft({
         title: val,
       });
@@ -490,7 +521,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // update draft license
+      // update draft tags
       await updateDraft({
         tags: val,
       });

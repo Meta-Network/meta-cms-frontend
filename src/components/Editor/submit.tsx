@@ -9,7 +9,6 @@ import {
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import styles from './submit.less';
-import { sleep } from '@/utils';
 import {
   generateSeed,
   generateKeys,
@@ -23,9 +22,9 @@ import type {
   // AuthorDigestRequestMetadata,
   // AuthorSignatureMetadata,
 } from '@metaio/meta-signature-util/type/types.d';
-import { storeGet, storeSet } from '@/utils/store';
+import { storeSet } from '@/utils/store';
 import { KEY_META_CMS_METADATA_PUBLIC_KEYS, KEY_META_CMS_METADATA_SEED } from '../../../config';
-import { isEmpty } from 'lodash';
+import { verifySeedAndKey } from '@/utils/editor';
 
 interface Props {
   handlePublish: () => void;
@@ -39,14 +38,19 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   const [signatureLoading, setSignatureLoading] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<string>('');
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [gatewayLoading, setGatewayLoading] = useState<boolean>(false);
+  const [gatewayLoading, setGatewayLoading] = useState<boolean>(true);
 
   const onFinish = (values: any) => {
     console.log('Success:', values);
     // if (false) {
     //   handlePublish();
     // }
+
+    if (!publicKey) {
+      message.warning('请生成 非金融 KEY');
+      return;
+    }
+
     handlePublish();
   };
 
@@ -58,20 +62,9 @@ const Submit: FC<Props> = ({ handlePublish }) => {
    * get seed and key
    */
   const getSeedAndKey = useCallback(() => {
-    const seedStore = JSON.parse(storeGet(KEY_META_CMS_METADATA_SEED) || '[]');
-    const publicKeyStore = storeGet(KEY_META_CMS_METADATA_PUBLIC_KEYS) || '';
-
-    if (isEmpty(seedStore) || !publicKeyStore) {
-      setPublicKey('');
-      return;
-    }
-
-    const keys: KeyPair = generateKeys(seedStore);
-    const seedGeneratePublicKey = uint8ToHexString(keys.public);
-
-    // Verify that the seed and key match
-    if (publicKeyStore === seedGeneratePublicKey) {
-      setPublicKey(publicKeyStore);
+    const result = verifySeedAndKey();
+    if (result) {
+      setPublicKey(result.publicKey);
     } else {
       setPublicKey('');
     }
@@ -153,15 +146,15 @@ const Submit: FC<Props> = ({ handlePublish }) => {
    */
   const handleSetGateway = useCallback(async () => {
     setGatewayLoading(true);
-    // const result = await something()
-    await sleep(2000);
-    const result = true;
-    if (result) {
-      message.success('设置成功');
-    } else {
-      message.error('设置失败');
-    }
-    setGatewayLoading(false);
+    // // const result = await something()
+    // await sleep(2000);
+    // const result = true;
+    // if (result) {
+    //   message.success('设置成功');
+    // } else {
+    //   message.error('设置失败');
+    // }
+    // setGatewayLoading(false);
   }, []);
 
   useEffect(() => {
@@ -213,8 +206,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                 placeholder="网关未选定"
                 bordered={false}
                 showArrow={false}
-                // disabled={gatewayLoading}
-                disabled={true}
+                disabled={gatewayLoading}
                 defaultValue="ipfs"
               >
                 <Option value="ipfs">IPFS</Option>

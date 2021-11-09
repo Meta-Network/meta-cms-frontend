@@ -99,6 +99,8 @@ declare namespace CMS {
     categories?: string[];
     content?: string;
     license?: string;
+    authorDigestSignatureMetadataStorageType?: string;
+    authorDigestSignatureMetadataRefer?: string;
   };
 
   type Draft = {
