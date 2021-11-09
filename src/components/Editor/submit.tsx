@@ -27,9 +27,10 @@ const Submit: FC<Props> = ({ handlePublish }) => {
 
   const onFinish = (values: any) => {
     console.log('Success:', values);
-    if (false) {
-      handlePublish();
-    }
+    // if (false) {
+    //   handlePublish();
+    // }
+    handlePublish();
   };
 
   const onFinishFailed = (errorInfo: any) => {
