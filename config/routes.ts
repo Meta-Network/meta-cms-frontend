@@ -30,7 +30,7 @@
   {
     path: '/post/edit',
     component: './post/Edit',
-    name: '创作',
+    name: 'post.create',
     icon: 'plus',
     layout: false,
   },

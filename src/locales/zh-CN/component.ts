@@ -17,7 +17,6 @@ export default {
   'component.button.delete': '删除',
   'component.button.yes': '是',
   'component.button.no': '否',
-  'component.button.create': '创作',
   'component.status.alreadyBound': '已绑定',
   'component.status.notBound': '未绑定',
   'component.badge.invitationAvailable': '邀请码可用',

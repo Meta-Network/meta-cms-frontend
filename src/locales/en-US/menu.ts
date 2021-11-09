@@ -19,4 +19,5 @@ export default {
   'menu.moreInfo.terms': 'Terms',
   'menu.moreInfo.privacyPolicy': 'Privacy Policy',
   'menu.moreInfo.versions': 'Version record',
+  'menu.post.create': 'Create',
 };
