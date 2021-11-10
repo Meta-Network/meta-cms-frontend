@@ -126,7 +126,7 @@ export default () => {
 
         const currentDraft = await dbPostsWhereByID(post.id);
         console.log('currentDraft', currentDraft);
-        const _url = currentDraft ? `/post/edit?id=${currentDraft.id}` : `/posts`;
+        const _url = currentDraft ? `/content/drafts/edit?id=${currentDraft.id}` : `/posts`;
         confirm({
           icon: <ExclamationCircleOutlined />,
           content: intl.formatMessage({ id: 'messages.syncCenter.draftSavedTips' }),
@@ -182,7 +182,7 @@ export default () => {
         }),
       );
 
-      history.push(`/post/edit?id=${resultID}`);
+      history.push(`/content/drafts/edit?id=${resultID}`);
 
       setTransferDraftLoading(false);
     },
@@ -285,7 +285,12 @@ export default () => {
         >
           {intl.formatMessage({ id: 'component.button.publish' })}
         </Button>,
-        <Button key="option-edit" ghost type="primary">
+        <Button
+          onClick={() => transferDraft(record)}
+          loading={transferDraftLoading}
+          ghost
+          type="primary"
+        >
           {intl.formatMessage({ id: 'component.button.edit' })}
         </Button>,
         <Button
@@ -296,13 +301,6 @@ export default () => {
           danger
         >
           {intl.formatMessage({ id: 'component.button.discard' })}
-        </Button>,
-        <Button
-          onClick={() => transferDraft(record)}
-          loading={transferDraftLoading}
-          // disabled={!siteConfiguration.domain}
-        >
-          {intl.formatMessage({ id: 'component.button.editLocally' })}
         </Button>,
       ],
     },

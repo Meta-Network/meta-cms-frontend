@@ -147,4 +147,5 @@ export default {
   'messages.editor.upload.image.success': '上传成功',
   'messages.editor.upload.image.fail': '上传失败',
   'messages.editor.edit.tool.upload.fail': '图片上传失败',
+  'messages.invitation.card.title': '邀请码 #{codeId}',
 };

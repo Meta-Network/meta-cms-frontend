@@ -12,7 +12,6 @@ export default {
   'component.button.finish': '完成',
   'component.button.publish': '发布',
   'component.button.edit': '编辑',
-  'component.button.editLocally': '本地编辑',
   'component.button.discard': '移除',
   'component.button.delete': '删除',
   'component.button.yes': '是',

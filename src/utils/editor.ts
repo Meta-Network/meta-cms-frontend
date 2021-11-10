@@ -132,7 +132,13 @@ export const uploadMetadata = async ({
   payload,
 }: {
   payload: PostMetadata;
-}): Promise<Storage.Fleek | false> => {
+}): Promise<
+  | {
+      metadata: AuthorSignatureMetadata;
+      ipfs: Storage.Fleek;
+    }
+  | false
+> => {
   const metadata = generateMetadata({ payload });
 
   // generate json file
@@ -145,7 +151,10 @@ export const uploadMetadata = async ({
   console.log('res', result);
 
   if (result) {
-    return result;
+    return {
+      metadata: metadata,
+      ipfs: result,
+    };
   } else {
     console.error('no result');
     return false;

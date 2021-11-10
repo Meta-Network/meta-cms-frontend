@@ -31,6 +31,7 @@ export default () => {
   const intl = useIntl();
   const [configId, setConfigId] = useState<number>();
 
+  // set default message
   useEffect(() => {
     updateProcessing({
       message: intl.formatMessage({ id: 'messages.deployment.readyToStart' }),
@@ -45,6 +46,19 @@ export default () => {
       setCurrentStage(currentStage + 1);
     }
   }, [currentStage, stageCompleted]);
+
+  // if facing into an error, prepare for the next run
+  useEffect(() => {
+    if (onError) {
+      setCurrentStage(DeployStages.pending);
+      updateProcessing({
+        message: intl.formatMessage({
+          id: 'messages.deployment.readyToStart',
+        }),
+        state: 'info',
+      });
+    }
+  }, [onError]);
 
   // handle stage changes
   useEffect(() => {
@@ -91,8 +105,6 @@ export default () => {
       }
       case DeployStages.submitting: {
         const submitting = async () => {
-          message.loading(intl.formatMessage({ id: 'messages.deployment.deploying' }), 10);
-
           const infoSetting = await newSiteInfoSetting({
             title: siteSetting.title,
             subtitle: siteSetting.subtitle,
@@ -262,6 +274,10 @@ export default () => {
       }
       case DeployStages.deploying: {
         const deploying = async () => {
+          const done = message.loading(
+            intl.formatMessage({ id: 'messages.deployment.deploying' }),
+            0,
+          );
           const deployAndPublish = await deployAndPublishSite(configId as number);
 
           if (deployAndPublish.message === 'Ok') {
@@ -292,6 +308,7 @@ export default () => {
             }),
             state: 'success',
           });
+          done();
         };
         deploying()
           .then(() => {
@@ -326,19 +343,6 @@ export default () => {
         break;
     }
   }, [currentStage]);
-
-  // if facing into an error, prepare for the next run
-  useEffect(() => {
-    if (onError) {
-      setCurrentStage(DeployStages.pending);
-      updateProcessing({
-        message: intl.formatMessage({
-          id: 'messages.deployment.readyToStart',
-        }),
-        state: 'info',
-      });
-    }
-  }, [onError]);
 
   return (
     <div className={styles.container}>

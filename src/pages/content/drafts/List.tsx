@@ -5,7 +5,7 @@ import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { dbPostsUpdate, dbPostsAll } from '@/db/db';
-import type { Posts } from '@/db/Posts.d';
+import type { Posts } from '@/db/Posts';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { strSlice } from '@/utils';
 
@@ -137,7 +137,7 @@ export default () => {
             <Button
               onClick={() => {
                 history.push({
-                  pathname: '/post/edit',
+                  pathname: '/content/drafts/edit',
                   query: {
                     id: String(record.id),
                   },

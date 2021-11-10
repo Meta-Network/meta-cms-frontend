@@ -63,9 +63,11 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
       break;
     }
   }
-  cache[key as string] = {
-    value: values,
-    result: result,
-  };
+  if (key) {
+    cache[key as string] = {
+      value: values,
+      result: result,
+    };
+  }
   return result;
 };

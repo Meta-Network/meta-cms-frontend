@@ -18,6 +18,7 @@ export default () => {
   const { storeSetting, setStoreSetting } = useModel('storage');
 
   useEffect(() => {
+    if (userRepos.length !== 0) return;
     if (storeSetting.username) {
       // TODO: This is for Github only
       getGithubReposName()

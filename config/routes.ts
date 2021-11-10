@@ -1,8 +1,14 @@
 ﻿export default [
   {
-    path: '/guide',
+    path: '/create',
     component: './Guide',
-    name: 'guide',
+    name: 'create',
+    icon: 'PlusSquare',
+  },
+  {
+    path: '/dashboard',
+    component: './Dashboard',
+    name: 'dashboard',
     icon: 'dashboard',
   },
   {
@@ -40,6 +46,12 @@
     icon: 'edit',
     routes: [
       {
+        path: '/content/drafts',
+        name: 'drafts',
+        icon: 'edit',
+        component: './content/drafts/List',
+      },
+      {
         path: '/content/sync-center',
         name: 'syncCenter',
         component: './content/SyncCenter',
@@ -48,6 +60,11 @@
         path: '/content/published-posts',
         name: 'publishedPosts',
         component: './content/PublishedPosts',
+      },
+      {
+        path: '/content/drafts/edit',
+        component: './content/drafts/Edit',
+        layout: false,
       },
     ],
   },
@@ -77,13 +94,12 @@
         name: 'domainSetting',
         component: './manage/DomainSetting',
       },
+      {
+        path: '/manage/account',
+        name: 'account',
+        component: './manage/Account',
+      },
     ],
-  },
-  {
-    path: '/posts',
-    name: 'localDraft',
-    icon: 'edit',
-    component: './post/List',
   },
   {
     path: '/invitation',
@@ -104,7 +120,7 @@
   },
   {
     path: '/',
-    redirect: '/guide',
+    redirect: '/create',
   },
   {
     component: './404',
