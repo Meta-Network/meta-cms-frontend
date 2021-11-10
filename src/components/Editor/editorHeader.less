@@ -1,3 +1,11 @@
+@marginElement: 40px;
+@marginAdjacent: 20px;
+@marginSpace: 4px;
+@sizeMain: 16px;
+@sizeSecondary: 14px;
+@colorMain: #222;
+@colorSecondary: #bfbfbf;
+
 .header {
   position: fixed;
   top: 0;
@@ -7,32 +15,51 @@
   // align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
-  padding: 40px 40px 0;
+  padding: @marginElement @marginElement 0;
   @media screen and (max-width: 1200px) {
     position: relative;
   }
 }
 .headerBack {
-  color: #333;
+  color: @colorMain;
   font-weight: 500;
-  font-size: 16px;
+  font-size: @sizeMain;
   cursor: pointer;
 }
+
 .headerStatus {
-  margin-left: 40px;
-  color: #bfbfbf;
+  margin-left: @marginElement;
+  color: @colorSecondary;
   font-weight: 500;
-  font-size: 16px;
+  font-size: @sizeSecondary;
 }
-.headerPreview {
-  color: rgb(33, 189, 67);
+
+.headerUpload,
+.headerDownload {
+  color: @colorSecondary;
   font-weight: 500;
-  font-size: 16px;
+  font-size: @sizeSecondary;
+  cursor: pointer;
+  transition: color 0.2s;
+  &:hover {
+    color: @colorMain;
+  }
+}
+.headerUpload {
+  margin-left: @marginElement;
+}
+.headerDownload {
+  margin-left: @marginAdjacent;
+}
+.headerIconText {
+  margin-left: @marginSpace;
+}
+.headerDropdown {
+  z-index: 10;
 }
 .headerPublish {
   color: rgb(33, 189, 67);
-  // margin-left: 40px;
   font-weight: 500;
-  font-size: 16px;
+  font-size: @sizeMain;
   cursor: pointer;
 }

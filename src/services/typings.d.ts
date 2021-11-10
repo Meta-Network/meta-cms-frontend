@@ -98,6 +98,9 @@ declare namespace CMS {
     tags?: string[];
     categories?: string[];
     content?: string;
+    license?: string;
+    authorDigestSignatureMetadataStorageType?: string;
+    authorDigestSignatureMetadataRefer?: string;
   };
 
   type Draft = {
@@ -110,6 +113,7 @@ declare namespace CMS {
     state: string;
     categories: string[] | null;
     tags: string[];
+    license: string;
     id: number;
     createdAt: Date;
     updatedAt: Date;
@@ -129,6 +133,7 @@ declare namespace CMS {
     state: 'drafted' | 'pending';
     category: string;
     tags: string[];
+    license: string;
     siteConfigRelas: {
       id: number;
       createdAt: Date;

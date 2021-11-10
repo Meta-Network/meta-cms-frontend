@@ -53,6 +53,7 @@
     "@ant-design/pro-form": "^1.18.3",
     "@ant-design/pro-layout": "^6.15.3",
     "@ant-design/pro-table": "^2.30.8",
+    "@metaio/meta-signature-util": "^0.1.2",
     "@simplewebauthn/browser": "^3.1.0",
     "@umijs/route-utils": "^1.0.36",
     "ahooks": "^2.10.11",

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { Fragment, useState, useCallback, useEffect } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { Input, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
 import { dbPostsUpdate, dbPostsAdd, dbPostsGet, PostTempData } from '@/db/db';
-// import type { Posts } from '@/db/Posts.d';
+import type { Posts } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
   getDefaultSiteConfigAPI,
@@ -19,20 +19,30 @@ import {
 } from '@/helpers';
 import { assign } from 'lodash';
 // import type Vditor from 'vditor';
-import { generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
+import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
+import Submit from '@/components/Editor/submit';
+import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
+import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
+import SettingsTags from '@/components/Editor/settingsTags';
+import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
+import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
+import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
+import SettingsTips from '@/components/Editor/settingsTips';
+import type { PostMetadata } from '@metaio/meta-signature-util/type/types.d';
 
 const { confirm } = Modal;
 
 const Edit: React.FC = () => {
   const intl = useIntl();
   // post data
-  // const [postData, setPostData] = useState<Posts>({} as Posts);
+  const [postData, setPostData] = useState<Posts>({} as Posts);
   const [cover, setCover] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
+  const [license, setLicense] = useState<string>('');
 
   // draft mode
   const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
@@ -181,12 +191,31 @@ const Edit: React.FC = () => {
       );
 
       // update post(draft)
-      const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
+      const data = {
         title: title,
         cover: cover,
         summary: generateSummary(),
         content: content,
+        // tags: tags,
+        license: license,
+      };
+
+      const payload: PostMetadata = {
+        ...data,
+        categories: '',
+        tags: tags.join(),
+      };
+      const metadata = await uploadMetadata({ payload });
+      if (!metadata) {
+        message.error('上传 metadata 失败');
+        return;
+      }
+
+      const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
+        ...data,
         tags: tags,
+        authorDigestSignatureMetadataStorageType: 'ipfs',
+        authorDigestSignatureMetadataRefer: metadata.hash,
       });
 
       // update local db draft data
@@ -208,7 +237,7 @@ const Edit: React.FC = () => {
 
       return Promise.resolve();
     },
-    [draftPublishAsPost, title, cover, content, tags, intl, setSiteNeedToDeploy],
+    [draftPublishAsPost, title, cover, content, tags, license, intl, setSiteNeedToDeploy],
   );
 
   /**
@@ -241,6 +270,7 @@ const Edit: React.FC = () => {
           id: 'messages.editor.tip.coverFormat',
         }),
       );
+      return;
     }
 
     const result = await dbPostsGet(Number(id));
@@ -260,16 +290,46 @@ const Edit: React.FC = () => {
       });
     } else {
       // 本地编辑发布
-      await publishAsPost({
+      const data = {
         title: title,
         cover: cover,
         summary: generateSummary(),
+        content: content,
+        license: license,
+      };
+
+      const payload: PostMetadata = {
+        ...data,
+        categories: '',
+        tags: tags.join(),
+      };
+
+      const metadata = await uploadMetadata({ payload });
+
+      if (!metadata) {
+        message.error('上传 metadata 失败');
+        return;
+      }
+
+      await publishAsPost({
+        ...data,
         tags: tags,
         categories: [],
-        content: content,
+        authorDigestSignatureMetadataStorageType: 'ipfs',
+        authorDigestSignatureMetadataRefer: metadata.hash,
       });
     }
-  }, [title, cover, content, tags, publishAsPost, draftPublishAsPost, postPublishToPost, intl]);
+  }, [
+    title,
+    cover,
+    content,
+    tags,
+    license,
+    publishAsPost,
+    draftPublishAsPost,
+    postPublishToPost,
+    intl,
+  ]);
 
   /**
    * handle history url state
@@ -378,7 +438,7 @@ const Edit: React.FC = () => {
       await asyncContentToDB(val);
       await handleImageUploadToIpfs();
 
-      // 更新草稿内容
+      // update draft content and sumary
       await updateDraft({
         content: val,
         summary: generateSummary(),
@@ -404,7 +464,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // 更新草稿内容
+      // update draft cover
       await updateDraft({
         cover: url,
       });
@@ -428,7 +488,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // 更新草稿内容
+      // update draft title
       await updateDraft({
         title: val,
       });
@@ -468,9 +528,36 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // 更新草稿内容
+      // update draft tags
       await updateDraft({
         tags: val,
+      });
+
+      setDraftMode(2);
+    },
+    [handleHistoryState, updateDraft],
+  );
+
+  /**
+   * handle change license
+   */
+  const handleChangeLicense = useCallback(
+    async (val: string) => {
+      setLicense(val);
+      setDraftMode(1);
+
+      const { id } = history.location.query as Router.PostQuery;
+      const data = postDataMergedUpdateAt({ license: val });
+      if (id) {
+        await dbPostsUpdate(Number(id), data);
+      } else {
+        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        handleHistoryState(String(resultID));
+      }
+
+      // update draft license
+      await updateDraft({
+        license: val,
       });
 
       setDraftMode(2);
@@ -488,12 +575,13 @@ const Edit: React.FC = () => {
       if (resultPost) {
         // console.log('resultPost', resultPost);
 
-        // setPostData(resultPost);
+        setPostData(resultPost);
 
         setCover(resultPost.cover);
         setTitle(resultPost.title);
         setContent(resultPost.content);
         setTags(resultPost.tags);
+        setLicense(resultPost.license);
 
         // TODO：need modify
         setTimeout(() => {
@@ -519,8 +607,23 @@ const Edit: React.FC = () => {
     <section className={styles.container}>
       <EditorHeader
         draftMode={draftMode}
-        handlePublish={handlePublish}
-        settings={<Settings tags={tags} handleChangeTags={handleChangeTags} />}
+        headerCloudDraftUpload={<HeaderCloudDraftUpload />}
+        headerCloudDraftDownload={<HeaderCloudDraftDownload />}
+        settings={
+          <Settings>
+            <Fragment>
+              <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
+              <SettingsOriginalLink hash={postData.post?.source || postData.draft?.source || ''} />
+              <SettingsCopyrightNotice
+                license={license}
+                handleChangeLicense={handleChangeLicense}
+              />
+              <SettingsTips />
+              <SettingsLearnMore />
+            </Fragment>
+          </Settings>
+        }
+        submit={<Submit handlePublish={handlePublish} />}
       />
       <section className={styles.edit}>
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />

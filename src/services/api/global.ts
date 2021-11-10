@@ -51,8 +51,8 @@ export async function getUsernameOfStore(name: string): Promise<string> {
 }
 
 /** 上传并更新用户头像 */
-export async function uploadImageIPFS(file: FormData, token: string) {
-  return request<GLOBAL.GeneralResponse<any>>(META_STORAGE_API, {
+export async function uploadToIpfs(file: FormData, token: string) {
+  return request<GLOBAL.GeneralResponse<Storage.Fleek>>(META_STORAGE_API, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

@@ -34,6 +34,13 @@
     ],
   },
   {
+    path: '/post/edit',
+    component: './post/Edit',
+    name: 'post.create',
+    icon: 'plus',
+    layout: false,
+  },
+  {
     path: '/content',
     name: 'content',
     icon: 'edit',
@@ -99,6 +106,12 @@
     name: 'invitation',
     icon: 'apartment',
     component: './Invitation',
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    icon: 'setting',
+    component: './settings/Index',
   },
   {
     path: '/result/store-setting-success',

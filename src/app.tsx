@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 import { useModel, history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
-import { dbPostsAllCount } from './db/db';
-import { Typography, Avatar, Card, Dropdown } from 'antd';
+import { Typography, Avatar, Card, Dropdown, message } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import { fetchPostsPublished, getDefaultSiteConfig } from '@/services/api/meta-cms';
 import MenuMoreInfo from './components/MenuMoreInfo';
@@ -13,6 +12,8 @@ import MenuLanguageSwitch from './components/MenuLanguageSwitch';
 import PublishSiteButton from './components/app/PublishSiteButton';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
+import { dbPostsAllCount } from './db/db';
+import { getDefaultSiteConfigAPI } from './helpers/index';
 
 const { Text } = Typography;
 
@@ -88,7 +89,8 @@ export async function getInitialState(): Promise<{
   fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
   invitationsCount?: number;
   publishedCount?: number;
-  localDraftCount?: number;
+  localDraftCount: number;
+  siteConfig: CMS.SiteConfiguration | '';
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -111,11 +113,15 @@ export async function getInitialState(): Promise<{
   // local draft count
   const localDraftCount = await dbPostsAllCount();
 
+  // get site config
+  const siteConfig = await getDefaultSiteConfigAPI();
+
   const states: any = {
     fetchUserInfo,
     invitationsCount,
     publishedCount,
     localDraftCount,
+    siteConfig,
   };
 
   if (history.location.pathname !== '/user/login') {
@@ -163,6 +169,23 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
               dom={defaultDom}
               count={initialState?.publishedCount || 0}
             />
+          );
+        }
+        // create post
+        case '/content/drafts/edit': {
+          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
+          return (
+            <Link
+              to={menuItemProps.path as string}
+              onClick={(e) => {
+                if (_status) {
+                  e.preventDefault();
+                  message.warning('请先创建 Meta Space');
+                }
+              }}
+            >
+              <Text disabled={_status}>{defaultDom}</Text>
+            </Link>
           );
         }
         default: {
