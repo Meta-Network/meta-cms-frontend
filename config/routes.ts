@@ -7,7 +7,7 @@
   },
   {
     path: '/dashboard',
-    component: './Guide',
+    component: './Dashboard',
     name: 'dashboard',
     icon: 'dashboard',
   },
@@ -53,11 +53,6 @@
         path: '/content/published-posts',
         name: 'publishedPosts',
         component: './content/PublishedPosts',
-      },
-      {
-        path: '/content/discarded-posts',
-        name: 'discardedPosts',
-        component: './content/DiscardedPosts',
       },
       {
         path: '/content/drafts/edit',

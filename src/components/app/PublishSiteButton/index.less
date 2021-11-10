@@ -1,0 +1,67 @@
+.publishButtonBackgroundInvisible {
+  height: 0;
+}
+
+.publishButtonBackgroundVisible {
+  height: 120px;
+}
+
+.publishButtonBackground {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  margin: 2rem auto 0;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.1);
+  transition: all 1.2s ease;
+  backdrop-filter: blur(5px);
+
+  .publishButton {
+    position: relative;
+    display: inline-block;
+    min-width: 150px;
+    height: 40px;
+    margin-top: 33px;
+    padding: 5px 10px;
+    color: #fff;
+    font-weight: bold;
+    background-color: #1890ff;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  //.publishButton:hover {
+  //  padding-right: 24px;
+  //  padding-left: 8px;
+  //  border-radius: 5px;
+  //}
+  //
+  //.publishButton:hover::after {
+  //  right: 10px;
+  //  opacity: 1;
+  //}
+
+  //.publishButton::after {
+  //  position: absolute;
+  //  top: 0;
+  //  right: -20px;
+  //  font-size: 20px;
+  //  line-height: 40px;
+  //  opacity: 0;
+  //  transition: 0.4s;
+  //  content: '\02303';
+  //}
+}
+
+.subheader {
+  padding-left: 24px;
+}
+
+.subItem {
+  padding-left: 24px;
+}

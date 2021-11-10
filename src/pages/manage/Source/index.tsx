@@ -1,11 +1,12 @@
-import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
+import { useIntl } from 'umi';
 import { Button, List, message, Tag } from 'antd';
 import { Fragment, useEffect, useState } from 'react';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
-import { getSourceStatus, syncPostsByPlatform } from '@/services/api/meta-cms';
-import styles from './index.less';
-import { useIntl } from 'umi';
+import syncPostsRequest from '@/utils/sync-posts-request';
+import { getSourceStatus } from '@/services/api/meta-cms';
 import FormattedDescription from '@/components/FormattedDescription';
+import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
+import styles from './index.less';
 
 const status: GLOBAL.SourcePlatforms = {
   matataki: {
@@ -25,18 +26,13 @@ export default () => {
       sync: (
         <Button
           loading={syncLoading}
-          onClick={() => {
+          onClick={async () => {
             setSyncLoading(true);
             const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
-            syncPostsByPlatform('matataki').then((result) => {
-              if (result.statusCode === 201) {
-                message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }), 0);
-              } else {
-                message.error(intl.formatMessage({ id: 'messages.source.syncFailed' }), 0);
-              }
-              done();
-              setSyncLoading(false);
-            });
+            await syncPostsRequest((await getSourceStatus()).data);
+            done();
+            message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
+            setSyncLoading(false);
           }}
           type="primary"
         >

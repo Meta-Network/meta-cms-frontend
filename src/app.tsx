@@ -1,26 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useIntl, useModel, history, Link } from 'umi';
+import { useEffect } from 'react';
+import { useModel, history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
-import { Typography, Avatar, Card, Dropdown, Button, message, notification } from 'antd';
+import { dbPostsAllCount } from './db/db';
+import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import {
-  deployAndPublishSite,
-  fetchPostsPublished,
-  getDefaultSiteConfig,
-} from '@/services/api/meta-cms';
+import { fetchPostsPublished, getDefaultSiteConfig } from '@/services/api/meta-cms';
 import MenuMoreInfo from './components/MenuMoreInfo';
 import MenuUserInfo from './components/MenuUserInfo';
 import MenuItemWithBadge from './components/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/MenuLanguageSwitch';
+import PublishSiteButton from './components/app/PublishSiteButton';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
-import { dbPostsAllCount } from './db/db';
 
 const { Text } = Typography;
-
-const loginPath = '/user/login';
 
 function CustomSiderMenu({
   initialState,
@@ -29,13 +23,7 @@ function CustomSiderMenu({
   initialState: any;
   menuItemProps: SiderMenuProps;
 }) {
-  const intl = useIntl();
-  const [publishButtonDisplay, setPublishButtonDisplay] = useState<boolean>(false);
-  const [publishLoading, setPublishLoading] = useState<boolean>(false);
-  const { deployedSite, setDeployedSite, siteNeedToDeploy, setSiteNeedToDeploy } =
-    useModel('storage');
-  const location = useLocation();
-
+  const { deployedSite, setDeployedSite } = useModel('storage');
   useEffect(() => {
     getDefaultSiteConfig().then((response) => {
       if (response?.data) {
@@ -49,60 +37,6 @@ function CustomSiderMenu({
       }
     });
   }, [setDeployedSite]);
-
-  const publishSiteRequest = async () => {
-    const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
-    setPublishLoading(true);
-
-    if (deployedSite.configId) {
-      const response = await deployAndPublishSite(deployedSite.configId);
-      if (response.statusCode === 201) {
-        notification.success({
-          message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),
-          description: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.description' }),
-          duration: 0,
-        });
-        setSiteNeedToDeploy(false);
-      } else {
-        notification.error({
-          message: intl.formatMessage({ id: 'messages.redeployment.taskFailed.title' }),
-          description: intl.formatMessage({ id: 'messages.redeployment.taskFailed.description' }),
-          duration: 0,
-        });
-      }
-    } else {
-      message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
-    }
-
-    done();
-    setPublishLoading(false);
-  };
-
-  // If publishButtonDisplay is true, display the button when scrolling
-  // but hide it if is scrolled to the bottom
-  useEffect(() => {
-    if (siteNeedToDeploy && window.innerHeight + window.scrollY >= document.body.scrollHeight) {
-      setPublishButtonDisplay(true);
-    }
-  }, [location, siteNeedToDeploy]);
-
-  useEffect(() => {
-    const scrollListener = () => {
-      if (!siteNeedToDeploy) {
-        return setPublishButtonDisplay(false);
-      }
-      if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
-        return setPublishButtonDisplay(false);
-      }
-      return setPublishButtonDisplay(true);
-    };
-
-    if (siteNeedToDeploy) {
-      window.addEventListener('scroll', scrollListener);
-    } else {
-      window.removeEventListener('scroll', scrollListener);
-    }
-  }, [siteNeedToDeploy]);
 
   return (
     <div className="menu-extra-cards">
@@ -135,22 +69,8 @@ function CustomSiderMenu({
           </Card>
         </a>
       )}
-      <div
-        className={`global-publish-button-background ${
-          publishButtonDisplay
-            ? 'global-publish-button-background-visible'
-            : 'global-publish-button-background-invisible'
-        }`}
-      >
-        <Button
-          key="publish-button"
-          loading={publishLoading}
-          onClick={publishSiteRequest}
-          className="global-publish-button"
-        >
-          {intl.formatMessage({ id: 'messages.redeployment.button' })}
-        </Button>
-      </div>
+      {/* Button to redeploy the Meta Space */}
+      <PublishSiteButton />
     </div>
   );
 }
@@ -176,7 +96,7 @@ export async function getInitialState(): Promise<{
       const msg = await queryCurrentUser();
       return msg.data;
     } catch (error) {
-      history.push(loginPath);
+      history.push('/user/login');
     }
     return undefined;
   };
@@ -198,7 +118,7 @@ export async function getInitialState(): Promise<{
     localDraftCount,
   };
 
-  if (history.location.pathname !== loginPath) {
+  if (history.location.pathname !== '/user/login') {
     const currentUser = await fetchUserInfo();
     if (currentUser) states.currentUser = currentUser;
   }
@@ -256,8 +176,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
-        history.push(loginPath);
+      if (!initialState?.currentUser && location.pathname !== '/user/login') {
+        history.push('/user/login');
       }
     },
     links: [<MenuLanguageSwitch key="MenuLanguageSwitch" />, <MenuMoreInfo key="MenuMoreInfo" />],

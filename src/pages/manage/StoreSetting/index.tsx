@@ -105,6 +105,7 @@ export default () => {
           <Fragment>
             <List
               itemLayout="horizontal"
+              rowKey={(record) => record.name}
               dataSource={stores}
               renderItem={(store) => {
                 if (store.actions.length && store.title.length) {

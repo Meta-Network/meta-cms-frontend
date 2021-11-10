@@ -7,13 +7,11 @@ import { fetchPostsPublished } from '@/services/api/meta-cms';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import FormattedDescription from '@/components/FormattedDescription';
 
-type PostsInfo = CMS.ExistsPostsResponse['items'][number];
-
 export default () => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
 
-  const columns: ProColumns<PostsInfo>[] = [
+  const columns: ProColumns<CMS.Post>[] = [
     {
       dataIndex: 'cover',
       title: intl.formatMessage({ id: 'messages.published.table.cover' }),
@@ -119,7 +117,7 @@ export default () => {
       title={intl.formatMessage({ id: 'messages.published.table.title' })}
       content={<FormattedDescription id="messages.published.description" />}
     >
-      <ProTable<PostsInfo>
+      <ProTable<CMS.Post>
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {
@@ -154,12 +152,8 @@ export default () => {
             return values;
           },
         }}
-        // pagination={{
-        //   total: response.total,
-        //   pageSize: response.pageSize,
-        // }}
         expandable={{
-          expandedRowRender: (record: PostsInfo) => (
+          expandedRowRender: (record: CMS.Post) => (
             <p dangerouslySetInnerHTML={{ __html: record.summary }} />
           ),
         }}

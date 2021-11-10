@@ -131,7 +131,7 @@ export async function fetchPostsPending(page: number, limit: number) {
   });
 }
 
-/** 获取已经同步的文章列表 GET /post */
+/** 获取已经发布的文章列表 GET /post */
 export async function fetchPostsPublished(page: number, limit: number) {
   return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post', {
     method: 'GET',
@@ -139,6 +139,18 @@ export async function fetchPostsPublished(page: number, limit: number) {
       page,
       limit,
       state: 'published',
+    },
+  });
+}
+
+/** 获取已经提交的文章列表 GET /post */
+export async function fetchPostsSubmitted(page: number, limit: number) {
+  return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post', {
+    method: 'GET',
+    params: {
+      page,
+      limit,
+      state: 'submitted',
     },
   });
 }
@@ -229,10 +241,14 @@ export async function getSourceStatus() {
   // WARNING of side effect: set active as true for all platforms
   response.data = response.data.map((platform) => {
     if (!platform.active) {
-      bindSourcePlatform(platform.platform);
+      try {
+        // TODO: shouldn't run this method here
+        // it should has a entry to bind platform
+        bindSourcePlatform(platform.platform);
+        // eslint-disable-next-line no-param-reassign
+        platform.active = true;
+      } catch (e) {}
     }
-    // eslint-disable-next-line no-param-reassign
-    platform.active = true;
     return platform;
   });
 

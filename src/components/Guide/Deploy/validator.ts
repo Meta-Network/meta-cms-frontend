@@ -9,7 +9,6 @@ const cache = {};
 export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
   // return false when the key is not empty and no values
   // otherwise (whether there's value exists, or the key is empty) it's controlled by the following cases
-  console.log(cache);
   if (key !== '' && !values) return false;
   let result: boolean = false;
 
