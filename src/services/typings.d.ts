@@ -99,9 +99,9 @@ declare namespace CMS {
     categories?: string[];
     content?: string;
     license?: string;
-    authorDigestRequestMetadataStorageType?: string;
+    authorDigestRequestMetadataStorageType?: 'ipfs';
     authorDigestRequestMetadataRefer?: string;
-    authorDigestSignatureMetadataStorageType?: string;
+    authorDigestSignatureMetadataStorageType?: 'ipfs';
     authorDigestSignatureMetadataRefer?: string;
   };
 

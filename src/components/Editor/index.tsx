@@ -1,4 +1,4 @@
-import React, { createRef, useCallback } from 'react';
+import React, { createRef, useCallback, useEffect } from 'react';
 import Vditor from 'vditor';
 import { fetchTokenAPI } from '@/helpers';
 // 目前在 document 内导入
@@ -167,6 +167,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
       },
       tab: '\t',
       upload: {
+        multiple: false,
         fieldName: 'file',
         accept: '.jpg,.jpeg,.png,.gif,.webp,.webm,.bmp',
         // token: token,
@@ -226,13 +227,16 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
   }, [asyncContentToDB, intl]);
 
   useMount(() => {
-    fetchToken();
     init();
+  });
+
+  useEffect(() => {
+    fetchToken();
 
     // TODO: 没有找到更好的办法获取 token (最好在上传前获取一次)， 暂时 loop
     const timer = setInterval(fetchToken, 1000 * 30);
-    return clearInterval(timer);
-  });
+    return () => clearInterval(timer);
+  }, [fetchToken]);
 
   return e('div', { id: 'vditor', className: 'vditor-edit', ref: vditorRef });
 });
