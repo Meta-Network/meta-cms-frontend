@@ -34,8 +34,8 @@
     ],
   },
   {
-    path: '/post/edit',
-    component: './post/Edit',
+    path: '/content/drafts/edit',
+    component: './content/drafts/Edit',
     name: 'post.create',
     icon: 'plus',
     layout: false,

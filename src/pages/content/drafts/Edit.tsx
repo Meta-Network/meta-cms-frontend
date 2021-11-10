@@ -217,9 +217,9 @@ const Edit: React.FC = () => {
         ...data,
         tags: tags,
         authorDigestRequestMetadataStorageType: 'ipfs',
-        authorDigestRequestMetadataRefer: uploadMetadataResult.ipfs.hash,
-        authorDigestSignatureMetadataStorageType: uploadMetadataResult.metadata.digest,
-        authorDigestSignatureMetadataRefer: uploadMetadataResult.metadata.signature,
+        authorDigestRequestMetadataRefer: uploadMetadataResult.digestMetadataIpfs.hash,
+        authorDigestSignatureMetadataStorageType: 'ipfs',
+        authorDigestSignatureMetadataRefer: uploadMetadataResult.authorSignatureMetadataIpfs.hash,
       });
 
       // update local db draft data
@@ -320,9 +320,9 @@ const Edit: React.FC = () => {
         tags: tags,
         categories: [],
         authorDigestRequestMetadataStorageType: 'ipfs',
-        authorDigestRequestMetadataRefer: uploadMetadataResult.ipfs.hash,
-        authorDigestSignatureMetadataStorageType: uploadMetadataResult.metadata.digest,
-        authorDigestSignatureMetadataRefer: uploadMetadataResult.metadata.signature,
+        authorDigestRequestMetadataRefer: uploadMetadataResult.digestMetadataIpfs.hash,
+        authorDigestSignatureMetadataStorageType: 'ipfs',
+        authorDigestSignatureMetadataRefer: uploadMetadataResult.authorSignatureMetadataIpfs.hash,
       });
     }
   }, [
