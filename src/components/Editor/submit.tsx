@@ -56,25 +56,14 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   }, [setPublicKey]);
 
   /**
-   * generate Seed and Key
-   */
-  const generatePublicKey = useCallback(() => {
-    const { keys } = generateSeedAndKey();
-
-    return {
-      publicKey: keys.public,
-    };
-  }, []);
-
-  /**
    * handle generate publicKey
    */
   const handleGeneratePublicKey = useCallback(async () => {
     setSignatureLoading(true);
 
     try {
-      const { publicKey: _publicKey } = generatePublicKey();
-      setPublicKey(_publicKey);
+      const { keys } = generateSeedAndKey();
+      setPublicKey(keys.public);
 
       message.success('生成成功');
     } catch (error) {
@@ -83,7 +72,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     }
 
     setSignatureLoading(false);
-  }, [generatePublicKey, setPublicKey]);
+  }, [setPublicKey]);
 
   /**
    * handle set gateway

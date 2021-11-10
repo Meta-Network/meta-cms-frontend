@@ -48,7 +48,7 @@ const HeaderCloudDraftDownload: React.FC = () => {
         }
         onCancel={() => setCloudDraftDownloadVisible(false)}
         footer={[
-          <Button onClick={() => window.open('https://www.metaspaces.life', '_blank')}>
+          <Button onClick={() => window.open(`https://${META_SPACE_BASE_DOMAIN}`, '_blank')}>
             查看云端内容
           </Button>,
           <Button
