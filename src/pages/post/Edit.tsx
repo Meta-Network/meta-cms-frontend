@@ -205,8 +205,10 @@ const Edit: React.FC = () => {
         categories: '',
         tags: tags.join(),
       };
-      const metadata = await uploadMetadata({ payload });
-      if (!metadata) {
+
+      const uploadMetadataResult = await uploadMetadata({ payload });
+
+      if (!uploadMetadataResult) {
         message.error('上传 metadata 失败');
         return;
       }
@@ -214,8 +216,10 @@ const Edit: React.FC = () => {
       const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
         ...data,
         tags: tags,
-        authorDigestSignatureMetadataStorageType: 'ipfs',
-        authorDigestSignatureMetadataRefer: metadata.hash,
+        authorDigestRequestMetadataStorageType: 'ipfs',
+        authorDigestRequestMetadataRefer: uploadMetadataResult.ipfs.hash,
+        authorDigestSignatureMetadataStorageType: uploadMetadataResult.metadata.digest,
+        authorDigestSignatureMetadataRefer: uploadMetadataResult.metadata.signature,
       });
 
       // update local db draft data
@@ -304,9 +308,9 @@ const Edit: React.FC = () => {
         tags: tags.join(),
       };
 
-      const metadata = await uploadMetadata({ payload });
+      const uploadMetadataResult = await uploadMetadata({ payload });
 
-      if (!metadata) {
+      if (!uploadMetadataResult) {
         message.error('上传 metadata 失败');
         return;
       }
@@ -315,8 +319,10 @@ const Edit: React.FC = () => {
         ...data,
         tags: tags,
         categories: [],
-        authorDigestSignatureMetadataStorageType: 'ipfs',
-        authorDigestSignatureMetadataRefer: metadata.hash,
+        authorDigestRequestMetadataStorageType: 'ipfs',
+        authorDigestRequestMetadataRefer: uploadMetadataResult.ipfs.hash,
+        authorDigestSignatureMetadataStorageType: uploadMetadataResult.metadata.digest,
+        authorDigestSignatureMetadataRefer: uploadMetadataResult.metadata.signature,
       });
     }
   }, [
