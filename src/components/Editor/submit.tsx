@@ -9,7 +9,6 @@ import {
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import styles from './submit.less';
-// import * as utils from '@metaio/meta-signature-util';
 import { generateSeedAndKey, verifySeedAndKey } from '@/utils/editor';
 
 interface Props {
@@ -60,42 +59,6 @@ const Submit: FC<Props> = ({ handlePublish }) => {
    * generate Seed and Key
    */
   const generatePublicKey = useCallback(() => {
-    // test
-    // const seed: string[] = generateSeed();
-    // console.log('seed', seed);
-
-    // const keys: KeyPair = generateKeys(seed);
-    // console.log('keys', keys);
-
-    // const payload = {
-    //   title: 'One testing post',
-    //   categories: 'Meta Network,Testing',
-    //   content: 'Some post content here...May be very long...',
-    //   cover: 'https://cover.url.com/',
-    //   licence: 'CC BY 4.0',
-    //   summary: 'Some post content here...',
-    //   tags: 'Testing Tag, UnitTest',
-    // };
-    // const digestMetadata: AuthorDigestRequestMetadata = generatePostDigestRequestMetadata(payload);
-    // console.log('digestMetadata', digestMetadata);
-
-    // const authorSignatureMetadata: AuthorSignatureMetadata = generateAuthorDigestSignMetadata(
-    //   keys,
-    //   'metaspace.life',
-    //   digestMetadata.digest,
-    // );
-    // console.log('authorSignatureMetadata', authorSignatureMetadata);
-
-    // // test
-    // return {
-    //   authorDigestSignatureMetadataStorageType: 'ipfs',
-    //   authorDigestSignatureMetadataRefer: authorSignatureMetadata.signature,
-    // };
-
-    // const seed = JSON.parse(storeGet(KEY_META_CMS_METADATA_SEED) || '[]');
-    // const publicKey = JSON.parse(storeGet(KEY_META_CMS_METADATA_PUBLIC_KEYS) || '""');
-    // const privateKey = JSON.parse(storeGet(KEY_META_CMS_METADATA_PRIVATE_KEYS || '""');
-
     const { keys } = generateSeedAndKey();
 
     return {
@@ -153,28 +116,26 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
-        <Form.Item name="radio-group" label="储存正文" className={styles.item}>
-          <Radio.Group>
-            <Radio value="a">
+        <Form.Item name="githubPrivate" label="储存正文" className={styles.item}>
+          <Radio.Group disabled>
+            <Radio value="githubPrivate">
               <span className={styles.itemType}>Github私密库</span> - 存储未发布内容
             </Radio>
           </Radio.Group>
           <div className={styles.itemRepo}>
             <div className={styles.itemStatus}>
-              <span className={styles.done} />
+              <span className={styles.undone} />
             </div>
-            <a href="#" className={styles.itemRepoName}>
-              guanchao71 - linkework....
+            <a href="javascript:;" className={styles.itemRepoName}>
+              ...
             </a>
           </div>
         </Form.Item>
 
-        <Form.Item name="checkbox-group" label="存证服务" className={styles.item}>
-          <Checkbox.Group>
-            <Checkbox value="A" style={{ lineHeight: '32px' }}>
-              <span className={styles.itemType}>IPFS</span> - 存储可验证的元数据
-            </Checkbox>
-          </Checkbox.Group>
+        <Form.Item name="ipfs" label="存证服务" className={styles.item}>
+          <Checkbox value="ipfs" style={{ lineHeight: '32px' }} defaultChecked disabled>
+            <span className={styles.itemType}>IPFS</span> - 存储可验证的元数据
+          </Checkbox>
         </Form.Item>
 
         <Form.Item name="select-multiple" label="" className={styles.item}>
