@@ -19,7 +19,7 @@ import {
 } from '@/helpers';
 import { assign } from 'lodash';
 // import type Vditor from 'vditor';
-import { generateSignature, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
+import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 import Submit from '@/components/Editor/submit';
@@ -201,20 +201,21 @@ const Edit: React.FC = () => {
       };
 
       const payload: PostMetadata = {
-        title: title,
-        cover: cover,
-        summary: generateSummary(),
-        content: content,
+        ...data,
         categories: '',
         tags: tags.join(),
-        licence: license,
       };
-      const metadata = generateSignature({ payload });
+      const metadata = await uploadMetadata({ payload });
+      if (!metadata) {
+        message.error('上传 metadata 失败');
+        return;
+      }
+
       const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
         ...data,
         tags: tags,
-        authorDigestSignatureMetadataStorageType: metadata.authorDigestSignatureMetadataStorageType,
-        authorDigestSignatureMetadataRefer: metadata.authorDigestSignatureMetadataRefer,
+        authorDigestSignatureMetadataStorageType: 'ipfs',
+        authorDigestSignatureMetadataRefer: metadata.hash,
       });
 
       // update local db draft data
@@ -289,27 +290,33 @@ const Edit: React.FC = () => {
       });
     } else {
       // 本地编辑发布
-      const payload: PostMetadata = {
+      const data = {
         title: title,
         cover: cover,
         summary: generateSummary(),
-        content: content,
-        categories: '',
-        tags: tags.join(),
-        licence: license,
-      };
-
-      const metadata = generateSignature({ payload });
-      await publishAsPost({
-        title: title,
-        cover: cover,
-        summary: generateSummary(),
-        tags: tags,
-        categories: [],
         content: content,
         license: license,
-        authorDigestSignatureMetadataStorageType: metadata.authorDigestSignatureMetadataStorageType,
-        authorDigestSignatureMetadataRefer: metadata.authorDigestSignatureMetadataRefer,
+      };
+
+      const payload: PostMetadata = {
+        ...data,
+        categories: '',
+        tags: tags.join(),
+      };
+
+      const metadata = await uploadMetadata({ payload });
+
+      if (!metadata) {
+        message.error('上传 metadata 失败');
+        return;
+      }
+
+      await publishAsPost({
+        ...data,
+        tags: tags,
+        categories: [],
+        authorDigestSignatureMetadataStorageType: 'ipfs',
+        authorDigestSignatureMetadataRefer: metadata.hash,
       });
     }
   }, [

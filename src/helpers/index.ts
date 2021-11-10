@@ -1,3 +1,4 @@
+import { uploadToIpfs } from '@/services/api/global';
 import {
   getDefaultSiteConfig,
   imageUploadByUrl,
@@ -37,6 +38,33 @@ export const imageUploadByUrlAPI = async (url: string) => {
       return res.data;
     }
     throw new Error(res.message);
+  } catch (e) {
+    console.log(e);
+    return '';
+  }
+};
+
+/**
+ * upload To Ipfs API
+ * @param formData
+ * @returns
+ */
+export const uploadToIpfsAPI = async (formData: FormData): Promise<Storage.Fleek | ''> => {
+  try {
+    const token = await fetchTokenAPI();
+    if (!token) {
+      console.error('no token');
+      return '';
+    }
+
+    const res = await uploadToIpfs(formData, token);
+    console.log('res', res);
+
+    if (res.statusCode === 201) {
+      return res.data;
+    } else {
+      throw new Error(res.message);
+    }
   } catch (e) {
     console.log(e);
     return '';

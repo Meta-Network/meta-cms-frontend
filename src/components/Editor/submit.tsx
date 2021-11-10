@@ -9,22 +9,8 @@ import {
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import styles from './submit.less';
-import {
-  generateSeed,
-  generateKeys,
-  // generatePostDigestRequestMetadata,
-  // generateAuthorDigestSignMetadata,
-  uint8ToHexString,
-} from '@metaio/meta-signature-util';
 // import * as utils from '@metaio/meta-signature-util';
-import type {
-  KeyPair,
-  // AuthorDigestRequestMetadata,
-  // AuthorSignatureMetadata,
-} from '@metaio/meta-signature-util/type/types.d';
-import { storeSet } from '@/utils/store';
-import { KEY_META_CMS_METADATA_PUBLIC_KEYS, KEY_META_CMS_METADATA_SEED } from '../../../config';
-import { verifySeedAndKey } from '@/utils/editor';
+import { generateSeedAndKey, verifySeedAndKey } from '@/utils/editor';
 
 interface Props {
   handlePublish: () => void;
@@ -73,7 +59,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   /**
    * generate Seed and Key
    */
-  const generateSeedAndKey = useCallback(() => {
+  const generatePublicKey = useCallback(() => {
     // test
     // const seed: string[] = generateSeed();
     // console.log('seed', seed);
@@ -110,15 +96,10 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     // const publicKey = JSON.parse(storeGet(KEY_META_CMS_METADATA_PUBLIC_KEYS) || '""');
     // const privateKey = JSON.parse(storeGet(KEY_META_CMS_METADATA_PRIVATE_KEYS || '""');
 
-    const seed: string[] = generateSeed();
-    const keys: KeyPair = generateKeys(seed);
-    const _publicKey = uint8ToHexString(keys.public);
-
-    storeSet(KEY_META_CMS_METADATA_SEED, JSON.stringify(seed));
-    storeSet(KEY_META_CMS_METADATA_PUBLIC_KEYS, _publicKey);
+    const { keys } = generateSeedAndKey();
 
     return {
-      publicKey: _publicKey,
+      publicKey: keys.public,
     };
   }, []);
 
@@ -129,7 +110,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     setSignatureLoading(true);
 
     try {
-      const { publicKey: _publicKey } = generateSeedAndKey();
+      const { publicKey: _publicKey } = generatePublicKey();
       setPublicKey(_publicKey);
 
       message.success('生成成功');
@@ -139,7 +120,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     }
 
     setSignatureLoading(false);
-  }, [generateSeedAndKey, setPublicKey]);
+  }, [generatePublicKey, setPublicKey]);
 
   /**
    * handle set gateway

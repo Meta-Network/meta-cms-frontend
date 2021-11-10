@@ -1,10 +1,10 @@
 import { assign, isEmpty } from 'lodash';
 import moment from 'moment';
 import {
+  generateSeed,
   generateKeys,
   generatePostDigestRequestMetadata,
   generateAuthorDigestSignMetadata,
-  uint8ToHexString,
 } from '@metaio/meta-signature-util';
 import type {
   KeyPair,
@@ -12,8 +12,9 @@ import type {
   AuthorDigestRequestMetadata,
   AuthorSignatureMetadata,
 } from '@metaio/meta-signature-util/type/types.d';
-import { storeGet } from './store';
+import { storeGet, storeSet } from './store';
 import { KEY_META_CMS_METADATA_SEED, KEY_META_CMS_METADATA_PUBLIC_KEYS } from '../../config';
+import { uploadToIpfsAPI } from '../helpers';
 
 /**
  * generate summary
@@ -42,6 +43,26 @@ export const postDataMergedUpdateAt = (data: any) =>
   assign(data, { updatedAt: moment().toISOString() });
 
 /**
+ * generate Seed And Key
+ * @returns
+ */
+export const generateSeedAndKey = (): {
+  seed: string[];
+  keys: KeyPair;
+} => {
+  const seed: string[] = generateSeed();
+  const keys: KeyPair = generateKeys(seed);
+
+  storeSet(KEY_META_CMS_METADATA_SEED, JSON.stringify(seed));
+  storeSet(KEY_META_CMS_METADATA_PUBLIC_KEYS, keys.public);
+
+  return {
+    seed,
+    keys,
+  };
+};
+
+/**
  * verify Seed And Key
  * @returns object or false
  */
@@ -60,10 +81,9 @@ export const verifySeedAndKey = ():
   }
 
   const keys: KeyPair = generateKeys(seedStore);
-  const seedGeneratePublicKey = uint8ToHexString(keys.public);
 
   // Verify that the seed and key match
-  if (publicKeyStore === seedGeneratePublicKey) {
+  if (publicKeyStore === keys.public) {
     return {
       seed: seedStore,
       publicKey: publicKeyStore,
@@ -75,18 +95,15 @@ export const verifySeedAndKey = ():
 };
 
 /**
- * generate signature
+ * generate metadata
  * @param { payload: PostMetadata }
  * @returns
  */
-export const generateSignature = ({
+export const generateMetadata = ({
   payload,
 }: {
   payload: PostMetadata;
-}): {
-  authorDigestSignatureMetadataStorageType: string;
-  authorDigestSignatureMetadataRefer: string;
-} => {
+}): AuthorSignatureMetadata => {
   const verifyResult = verifySeedAndKey();
   if (!verifyResult) {
     throw new Error('seed or key does not exist or does not match.');
@@ -103,8 +120,34 @@ export const generateSignature = ({
   );
   console.log('authorSignatureMetadata', authorSignatureMetadata);
 
-  return {
-    authorDigestSignatureMetadataStorageType: 'ipfs',
-    authorDigestSignatureMetadataRefer: authorSignatureMetadata.signature,
-  };
+  return authorSignatureMetadata;
+};
+
+/**
+ * upload metadata
+ * @param { payload: PostMetadata }
+ * @returns
+ */
+export const uploadMetadata = async ({
+  payload,
+}: {
+  payload: PostMetadata;
+}): Promise<Storage.Fleek | false> => {
+  const metadata = generateMetadata({ payload });
+
+  // generate json file
+  const blob = new Blob([JSON.stringify(metadata)], { type: 'application/json' });
+  const form = new FormData();
+  form.append('file', blob, `metadata-${metadata.ts}.json`);
+
+  // upload ipfs
+  const result = await uploadToIpfsAPI(form);
+  console.log('res', result);
+
+  if (result) {
+    return result;
+  } else {
+    console.error('no result');
+    return false;
+  }
 };
