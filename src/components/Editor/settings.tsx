@@ -3,14 +3,8 @@ import { Drawer } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 import styles from './settings.less';
-import SettingsTags from './settingsTags';
 
-interface Props {
-  readonly tags: string[];
-  handleChangeTags: (val: string[]) => void;
-}
-
-const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
+const Settings: React.FC = ({ children }) => {
   const intl = useIntl();
   const [visible, setVisible] = useState(false);
 
@@ -31,9 +25,9 @@ const Settings: React.FC<Props> = ({ tags, handleChangeTags }) => {
         placement="right"
         onClose={onClose}
         visible={visible}
-        width={300}
+        width={340}
       >
-        <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
+        <section className={styles.container}>{children}</section>
       </Drawer>
     </span>
   );

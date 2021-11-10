@@ -17,7 +17,6 @@ export default {
   'component.button.delete': 'Delete',
   'component.button.yes': 'Yes',
   'component.button.no': 'No',
-  'component.button.create': 'Create',
   'component.status.alreadyBound': 'Already bound',
   'component.status.notBound': 'Not bound',
   'component.badge.invitationAvailable': 'Invitation code available',

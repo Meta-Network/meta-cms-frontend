@@ -28,6 +28,13 @@
     ],
   },
   {
+    path: '/post/edit',
+    component: './post/Edit',
+    name: 'post.create',
+    icon: 'plus',
+    layout: false,
+  },
+  {
     path: '/content',
     name: 'content',
     icon: 'edit',
@@ -79,15 +86,16 @@
     component: './post/List',
   },
   {
-    path: '/post/edit',
-    component: './post/Edit',
-    layout: false,
-  },
-  {
     path: '/invitation',
     name: 'invitation',
     icon: 'apartment',
     component: './Invitation',
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    icon: 'setting',
+    component: './settings/Index',
   },
   {
     path: '/result/store-setting-success',

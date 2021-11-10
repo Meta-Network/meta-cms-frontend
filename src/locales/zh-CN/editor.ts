@@ -3,7 +3,6 @@ export default {
   'editor.header.draft': '草稿',
   'editor.header.draft.saving': '保存中...',
   'editor.header.draft.saved': '已保存',
-  'editor.header.publish': '发布',
   'editor.header.settings.title': '文章设置',
   'editor.header.settings.tags': '标签',
   'editor.upload.cover.description': '添加封面',
@@ -11,4 +10,8 @@ export default {
   'editor.edit.placeholder': '现在就开始编辑吧！',
   'editor.edit.tool.upload': '上传图片',
   'editor.edit.tool.emoji.setEmoji': '设置常用表情',
+  'editor.creativeCommons.attribution': '署名',
+  'editor.creativeCommons.nonCommercial': '非商业性使用',
+  'editor.creativeCommons.noDerivatives': '禁止演绎',
+  'editor.creativeCommons.shareAlike': '相同方式共享',
 };

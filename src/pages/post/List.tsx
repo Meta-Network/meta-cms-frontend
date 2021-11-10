@@ -3,7 +3,7 @@ import { history, useIntl } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
-import { CopyOutlined, EditOutlined } from '@ant-design/icons';
+import { CopyOutlined } from '@ant-design/icons';
 import { dbPostsUpdate, dbPostsAll } from '@/db/db';
 import type { Posts } from '@/db/Posts.d';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -196,15 +196,6 @@ export default () => {
         </div>
       }
     >
-      <Button
-        style={{ marginBottom: 10 }}
-        icon={<EditOutlined />}
-        onClick={() => history.push('/post/edit')}
-      >
-        {intl.formatMessage({
-          id: 'component.button.create',
-        })}
-      </Button>
       <Table
         rowKey={(record: Posts) => String(record.id)}
         onRow={() => {

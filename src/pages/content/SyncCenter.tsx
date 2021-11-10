@@ -32,10 +32,14 @@ export default () => {
   const [transferDraftLoading, setTransferDraftLoading] = useState<boolean>(false);
   const { getLockedConfigState, setLockedConfig } = useModel('global');
   const { setSiteNeedToDeploy } = useModel('storage');
+  // const [siteConfiguration, setSiteConfiguration] = useState<CMS.SiteConfiguration>(
+  //   {} as CMS.SiteConfiguration,
+  // );
 
   getDefaultSiteConfig().then((response) => {
     if (response.statusCode === 200) {
       setSiteConfigId(response.data.id);
+      // setSiteConfiguration(response.data);
     }
   });
 
@@ -174,6 +178,7 @@ export default () => {
           post: _post,
           draft: _draftData,
           tags: _draftData.tags || _post.tags || [],
+          license: _draftData.license || _post.license || '',
         }),
       );
 
@@ -292,7 +297,11 @@ export default () => {
         >
           {intl.formatMessage({ id: 'component.button.discard' })}
         </Button>,
-        <Button onClick={() => transferDraft(record)} loading={transferDraftLoading}>
+        <Button
+          onClick={() => transferDraft(record)}
+          loading={transferDraftLoading}
+          // disabled={!siteConfiguration.domain}
+        >
           {intl.formatMessage({ id: 'component.button.editLocally' })}
         </Button>,
       ],

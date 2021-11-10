@@ -11,4 +11,8 @@ export default {
   'editor.edit.placeholder': 'Start editing now!',
   'editor.edit.tool.upload': 'Upload image',
   'editor.edit.tool.emoji.setEmoji': 'Set common emoticons',
+  'editor.creativeCommons.attribution': 'Attribution',
+  'editor.creativeCommons.nonCommercial': 'NonCommercial',
+  'editor.creativeCommons.noDerivatives': 'NoDerivatives 4.0',
+  'editor.creativeCommons.shareAlike': 'ShareAlike',
 };

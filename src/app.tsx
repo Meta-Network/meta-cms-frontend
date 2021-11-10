@@ -17,6 +17,7 @@ import MenuLanguageSwitch from './components/MenuLanguageSwitch';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 import { dbPostsAllCount } from './db/db';
+import { getDefaultSiteConfigAPI } from './helpers/index';
 
 const { Text } = Typography;
 
@@ -168,7 +169,8 @@ export async function getInitialState(): Promise<{
   fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
   invitationsCount?: number;
   publishedCount?: number;
-  localDraftCount?: number;
+  localDraftCount: number;
+  siteConfig: CMS.SiteConfiguration | '';
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -191,11 +193,15 @@ export async function getInitialState(): Promise<{
   // local draft count
   const localDraftCount = await dbPostsAllCount();
 
+  // get site config
+  const siteConfig = await getDefaultSiteConfigAPI();
+
   const states: any = {
     fetchUserInfo,
     invitationsCount,
     publishedCount,
     localDraftCount,
+    siteConfig,
   };
 
   if (history.location.pathname !== loginPath) {
@@ -243,6 +249,23 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
               dom={defaultDom}
               count={initialState?.publishedCount || 0}
             />
+          );
+        }
+        // create post
+        case '/post/edit': {
+          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
+          return (
+            <Link
+              to={menuItemProps.path as string}
+              onClick={(e) => {
+                if (_status) {
+                  e.preventDefault();
+                  message.warning('请先创建 Meta Space');
+                }
+              }}
+            >
+              <Text disabled={_status}>{defaultDom}</Text>
+            </Link>
           );
         }
         default: {

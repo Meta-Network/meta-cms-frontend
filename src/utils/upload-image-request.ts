@@ -1,6 +1,6 @@
 import type React from 'react';
 import { message } from 'antd';
-import { uploadImageIPFS } from '@/services/api/global';
+import { uploadToIpfs } from '@/services/api/global';
 import { requestStorageToken } from '@/services/api/meta-ucenter';
 
 export default (
@@ -23,7 +23,7 @@ export default (
     const form = new FormData();
     form.append('file', file);
 
-    const result = await uploadImageIPFS(form, token);
+    const result = await uploadToIpfs(form, token);
     done();
     setUploading(false);
 
