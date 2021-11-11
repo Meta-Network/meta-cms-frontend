@@ -91,6 +91,8 @@ declare namespace CMS {
     };
   };
 
+  type LocalDraftStorageType = 'ipfs';
+
   type LocalDraft = {
     title?: string;
     cover?: string;
@@ -99,9 +101,9 @@ declare namespace CMS {
     categories?: string[];
     content?: string;
     license?: string;
-    authorDigestRequestMetadataStorageType?: 'ipfs';
+    authorDigestRequestMetadataStorageType?: LocalDraftStorageType;
     authorDigestRequestMetadataRefer?: string;
-    authorDigestSignatureMetadataStorageType?: 'ipfs';
+    authorDigestSignatureMetadataStorageType?: LocalDraftStorageType;
     authorDigestSignatureMetadataRefer?: string;
   };
 
