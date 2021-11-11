@@ -7,7 +7,14 @@ import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
-import { dbPostsUpdate, dbPostsAdd, dbPostsGet, PostTempData } from '@/db/db';
+import {
+  dbPostsUpdate,
+  dbPostsAdd,
+  dbPostsGet,
+  PostTempData,
+  dbMetadatasAdd,
+  MetadataTempData,
+} from '@/db/db';
 import type { Posts } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
@@ -213,18 +220,38 @@ const Edit: React.FC = () => {
         return;
       }
 
+      const {
+        digestMetadata,
+        authorSignatureMetadata,
+        digestMetadataIpfs,
+        authorSignatureMetadataIpfs,
+      } = uploadMetadataResult;
+
+      // local add metadada
+      const { id } = history.location.query as Router.PostQuery;
+      await dbMetadatasAdd(
+        assign(MetadataTempData(), {
+          postId: Number(id),
+          metadata: {
+            digestMetadata: digestMetadata,
+            authorSignatureMetadata: authorSignatureMetadata,
+            digestMetadataIpfs: digestMetadataIpfs,
+            authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
+          },
+        }),
+      );
+
       const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
         ...data,
         tags: tags,
         authorDigestRequestMetadataStorageType: 'ipfs',
-        authorDigestRequestMetadataRefer: uploadMetadataResult.digestMetadataIpfs.hash,
+        authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
         authorDigestSignatureMetadataStorageType: 'ipfs',
-        authorDigestSignatureMetadataRefer: uploadMetadataResult.authorSignatureMetadataIpfs.hash,
+        authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
       });
 
       // update local db draft data
       if (resultUpdatePost) {
-        const { id } = history.location.query as Router.PostQuery;
         await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultUpdatePost }));
       } else {
         message.error(
@@ -315,14 +342,34 @@ const Edit: React.FC = () => {
         return;
       }
 
+      const {
+        digestMetadata,
+        authorSignatureMetadata,
+        digestMetadataIpfs,
+        authorSignatureMetadataIpfs,
+      } = uploadMetadataResult;
+
+      // local add metadada
+      await dbMetadatasAdd(
+        assign(MetadataTempData(), {
+          postId: Number(id),
+          metadata: {
+            digestMetadata: digestMetadata,
+            authorSignatureMetadata: authorSignatureMetadata,
+            digestMetadataIpfs: digestMetadataIpfs,
+            authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
+          },
+        }),
+      );
+
       await publishAsPost({
         ...data,
         tags: tags,
         categories: [],
         authorDigestRequestMetadataStorageType: 'ipfs',
-        authorDigestRequestMetadataRefer: uploadMetadataResult.digestMetadataIpfs.hash,
+        authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
         authorDigestSignatureMetadataStorageType: 'ipfs',
-        authorDigestSignatureMetadataRefer: uploadMetadataResult.authorSignatureMetadataIpfs.hash,
+        authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
       });
     }
   }, [

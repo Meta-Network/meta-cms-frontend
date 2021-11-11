@@ -1,17 +1,20 @@
 import type { Table, Transaction } from 'dexie';
 import Dexie from 'dexie';
 import type { Posts } from './Posts';
+import type { Metadatas } from './Metadatas';
 import moment from 'moment';
 import { License } from '../../config';
 
 export class StoreDB extends Dexie {
   posts!: Table<Posts, number>;
+  metadatas!: Table<Metadatas, number>;
   constructor() {
     super('StoreDB');
-    this.version(7)
+    this.version(8)
       .stores({
         posts:
           '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, createdAt, updatedAt',
+        metadatas: '++id, postId, metadata, createdAt, updatedAt',
       })
       .upgrade((tx: Transaction | any) => {
         const time = moment().toISOString();
@@ -130,3 +133,20 @@ export const PostTempData = (): Posts => ({
   createdAt: moment().toISOString(),
   updatedAt: moment().toISOString(),
 });
+
+// db metadatas
+
+// metadata data temp
+export const MetadataTempData = () => ({
+  createdAt: moment().toISOString(),
+  updatedAt: moment().toISOString(),
+});
+
+/**
+ * db metadatas add
+ * @param data
+ * @returns
+ */
+export const dbMetadatasAdd = async (data: Metadatas): Promise<number> => {
+  return await db.metadatas.add(data);
+};
