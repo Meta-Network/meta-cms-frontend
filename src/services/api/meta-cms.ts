@@ -37,7 +37,7 @@ export async function newSiteConfigSetting(siteInfoId: number, body: CMS.SiteCon
 }
 
 /** 更新一个站点信息 PATCH /site/info */
-export async function modifySiteInfoSetting(siteInfoId: number, body: CMS.SiteInfoSettingRequest) {
+export async function updateSiteInfoSetting(siteInfoId: number, body: CMS.SiteInfoSettingRequest) {
   return request<GLOBAL.GeneralResponse<any>>(`/site/info/${siteInfoId}`, {
     method: 'PATCH',
     data: body,
@@ -45,7 +45,7 @@ export async function modifySiteInfoSetting(siteInfoId: number, body: CMS.SiteIn
 }
 
 /** 更新一个站点设置 PATCH /site/config */
-export async function modifySiteConfigSetting(
+export async function updateSiteConfigSetting(
   configId: number,
   body: CMS.SiteConfigSettingRequest,
 ) {

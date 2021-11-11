@@ -1,3 +1,4 @@
+import { uploadToIpfs } from '@/services/api/global';
 import { useModel, useIntl } from 'umi';
 import ImgCrop from 'antd-img-crop';
 import React, { useEffect, useState } from 'react';
@@ -6,7 +7,6 @@ import { UploadOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import FormattedDescription from '@/components/FormattedDescription';
 import { updateUserInfo } from '@/services/api/meta-ucenter';
-import uploadImageRequest from '@/utils/upload-image-request';
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import styles from './index.less';
 
@@ -18,6 +18,20 @@ const BaseView: React.FC = () => {
   useEffect(() => {
     updateUserInfo({ avatar: userAvatar }).then(() => '');
   }, [userAvatar]);
+
+  const uploadImageRequest = async ({ file }: { file: File }) => {
+    // TODO: Need i18n here
+    const done = message.loading('上传图片中...请稍候', 0);
+    const result = await uploadToIpfs(file);
+    done();
+
+    if (result?.statusCode === 201) {
+      message.success('图片上传成功。');
+      setUserAvatar(result.data.publicUrl);
+    } else {
+      message.error('图片上传失败。');
+    }
+  };
 
   const handleFinish = async (values: GLOBAL.UserInfo) => {
     await updateUserInfo(values);
@@ -34,7 +48,7 @@ const BaseView: React.FC = () => {
       </div>
       <ImgCrop rotate>
         {/* @ts-ignore */}
-        <Upload customRequest={uploadImageRequest(setUserAvatar)} showUploadList={false}>
+        <Upload customRequest={uploadImageRequest} showUploadList={false}>
           <div className={styles.buttonView}>
             <Button>
               <UploadOutlined />

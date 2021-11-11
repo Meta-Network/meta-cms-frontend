@@ -1,5 +1,5 @@
 import { extendWithErrorHandler } from '@/services/api/base-request';
-import { getSocialAuthToken } from '@/services/api/meta-ucenter';
+import { getSocialAuthToken, requestStorageToken } from '@/services/api/meta-ucenter';
 
 const request = extendWithErrorHandler();
 
@@ -51,12 +51,18 @@ export async function getUsernameOfStore(name: string): Promise<string> {
 }
 
 /** 上传并更新用户头像 */
-export async function uploadToIpfs(file: FormData, token: string) {
+export async function uploadToIpfs(file: File) {
+  const tokenRequest = await requestStorageToken();
+  const token = tokenRequest.data;
+
+  const form = new FormData();
+  form.append('file', file);
+
   return request<GLOBAL.GeneralResponse<Storage.Fleek>>(META_STORAGE_API, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    data: file,
+    data: form,
   });
 }

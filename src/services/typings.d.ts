@@ -177,6 +177,15 @@ declare namespace GLOBAL {
     bio: string;
   };
 
+  type Account = {
+    id: number;
+    user_id: number;
+    account_id: string;
+    platform: string;
+    created_at: Date;
+    updated_at: Date;
+  };
+
   type UserResponse = CurrentUser;
 
   type UserInfo = {

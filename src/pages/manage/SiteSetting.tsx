@@ -4,8 +4,8 @@ import { Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
   getDefaultSiteConfig,
-  modifySiteInfoSetting,
-  modifySiteConfigSetting,
+  updateSiteInfoSetting,
+  updateSiteConfigSetting,
 } from '@/services/api/meta-cms';
 import { message } from 'antd';
 import ProForm from '@ant-design/pro-form';
@@ -24,12 +24,12 @@ export default () => {
     }
 
     if (defaultSiteConfig?.id && defaultSiteConfig?.siteInfo?.id) {
-      const siteConfigRequest = modifySiteConfigSetting(defaultSiteConfig.id, {
+      const siteConfigRequest = updateSiteConfigSetting(defaultSiteConfig.id, {
         language: values.language,
         timezone: values.timezone,
       });
 
-      const siteInfoRequest = modifySiteInfoSetting(defaultSiteConfig.siteInfo.id, {
+      const siteInfoRequest = updateSiteInfoSetting(defaultSiteConfig.siteInfo.id, {
         title: values.title,
         subtitle: values.subtitle,
         description: values.description,

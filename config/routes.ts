@@ -119,6 +119,12 @@
     component: './result/StoreSettingSuccess',
   },
   {
+    path: '/result/mobile',
+    hideInMenu: true,
+    layout: false,
+    component: './result/Mobile',
+  },
+  {
     path: '/',
     redirect: '/create',
   },

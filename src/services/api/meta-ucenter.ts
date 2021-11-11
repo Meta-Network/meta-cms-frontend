@@ -57,9 +57,16 @@ export async function emailGetVerificationCode(body: GLOBAL.VerificationCodePara
   });
 }
 
-/** 获取当前的用户 GET /users/me */
+/** 获取当前用户的信息 GET /users/me */
 export async function queryCurrentUser() {
   return request<GLOBAL.GeneralResponse<GLOBAL.CurrentUser>>('/users/me', {
+    method: 'GET',
+  });
+}
+
+/** 获取当前的用户的账户信息 GET /accounts/mine */
+export async function queryMyAccounts() {
+  return request<GLOBAL.GeneralResponse<GLOBAL.Account[]>>('/accounts/mine', {
     method: 'GET',
   });
 }
