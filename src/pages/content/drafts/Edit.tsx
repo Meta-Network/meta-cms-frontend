@@ -1,13 +1,19 @@
 import React, { Fragment, useState, useCallback, useEffect } from 'react';
 import { history, useIntl, useModel } from 'umi';
-import { Input, message, Modal } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Input, message } from 'antd';
 import Editor from '@/components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
 import { useMount, useThrottleFn } from 'ahooks';
-import { dbPostsUpdate, dbPostsAdd, dbPostsGet, PostTempData } from '@/db/db';
+import {
+  dbPostsUpdate,
+  dbPostsAdd,
+  dbPostsGet,
+  PostTempData,
+  dbMetadatasAdd,
+  MetadataTempData,
+} from '@/db/db';
 import type { Posts } from '@/db/Posts.d';
 import {
   imageUploadByUrlAPI,
@@ -15,7 +21,6 @@ import {
   publishPendingPostAPI,
   publishPostAPI,
   updatePostAPI,
-  publishPostAsDraftAPI,
 } from '@/helpers';
 import { assign } from 'lodash';
 // import type Vditor from 'vditor';
@@ -31,8 +36,6 @@ import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
 import type { PostMetadata } from '@metaio/meta-signature-util/type/types.d';
-
-const { confirm } = Modal;
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -59,7 +62,7 @@ const Edit: React.FC = () => {
 
   /**
    * draft publish as post
-   * post or draft ID
+   * post ID or draft ID
    */
   const draftPublishAsPost = useCallback(
     async (postId: number) => {
@@ -72,15 +75,14 @@ const Edit: React.FC = () => {
             id: 'messages.editor.noDefaultConfig',
           }),
         );
-        setPublishLoading(false);
-        return;
+        return false;
       }
 
-      const res = await publishPendingPostAPI(postId, [siteConfig.id]);
-      if (res) {
-        // 发布文章， 更新最新 Post 数据
+      const postResult = await publishPendingPostAPI(postId, [siteConfig.id]);
+      if (postResult) {
+        // publish post, update db post data
         const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: res, draft: null }));
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: postResult, draft: null }));
 
         message.success(
           intl.formatMessage({
@@ -88,48 +90,17 @@ const Edit: React.FC = () => {
           }),
         );
         setSiteNeedToDeploy(true);
+        return true;
       } else {
         message.error(
           intl.formatMessage({
             id: 'messages.editor.fail',
           }),
         );
-      }
-      setPublishLoading(false);
-
-      if (res) {
-        history.push('/posts');
+        return false;
       }
     },
     [intl, setSiteNeedToDeploy],
-  );
-
-  /**
-   * local draft as post
-   */
-  const publishAsPost = useCallback(
-    async (data: CMS.LocalDraft) => {
-      setPublishLoading(true);
-
-      const resultDraft = await publishPostAPI(data);
-      if (resultDraft) {
-        // 发布文章 更新最新 Draft 数据, 如果第二次发送失败少增加一篇草稿
-        const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultDraft }));
-
-        setSiteNeedToDeploy(true);
-        await draftPublishAsPost(resultDraft.id);
-        setSiteNeedToDeploy(true);
-      } else {
-        message.error(
-          intl.formatMessage({
-            id: 'messages.editor.fail',
-          }),
-        );
-        setPublishLoading(false);
-      }
-    },
-    [intl, draftPublishAsPost, setSiteNeedToDeploy],
   );
 
   /**
@@ -172,25 +143,6 @@ const Edit: React.FC = () => {
     async (postId: number) => {
       setPublishLoading(true);
 
-      // post publish draft
-      const _draft = await publishPostAsDraftAPI(Number(postId));
-      if (!_draft) {
-        message.error(
-          intl.formatMessage({
-            id: 'messages.editor.saveToDraftFail',
-          }),
-        );
-        // setTransferDraftLoading(false);
-        setPublishLoading(false);
-        return;
-      }
-      message.success(
-        intl.formatMessage({
-          id: 'messages.editor.saveToDraftSuccess',
-        }),
-      );
-
-      // update post(draft)
       const data = {
         title: title,
         cover: cover,
@@ -210,39 +162,132 @@ const Edit: React.FC = () => {
 
       if (!uploadMetadataResult) {
         message.error('上传 metadata 失败');
+        setPublishLoading(false);
         return;
       }
 
-      const resultUpdatePost = await updatePostAPI(Number(_draft.id), {
+      const {
+        digestMetadata,
+        authorSignatureMetadata,
+        digestMetadataIpfs,
+        authorSignatureMetadataIpfs,
+      } = uploadMetadataResult;
+
+      // local add metadada
+      const { id } = history.location.query as Router.PostQuery;
+      await dbMetadatasAdd(
+        assign(MetadataTempData(), {
+          postId: Number(id),
+          metadata: {
+            digestMetadata: digestMetadata,
+            authorSignatureMetadata: authorSignatureMetadata,
+            digestMetadataIpfs: digestMetadataIpfs,
+            authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
+          },
+        }),
+      );
+
+      const updatePostResult = await updatePostAPI(Number(postId), {
         ...data,
         tags: tags,
         authorDigestRequestMetadataStorageType: 'ipfs',
-        authorDigestRequestMetadataRefer: uploadMetadataResult.digestMetadataIpfs.hash,
+        authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
         authorDigestSignatureMetadataStorageType: 'ipfs',
-        authorDigestSignatureMetadataRefer: uploadMetadataResult.authorSignatureMetadataIpfs.hash,
+        authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
       });
 
       // update local db draft data
-      if (resultUpdatePost) {
-        const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: resultUpdatePost }));
+      if (updatePostResult) {
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: updatePostResult }));
+
+        // publish
+        const postResult = await draftPublishAsPost(postId);
+        if (postResult) {
+          setSiteNeedToDeploy(true);
+          history.push('/content/drafts');
+        }
       } else {
         message.error(
           intl.formatMessage({
             id: 'messages.editor.draftUpdateFail',
           }),
         );
-        setPublishLoading(false);
-        return Promise.reject();
       }
-      // send
-      await draftPublishAsPost(_draft.id);
-      setSiteNeedToDeploy(true);
-
-      return Promise.resolve();
+      setPublishLoading(false);
     },
     [draftPublishAsPost, title, cover, content, tags, license, intl, setSiteNeedToDeploy],
   );
+
+  /**
+   * local draft publish to post
+   */
+  const localDraftPublishToPost = useCallback(async () => {
+    setPublishLoading(true);
+
+    // 本地编辑发布
+    const data = {
+      title: title,
+      cover: cover,
+      summary: generateSummary(),
+      content: content,
+      license: license,
+    };
+
+    const payload: PostMetadata = {
+      ...data,
+      categories: '',
+      tags: tags.join(),
+    };
+
+    const uploadMetadataResult = await uploadMetadata({ payload });
+
+    if (!uploadMetadataResult) {
+      message.error('上传 metadata 失败');
+      setPublishLoading(false);
+      return;
+    }
+
+    const {
+      digestMetadata,
+      authorSignatureMetadata,
+      digestMetadataIpfs,
+      authorSignatureMetadataIpfs,
+    } = uploadMetadataResult;
+    const { id } = history.location.query as Router.PostQuery;
+
+    // local add metadada
+    await dbMetadatasAdd(
+      assign(MetadataTempData(), {
+        postId: Number(id),
+        metadata: {
+          digestMetadata: digestMetadata,
+          authorSignatureMetadata: authorSignatureMetadata,
+          digestMetadataIpfs: digestMetadataIpfs,
+          authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
+        },
+      }),
+    );
+
+    const draftResult = await publishPostAPI({
+      ...data,
+      tags: tags,
+      categories: [],
+      authorDigestRequestMetadataStorageType: 'ipfs',
+      authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
+      authorDigestSignatureMetadataStorageType: 'ipfs',
+      authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
+    });
+    if (draftResult) {
+      await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: draftResult }));
+
+      const postResult = await draftPublishAsPost(draftResult.id);
+      if (postResult) {
+        setSiteNeedToDeploy(true);
+        history.push('/content/drafts');
+      }
+    }
+    setPublishLoading(false);
+  }, [title, cover, content, tags, license, draftPublishAsPost, setSiteNeedToDeploy]);
 
   /**
    * publish
@@ -280,62 +325,21 @@ const Edit: React.FC = () => {
     const result = await dbPostsGet(Number(id));
     // 转存草稿发布
     if (result && result.draft) {
-      await draftPublishAsPost(result.draft.id);
-    } else if (result && result.post) {
-      confirm({
-        icon: <ExclamationCircleOutlined />,
-        content: intl.formatMessage({
-          id: 'messages.editor.tip.postExists',
-        }),
-        onOk() {
-          postPublishToPost(result.post!.id);
-        },
-        onCancel() {},
-      });
-    } else {
-      // 本地编辑发布
-      const data = {
-        title: title,
-        cover: cover,
-        summary: generateSummary(),
-        content: content,
-        license: license,
-      };
+      setPublishLoading(true);
 
-      const payload: PostMetadata = {
-        ...data,
-        categories: '',
-        tags: tags.join(),
-      };
+      const _result = await draftPublishAsPost(result.draft.id);
 
-      const uploadMetadataResult = await uploadMetadata({ payload });
-
-      if (!uploadMetadataResult) {
-        message.error('上传 metadata 失败');
-        return;
+      if (_result) {
+        history.push('/posts');
       }
 
-      await publishAsPost({
-        ...data,
-        tags: tags,
-        categories: [],
-        authorDigestRequestMetadataStorageType: 'ipfs',
-        authorDigestRequestMetadataRefer: uploadMetadataResult.digestMetadataIpfs.hash,
-        authorDigestSignatureMetadataStorageType: 'ipfs',
-        authorDigestSignatureMetadataRefer: uploadMetadataResult.authorSignatureMetadataIpfs.hash,
-      });
+      setPublishLoading(false);
+    } else if (result && result.post) {
+      postPublishToPost(result.post!.id);
+    } else {
+      localDraftPublishToPost();
     }
-  }, [
-    title,
-    cover,
-    content,
-    tags,
-    license,
-    publishAsPost,
-    draftPublishAsPost,
-    postPublishToPost,
-    intl,
-  ]);
+  }, [title, cover, content, draftPublishAsPost, postPublishToPost, localDraftPublishToPost, intl]);
 
   /**
    * handle history url state
