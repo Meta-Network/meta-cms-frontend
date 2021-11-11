@@ -18,10 +18,19 @@ import { uploadToIpfsAPI } from '../helpers';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
 type GenerateMetadataParams = { payload: PostMetadata };
+type UploadMetadataParams = { payload: PostMetadata };
 type GenerateMetadataReturnState =
   | {
       digestMetadata: AuthorDigestRequestMetadata;
       authorSignatureMetadata: AuthorSignatureMetadata;
+    }
+  | false;
+type UploadMetadataReturnState =
+  | {
+      digestMetadata: AuthorDigestRequestMetadata;
+      authorSignatureMetadata: AuthorSignatureMetadata;
+      digestMetadataIpfs: Storage.Fleek;
+      authorSignatureMetadataIpfs: Storage.Fleek;
     }
   | false;
 
@@ -136,15 +145,7 @@ export const generateMetadata = ({
  */
 export const uploadMetadata = async ({
   payload,
-}: {
-  payload: PostMetadata;
-}): Promise<
-  | {
-      digestMetadataIpfs: Storage.Fleek;
-      authorSignatureMetadataIpfs: Storage.Fleek;
-    }
-  | false
-> => {
+}: UploadMetadataParams): Promise<UploadMetadataReturnState | false> => {
   const generateMetadataResult = generateMetadata({ payload });
   if (!generateMetadataResult) {
     return false;
@@ -181,7 +182,10 @@ export const uploadMetadata = async ({
   if (!authorSignatureMetadataResult) {
     return false;
   }
+
   return {
+    digestMetadata: digestMetadata,
+    authorSignatureMetadata: authorSignatureMetadata,
     digestMetadataIpfs: digestMetadataResult,
     authorSignatureMetadataIpfs: authorSignatureMetadataResult,
   };
