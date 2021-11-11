@@ -192,24 +192,24 @@ const Edit: React.FC = () => {
       );
 
       let draftResult: CMS.Draft | '' = '';
+      const metadataData = {
+        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+        authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
+        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+        authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
+      };
       if (mode === 'local') {
         draftResult = await publishPostAPI({
           ...data,
+          ...metadataData,
           tags: tags,
           categories: [],
-          authorDigestRequestMetadataStorageType: 'ipfs',
-          authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
-          authorDigestSignatureMetadataStorageType: 'ipfs',
-          authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
         });
       } else if (mode === 'draft' || mode === 'post') {
         draftResult = await updatePostAPI(Number(postId), {
           ...data,
+          ...metadataData,
           tags: tags,
-          authorDigestRequestMetadataStorageType: 'ipfs',
-          authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
-          authorDigestSignatureMetadataStorageType: 'ipfs',
-          authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
         });
       }
 
