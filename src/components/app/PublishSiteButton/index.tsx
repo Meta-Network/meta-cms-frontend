@@ -72,17 +72,18 @@ export default () => {
             : styles.publishButtonBackgroundInvisible
         }`}
     >
-      <PublishButtonPopover>
-        <Button
-          key="publish-button"
-          loading={publishLoading}
-          className={styles.publishButton}
-          type="primary"
-        >
-          {intl.formatMessage({ id: 'messages.redeployment.button' })}
-          <UpOutlined />
-        </Button>
-      </PublishButtonPopover>
+      {/*<PublishButtonPopover>*/}
+      <Button
+        onClick={publishSiteRequest}
+        key="publish-button"
+        loading={publishLoading}
+        className={styles.publishButton}
+        type="primary"
+      >
+        {intl.formatMessage({ id: 'messages.redeployment.button' })}
+        {/*<UpOutlined />*/}
+      </Button>
+      {/*</PublishButtonPopover>*/}
     </div>
   );
 };

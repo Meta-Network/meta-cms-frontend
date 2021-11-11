@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { isMobile } from 'is-mobile';
 import { useModel, history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
@@ -89,8 +90,8 @@ export async function getInitialState(): Promise<{
   fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
   invitationsCount?: number;
   publishedCount?: number;
-  localDraftCount: number;
-  siteConfig: CMS.SiteConfiguration | '';
+  localDraftCount?: number;
+  siteConfig?: CMS.SiteConfiguration | '';
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -127,6 +128,10 @@ export async function getInitialState(): Promise<{
   if (history.location.pathname !== '/user/login') {
     const currentUser = await fetchUserInfo();
     if (currentUser) states.currentUser = currentUser;
+  }
+
+  if (isMobile()) {
+    history.push('/result/mobile');
   }
   return states;
 }

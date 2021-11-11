@@ -1,7 +1,7 @@
-import { Upload } from 'antd';
 import { useIntl } from 'umi';
+import { message, Upload } from 'antd';
 import React, { useState } from 'react';
-import uploadImageRequest from '@/utils/upload-image-request';
+import { uploadToIpfs } from '@/services/api/global';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import ProForm, { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
@@ -14,6 +14,24 @@ export default ({
 }) => {
   const intl = useIntl();
   const [uploading, setUploading] = useState<boolean>(false);
+
+  const uploadImageRequest = async ({ file }: { file: File }) => {
+    if (file.type !== 'image/vnd.microsoft.icon') {
+      message.error('请上传 .ico 格式的图片或使用默认');
+      return;
+    }
+    setUploading(true);
+    const done = message.loading('上传图片中...请稍候', 0);const result = await uploadToIpfs(file);
+    done();
+    setUploading(false);
+
+    if (result?.statusCode === 201) {
+      message.success('图片上传成功');
+      setFavIconUrl(result.data.publicUrl);
+    } else {
+      message.error('图片上传失败');
+    }
+  };
 
   const timezones = {
     'Etc/GMT+12': intl.formatMessage({ id: 'timezones.Etc/GMT+12' }),
@@ -166,7 +184,7 @@ export default ({
           listType="picture-card"
           /*
           // @ts-ignore */
-          customRequest={uploadImageRequest(setFavIconUrl, setUploading)}
+          customRequest={uploadImageRequest}
           showUploadList={false}
         >
           {faviconUrl ? (
