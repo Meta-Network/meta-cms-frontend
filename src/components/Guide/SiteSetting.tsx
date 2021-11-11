@@ -18,15 +18,20 @@ export default () => {
     setSiteSetting: React.Dispatch<React.SetStateAction<GLOBAL.SiteSetting>>;
   } = useModel('storage');
 
-  const [faviconUrl, setFaviconUrl] = useState<string>(siteSetting.favicon || '');
+  const [faviconUrl, setFaviconUrl] = useState<string>(
+    siteSetting.favicon || META_SPACE_DEFAULT_FAVICON_URL,
+  );
 
   const author = initialState?.currentUser?.nickname || '';
+
   let defaultLanguage = getLocale().split('-')[0];
   if (defaultLanguage === 'zh') defaultLanguage = 'zh-CN';
+
   const initialValues = {
+    author,
     language: defaultLanguage,
     timezone: momentTimezone.tz.guess(),
-    author,
+    favicon: META_SPACE_DEFAULT_FAVICON_URL,
     ...siteSetting,
   };
 

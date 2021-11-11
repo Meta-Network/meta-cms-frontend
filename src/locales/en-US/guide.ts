@@ -57,7 +57,7 @@ export default {
   'guide.config.form.timezonePleaseEnter': 'Please select your Meta Space time zone',
   'guide.config.form.favicon': 'Website icon',
   'guide.config.form.faviconExtra':
-    'You can upload pictures in .ico .jpg .png format and display them on the page label',
+    'You can upload a picture in .ico  format and display it on the tab',
   'guide.config.form.faviconPleaseEnter': 'Please upload an icon for Meta Space',
   'guide.config.form.uploadFavicon': 'Upload Meta Space icon',
   'guide.storage.githubDescription':

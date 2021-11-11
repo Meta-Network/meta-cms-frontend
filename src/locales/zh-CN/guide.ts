@@ -71,7 +71,7 @@ export default {
   'guide.config.form.timezone': '时区',
   'guide.config.form.timezonePleaseEnter': '请选择您的 Meta Space 时区',
   'guide.config.form.favicon': '网站图标',
-  'guide.config.form.faviconExtra': '可上传.ico .jpg .png 格式图片，展示在页面标签上',
+  'guide.config.form.faviconExtra': '可上传.ico格式图片，展示在页面标签上',
   'guide.config.form.faviconPleaseEnter': '请上传一个站点图标',
   'guide.config.form.uploadFavicon': '上传站点图标',
   'guide.storage.githubDescription': '世界上最大的代码存放网站和开源社区',

@@ -111,7 +111,7 @@ export default () => {
             description: siteSetting.description,
             author: siteSetting.author,
             keywords: siteSetting.keywords,
-            favicon: siteSetting.favicon,
+            favicon: new URL(siteSetting.favicon).href,
           });
 
           if (infoSetting.message === 'Ok') {
@@ -121,8 +121,6 @@ export default () => {
               }),
               state: 'success',
             });
-            // TODO: only for testing, delete this line if release
-            updateProcessing({ message: `SiteInfoId: ${infoSetting.data.id}`, state: 'info' });
           } else {
             updateProcessing({
               info: intl.formatMessage(
@@ -152,11 +150,6 @@ export default () => {
                 id: 'messages.deployment.submitConfigSuccess',
               }),
               state: 'success',
-            });
-            // TODO: only for testing, delete this line if release
-            updateProcessing({
-              message: `SiteConfigId: ${configSetting.data.id}。`,
-              state: 'info',
             });
           } else {
             updateProcessing({
@@ -193,11 +186,6 @@ export default () => {
               }),
               state: 'success',
             });
-            // TODO: only for testing, delete this line if release
-            updateProcessing({
-              message: `StorageSettingId: ${storageSetting.data.id}。`,
-              state: 'info',
-            });
           } else {
             updateProcessing({
               message: intl.formatMessage(
@@ -233,10 +221,6 @@ export default () => {
                 id: 'messages.deployment.submitPublishSuccess',
               }),
               state: 'success',
-            });
-            updateProcessing({
-              message: `PublishSettingId: ${publishSetting.data.id}。`,
-              state: 'info',
             });
             updateProcessing({
               message: intl.formatMessage({

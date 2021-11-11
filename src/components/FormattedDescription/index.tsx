@@ -16,7 +16,7 @@ export default ({
 }: {
   id: string;
   variables?: any;
-  customClass?: any;
+  customClass?: string;
 }) => (
   <FormattedMessage id={id} values={variables}>
     {(msg: string) => (

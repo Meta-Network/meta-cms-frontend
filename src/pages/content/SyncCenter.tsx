@@ -126,7 +126,9 @@ export default () => {
 
         const currentDraft = await dbPostsWhereByID(post.id);
         console.log('currentDraft', currentDraft);
-        const _url = currentDraft ? `/content/drafts/edit?id=${currentDraft.id}` : `/posts`;
+        const _url = currentDraft
+          ? `/content/drafts/edit?id=${currentDraft.id}`
+          : '/content/drafts';
         confirm({
           icon: <ExclamationCircleOutlined />,
           content: intl.formatMessage({ id: 'messages.syncCenter.draftSavedTips' }),
