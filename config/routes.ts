@@ -4,12 +4,14 @@
     component: './Guide',
     name: 'create',
     icon: 'PlusSquare',
+    // access: 'hasNoSite',
   },
   {
     path: '/dashboard',
     component: './Dashboard',
     name: 'dashboard',
     icon: 'dashboard',
+    access: 'hasSite',
   },
   {
     path: '/user',
@@ -126,7 +128,9 @@
   },
   {
     path: '/',
-    redirect: '/create',
+    hideInMenu: true,
+    layout: false,
+    component: './Index',
   },
   {
     component: './404',

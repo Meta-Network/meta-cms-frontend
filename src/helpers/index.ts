@@ -119,7 +119,7 @@ export const getDefaultSiteConfigAPI = async () => {
     throw new Error(res.message);
   } catch (e) {
     console.log(e);
-    return '';
+    return;
   }
 };
 

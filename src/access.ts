@@ -1,6 +1,7 @@
-export default function access(initialState: { currentUser?: GLOBAL.CurrentUser | undefined }) {
-  const { currentUser } = initialState || {};
+export default function access(initialState: GLOBAL.InitialState) {
+  const { siteConfig } = initialState || {};
   return {
-    loggedIn: Boolean(currentUser),
+    hasSite: Boolean(siteConfig?.domain),
+    hasNoSite: !siteConfig?.domain,
   };
 }

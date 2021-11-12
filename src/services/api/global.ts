@@ -50,8 +50,19 @@ export async function getUsernameOfStore(name: string): Promise<string> {
   }
 }
 
-/** 上传并更新用户头像 */
-export async function uploadToIpfs(file: File) {
+/** 上传文件到 IPFS */
+export async function uploadToIpfs(form: FormData, token: string) {
+  return request<GLOBAL.GeneralResponse<Storage.Fleek>>(META_STORAGE_API, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: form,
+  });
+}
+
+/** 上传文件到 IPFS */
+export async function uploadFileToIpfs(file: File) {
   const tokenRequest = await requestStorageToken();
   const token = tokenRequest.data;
 

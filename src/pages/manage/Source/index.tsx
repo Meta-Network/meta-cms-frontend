@@ -1,6 +1,6 @@
 import { useIntl } from 'umi';
-import { Button, List, message, Tag } from 'antd';
-import { Fragment, useEffect, useState } from 'react';
+import { Button, List, message, Spin, Tag } from 'antd';
+import { useEffect, useState } from 'react';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import syncPostsRequest from '@/utils/sync-posts-request';
 import { getSourceStatus } from '@/services/api/meta-cms';
@@ -17,6 +17,7 @@ const status: GLOBAL.SourcePlatforms = {
 
 export default () => {
   const intl = useIntl();
+  const [pageLoading, setPageLoading] = useState<boolean>(true);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [unbindLoading, setUnbindLoading] = useState<boolean>(false);
   const [sourceStatus, setSourceStatus] = useState<GLOBAL.SourcePlatforms>(status);
@@ -104,6 +105,7 @@ export default () => {
         });
         return copy;
       });
+      setPageLoading(false);
     });
   }, []);
 
@@ -130,7 +132,9 @@ export default () => {
     >
       <GridContent>
         <div className={styles.main}>
-          <Fragment>
+          {pageLoading ? (
+            <Spin />
+          ) : (
             <List
               itemLayout="horizontal"
               dataSource={sourcePlatforms}
@@ -144,7 +148,7 @@ export default () => {
                 </List.Item>
               )}
             />
-          </Fragment>
+          )}
         </div>
       </GridContent>
     </PageContainer>

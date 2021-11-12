@@ -15,8 +15,8 @@ import { validator } from './validator';
 import styles from './index.less';
 
 export default () => {
-  const { siteSetting, storeSetting, themeSetting, domainSetting, setDeployedSite } =
-    useModel('storage');
+  const { siteSetting, storeSetting, themeSetting, domainSetting } = useModel('storage');
+  const { refresh } = useModel('@@initialState');
   const {
     onError,
     setOnError,
@@ -305,10 +305,7 @@ export default () => {
               }),
               duration: 0,
             });
-            setDeployedSite({
-              title: siteSetting.title,
-              domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
-            });
+            refresh();
           })
           .catch(() => {
             notification.error({
