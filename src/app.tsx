@@ -2,7 +2,7 @@ import { isMobile } from 'is-mobile';
 import { history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
-import { Typography, Avatar, Card, Dropdown, message } from 'antd';
+import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import { fetchPostsPublished } from '@/services/api/meta-cms';
 import { dbPostsAllCount } from './db/db';
@@ -163,7 +163,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
               onClick={(e) => {
                 if (_status) {
                   e.preventDefault();
-                  message.warning('请先创建 Meta Space');
+                  // message.warning('请先创建 Meta Space');
                 }
               }}
             >
