@@ -7,6 +7,7 @@ import {
   publishPost,
   publishPostAsDraft,
   updatePost,
+  getStorageSetting,
 } from '@/services/api/meta-cms';
 import { requestStorageToken } from '@/services/api/meta-ucenter';
 
@@ -171,5 +172,24 @@ export const updatePostAPI = async (id: number, data: CMS.LocalDraft) => {
   } catch (e) {
     console.log(e);
     return '';
+  }
+};
+
+/**
+ * get storage setting api
+ * @param configId
+ * @param platform
+ * @returns
+ */
+export const getStorageSettingAPI = async (
+  configId: number,
+  platform: CMS.StoragePlatform,
+): Promise<CMS.StoragePlatformSetting | undefined> => {
+  const res = await getStorageSetting(configId, platform);
+  if (res.statusCode === 200) {
+    return res.data;
+  } else {
+    console.log(res.message);
+    return;
   }
 };

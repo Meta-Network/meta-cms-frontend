@@ -70,6 +70,16 @@ export async function newSiteStorageSetting(
   });
 }
 
+/**
+ * get storage setting
+ */
+export async function getStorageSetting(configId: number, platform: CMS.StoragePlatform) {
+  return request<GLOBAL.GeneralResponse<CMS.StoragePlatformSetting>>(`/storage/${platform}`, {
+    params: { configId },
+    method: 'GET',
+  });
+}
+
 /** 提交新的存储配置 POST /storage/{platform} */
 export async function newSitePublishSetting(
   configId: number,

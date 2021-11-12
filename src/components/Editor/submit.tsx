@@ -1,6 +1,18 @@
 import type { FC } from 'react';
 import React, { Fragment, useCallback, useState, useEffect } from 'react';
-import { Modal, Card, Form, Input, Button, Checkbox, Radio, Select, Space, message } from 'antd';
+import {
+  Modal,
+  Card,
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  Radio,
+  Select,
+  Space,
+  message,
+  Typography,
+} from 'antd';
 import {
   KeyOutlined,
   EyeOutlined,
@@ -9,13 +21,17 @@ import {
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import styles from './submit.less';
-import { generateSeedAndKey, verifySeedAndKey } from '@/utils/editor';
+import { generateSeedAndKey, generateStorageLink, verifySeedAndKey } from '@/utils/editor';
+import { getDefaultSiteConfigAPI, getStorageSettingAPI } from '@/helpers/index';
+import { useMount } from 'ahooks';
 
 interface Props {
   handlePublish: () => void;
 }
 
+const { Text, Link } = Typography;
 const { Option } = Select;
+const STORAGE_PLATFORM = 'github';
 
 const Submit: FC<Props> = ({ handlePublish }) => {
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
@@ -23,7 +39,9 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   const [signatureLoading, setSignatureLoading] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<string>('');
 
-  const [gatewayLoading, setGatewayLoading] = useState<boolean>(true);
+  // const [gatewayLoading, setGatewayLoading] = useState<boolean>(true);
+
+  const [storageSetting, setStorageSetting] = useState<CMS.StoragePlatformSetting>();
 
   const onFinish = (values: any) => {
     console.log('Success:', values);
@@ -77,23 +95,41 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   /**
    * handle set gateway
    */
-  const handleSetGateway = useCallback(async () => {
-    setGatewayLoading(true);
-    // // const result = await something()
-    // await sleep(2000);
-    // const result = true;
-    // if (result) {
-    //   message.success('设置成功');
-    // } else {
-    //   message.error('设置失败');
-    // }
-    // setGatewayLoading(false);
+  // const handleSetGateway = useCallback(async () => {
+  // setGatewayLoading(true);
+  // // const result = await something()
+  // await sleep(2000);
+  // const result = true;
+  // if (result) {
+  //   message.success('设置成功');
+  // } else {
+  //   message.error('设置失败');
+  // }
+  // setGatewayLoading(false);
+  // }, []);
+
+  /**
+   * fetch Storage Setting
+   */
+  const fetchStorageSetting = useCallback(async () => {
+    const defaultSiteConfigResult = await getDefaultSiteConfigAPI();
+    if (!defaultSiteConfigResult) {
+      return;
+    }
+    const storageResult = await getStorageSettingAPI(defaultSiteConfigResult.id, STORAGE_PLATFORM);
+    if (storageResult) {
+      setStorageSetting(storageResult);
+    }
   }, []);
 
   useEffect(() => {
     // (window as any).utils = utils;
     getSeedAndKey();
   }, [getSeedAndKey]);
+
+  useMount(() => {
+    fetchStorageSetting();
+  });
 
   return (
     <Card title="准备好提交文章到仓储仓库了？" bodyStyle={{ padding: 0 }} style={{ width: 340 }}>
@@ -105,25 +141,35 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
-        <Form.Item name="githubPrivate" label="储存正文" className={styles.item}>
-          <Radio.Group disabled>
-            <Radio value="githubPrivate">
-              <span className={styles.itemType}>Github私密库</span> - 存储未发布内容
-            </Radio>
-          </Radio.Group>
+        <Form.Item name="github" label="储存正文" className={styles.item}>
+          <Radio value="githubPublic" checked={!!STORAGE_PLATFORM}>
+            <span className={styles.itemType}>Github 公开库</span> - 存储已发布内容
+          </Radio>
           <div className={styles.itemRepo}>
             <div className={styles.itemStatus}>
-              <span className={styles.undone} />
+              <span className={storageSetting ? styles.done : styles.undone} />
             </div>
-            <a href="javascript:;" className={styles.itemRepoName}>
-              ...
-            </a>
+            {storageSetting ? (
+              <Link
+                href={generateStorageLink(
+                  STORAGE_PLATFORM,
+                  `${storageSetting.userName}/${storageSetting.repoName}`,
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.itemRepoName}
+              >
+                {`${storageSetting.userName} - ${storageSetting.repoName}`}
+              </Link>
+            ) : (
+              <Text>暂未绑定</Text>
+            )}
           </div>
         </Form.Item>
 
-        <Form.Item name="ipfs" label="存证服务" className={styles.item}>
-          <Checkbox value="ipfs" style={{ lineHeight: '32px' }} defaultChecked disabled>
-            <span className={styles.itemType}>IPFS</span> - 存储可验证的元数据
+        <Form.Item name="ipfs" label="备份储存" className={styles.item}>
+          <Checkbox value="ipfs" style={{ lineHeight: '32px' }} checked={true}>
+            <span className={styles.itemType}>IPFS</span> - 存储全文，且无法删除
           </Checkbox>
         </Form.Item>
 
@@ -137,7 +183,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                 placeholder="网关未选定"
                 bordered={false}
                 showArrow={false}
-                disabled={gatewayLoading}
+                disabled={true}
                 defaultValue="ipfs"
               >
                 <Option value="ipfs">IPFS</Option>
@@ -145,7 +191,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
               </Select>
               <CaretDownOutlined />
             </div>
-            <span onClick={handleSetGateway} className={styles.btn}>
+            <span className={styles.btn} style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
               设置
             </span>
           </div>
