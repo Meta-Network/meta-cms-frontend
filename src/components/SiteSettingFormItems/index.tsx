@@ -1,7 +1,7 @@
 import { useIntl } from 'umi';
 import { message, Upload } from 'antd';
 import React, { useState } from 'react';
-import { uploadToIpfs } from '@/services/api/global';
+import { uploadFileToIpfs } from '@/services/api/global';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import ProForm, { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
@@ -21,7 +21,8 @@ export default ({
       return;
     }
     setUploading(true);
-    const done = message.loading('上传图片中...请稍候', 0);const result = await uploadToIpfs(file);
+    const done = message.loading('上传图片中...请稍候', 0);
+    const result = await uploadFileToIpfs(file);
     done();
     setUploading(false);
 

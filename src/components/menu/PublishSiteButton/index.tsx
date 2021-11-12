@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react';
 import { UpOutlined } from '@ant-design/icons';
 import { Button, message, notification } from 'antd';
 import { deployAndPublishSite } from '@/services/api/meta-cms';
-import PublishButtonPopover from '@/components/app/PublishSiteButton/PublishButtonPopover';
+import PublishButtonPopover from '@/components/menu/PublishSiteButton/PublishButtonPopover';
 import styles from './index.less';
 
 export default () => {
   const intl = useIntl();
+  const { initialState } = useModel('@@initialState');
   const [publishButtonDisplay, setPublishButtonDisplay] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
-  const { deployedSite, siteNeedToDeploy, setSiteNeedToDeploy } = useModel('storage');
+  const { siteNeedToDeploy, setSiteNeedToDeploy } = useModel('storage');
 
   // If publishButtonDisplay is true, display the button when scrolling
   // but hide it if scrolled to the bottom
@@ -39,8 +40,8 @@ export default () => {
     const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
     setPublishLoading(true);
 
-    if (deployedSite.configId) {
-      const response = await deployAndPublishSite(deployedSite.configId);
+    if (initialState?.siteConfig?.id) {
+      const response = await deployAndPublishSite(initialState?.siteConfig?.id);
       if (response.statusCode === 201) {
         notification.success({
           message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),

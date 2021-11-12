@@ -61,7 +61,7 @@ export default () => {
   const { current, setCurrent, stepStatus } = useModel('steps');
 
   useEffect(() => {
-    const positioningOffset = () => {
+    const titlePositioningOffset = () => {
       let positions = steps.map(
         (step) => document.getElementById(step.title)?.getBoundingClientRect()?.top || 0,
       );
@@ -77,10 +77,10 @@ export default () => {
         setCurrent(positions.findIndex((e) => e === closest));
       }
     };
-    window.addEventListener('scroll', positioningOffset);
+    window.addEventListener('scroll', titlePositioningOffset);
 
     return () => {
-      window.removeEventListener('scroll', positioningOffset);
+      window.removeEventListener('scroll', titlePositioningOffset);
     };
   }, [steps, setCurrent]);
 

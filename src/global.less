@@ -35,6 +35,20 @@
   }
 }
 
+.menuCounterBadge {
+  float: right;
+}
+.menuCounterBadge > sup {
+  background-color: #1890ff;
+}
+.ant-menu-inline-collapsed-tooltip .menuCounterBadge > sup {
+  margin-top: 1px;
+  margin-left: 10px;
+}
+.ant-menu-item .menuCounterBadge > sup {
+  margin-top: 7px;
+}
+
 .ant-component-modifier() {
   .custom-user-menu.ant-menu-inline-collapsed {
     width: 120px;
@@ -145,9 +159,9 @@
     color: #542ee0;
   }
 
-  // style only for 邀请码管理
-  .ant-menu .ant-menu-item-only-child:last-child {
-    padding-right: 12.4px;
+  // style for counter badges
+  .ant-menu .ant-menu-item {
+    padding-right: 5%;
   }
 
   .ant-pro-sider-extra {

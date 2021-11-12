@@ -1,19 +1,18 @@
-import { useEffect } from 'react';
 import { isMobile } from 'is-mobile';
-import { useModel, history, Link } from 'umi';
+import { history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown, message } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import { fetchPostsPublished, getDefaultSiteConfig } from '@/services/api/meta-cms';
-import MenuMoreInfo from './components/MenuMoreInfo';
-import MenuUserInfo from './components/MenuUserInfo';
-import MenuItemWithBadge from './components/MenuItemWithBadge';
-import MenuLanguageSwitch from './components/MenuLanguageSwitch';
-import PublishSiteButton from './components/app/PublishSiteButton';
+import { fetchPostsPublished } from '@/services/api/meta-cms';
+import { dbPostsAllCount } from './db/db';
+import MenuMoreInfo from './components/menu/MenuMoreInfo';
+import MenuUserInfo from './components/menu/MenuUserInfo';
+import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
+import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
+import PublishSiteButton from './components/menu/PublishSiteButton';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
-import { dbPostsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from './helpers/index';
 
 const { Text } = Typography;
@@ -22,24 +21,9 @@ function CustomSiderMenu({
   initialState,
   menuItemProps,
 }: {
-  initialState: any;
+  initialState: GLOBAL.InitialState | undefined;
   menuItemProps: SiderMenuProps;
 }) {
-  const { deployedSite, setDeployedSite } = useModel('storage');
-  useEffect(() => {
-    getDefaultSiteConfig().then((response) => {
-      if (response?.data) {
-        setDeployedSite({
-          title: response.data.siteInfo.title,
-          domain: response.data.domain,
-          configId: response.data.id,
-        });
-      } else {
-        setDeployedSite({});
-      }
-    });
-  }, [setDeployedSite]);
-
   return (
     <div className="menu-extra-cards">
       <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click']}>
@@ -52,18 +36,18 @@ function CustomSiderMenu({
           <DownOutlined className="menu-extra-icons" />
         </Card>
       </Dropdown>
-      {deployedSite.domain && (
-        <a href={`https://${deployedSite.domain}`} target="__blank">
+      {initialState?.siteConfig?.domain && (
+        <a href={`https://${initialState.siteConfig.domain}`} target="__blank">
           <Card
             className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
           >
             <Card.Meta
               className="menu-site-card-meta"
               avatar={<Avatar src="/icons/custom/meta-space-icon.svg" />}
-              title={deployedSite.title}
+              title={initialState.siteConfig.siteInfo.title}
               description={
-                <Text type="secondary" ellipsis={deployedSite.domain.length > 20}>
-                  {deployedSite.domain}
+                <Text type="secondary" ellipsis={initialState.siteConfig.domain.length > 20}>
+                  {initialState.siteConfig.domain}
                 </Text>
               }
             />
@@ -85,14 +69,7 @@ export const initialStateConfig = {
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
-export async function getInitialState(): Promise<{
-  currentUser?: GLOBAL.CurrentUser | undefined;
-  fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
-  invitationsCount?: number;
-  publishedCount?: number;
-  localDraftCount?: number;
-  siteConfig?: CMS.SiteConfiguration;
-}> {
+export async function getInitialState(): Promise<GLOBAL.InitialState> {
   const fetchUserInfo = async () => {
     try {
       await refreshTokens();
@@ -117,7 +94,7 @@ export async function getInitialState(): Promise<{
   // get site config
   const siteConfig = await getDefaultSiteConfigAPI();
 
-  const states: any = {
+  const state: GLOBAL.InitialState = {
     fetchUserInfo,
     invitationsCount,
     publishedCount,
@@ -127,13 +104,14 @@ export async function getInitialState(): Promise<{
 
   if (history.location.pathname !== '/user/login') {
     const currentUser = await fetchUserInfo();
-    if (currentUser) states.currentUser = currentUser;
+    if (currentUser) state.currentUser = currentUser;
   }
 
   if (isMobile()) {
     history.push('/result/mobile');
   }
-  return states;
+
+  return state;
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout

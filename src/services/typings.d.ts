@@ -78,6 +78,7 @@ declare namespace CMS {
     updatedAt: Date;
     metaSpacePrefix: string;
     siteInfo: {
+      title: string;
       subtitle: string;
       description: string;
       author: string;
@@ -87,7 +88,6 @@ declare namespace CMS {
       createdAt: Date;
       updatedAt: Date;
       userId: number;
-      title: string;
     };
   };
 
@@ -178,6 +178,15 @@ declare namespace CMS {
 }
 
 declare namespace GLOBAL {
+  type InitialState = {
+    currentUser?: GLOBAL.CurrentUser;
+    fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
+    invitationsCount?: number;
+    publishedCount?: number;
+    localDraftCount?: number;
+    siteConfig?: CMS.SiteConfiguration;
+  };
+
   type GeneralResponse<T> = {
     statusCode: number;
     message: string;
@@ -297,5 +306,27 @@ declare namespace Space {
     name: string;
     path: string;
     count: number;
+  };
+}
+
+declare namespace NETWORK {
+  type HexGrid = {
+    createdAt: Date;
+    updatedAt: Date;
+    id: number;
+    siteName: string;
+    x: number;
+    y: number;
+    z: number;
+    userId: number;
+    username: string;
+    userNickname: string;
+    userBio: string;
+    userAvatar: string;
+    subdomain: string;
+    metaSpaceSiteId: number;
+    metaSpaceSiteUrl: string;
+    metaSpaceSiteProofUrl: string;
+    inviterUserId: number;
   };
 }

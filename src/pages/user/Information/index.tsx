@@ -1,4 +1,4 @@
-import { uploadToIpfs } from '@/services/api/global';
+import { uploadFileToIpfs } from '@/services/api/global';
 import { useModel, useIntl } from 'umi';
 import ImgCrop from 'antd-img-crop';
 import React, { useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ const BaseView: React.FC = () => {
   const uploadImageRequest = async ({ file }: { file: File }) => {
     // TODO: Need i18n here
     const done = message.loading('上传图片中...请稍候', 0);
-    const result = await uploadToIpfs(file);
+    const result = await uploadFileToIpfs(file);
     done();
 
     if (result?.statusCode === 201) {
