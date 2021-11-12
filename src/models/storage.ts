@@ -13,9 +13,6 @@ export default () => {
   const [siteSetting, setSiteSetting] = useState<GLOBAL.SiteSetting>(
     JSON.parse(window.localStorage.getItem('siteSetting') || '{}'),
   );
-  const [deployedSite, setDeployedSite] = useState<any>(
-    JSON.parse(window.localStorage.getItem('deployedSite') || '{}'),
-  );
   const [siteNeedToDeploy, setSiteNeedToDeploy] = useState<boolean>(
     JSON.parse(window.localStorage.getItem('siteNeedToDeploy') || 'false'),
   );
@@ -41,10 +38,6 @@ export default () => {
   }, [siteSetting]);
 
   useEffect(() => {
-    setStorage('deployedSite', deployedSite);
-  }, [deployedSite]);
-
-  useEffect(() => {
     setStorage('siteNeedToDeploy', siteNeedToDeploy);
   }, [siteNeedToDeploy]);
 
@@ -57,8 +50,6 @@ export default () => {
     setStoreSetting,
     siteSetting,
     setSiteSetting,
-    deployedSite,
-    setDeployedSite,
     siteNeedToDeploy,
     setSiteNeedToDeploy,
   };
