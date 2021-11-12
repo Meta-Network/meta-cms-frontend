@@ -26,6 +26,7 @@ import { getDefaultSiteConfigAPI, getStorageSettingAPI } from '@/helpers/index';
 import { useMount } from 'ahooks';
 import { KEY_META_CMS_GATEWAY_CHECKED } from '../../../config/index';
 import { storeGet, storeSet } from '@/utils/store';
+import { useIntl } from 'umi';
 
 interface Props {
   handlePublish: (gateway: boolean) => void;
@@ -36,6 +37,8 @@ const { Option } = Select;
 const STORAGE_PLATFORM = 'github';
 
 const Submit: FC<Props> = ({ handlePublish }) => {
+  const intl = useIntl();
+
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
   const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
   const [signatureLoading, setSignatureLoading] = useState<boolean>(false);
@@ -46,8 +49,14 @@ const Submit: FC<Props> = ({ handlePublish }) => {
 
   const onFinish = (values: any) => {
     console.log('Success:', values);
+
     if (gatewayChecked && !publicKey) {
-      message.warning('请生成 KEY');
+      message.warning(intl.formatMessage({ id: 'messages.editor.submit.generateKey' }));
+      return;
+    }
+
+    if (!storageSetting) {
+      message.warning(intl.formatMessage({ id: 'messages.editor.submit.bindStorage' }));
       return;
     }
 
@@ -80,14 +89,14 @@ const Submit: FC<Props> = ({ handlePublish }) => {
       const { keys } = generateSeedAndKey();
       setPublicKey(keys.public);
 
-      message.success('生成成功');
+      message.success(intl.formatMessage({ id: 'messages.editor.submit.generateKey.success' }));
     } catch (error) {
       console.log(error);
-      message.error('生成失败');
+      message.error(intl.formatMessage({ id: 'messages.editor.submit.generateKey.fail' }));
     }
 
     setSignatureLoading(false);
-  }, [setPublicKey]);
+  }, [setPublicKey, intl]);
 
   /**
    * handle Gateway Change Checked
@@ -145,7 +154,11 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   });
 
   return (
-    <Card title="准备好提交文章到仓储仓库了？" bodyStyle={{ padding: 0 }} style={{ width: 340 }}>
+    <Card
+      title={intl.formatMessage({ id: 'editor.submit.title' })}
+      bodyStyle={{ padding: 0 }}
+      style={{ width: 340 }}
+    >
       <Form
         name="basic"
         initialValues={{ remember: true }}
@@ -154,9 +167,16 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
-        <Form.Item name="github" label="储存正文" className={styles.item}>
+        <Form.Item
+          name="github"
+          label={intl.formatMessage({ id: 'editor.submit.item.repo.label' })}
+          className={styles.item}
+        >
           <Radio value="githubPublic" checked={!!STORAGE_PLATFORM}>
-            <span className={styles.itemType}>Github 公开库</span> - 存储已发布内容
+            <span className={styles.itemType}>
+              {intl.formatMessage({ id: 'editor.submit.item.repo.name' })}
+            </span>{' '}
+            - {intl.formatMessage({ id: 'editor.submit.item.repo.description' })}
           </Radio>
           <div className={styles.itemRepo}>
             <div className={styles.itemStatus}>
@@ -175,19 +195,26 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                 {`${storageSetting.userName} - ${storageSetting.repoName}`}
               </Link>
             ) : (
-              <Text>暂未绑定</Text>
+              <Text>{intl.formatMessage({ id: 'editor.submit.item.repo.noBuild' })}</Text>
             )}
           </div>
         </Form.Item>
 
-        <Form.Item name="ipfs" label="备份储存" className={styles.item}>
+        <Form.Item
+          name="ipfs"
+          label={intl.formatMessage({ id: 'editor.submit.item.gateway.label' })}
+          className={styles.item}
+        >
           <Checkbox
             value="ipfs"
             style={{ lineHeight: '32px' }}
             checked={gatewayChecked}
             onChange={(e) => handleGatewayChangeChecked(e.target.checked)}
           >
-            <span className={styles.itemType}>IPFS</span> - 存储全文，且无法删除
+            <span className={styles.itemType}>
+              {intl.formatMessage({ id: 'editor.submit.item.gateway.name' })}
+            </span>{' '}
+            - {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
           </Checkbox>
         </Form.Item>
 
@@ -200,19 +227,20 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                 </div>
                 <div className={styles.itemForm}>
                   <Select
-                    placeholder="网关未选定"
+                    placeholder={intl.formatMessage({
+                      id: 'editor.submit.item.gateway.gatewayPlaceholder',
+                    })}
                     bordered={false}
                     showArrow={false}
                     disabled={true}
                     defaultValue="ipfs"
                   >
                     <Option value="ipfs">IPFS - FLEEK</Option>
-                    <Option value="github">GITHUB</Option>
                   </Select>
                   <CaretDownOutlined />
                 </div>
                 <span className={styles.btn} style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
-                  设置
+                  {intl.formatMessage({ id: 'editor.submit.item.gateway.setting' })}
                 </span>
               </div>
             </Form.Item>
@@ -228,7 +256,9 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                 </div>
                 <div className={styles.itemForm}>
                   <Input
-                    placeholder="KEY 未设置"
+                    placeholder={intl.formatMessage({
+                      id: 'editor.submit.item.gateway.keyPlaceholder',
+                    })}
                     className={styles.input}
                     value={publicKey}
                     disabled={true}
@@ -240,15 +270,24 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                   )}
                 </div>
                 <span className={styles.btn} onClick={() => setVisibleSignatureGenerate(true)}>
-                  生成
+                  {intl.formatMessage({
+                    id: 'editor.submit.item.gateway.keyGenerate',
+                  })}
                 </span>
               </div>
             </Form.Item>
             {visibleSignature && (
               <div className={styles.key}>
-                <div className={styles.keyVal}>{publicKey || '暂无'}</div>
+                <div className={styles.keyVal}>
+                  {publicKey ||
+                    intl.formatMessage({
+                      id: 'component.no',
+                    })}
+                </div>
                 <div className={styles.keyGenerate}>
-                  生成自你的 KEY{' '}
+                  {intl.formatMessage({
+                    id: 'editor.submit.item.gateway.keyGenerateText',
+                  })}{' '}
                   <Link onClick={() => window.open('/manage/account')}>
                     <ArrowRightOutlined />
                   </Link>
@@ -260,9 +299,15 @@ const Submit: FC<Props> = ({ handlePublish }) => {
 
         <Form.Item className={styles.footer}>
           <Space>
-            <Button>取消</Button>
+            <Button>
+              {intl.formatMessage({
+                id: 'component.button.cancel',
+              })}
+            </Button>
             <Button type="primary" htmlType="submit">
-              提交
+              {intl.formatMessage({
+                id: 'component.button.submit',
+              })}
             </Button>
           </Space>
         </Form.Item>
@@ -272,20 +317,45 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         title={
           <Fragment>
             <KeyOutlined />
-            &nbsp;生成 KEY
+            &nbsp;
+            {intl.formatMessage({
+              id: 'editor.submit.modalKey.title',
+            })}
           </Fragment>
         }
         onCancel={() => setVisibleSignatureGenerate(false)}
         footer={[
-          <Button onClick={() => setVisibleSignatureGenerate(false)}>取消</Button>,
+          <Button onClick={() => setVisibleSignatureGenerate(false)}>
+            {intl.formatMessage({
+              id: 'component.button.cancel',
+            })}
+          </Button>,
           <Button type="primary" loading={signatureLoading} onClick={handleGeneratePublicKey}>
-            {publicKey ? '重新生成' : '立即生成'}
+            {publicKey
+              ? intl.formatMessage({
+                  id: 'component.button.regenerate',
+                })
+              : intl.formatMessage({
+                  id: 'component.button.generateImmediately',
+                })}
           </Button>,
         ]}
       >
         <Space direction="vertical">
-          <div>{publicKey ? '您已生成 KEY' : '检测到您当前还未生成 KEY'}</div>
-          <div>(存储在浏览器中，用户产生加密签名)</div>
+          <div>
+            {publicKey
+              ? intl.formatMessage({
+                  id: 'editor.submit.modalKey.content.beenGenerated',
+                })
+              : intl.formatMessage({
+                  id: 'editor.submit.modalKey.content.notGenerated',
+                })}
+          </div>
+          <div>
+            {intl.formatMessage({
+              id: 'editor.submit.modalKey.content.description',
+            })}
+          </div>
           <Input value={publicKey} placeholder="KEY" disabled />
         </Space>
       </Modal>

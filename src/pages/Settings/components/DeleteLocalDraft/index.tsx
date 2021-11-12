@@ -14,14 +14,24 @@ export default () => {
   const handleDeleteAllLocalDraft = useCallback(async () => {
     await dbPostsDeleteAll();
     await dbMetadatasDeleteAll();
-    message.success('删除成功');
-  }, []);
+    message.success(
+      intl.formatMessage({
+        id: 'messages.delete.success',
+      }),
+    );
+  }, [intl]);
 
   return (
     <Space>
-      <Text type="danger">删除本地所有草稿</Text>
+      <Text type="danger">
+        {intl.formatMessage({
+          id: 'setting.DeleteLocalDraft.all',
+        })}
+      </Text>
       <Popconfirm
-        title="您确定要删除本地所有草稿吗?"
+        title={intl.formatMessage({
+          id: 'setting.DeleteLocalDraft.all.tip',
+        })}
         onConfirm={handleDeleteAllLocalDraft}
         // onCancel={}
         okText={intl.formatMessage({
@@ -32,7 +42,9 @@ export default () => {
         })}
       >
         <Button type="primary" danger>
-          删除
+          {intl.formatMessage({
+            id: 'component.button.delete',
+          })}
         </Button>
       </Popconfirm>
     </Space>
