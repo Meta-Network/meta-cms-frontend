@@ -113,7 +113,7 @@
     path: '/settings',
     name: 'settings',
     icon: 'setting',
-    component: './Settings/index',
+    component: './Settings',
   },
   {
     path: '/result/store-setting-success',
