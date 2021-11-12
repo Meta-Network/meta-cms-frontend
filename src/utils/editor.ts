@@ -13,7 +13,11 @@ import type {
   AuthorSignatureMetadata,
 } from '@metaio/meta-signature-util/type/types.d';
 import { storeGet, storeSet } from './store';
-import { KEY_META_CMS_METADATA_SEED, KEY_META_CMS_METADATA_PUBLIC_KEYS } from '../../config';
+import {
+  KEY_META_CMS_METADATA_SEED,
+  KEY_META_CMS_METADATA_PUBLIC_KEYS,
+  GITHUB_URL,
+} from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
@@ -189,4 +193,18 @@ export const uploadMetadata = async ({
     digestMetadataIpfs: digestMetadataResult,
     authorSignatureMetadataIpfs: authorSignatureMetadataResult,
   };
+};
+
+/**
+ * generate Storage Link
+ * @param platform
+ * @param url
+ * @returns
+ */
+export const generateStorageLink = (platform: CMS.StoragePlatform, url: string) => {
+  const list = {
+    github: GITHUB_URL,
+  };
+
+  return `${list[platform]}/${url}`;
 };

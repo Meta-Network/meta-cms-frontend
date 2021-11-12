@@ -91,7 +91,7 @@ export async function getInitialState(): Promise<{
   invitationsCount?: number;
   publishedCount?: number;
   localDraftCount?: number;
-  siteConfig?: CMS.SiteConfiguration | '';
+  siteConfig?: CMS.SiteConfiguration;
 }> {
   const fetchUserInfo = async () => {
     try {
