@@ -1,7 +1,7 @@
 import type { Table, Transaction } from 'dexie';
 import Dexie from 'dexie';
 import type { Posts } from './Posts';
-import type { Metadatas } from './Metadatas';
+import type { Metadatas, MetadataTempDataState } from './Metadatas';
 import moment from 'moment';
 import { License } from '../../config';
 
@@ -10,16 +10,16 @@ export class StoreDB extends Dexie {
   metadatas!: Table<Metadatas, number>;
   constructor() {
     super('StoreDB');
-    this.version(8)
+    this.version(10)
       .stores({
         posts:
           '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, createdAt, updatedAt',
-        metadatas: '++id, postId, metadata, createdAt, updatedAt',
+        metadatas: '++id, postId, metadata, delete, createdAt, updatedAt',
       })
       .upgrade((tx: Transaction | any) => {
         const time = moment().toISOString();
         // TODO: modify typescript
-        return tx.posts.toCollection().modify((post: Posts) => {
+        tx.posts.toCollection().modify((post: Posts) => {
           // console.log('post', post);
           post.cover = post.cover || '';
           post.title = post.title || '';
@@ -35,6 +35,10 @@ export class StoreDB extends Dexie {
           post.license = post.license || License;
           post.createdAt = post.createdAt || time;
           post.updatedAt = post.updatedAt || time;
+        });
+        tx.metadatas.toCollection().modify((metadata: Metadatas) => {
+          // console.log('Metadatas', metadata);
+          metadata.delete = metadata.delete || 0;
         });
       });
   }
@@ -137,7 +141,8 @@ export const PostTempData = (): Posts => ({
 // db metadatas
 
 // metadata data temp
-export const MetadataTempData = () => ({
+export const MetadataTempData = (): MetadataTempDataState => ({
+  delete: 0,
   createdAt: moment().toISOString(),
   updatedAt: moment().toISOString(),
 });
@@ -149,4 +154,22 @@ export const MetadataTempData = () => ({
  */
 export const dbMetadatasAdd = async (data: Metadatas): Promise<number> => {
   return await db.metadatas.add(data);
+};
+
+/**
+ * db metadatas update by postId
+ * @param id
+ * @param data
+ * @returns
+ */
+export const dbMetadatasUpdateByPostId = async <T>(postId: number, data: T): Promise<number> => {
+  return await db.metadatas.where('postId').equals(postId).modify(data);
+};
+
+/**
+ * db metadatas delete all
+ * @returns
+ */
+export const dbMetadatasDeleteAll = async (): Promise<number> => {
+  return await db.metadatas.where('delete').anyOf(0, 1).delete();
 };

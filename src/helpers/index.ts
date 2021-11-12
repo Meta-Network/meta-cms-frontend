@@ -1,4 +1,4 @@
-import { uploadToIpfs } from '@/services/api/global';
+import { fileUploadToIpfs } from '@/services/api/global';
 import {
   getDefaultSiteConfig,
   imageUploadByUrl,
@@ -7,6 +7,7 @@ import {
   publishPost,
   publishPostAsDraft,
   updatePost,
+  getStorageSetting,
 } from '@/services/api/meta-cms';
 import { requestStorageToken } from '@/services/api/meta-ucenter';
 
@@ -49,17 +50,15 @@ export const imageUploadByUrlAPI = async (url: string) => {
  * @param formData
  * @returns
  */
-export const uploadToIpfsAPI = async (formData: FormData): Promise<Storage.Fleek | ''> => {
+export const uploadToIpfsAPI = async (formData: FormData): Promise<Storage.Fleek | undefined> => {
   try {
     const token = await fetchTokenAPI();
     if (!token) {
       console.error('no token');
-      return '';
+      return;
     }
 
-    const res = await uploadToIpfs(formData, token);
-    console.log('res', res);
-
+    const res = await fileUploadToIpfs(formData, token);
     if (res.statusCode === 201) {
       return res.data;
     } else {
@@ -67,7 +66,7 @@ export const uploadToIpfsAPI = async (formData: FormData): Promise<Storage.Fleek
     }
   } catch (e) {
     console.log(e);
-    return '';
+    return;
   }
 };
 
@@ -110,7 +109,7 @@ export const postByIdAPI = async (id: number) => {
 /**
  * get default site config
  */
-export const getDefaultSiteConfigAPI = async () => {
+export const getDefaultSiteConfigAPI = async (): Promise<CMS.SiteConfiguration | undefined> => {
   try {
     const res = await getDefaultSiteConfig();
     if (res.statusCode === 200) {
@@ -173,5 +172,24 @@ export const updatePostAPI = async (id: number, data: CMS.LocalDraft) => {
   } catch (e) {
     console.log(e);
     return '';
+  }
+};
+
+/**
+ * get storage setting api
+ * @param configId
+ * @param platform
+ * @returns
+ */
+export const getStorageSettingAPI = async (
+  configId: number,
+  platform: CMS.StoragePlatform,
+): Promise<CMS.StoragePlatformSetting | undefined> => {
+  const res = await getStorageSetting(configId, platform);
+  if (res.statusCode === 200) {
+    return res.data;
+  } else {
+    console.log(res.message);
+    return;
   }
 };

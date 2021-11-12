@@ -77,3 +77,16 @@ export async function uploadFileToIpfs(file: File) {
     data: form,
   });
 }
+
+/**
+ * file upload to ipfs
+ */
+export async function fileUploadToIpfs(file: FormData, token: string) {
+  return request<GLOBAL.GeneralResponse<Storage.Fleek>>(META_STORAGE_API, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: file,
+  });
+}

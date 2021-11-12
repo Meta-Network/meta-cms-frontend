@@ -162,6 +162,19 @@ declare namespace CMS {
       last: string;
     };
   };
+
+  type StoragePlatform = 'github' | 'gitee';
+  type StoragePlatformSetting = {
+    lastCommitHash: string | null;
+    useGitProvider: boolean;
+    id: number;
+    createdAt: string;
+    updatedAt: string;
+    userName: string;
+    repoName: string;
+    branchName: string;
+    dataType: 'HEXO' | string;
+  };
 }
 
 declare namespace GLOBAL {
