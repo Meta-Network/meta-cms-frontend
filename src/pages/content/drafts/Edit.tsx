@@ -144,7 +144,15 @@ const Edit: React.FC = () => {
    * If mode is draft or post, postId is required
    */
   const postPublishToPost = useCallback(
-    async ({ mode, postId }: { mode: 'local' | 'draft' | 'post'; postId?: number }) => {
+    async ({
+      mode,
+      postId,
+      gateway,
+    }: {
+      mode: 'local' | 'draft' | 'post';
+      postId?: number;
+      gateway: boolean;
+    }) => {
       setPublishLoading(true);
 
       const data = {
@@ -161,43 +169,52 @@ const Edit: React.FC = () => {
         categories: '',
         tags: tags.join(),
       };
-
-      const uploadMetadataResult = await uploadMetadata({ payload });
-
-      if (!uploadMetadataResult) {
-        message.error('上传 metadata 失败, 请重试！');
-        setPublishLoading(false);
-        return;
-      }
-
-      const {
-        digestMetadata,
-        authorSignatureMetadata,
-        digestMetadataIpfs,
-        authorSignatureMetadataIpfs,
-      } = uploadMetadataResult;
       const { id } = history.location.query as Router.PostQuery;
 
-      // local add metadada
-      await dbMetadatasAdd(
-        assign(MetadataTempData(), {
-          postId: Number(id),
-          metadata: {
-            digestMetadata: digestMetadata,
-            authorSignatureMetadata: authorSignatureMetadata,
-            digestMetadataIpfs: digestMetadataIpfs,
-            authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
-          },
-        }),
-      );
+      let metadataData = {
+        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+        authorDigestRequestMetadataRefer: '',
+        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+        authorDigestSignatureMetadataRefer: '',
+      };
+      // if select gateway
+      if (gateway) {
+        const uploadMetadataResult = await uploadMetadata({ payload });
+
+        if (uploadMetadataResult) {
+          const {
+            digestMetadata,
+            authorSignatureMetadata,
+            digestMetadataIpfs,
+            authorSignatureMetadataIpfs,
+          } = uploadMetadataResult;
+
+          // local add metadada
+          await dbMetadatasAdd(
+            assign(MetadataTempData(), {
+              postId: Number(id),
+              metadata: {
+                digestMetadata: digestMetadata,
+                authorSignatureMetadata: authorSignatureMetadata,
+                digestMetadataIpfs: digestMetadataIpfs,
+                authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
+              },
+            }),
+          );
+
+          metadataData = assign(metadataData, {
+            authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
+            authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
+          });
+        } else {
+          message.error('上传 metadata 失败, 请重试！');
+          setPublishLoading(false);
+          return;
+        }
+      }
 
       let draftResult: CMS.Draft | '' = '';
-      const metadataData = {
-        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
-        authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
-        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
-        authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
-      };
+
       if (mode === 'local') {
         draftResult = await publishPostAPI({
           ...data,
@@ -241,54 +258,61 @@ const Edit: React.FC = () => {
   /**
    * publish
    */
-  const handlePublish = useCallback(async () => {
-    const { id } = history.location.query as Router.PostQuery;
-    if (!id) {
-      message.warning(
-        intl.formatMessage({
-          id: 'messages.editor.tip.id',
-        }),
-      );
-      return;
-    }
 
-    if (!title && !content) {
-      message.warning(
-        intl.formatMessage({
-          id: 'messages.editor.tip.titleOrContent',
-        }),
-      );
-      return;
-    }
+  const handlePublish = useCallback(
+    async (gateway: boolean) => {
+      const { id } = history.location.query as Router.PostQuery;
+      if (!id) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.tip.id',
+          }),
+        );
+        return;
+      }
 
-    // check cover format
-    if (cover && !cover.includes(FLEEK_NAME)) {
-      message.success(
-        intl.formatMessage({
-          id: 'messages.editor.tip.coverFormat',
-        }),
-      );
-      return;
-    }
+      if (!title || !content) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.tip.titleOrContent',
+          }),
+        );
+        return;
+      }
 
-    const result = await dbPostsGet(Number(id));
-    // 转存草稿发布
-    if (result && result.draft) {
-      postPublishToPost({
-        mode: 'draft',
-        postId: result.draft.id,
-      });
-    } else if (result && result.post) {
-      postPublishToPost({
-        mode: 'post',
-        postId: result.post.id,
-      });
-    } else {
-      postPublishToPost({
-        mode: 'post',
-      });
-    }
-  }, [title, cover, content, postPublishToPost, intl]);
+      // check cover format
+      if (cover && !cover.includes(FLEEK_NAME)) {
+        message.success(
+          intl.formatMessage({
+            id: 'messages.editor.tip.coverFormat',
+          }),
+        );
+        return;
+      }
+
+      const result = await dbPostsGet(Number(id));
+      // 转存草稿发布
+      if (result && result.draft) {
+        postPublishToPost({
+          mode: 'draft',
+          postId: result.draft.id,
+          gateway,
+        });
+      } else if (result && result.post) {
+        postPublishToPost({
+          mode: 'post',
+          postId: result.post.id,
+          gateway,
+        });
+      } else {
+        postPublishToPost({
+          mode: 'local',
+          gateway,
+        });
+      }
+    },
+    [title, cover, content, postPublishToPost, intl],
+  );
 
   /**
    * handle history url state

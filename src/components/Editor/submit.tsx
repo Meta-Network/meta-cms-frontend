@@ -24,9 +24,11 @@ import styles from './submit.less';
 import { generateSeedAndKey, generateStorageLink, verifySeedAndKey } from '@/utils/editor';
 import { getDefaultSiteConfigAPI, getStorageSettingAPI } from '@/helpers/index';
 import { useMount } from 'ahooks';
+import { KEY_META_CMS_GATEWAY_CHECKED } from '../../../config/index';
+import { storeGet, storeSet } from '@/utils/store';
 
 interface Props {
-  handlePublish: () => void;
+  handlePublish: (gateway: boolean) => void;
 }
 
 const { Text, Link } = Typography;
@@ -38,23 +40,18 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
   const [signatureLoading, setSignatureLoading] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<string>('');
-
   // const [gatewayLoading, setGatewayLoading] = useState<boolean>(true);
-
+  const [gatewayChecked, setGatewayChecked] = useState<boolean>(false);
   const [storageSetting, setStorageSetting] = useState<CMS.StoragePlatformSetting>();
 
   const onFinish = (values: any) => {
     console.log('Success:', values);
-    // if (false) {
-    //   handlePublish();
-    // }
-
-    if (!publicKey) {
-      message.warning('请生成 非金融 KEY');
+    if (gatewayChecked && !publicKey) {
+      message.warning('请生成 KEY');
       return;
     }
 
-    handlePublish();
+    handlePublish(gatewayChecked);
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -85,12 +82,20 @@ const Submit: FC<Props> = ({ handlePublish }) => {
 
       message.success('生成成功');
     } catch (error) {
-      console.log('error', error);
+      console.log(error);
       message.error('生成失败');
     }
 
     setSignatureLoading(false);
   }, [setPublicKey]);
+
+  /**
+   * handle Gateway Change Checked
+   */
+  const handleGatewayChangeChecked = useCallback((val: boolean) => {
+    setGatewayChecked(val);
+    storeSet(KEY_META_CMS_GATEWAY_CHECKED, JSON.stringify(val));
+  }, []);
 
   /**
    * handle set gateway
@@ -122,13 +127,21 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     }
   }, []);
 
+  /**
+   * get Gateway Checked
+   */
+  const getGatewayChecked = useCallback(async () => {
+    const gatewayCheckedResult = JSON.parse(storeGet(KEY_META_CMS_GATEWAY_CHECKED) || 'false');
+    setGatewayChecked(gatewayCheckedResult);
+  }, []);
+
   useEffect(() => {
-    // (window as any).utils = utils;
     getSeedAndKey();
   }, [getSeedAndKey]);
 
   useMount(() => {
     fetchStorageSetting();
+    getGatewayChecked();
   });
 
   return (
@@ -168,70 +181,84 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         </Form.Item>
 
         <Form.Item name="ipfs" label="备份储存" className={styles.item}>
-          <Checkbox value="ipfs" style={{ lineHeight: '32px' }} checked={true}>
+          <Checkbox
+            value="ipfs"
+            style={{ lineHeight: '32px' }}
+            checked={gatewayChecked}
+            onChange={(e) => handleGatewayChangeChecked(e.target.checked)}
+          >
             <span className={styles.itemType}>IPFS</span> - 存储全文，且无法删除
           </Checkbox>
         </Form.Item>
 
-        <Form.Item name="select-multiple" label="" className={styles.item}>
-          <div className={styles.flexAlignItemCenter}>
-            <div className={styles.itemStatus}>
-              <span className={styles.done} />
-            </div>
-            <div className={styles.itemForm}>
-              <Select
-                placeholder="网关未选定"
-                bordered={false}
-                showArrow={false}
-                disabled={true}
-                defaultValue="ipfs"
-              >
-                <Option value="ipfs">IPFS</Option>
-                <Option value="github">GITHUB</Option>
-              </Select>
-              <CaretDownOutlined />
-            </div>
-            <span className={styles.btn} style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
-              设置
-            </span>
-          </div>
-        </Form.Item>
+        {gatewayChecked && (
+          <Fragment>
+            <Form.Item name="select-multiple" label="" className={styles.item}>
+              <div className={styles.flexAlignItemCenter}>
+                <div className={styles.itemStatus}>
+                  <span className={styles.done} />
+                </div>
+                <div className={styles.itemForm}>
+                  <Select
+                    placeholder="网关未选定"
+                    bordered={false}
+                    showArrow={false}
+                    disabled={true}
+                    defaultValue="ipfs"
+                  >
+                    <Option value="ipfs">IPFS - FLEEK</Option>
+                    <Option value="github">GITHUB</Option>
+                  </Select>
+                  <CaretDownOutlined />
+                </div>
+                <span className={styles.btn} style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
+                  设置
+                </span>
+              </div>
+            </Form.Item>
 
-        <Form.Item name="publicKey" label="" className={styles.item}>
-          <div className={styles.flexAlignItemCenter}>
-            <div className={styles.itemStatus}>
-              {publicKey ? <span className={styles.done} /> : <span className={styles.undone} />}
-            </div>
-            <div className={styles.itemForm}>
-              <Input
-                placeholder="签名未设置"
-                className={styles.input}
-                value={publicKey}
-                disabled={true}
-              />
-              {visibleSignature ? (
-                <EyeOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
-              ) : (
-                <EyeInvisibleOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
-              )}
-            </div>
-            <span className={styles.btn} onClick={() => setVisibleSignatureGenerate(true)}>
-              生成
-            </span>
-          </div>
-        </Form.Item>
-        {visibleSignature && (
-          <div className={styles.key}>
-            <div className={styles.keyVal}>{publicKey || '暂无'}</div>
-            <div className={styles.keyGenerate}>
-              生成自你的非金融 KEY{' '}
-              <a href="javascript:;" onClick={() => setVisibleSignatureGenerate(true)}>
-                <ArrowRightOutlined />
-              </a>
-            </div>
-          </div>
+            <Form.Item name="publicKey" label="" className={styles.item}>
+              <div className={styles.flexAlignItemCenter}>
+                <div className={styles.itemStatus}>
+                  {publicKey ? (
+                    <span className={styles.done} />
+                  ) : (
+                    <span className={styles.undone} />
+                  )}
+                </div>
+                <div className={styles.itemForm}>
+                  <Input
+                    placeholder="KEY 未设置"
+                    className={styles.input}
+                    value={publicKey}
+                    disabled={true}
+                  />
+                  {visibleSignature ? (
+                    <EyeOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
+                  ) : (
+                    <EyeInvisibleOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
+                  )}
+                </div>
+                <span className={styles.btn} onClick={() => setVisibleSignatureGenerate(true)}>
+                  生成
+                </span>
+              </div>
+            </Form.Item>
+            {visibleSignature && (
+              <div className={styles.key}>
+                <div className={styles.keyVal}>{publicKey || '暂无'}</div>
+                <div className={styles.keyGenerate}>
+                  生成自你的 KEY{' '}
+                  <Link onClick={() => window.open('/manage/account')}>
+                    <ArrowRightOutlined />
+                  </Link>
+                </div>
+              </div>
+            )}
+          </Fragment>
         )}
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }} className={styles.footer}>
+
+        <Form.Item className={styles.footer}>
           <Space>
             <Button>取消</Button>
             <Button type="primary" htmlType="submit">
@@ -245,7 +272,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         title={
           <Fragment>
             <KeyOutlined />
-            &nbsp;生成非金融 KEY
+            &nbsp;生成 KEY
           </Fragment>
         }
         onCancel={() => setVisibleSignatureGenerate(false)}
@@ -257,7 +284,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
         ]}
       >
         <Space direction="vertical">
-          <div>{publicKey ? '您已生成 非金融 KEY' : '检测到您当前还未生成 非金融 KEY'}</div>
+          <div>{publicKey ? '您已生成 KEY' : '检测到您当前还未生成 KEY'}</div>
           <div>(存储在浏览器中，用户产生加密签名)</div>
           <Input value={publicKey} placeholder="KEY" disabled />
         </Space>
