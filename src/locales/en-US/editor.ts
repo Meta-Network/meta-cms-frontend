@@ -63,7 +63,7 @@ export default {
   'editor.license.originalStatement.content.eight':
     'After obtaining the consent of the original author or the right holder, the adaptation, translation and re-creation of the work shall be regarded as original.',
   'editor.license.originalStatement.content.nine':
-    'MetaCMS encourages users to post original articles, and articles with this original statement will display the original logo. \nHowever, this original statement is only your unilateral commitment to the originality of the content of the article, and does not mean that MetaCMS recognizes the originality of the article. \nIf you check this original statement and the article proves to be not an independent original, MetaCMS will be removed from the shelves in accordance with the platform specifications.',
+    'Meta Space encourages users to post original articles, and articles with this original statement will display the original logo. However, this original statement is only your unilateral commitment to the originality of the content of the article, and does not mean that Meta Network or Meta Space endorses the originality of the article.',
   'editor.license.creativeCommons': 'Creative Commons license agreement',
   'editor.license.creativeCommons.tip': 'Creative Commons license agreement',
   'editor.license.creativeCommons.share':

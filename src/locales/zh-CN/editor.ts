@@ -55,7 +55,7 @@ export default {
   'editor.license.originalStatement.content.eight':
     '在取得原作者或权利人同意后，对作品进行改编、翻译再创作的，视同原创。',
   'editor.license.originalStatement.content.nine':
-    'MetaCMS 鼓励用户发布原创文章，勾选本原创声明的文章会展示原创标识。但本原创声明仅是您对文章内容原创性的单方承诺，并不表示 MetaCMS 认可了文章的原创性。若您在勾选本原创声明后，文章被证明并非独立原创，MetaCMS 将按照平台规范下架等。',
+    'Meta Space 鼓励用户发布原创文章，勾选本原创声明的文章会展示原创标识。但本原创声明仅是您对文章内容原创性的单方承诺，并不表示 Meta Network 或 Meta Space 认可了文章的原创性。',
 
   'editor.license.creativeCommons': 'Creative Commons 授权许可协议',
   'editor.license.creativeCommons.tip': 'Creative Commons 授权许可协议',
