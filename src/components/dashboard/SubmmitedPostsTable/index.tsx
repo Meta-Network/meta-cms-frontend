@@ -66,7 +66,7 @@ export default () => {
       key: 'option',
       width: 290,
       valueType: 'option',
-      render: (_, record) => [
+      render: () => [
         <Button
           key="option-publish"
           // onClick={() => publishSinglePost(record)}
