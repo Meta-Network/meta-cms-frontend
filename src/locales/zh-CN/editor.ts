@@ -29,6 +29,7 @@ export default {
   'editor.submit.item.gateway.keyPlaceholder': 'KEY 未设置',
   'editor.submit.item.gateway.keyGenerate': '生成',
   'editor.submit.item.gateway.keyGenerateText': '生成自你的 KEY',
+  'editor.submit.item.gateway.noKey': '没有 KEY',
   'editor.submit.modalKey.title': '生成 KEY',
   'editor.submit.modalKey.content.beenGenerated': '您已生成 KEY',
   'editor.submit.modalKey.content.notGenerated': '检测到您当前还未生成 KEY',
@@ -36,6 +37,7 @@ export default {
   'editor.tips.content':
     '当您提交文章并选择在 IPFS 直接存证您的元数据时，不会经过 Meta Network 的任何后台或数据库，减少中间人攻击的可能性。若要让内容在您的 Meta Space 中显示，则需要您在提交完成后返回 CMS 进行发布。',
   'editor.originalLink.title': '原文链接',
+  'editor.originalLink.noOriginalLink': '没有原文链接',
   'editor.learn.content': '快速学习 Meta Space 编辑器',
   'editor.license.title': '版权声明',
   'editor.license.originalStatement': '原创声明',

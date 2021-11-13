@@ -55,7 +55,7 @@ const SettingsOriginalLink: React.FC<Props> = ({ hash }) => {
         ) : (
           <span className={styles.itemEmpty}>
             {intl.formatMessage({
-              id: 'component.no',
+              id: 'editor.originalLink.noOriginalLink',
             })}
           </span>
         )}

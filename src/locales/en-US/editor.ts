@@ -32,6 +32,7 @@ export default {
   'editor.submit.item.gateway.keyPlaceholder': 'KEY is not set',
   'editor.submit.item.gateway.keyGenerate': 'generate',
   'editor.submit.item.gateway.keyGenerateText': 'Generated from your KEY',
+  'editor.submit.item.gateway.noKey': 'No KEY',
   'editor.submit.modalKey.title': 'Generate KEY',
   'editor.submit.modalKey.content.beenGenerated': 'You have generated KEY',
   'editor.submit.modalKey.content.notGenerated':
@@ -41,6 +42,7 @@ export default {
   'editor.tips.content':
     'When you submit an article and choose to directly store your metadata in IPFS, it will not go through any backend or database of Meta Network, reducing the possibility of man-in-the-middle attacks. If you want the content to be displayed in your Meta Space, you need to return to the CMS for publishing after submission.',
   'editor.originalLink.title': 'Original link',
+  'editor.originalLink.noOriginalLink': 'No original link',
   'editor.learn.content': 'Quickly learn the Meta Space editor',
   'editor.license.title': 'Copyright Notice',
   'editor.license.originalStatement': 'Original statement',

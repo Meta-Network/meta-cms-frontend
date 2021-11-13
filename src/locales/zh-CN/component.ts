@@ -25,5 +25,4 @@ export default {
   'component.badge.invitationAvailable': '邀请码可用',
   'component.badge.invitationUsed': '邀请码已使用',
   'component.full.tip': '如遇到页面失去反馈，可手动关闭！',
-  'component.no': '暂无',
 };

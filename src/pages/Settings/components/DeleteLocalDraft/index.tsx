@@ -25,12 +25,12 @@ export default () => {
     <Space>
       <Text type="danger">
         {intl.formatMessage({
-          id: 'setting.DeleteLocalDraft.all',
+          id: 'setting.deleteLocalDraft.all',
         })}
       </Text>
       <Popconfirm
         title={intl.formatMessage({
-          id: 'setting.DeleteLocalDraft.all.tip',
+          id: 'setting.deleteLocalDraft.all.tip',
         })}
         onConfirm={handleDeleteAllLocalDraft}
         // onCancel={}

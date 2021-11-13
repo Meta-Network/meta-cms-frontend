@@ -25,5 +25,4 @@ export default {
   'component.badge.invitationAvailable': 'Invitation code available',
   'component.badge.invitationUsed': 'Used invitation code',
   'component.full.tip': 'If the page does not respond, you can manually close it!',
-  'component.no': 'No',
 };

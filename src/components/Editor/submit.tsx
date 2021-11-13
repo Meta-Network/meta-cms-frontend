@@ -281,7 +281,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
                 <div className={styles.keyVal}>
                   {publicKey ||
                     intl.formatMessage({
-                      id: 'component.no',
+                      id: 'editor.submit.item.gateway.noKey',
                     })}
                 </div>
                 <div className={styles.keyGenerate}>
