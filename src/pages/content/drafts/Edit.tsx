@@ -28,8 +28,8 @@ import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 import Submit from '@/components/Editor/submit';
-import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
-import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
+// import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
+// import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
 import SettingsTags from '@/components/Editor/settingsTags';
 import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
 import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
@@ -207,7 +207,11 @@ const Edit: React.FC = () => {
             authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
           });
         } else {
-          message.error('上传 metadata 失败, 请重试！');
+          message.error(
+            intl.formatMessage({
+              id: 'messages.editor.submit.uploadMetadata.fail',
+            }),
+          );
           setPublishLoading(false);
           return;
         }
@@ -248,11 +252,15 @@ const Edit: React.FC = () => {
           history.push('/content/drafts');
         }
       } else {
-        message.error('发布失败');
+        message.error(
+          intl.formatMessage({
+            id: 'messages.editor.fail',
+          }),
+        );
       }
       setPublishLoading(false);
     },
-    [draftPublishAsPost, title, cover, content, tags, license, setSiteNeedToDeploy],
+    [draftPublishAsPost, title, cover, content, tags, license, setSiteNeedToDeploy, intl],
   );
 
   /**
@@ -590,8 +598,8 @@ const Edit: React.FC = () => {
     <section className={styles.container}>
       <EditorHeader
         draftMode={draftMode}
-        headerCloudDraftUpload={<HeaderCloudDraftUpload />}
-        headerCloudDraftDownload={<HeaderCloudDraftDownload />}
+        // headerCloudDraftUpload={<HeaderCloudDraftUpload />}
+        // headerCloudDraftDownload={<HeaderCloudDraftDownload />}
         settings={
           <Settings>
             <Fragment>

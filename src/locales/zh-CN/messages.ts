@@ -147,5 +147,12 @@ export default {
   'messages.editor.upload.image.success': '上传成功',
   'messages.editor.upload.image.fail': '上传失败',
   'messages.editor.edit.tool.upload.fail': '图片上传失败',
+  'messages.editor.submit.generateKey': '请生成 KEY',
+  'messages.editor.submit.generateKey.success': '生成成功',
+  'messages.editor.submit.generateKey.fail': '生成失败',
+  'messages.editor.submit.bindStorage': '请绑定 GitHub',
+  'messages.editor.submit.uploadMetadata.fail': '上传 metadata 失败, 请重试！',
   'messages.invitation.card.title': '邀请码 #{codeId}',
+  'messages.delete.success': '删除成功',
+  'messages.delete.fail': '删除失败',
 };

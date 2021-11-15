@@ -1,12 +1,12 @@
 import { PageHeader, Tabs } from 'antd';
-import { useIntl, FormattedMessage } from 'umi';
+import { FormattedMessage } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import FormattedDescription from '@/components/FormattedDescription';
 import SiteSettingStatus from '@/components/dashboard/SiteSettingStatus';
 import SubmittedPostsTable from '@/components/dashboard/SubmmitedPostsTable';
 
 export default () => {
-  const intl = useIntl();
+  // const intl = useIntl();
   const { TabPane } = Tabs;
 
   return (

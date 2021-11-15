@@ -10,6 +10,7 @@ import {
 } from '@/utils/creative-commons';
 import { useMount } from 'ahooks';
 import useCreativeCommons from '@/hooks/useCreativeCommons';
+import { useIntl } from 'umi';
 
 const { Link } = Typography;
 
@@ -21,6 +22,8 @@ interface Props {
 type LicenseRadioValueType = '' | 'nd' | 'sa';
 
 const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) => {
+  const intl = useIntl();
+
   const [licenseRadioValue, setLicenseRadioValue] = useState<LicenseRadioValueType>('');
   const [licenseCheckboxValue, setLicenseCheckboxValue] = useState<boolean>(false);
   const [originalNoticeVisible, setOriginalNoticeVisible] = useState<boolean>(false);
@@ -147,11 +150,14 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
   return (
     <Fragment>
       <section className={styles.item}>
-        <p className={styles.itemTitle}>版权声明</p>
+        <p className={styles.itemTitle}>{intl.formatMessage({ id: 'editor.license.title' })}</p>
         <section className={styles.itemContent}>
           <div className={styles.originalTitle}>
-            原创声明&nbsp;
-            <Tooltip title="原创声明" placement="top">
+            {intl.formatMessage({ id: 'editor.license.originalStatement.tip' })}&nbsp;
+            <Tooltip
+              title={intl.formatMessage({ id: 'editor.license.originalStatement.tip' })}
+              placement="top"
+            >
               <QuestionCircleOutlined />
             </Tooltip>
           </div>
@@ -160,20 +166,23 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
               checked={originalCheckbox}
               onChange={(e) => handleOriginalCheckbox(e.target.checked)}
             >
-              我声明此文章为本人原创
+              {intl.formatMessage({ id: 'editor.license.originalStatement.checkbox' })}
             </Checkbox>
           </div>
 
           {originalCheckbox && (
             <Fragment>
               <div className={styles.originalTips}>
-                Creative Commons 授权许可协议&nbsp;
-                <Tooltip title="Creative Commons 授权许可协议" placement="top">
+                {intl.formatMessage({ id: 'editor.license.creativeCommons' })}&nbsp;
+                <Tooltip
+                  title={intl.formatMessage({ id: 'editor.license.creativeCommons.tip' })}
+                  placement="top"
+                >
                   <QuestionCircleOutlined />
                 </Tooltip>
               </div>
               <div className={styles.originalTips}>
-                请问您允许作品被别人转载、节选、混编、二次创作吗？
+                {intl.formatMessage({ id: 'editor.license.creativeCommons.share' })}
               </div>
               <Space direction="vertical">
                 <Radio.Group
@@ -181,20 +190,22 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
                   value={licenseRadioValue}
                 >
                   <Space direction="vertical">
-                    <Radio value={''}>允许</Radio>
+                    <Radio value={''}>
+                      {intl.formatMessage({ id: 'editor.license.creativeCommons.allow' })}
+                    </Radio>
                     <Radio value={'nd'}>
-                      不允许&nbsp;
+                      {intl.formatMessage({ id: 'editor.license.creativeCommons.nd' })}&nbsp;
                       <Tooltip
-                        title="他人不能再混合、转换、或者基于该作品创作，且不能分发修改后的作品"
+                        title={intl.formatMessage({ id: 'editor.license.creativeCommons.nd.tip' })}
                         placement="top"
                       >
                         <InfoCircleOutlined />
                       </Tooltip>
                     </Radio>
                     <Radio value={'sa'}>
-                      仅允许采用本协议授权的二次创作&nbsp;
+                      {intl.formatMessage({ id: 'editor.license.creativeCommons.sa' })}&nbsp;
                       <Tooltip
-                        title="他人再混合、转换或者基于本作品进行创作，必须基于与原先许可协议相同的许可协议分发作品。"
+                        title={intl.formatMessage({ id: 'editor.license.creativeCommons.sa.tip' })}
                         placement="top"
                       >
                         <InfoCircleOutlined />
@@ -206,7 +217,7 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
                   onChange={(e) => handleLicenseCheckboxChange(e.target.checked)}
                   checked={licenseCheckboxValue}
                 >
-                  允许商业性使用
+                  {intl.formatMessage({ id: 'editor.license.creativeCommons.businessAllowed' })}
                 </Checkbox>
               </Space>
 
@@ -216,34 +227,29 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
                 rel="noopener noreferrer"
                 className={styles.originalTerms}
               >
-                则授权条款为：{CCLicenseCredit?.chinese}
+                {intl.formatMessage({ id: 'editor.license.creativeCommons.terms' })}
+                {CCLicenseCredit?.chinese}
               </Link>
             </Fragment>
           )}
         </section>
       </section>
       <Modal
-        title="原创声明"
+        title={intl.formatMessage({ id: 'editor.license.originalStatement' })}
         visible={originalNoticeVisible}
         onOk={() => setOriginalNoticeVisible(false)}
         onCancel={() => setOriginalNoticeVisible(false)}
       >
         <Space direction="vertical">
-          <div>
-            勾选本原创声明，即代表您确认并承诺该文章，包括文章中的使用的图片等其他元素，是由您本人（或持有该账号之组织）独立创作完成，或者已取得原作权利人的使用许可。有如下情况的文章请勿勾选本原创声明：
-          </div>
-          <div>1.歪曲、篡改、抄袭、剽窃他人创作而产生的作品，</div>
-          <div>
-            2.文章主要篇幅为诸如“法律、法规，国家机关的决议、决定、命令和其他具有立法、行政、司法性质的文件、时事新闻、历法、通用数表、通用表格和公式”等的公共内容；
-          </div>
-          <div>3.转发他人作品形成的内容，</div>
-          <div>4.大篇幅引用他人内容或文章主要内容为他人作品，如书摘、文摘、报摘等；</div>
-          <div>5.文章主体系整合、汇编他人作品内容</div>
-          <div>6.通过其他侵犯著作权或其他权益方式形成的内容。</div>
-          <div>在取得原作者或权利人同意后，对作品进行改编、翻译再创作的，视同原创。</div>
-          <div>
-            瞬MATATAKI鼓励用户发布原创文章，勾选本原创声明的文章会展示原创标识。但本原创声明仅是您对文章内容原创性的单方承诺，并不表示瞬MATATAKI认可了文章的原创性。若您在勾选本原创声明后，文章被证明并非独立原创，瞬MATATAKI将按照平台规范下架等。
-          </div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.one' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.two' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.three' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.four' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.five' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.six' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.seven' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.eight' })}</div>
+          <div>{intl.formatMessage({ id: 'editor.license.originalStatement.content.nine' })}</div>
         </Space>
       </Modal>
     </Fragment>

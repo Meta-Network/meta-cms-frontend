@@ -8,14 +8,14 @@ interface Props {
   readonly draftMode: 0 | 1 | 2;
   settings: JSX.Element;
   submit: JSX.Element;
-  headerCloudDraftUpload: JSX.Element;
-  headerCloudDraftDownload: JSX.Element;
+  // headerCloudDraftUpload: JSX.Element;
+  // headerCloudDraftDownload: JSX.Element;
 }
 
 const EditorHeader: React.FC<Props> = ({
   draftMode,
-  headerCloudDraftUpload,
-  headerCloudDraftDownload,
+  // headerCloudDraftUpload,
+  // headerCloudDraftDownload,
   submit,
   settings,
 }) => {
@@ -37,7 +37,12 @@ const EditorHeader: React.FC<Props> = ({
               id: 'editor.header.title',
             })}
           </span>
-          <Tooltip placement="bottom" title={'在您设备的浏览器中自动保存草稿，跨设备不可同步。'}>
+          <Tooltip
+            placement="bottom"
+            title={intl.formatMessage({
+              id: 'editor.header.draft.tip',
+            })}
+          >
             <span className={styles.headerStatus}>
               {intl.formatMessage({
                 id: 'editor.header.draft',
@@ -53,19 +58,25 @@ const EditorHeader: React.FC<Props> = ({
                 : ''}
             </span>
           </Tooltip>
-          {headerCloudDraftUpload}
-          {headerCloudDraftDownload}
+          {/* {headerCloudDraftUpload} */}
+          {/* {headerCloudDraftDownload} */}
         </span>
         <span>
-          <Tooltip placement="left" title={'无需经过平台直接提交至存储仓库'}>
+          <Tooltip
+            placement="left"
+            title={intl.formatMessage({
+              id: 'editor.submit.tip',
+            })}
+          >
             <Dropdown overlayClassName={styles.headerDropdown} trigger={['click']} overlay={submit}>
               <span className={styles.headerPublish}>
-                提交
+                {intl.formatMessage({
+                  id: 'component.button.submit',
+                })}
                 <DownOutlined className={styles.headerIconText} />
               </span>
             </Dropdown>
           </Tooltip>
-
           {settings}
         </span>
       </section>

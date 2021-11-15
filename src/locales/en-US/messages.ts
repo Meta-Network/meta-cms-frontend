@@ -166,5 +166,12 @@ export default {
   'messages.editor.upload.image.success': 'Uploaded successfully',
   'messages.editor.upload.image.fail': 'Upload failed',
   'messages.editor.edit.tool.upload.fail': 'Image upload failed',
+  'messages.editor.submit.generateKey': 'Please generate KEY',
+  'messages.editor.submit.generateKey.success': 'Generated successfully',
+  'messages.editor.submit.generateKey.fail': 'Generated failed',
+  'messages.editor.submit.bindStorage': 'Please bind GitHub',
+  'messages.editor.submit.uploadMetadata.fail': 'Failed to upload metadata, please try again!',
   'messages.invitation.card.title': 'Invitation code #{codeId}',
+  'messages.delete.success': 'deleted successfully',
+  'messages.delete.fail': 'delete failed',
 };

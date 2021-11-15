@@ -1,8 +1,11 @@
 import React from 'react';
 import { ShareAltOutlined } from '@ant-design/icons';
 import styles from './settings.less';
+import { useIntl } from 'umi';
 
 const SettingsLearnMore: React.FC = () => {
+  const intl = useIntl();
+
   return (
     <a
       href="https://www.matataki.io/p/10753"
@@ -10,7 +13,7 @@ const SettingsLearnMore: React.FC = () => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      快速学习 Meta Space 编辑器&nbsp;
+      {intl.formatMessage({ id: 'editor.learn.content' })}&nbsp;
       <ShareAltOutlined />
     </a>
   );
