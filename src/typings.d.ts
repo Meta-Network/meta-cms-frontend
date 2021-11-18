@@ -25,3 +25,4 @@ declare const META_NETWORK_API: string;
 declare const META_SPACE_BASE_DOMAIN: string;
 declare const META_SPACE_DEFAULT_FAVICON_URL: string;
 declare const FLEEK_NAME: string;
+declare const META_NETWORK_DATA_VIEWER_URL: string;

@@ -208,3 +208,7 @@ export const generateStorageLink = (platform: CMS.StoragePlatform, url: string) 
 
   return `${list[platform]}/${url}`;
 };
+
+export const generateDataViewerLink = (type: CMS.MetadataStorageType, refer: string): string => {
+  return `${META_NETWORK_DATA_VIEWER_URL}/${type}/${refer}`;
+};

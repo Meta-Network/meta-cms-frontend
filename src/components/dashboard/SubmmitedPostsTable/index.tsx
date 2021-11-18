@@ -1,8 +1,10 @@
 import { fetchPostsPublished } from '@/services/api/meta-cms';
-import { useIntl } from 'umi';
+import { FormattedMessage, useIntl } from 'umi';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, Image, Space } from 'antd';
+import { Button, Image, Space, Typography } from 'antd';
+import { LinkOutlined } from '@ant-design/icons';
+import { generateDataViewerLink } from '@/utils/editor';
 
 export default () => {
   const intl = useIntl();
@@ -20,7 +22,7 @@ export default () => {
           {record.cover ? (
             <Image width={100} src={record.cover} />
           ) : (
-            intl.formatMessage({ id: 'messages.table.noCoverExists' })
+            <FormattedMessage id="messages.table.noCoverExists" />
           )}
         </Space>
       ),
@@ -35,8 +37,8 @@ export default () => {
     {
       title: intl.formatMessage({ id: 'messages.published.table.updateTime' }),
       key: 'showTime',
-      dataIndex: 'updated',
-      valueType: 'date',
+      dataIndex: 'updatedAt',
+      valueType: 'dateTime',
       sorter: true,
       hideInSearch: true,
     },
@@ -55,11 +57,34 @@ export default () => {
       },
     },
     {
-      dataIndex: 'ipfs',
-      title: intl.formatMessage({ id: 'ipfs' }) || 'IPFS元数据存证',
+      dataIndex: 'serverVerificationMetadataRefer',
+      title: intl.formatMessage({ id: 'messages.published.table.ipfsSignatureMetadata' }),
       width: 200,
+      search: false,
       copyable: true,
-      ellipsis: true,
+      render: (_, record) => (
+        <Space>
+          {record.serverVerificationMetadataRefer ? (
+            <>
+              <Typography.Text copyable={{ text: record.serverVerificationMetadataRefer }}>
+                <FormattedMessage id="messages.published.table.hasIPFSSignature" />
+              </Typography.Text>
+              <Button
+                type="link"
+                href={generateDataViewerLink(
+                  record.serverVerificationMetadataStorageType,
+                  record.serverVerificationMetadataRefer,
+                )}
+                target="_blank"
+                icon={<LinkOutlined />}
+                style={{ height: 'auto', width: 'auto' }}
+              />
+            </>
+          ) : (
+            <FormattedMessage id="messages.published.table.noIPFSSignature" />
+          )}
+        </Space>
+      ),
     },
     {
       title: intl.formatMessage({ id: 'messages.syncCenter.table.actions' }),
@@ -74,7 +99,8 @@ export default () => {
           编辑
         </Button>,
         <Button
-        // onClick={() => transferDraft(record)}
+          key="option-transfer"
+          // onClick={() => transferDraft(record)}
         >
           移到草稿
         </Button>,

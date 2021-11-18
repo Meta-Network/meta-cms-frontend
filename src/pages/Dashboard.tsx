@@ -8,11 +8,17 @@ import SubmittedPostsTable from '@/components/dashboard/SubmmitedPostsTable';
 export default () => {
   // const intl = useIntl();
   const { TabPane } = Tabs;
+  const publishDataAndStatus = (
+    <>
+      <FormattedMessage id="messages.dashboard.lastPublishDate" values={{ time: Date.now() }} />{' '}
+      <FormattedMessage id="messages.publish.success" />
+    </>
+  );
 
   return (
     <PageContainer
-      title={<FormattedMessage id="guide.intro.title" />}
-      subTitle={'上次发布时间：2132131231 发布成功'}
+      title={<FormattedMessage id="menu.dashboard" />}
+      subTitle={publishDataAndStatus}
       content={
         <FormattedDescription id="guide.intro.description" customClass="header-text-description" />
       }
@@ -20,14 +26,14 @@ export default () => {
     >
       <PageHeader
         className="site-page-header"
-        title="待发布"
-        subTitle={'上次发布时间：2132131231 发布成功'}
+        title={<FormattedMessage id="messages.dashboard.waitForPublish" />}
+        subTitle={publishDataAndStatus}
       />
       <Tabs defaultActiveKey="1">
-        <TabPane tab="已提交" key="1">
+        <TabPane tab={<FormattedMessage id="messages.dashboard.submitted" />} key="1">
           <SubmittedPostsTable />
         </TabPane>
-        <TabPane tab="设置项" key="2">
+        <TabPane tab={<FormattedMessage id="messages.dashboard.settings" />} key="2">
           <SiteSettingStatus />
         </TabPane>
       </Tabs>
