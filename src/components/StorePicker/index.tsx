@@ -21,11 +21,25 @@ export default () => {
       name: 'GitHub',
       description: intl.formatMessage({ id: 'guide.storage.githubDescription' }),
       avatar: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
+      enabled: true,
     },
     {
       name: 'Gitee',
       description: intl.formatMessage({ id: 'guide.storage.giteeDescription' }),
       avatar: 'https://gitee.com/static/images/logo_gitee_g_red.png',
+      enabled: true,
+    },
+    {
+      name: 'IPFS',
+      description: intl.formatMessage({ id: 'guide.storage.ipfsDescription' }),
+      avatar: 'https://awesome.ipfs.io/images/logo.png',
+      enabled: false,
+    },
+    {
+      name: 'Arweave',
+      description: intl.formatMessage({ id: 'guide.storage.arweaveDescription' }),
+      avatar: 'https://avatars.githubusercontent.com/u/31965957?s=200&v=4',
+      enabled: false,
     },
   ];
 
@@ -85,14 +99,20 @@ export default () => {
         renderItem={(item) => (
           <List.Item key={item.name}>
             <Card
-              onClick={() => handleSelectStore(item.name as GLOBAL.StoreProvider)}
-              hoverable
+              onClick={
+                item.enabled
+                  ? () => handleSelectStore(item.name as GLOBAL.StoreProvider)
+                  : undefined
+              }
+              hoverable={item.enabled}
               bordered
               className={styles.card}
             >
               <Card.Meta
                 avatar={<Avatar src={item.avatar} />}
-                title={item.name}
+                title={`${item.name}${
+                  !item.enabled ? intl.formatMessage({ id: 'guide.storage.availableSoon' }) : ''
+                }`}
                 description={item.description}
               />
             </Card>

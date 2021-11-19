@@ -63,6 +63,10 @@ export default {
   'guide.storage.githubDescription':
     "The world's largest code storage website with open source community",
   'guide.storage.giteeDescription': 'Provide Chinese localized code storage hosting services',
+  'guide.storage.ipfsDescription':
+    'A protocol and P2P network for storing and sharing data in a distributed file system',
+  'guide.storage.arweaveDescription': 'Arweave makes information permanence sustainable',
+  'guide.storage.availableSoon': '(Soon)',
   'guide.storage.noAuthToken': 'Authorization failed, please rebind the storage repository service',
   'guide.storage.canNotGetUsername': 'Username was not successfully obtained',
   'guide.storage.setStorageAs': 'Successfully selected storage as {storage}',
