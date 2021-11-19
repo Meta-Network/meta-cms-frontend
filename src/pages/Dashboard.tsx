@@ -30,7 +30,6 @@ export default () => {
 
   const fetchDefaultConfig = useCallback(async () => {
     const defaultConfig = await getDefaultSiteConfigAPI();
-    console.log(defaultConfig);
     if (defaultConfig) {
       setLastUpdate(defaultConfig.lastPublishedAt);
       setPublishState(defaultConfig.status as SiteStatus);
