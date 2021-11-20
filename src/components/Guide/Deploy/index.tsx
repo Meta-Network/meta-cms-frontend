@@ -140,7 +140,7 @@ export default () => {
             timezone: siteSetting.timezone,
             templateId: themeSetting,
             metaSpacePrefix: domainSetting as string,
-            domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
+            // domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
           });
           setConfigId(configSetting.data.id);
 
