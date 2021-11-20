@@ -4,14 +4,63 @@ import { PageContainer } from '@ant-design/pro-layout';
 import FormattedDescription from '@/components/FormattedDescription';
 import SiteSettingStatus from '@/components/dashboard/SiteSettingStatus';
 import SubmittedPostsTable from '@/components/dashboard/SubmmitedPostsTable';
+import { useCallback, useState } from 'react';
+import { getDefaultSiteConfigAPI } from '@/helpers';
+import { useMount } from 'ahooks';
+
+enum SiteStatus {
+  /** SiteConfig generated */
+  Configured = 'CONFIGURED',
+  /** Deploy worker running */
+  Deploying = 'DEPLOYING',
+  /** Site deployed, e.g. repo init & push */
+  Deployed = 'DEPLOYED',
+  /** Publish worker running */
+  Publishing = 'PUBLISHING',
+  /** Site published, can be visit */
+  Published = 'PUBLISHED',
+}
 
 export default () => {
   // const intl = useIntl();
   const { TabPane } = Tabs;
+
+  const [lastUpdate, setLastUpdate] = useState('');
+  const [publishState, setPublishState] = useState(SiteStatus.Configured);
+
+  const fetchDefaultConfig = useCallback(async () => {
+    const defaultConfig = await getDefaultSiteConfigAPI();
+    if (defaultConfig) {
+      setLastUpdate(defaultConfig.lastPublishedAt);
+      setPublishState(defaultConfig.status as SiteStatus);
+    }
+  }, []);
+
+  useMount(() => {
+    fetchDefaultConfig();
+  });
+
+  const renderPublishStatus = () => {
+    if (publishState === SiteStatus.Published) {
+      return <FormattedMessage id="messages.publish.success" />;
+    } else if (publishState === SiteStatus.Publishing) {
+      return <FormattedMessage id="messages.publish.publishing" />;
+    } else {
+      return <FormattedMessage id="messages.publish.waiting" />;
+    }
+  };
+
   const publishDataAndStatus = (
     <>
-      <FormattedMessage id="messages.dashboard.lastPublishDate" values={{ time: Date.now() }} />{' '}
-      <FormattedMessage id="messages.publish.success" />
+      {lastUpdate ? (
+        <FormattedMessage
+          id="messages.dashboard.lastPublishDate"
+          values={{ time: new Date(lastUpdate) }}
+        />
+      ) : (
+        <FormattedMessage id="messages.dashboard.noLastPublishDate" />
+      )}{' '}
+      {renderPublishStatus()}
     </>
   );
 

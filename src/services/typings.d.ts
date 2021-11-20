@@ -77,6 +77,7 @@ declare namespace CMS {
     createdAt: Date;
     updatedAt: Date;
     metaSpacePrefix: string;
+    lastPublishedAt: string;
     siteInfo: {
       title: string;
       subtitle: string;
