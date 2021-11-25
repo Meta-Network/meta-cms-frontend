@@ -35,7 +35,7 @@ import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
 import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
-import type { PostMetadata } from '@metaio/meta-signature-util/type/types.d';
+import type { PostMetadata } from '@metaio/meta-signature-util/lib/type/types.d';
 
 const Edit: React.FC = () => {
   const intl = useIntl();

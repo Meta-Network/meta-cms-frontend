@@ -3,15 +3,15 @@ import moment from 'moment';
 import {
   generateSeed,
   generateKeys,
-  generatePostDigestRequestMetadata,
-  generateAuthorDigestSignMetadata,
+  authorDigest,
+  authorDigestSign,
 } from '@metaio/meta-signature-util';
 import type {
   KeyPair,
   PostMetadata,
   AuthorDigestRequestMetadata,
   AuthorSignatureMetadata,
-} from '@metaio/meta-signature-util/type/types.d';
+} from '@metaio/meta-signature-util/lib/type/types.d';
 import { storeGet, storeSet } from './store';
 import {
   KEY_META_CMS_METADATA_SEED,
@@ -126,15 +126,15 @@ export const generateMetadata = ({
   }
 
   const keys: KeyPair = generateKeys(verifyResult.seed);
-  const digestMetadata: AuthorDigestRequestMetadata = generatePostDigestRequestMetadata(payload);
-  console.log('digestMetadata', digestMetadata);
+  const digestMetadata: AuthorDigestRequestMetadata = authorDigest.generate(payload);
+  // console.log('digestMetadata', digestMetadata);
 
-  const authorSignatureMetadata: AuthorSignatureMetadata = generateAuthorDigestSignMetadata(
+  const authorSignatureMetadata: AuthorSignatureMetadata = authorDigestSign.generate(
     keys,
     META_SPACE_BASE_DOMAIN,
     digestMetadata.digest,
   );
-  console.log('authorSignatureMetadata', authorSignatureMetadata);
+  // console.log('authorSignatureMetadata', authorSignatureMetadata);
 
   return {
     digestMetadata,
