@@ -9,9 +9,9 @@ import {
 import type {
   KeyPair,
   PostMetadata,
-  AuthorDigestRequestMetadata,
+  AuthorDigestMetadata,
   AuthorSignatureMetadata,
-} from '@metaio/meta-signature-util/lib/type/types.d';
+} from '@metaio/meta-signature-util';
 import { storeGet, storeSet } from './store';
 import {
   KEY_META_CMS_METADATA_SEED,
@@ -25,13 +25,13 @@ type GenerateMetadataParams = { payload: PostMetadata };
 type UploadMetadataParams = { payload: PostMetadata };
 type GenerateMetadataReturnState =
   | {
-      digestMetadata: AuthorDigestRequestMetadata;
+      digestMetadata: AuthorDigestMetadata;
       authorSignatureMetadata: AuthorSignatureMetadata;
     }
   | false;
 type UploadMetadataReturnState =
   | {
-      digestMetadata: AuthorDigestRequestMetadata;
+      digestMetadata: AuthorDigestMetadata;
       authorSignatureMetadata: AuthorSignatureMetadata;
       digestMetadataIpfs: Storage.Fleek;
       authorSignatureMetadataIpfs: Storage.Fleek;
@@ -126,7 +126,7 @@ export const generateMetadata = ({
   }
 
   const keys: KeyPair = generateKeys(verifyResult.seed);
-  const digestMetadata: AuthorDigestRequestMetadata = authorDigest.generate(payload);
+  const digestMetadata: AuthorDigestMetadata = authorDigest.generate(payload);
   // console.log('digestMetadata', digestMetadata);
 
   const authorSignatureMetadata: AuthorSignatureMetadata = authorDigestSign.generate(
