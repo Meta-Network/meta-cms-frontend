@@ -188,6 +188,18 @@ declare namespace CMS {
     branchName: string;
     dataType: 'HEXO' | string;
   };
+  type PublisherPlatformSetting = {
+    lastCommitHash: string | null;
+    useGitProvider: boolean;
+    id: number;
+    createdAt: string;
+    updatedAt: string;
+    userName: string;
+    repoName: string;
+    branchName: string;
+    dataType: 'HEXO' | string;
+    publishDir: 'public';
+  };
 }
 
 declare namespace GLOBAL {
