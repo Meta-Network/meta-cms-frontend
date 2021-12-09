@@ -66,7 +66,7 @@ export default () => {
         (step) => document.getElementById(step.title)?.getBoundingClientRect()?.top || 0,
       );
 
-      const currentPosition = window.pageYOffset;
+      const currentPosition = window.scrollY;
       positions = positions.map((e) => e + currentPosition);
 
       const closest = positions.reduce((prev, curr) =>
