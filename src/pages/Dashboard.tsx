@@ -1,18 +1,73 @@
 import { PageHeader, Tabs } from 'antd';
-import { useIntl, FormattedMessage } from 'umi';
+import { FormattedMessage } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import FormattedDescription from '@/components/FormattedDescription';
 import SiteSettingStatus from '@/components/dashboard/SiteSettingStatus';
 import SubmittedPostsTable from '@/components/dashboard/SubmmitedPostsTable';
+import { useCallback, useState } from 'react';
+import { getDefaultSiteConfigAPI } from '@/helpers';
+import { useMount } from 'ahooks';
+
+enum SiteStatus {
+  /** SiteConfig generated */
+  Configured = 'CONFIGURED',
+  /** Deploy worker running */
+  Deploying = 'DEPLOYING',
+  /** Site deployed, e.g. repo init & push */
+  Deployed = 'DEPLOYED',
+  /** Publish worker running */
+  Publishing = 'PUBLISHING',
+  /** Site published, can be visit */
+  Published = 'PUBLISHED',
+}
 
 export default () => {
-  const intl = useIntl();
+  // const intl = useIntl();
   const { TabPane } = Tabs;
+
+  const [lastUpdate, setLastUpdate] = useState('');
+  const [publishState, setPublishState] = useState(SiteStatus.Configured);
+
+  const fetchDefaultConfig = useCallback(async () => {
+    const defaultConfig = await getDefaultSiteConfigAPI();
+    if (defaultConfig) {
+      setLastUpdate(defaultConfig.lastPublishedAt);
+      setPublishState(defaultConfig.status as SiteStatus);
+    }
+  }, []);
+
+  useMount(() => {
+    fetchDefaultConfig();
+  });
+
+  const renderPublishStatus = () => {
+    if (publishState === SiteStatus.Published) {
+      return <FormattedMessage id="messages.publish.success" />;
+    } else if (publishState === SiteStatus.Publishing) {
+      return <FormattedMessage id="messages.publish.publishing" />;
+    } else {
+      return <FormattedMessage id="messages.publish.waiting" />;
+    }
+  };
+
+  const publishDataAndStatus = (
+    <>
+      {lastUpdate ? (
+        <FormattedMessage
+          id="messages.dashboard.lastPublishDate"
+          values={{ time: new Date(lastUpdate) }}
+        />
+      ) : (
+        <FormattedMessage id="messages.dashboard.noLastPublishDate" />
+      )}{' '}
+      {renderPublishStatus()}
+    </>
+  );
 
   return (
     <PageContainer
-      title={<FormattedMessage id="guide.intro.title" />}
-      subTitle={'上次发布时间：2132131231 发布成功'}
+      title={<FormattedMessage id="menu.dashboard" />}
+      subTitle={publishDataAndStatus}
       content={
         <FormattedDescription id="guide.intro.description" customClass="header-text-description" />
       }
@@ -20,14 +75,14 @@ export default () => {
     >
       <PageHeader
         className="site-page-header"
-        title="待发布"
-        subTitle={'上次发布时间：2132131231 发布成功'}
+        title={<FormattedMessage id="messages.dashboard.waitForPublish" />}
+        subTitle={publishDataAndStatus}
       />
       <Tabs defaultActiveKey="1">
-        <TabPane tab="已提交" key="1">
+        <TabPane tab={<FormattedMessage id="messages.dashboard.submitted" />} key="1">
           <SubmittedPostsTable />
         </TabPane>
-        <TabPane tab="设置项" key="2">
+        <TabPane tab={<FormattedMessage id="messages.dashboard.settings" />} key="2">
           <SiteSettingStatus />
         </TabPane>
       </Tabs>

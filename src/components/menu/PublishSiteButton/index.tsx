@@ -1,9 +1,9 @@
 import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
-import { UpOutlined } from '@ant-design/icons';
+// import { UpOutlined } from '@ant-design/icons';
 import { Button, message, notification } from 'antd';
 import { deployAndPublishSite } from '@/services/api/meta-cms';
-import PublishButtonPopover from '@/components/menu/PublishSiteButton/PublishButtonPopover';
+// import PublishButtonPopover from '@/components/menu/PublishSiteButton/PublishButtonPopover';
 import styles from './index.less';
 
 export default () => {

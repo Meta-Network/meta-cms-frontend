@@ -28,14 +28,14 @@ import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 import Submit from '@/components/Editor/submit';
-import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
-import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
+// import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
+// import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
 import SettingsTags from '@/components/Editor/settingsTags';
 import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
 import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
-import type { PostMetadata } from '@metaio/meta-signature-util/type/types.d';
+import type { PostMetadata } from '@metaio/meta-signature-util';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -144,7 +144,15 @@ const Edit: React.FC = () => {
    * If mode is draft or post, postId is required
    */
   const postPublishToPost = useCallback(
-    async ({ mode, postId }: { mode: 'local' | 'draft' | 'post'; postId?: number }) => {
+    async ({
+      mode,
+      postId,
+      gateway,
+    }: {
+      mode: 'local' | 'draft' | 'post';
+      postId?: number;
+      gateway: boolean;
+    }) => {
       setPublishLoading(true);
 
       const data = {
@@ -161,43 +169,56 @@ const Edit: React.FC = () => {
         categories: '',
         tags: tags.join(),
       };
-
-      const uploadMetadataResult = await uploadMetadata({ payload });
-
-      if (!uploadMetadataResult) {
-        message.error('上传 metadata 失败, 请重试！');
-        setPublishLoading(false);
-        return;
-      }
-
-      const {
-        digestMetadata,
-        authorSignatureMetadata,
-        digestMetadataIpfs,
-        authorSignatureMetadataIpfs,
-      } = uploadMetadataResult;
       const { id } = history.location.query as Router.PostQuery;
 
-      // local add metadada
-      await dbMetadatasAdd(
-        assign(MetadataTempData(), {
-          postId: Number(id),
-          metadata: {
-            digestMetadata: digestMetadata,
-            authorSignatureMetadata: authorSignatureMetadata,
-            digestMetadataIpfs: digestMetadataIpfs,
-            authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
-          },
-        }),
-      );
+      let metadataData = {
+        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+        authorDigestRequestMetadataRefer: '',
+        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+        authorDigestSignatureMetadataRefer: '',
+      };
+      // if select gateway
+      if (gateway) {
+        const uploadMetadataResult = await uploadMetadata({ payload });
+
+        if (uploadMetadataResult) {
+          const {
+            digestMetadata,
+            authorSignatureMetadata,
+            digestMetadataIpfs,
+            authorSignatureMetadataIpfs,
+          } = uploadMetadataResult;
+
+          // local add metadada
+          await dbMetadatasAdd(
+            assign(MetadataTempData(), {
+              postId: Number(id),
+              metadata: {
+                digestMetadata: digestMetadata,
+                authorSignatureMetadata: authorSignatureMetadata,
+                digestMetadataIpfs: digestMetadataIpfs,
+                authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
+              },
+            }),
+          );
+
+          metadataData = assign(metadataData, {
+            authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
+            authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
+          });
+        } else {
+          message.error(
+            intl.formatMessage({
+              id: 'messages.editor.submit.uploadMetadata.fail',
+            }),
+          );
+          setPublishLoading(false);
+          return;
+        }
+      }
 
       let draftResult: CMS.Draft | '' = '';
-      const metadataData = {
-        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
-        authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
-        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
-        authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
-      };
+
       if (mode === 'local') {
         draftResult = await publishPostAPI({
           ...data,
@@ -231,64 +252,75 @@ const Edit: React.FC = () => {
           history.push('/content/drafts');
         }
       } else {
-        message.error('发布失败');
+        message.error(
+          intl.formatMessage({
+            id: 'messages.editor.fail',
+          }),
+        );
       }
       setPublishLoading(false);
     },
-    [draftPublishAsPost, title, cover, content, tags, license, setSiteNeedToDeploy],
+    [draftPublishAsPost, title, cover, content, tags, license, setSiteNeedToDeploy, intl],
   );
 
   /**
    * publish
    */
-  const handlePublish = useCallback(async () => {
-    const { id } = history.location.query as Router.PostQuery;
-    if (!id) {
-      message.warning(
-        intl.formatMessage({
-          id: 'messages.editor.tip.id',
-        }),
-      );
-      return;
-    }
 
-    if (!title && !content) {
-      message.warning(
-        intl.formatMessage({
-          id: 'messages.editor.tip.titleOrContent',
-        }),
-      );
-      return;
-    }
+  const handlePublish = useCallback(
+    async (gateway: boolean) => {
+      const { id } = history.location.query as Router.PostQuery;
+      if (!id) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.tip.id',
+          }),
+        );
+        return;
+      }
 
-    // check cover format
-    if (cover && !cover.includes(FLEEK_NAME)) {
-      message.success(
-        intl.formatMessage({
-          id: 'messages.editor.tip.coverFormat',
-        }),
-      );
-      return;
-    }
+      if (!title || !content) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.tip.titleOrContent',
+          }),
+        );
+        return;
+      }
 
-    const result = await dbPostsGet(Number(id));
-    // 转存草稿发布
-    if (result && result.draft) {
-      postPublishToPost({
-        mode: 'draft',
-        postId: result.draft.id,
-      });
-    } else if (result && result.post) {
-      postPublishToPost({
-        mode: 'post',
-        postId: result.post.id,
-      });
-    } else {
-      postPublishToPost({
-        mode: 'post',
-      });
-    }
-  }, [title, cover, content, postPublishToPost, intl]);
+      // check cover format
+      if (cover && !cover.includes(FLEEK_NAME)) {
+        message.success(
+          intl.formatMessage({
+            id: 'messages.editor.tip.coverFormat',
+          }),
+        );
+        return;
+      }
+
+      const result = await dbPostsGet(Number(id));
+      // 转存草稿发布
+      if (result && result.draft) {
+        postPublishToPost({
+          mode: 'draft',
+          postId: result.draft.id,
+          gateway,
+        });
+      } else if (result && result.post) {
+        postPublishToPost({
+          mode: 'post',
+          postId: result.post.id,
+          gateway,
+        });
+      } else {
+        postPublishToPost({
+          mode: 'local',
+          gateway,
+        });
+      }
+    },
+    [title, cover, content, postPublishToPost, intl],
+  );
 
   /**
    * handle history url state
@@ -566,8 +598,8 @@ const Edit: React.FC = () => {
     <section className={styles.container}>
       <EditorHeader
         draftMode={draftMode}
-        headerCloudDraftUpload={<HeaderCloudDraftUpload />}
-        headerCloudDraftDownload={<HeaderCloudDraftDownload />}
+        // headerCloudDraftUpload={<HeaderCloudDraftUpload />}
+        // headerCloudDraftDownload={<HeaderCloudDraftDownload />}
         settings={
           <Settings>
             <Fragment>

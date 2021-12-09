@@ -77,6 +77,7 @@ declare namespace CMS {
     createdAt: Date;
     updatedAt: Date;
     metaSpacePrefix: string;
+    lastPublishedAt: string;
     siteInfo: {
       title: string;
       subtitle: string;
@@ -144,6 +145,18 @@ declare namespace CMS {
       updatedAt: Date;
       state: 'SUCCESS';
     }[];
+  } & PostMetadata;
+
+  type MetadataStorageType = 'ipfs';
+
+  type PostMetadata = {
+    authorPublicKey: string;
+    authorDigestRequestMetadataRefer: string;
+    authorDigestRequestMetadataStorageType: MetadataStorageType;
+    authorDigestSignatureMetadataRefer: string;
+    authorDigestSignatureMetadataStorageType: MetadataStorageType;
+    serverVerificationMetadataRefer: string;
+    serverVerificationMetadataStorageType: MetadataStorageType;
   };
 
   type ExistsPostsResponse = {

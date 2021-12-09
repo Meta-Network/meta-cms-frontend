@@ -7,5 +7,6 @@ export const License = '';
 // local store key
 export const KEY_META_CMS_METADATA_SEED = 'META_CMS_METADATA_SEED';
 export const KEY_META_CMS_METADATA_PUBLIC_KEYS = 'META_CMS_METADATA_PUBLIC_KEYS';
+export const KEY_META_CMS_GATEWAY_CHECKED = 'META_CMS_GATEWAY_CHECKED';
 
 export const GITHUB_URL = 'https://github.com';

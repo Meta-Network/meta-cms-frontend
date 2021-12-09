@@ -1,6 +1,6 @@
 export default {
   'menu.create': '创建 Meta Space',
-  'menu.dashboard': 'Dashboard',
+  'menu.dashboard': '仪表盘',
   'menu.content': '内容',
   'menu.content.drafts': '草稿',
   'menu.content.syncCenter': '同步中心',
