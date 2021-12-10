@@ -27,7 +27,6 @@ import { assign } from 'lodash';
 import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
-import Submit from '@/components/Submit/editor';
 // import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
 // import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
 import SettingsTags from '@/components/Editor/settingsTags';
@@ -614,7 +613,7 @@ const Edit: React.FC = () => {
             </Fragment>
           </Settings>
         }
-        submit={<Submit handlePublish={handlePublish} />}
+        handlePublish={handlePublish}
       />
       <section className={styles.edit}>
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />

@@ -29,13 +29,14 @@ import GenerateKey from './generate';
 
 interface Props {
   handlePublish: (gateway: boolean) => void;
+  setDropdownVisible: (visible: boolean) => void;
 }
 
 const { Text, Link } = Typography;
 const { Option } = Select;
 const STORAGE_PLATFORM = 'github';
 
-const Submit: FC<Props> = ({ handlePublish }) => {
+const Submit: FC<Props> = ({ handlePublish, setDropdownVisible }) => {
   const intl = useIntl();
 
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
@@ -278,7 +279,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
 
         <Form.Item className={styles.footer}>
           <Space>
-            <Button>
+            <Button onClick={() => setDropdownVisible(false)}>
               {intl.formatMessage({
                 id: 'component.button.cancel',
               })}

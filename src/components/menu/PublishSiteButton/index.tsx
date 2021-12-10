@@ -14,6 +14,8 @@ export default () => {
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
   const { siteNeedToDeploy, setSiteNeedToDeploy } = useModel('storage');
 
+  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+
   // If publishButtonDisplay is true, display the button when scrolling
   // but hide it if scrolled to the bottom
   useEffect(() => {
@@ -60,7 +62,6 @@ export default () => {
     } else {
       message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
     }
-
     done();
     setPublishLoading(false);
   };
@@ -76,9 +77,17 @@ export default () => {
     >
       {/*<PublishButtonPopover>*/}
       <Dropdown
-        overlay={<Publish handlePublish={publishSiteRequest} />}
+        overlay={
+          <Publish
+            loading={publishLoading}
+            setDropdownVisible={setDropdownVisible}
+            handlePublish={publishSiteRequest}
+          />
+        }
         trigger={['click']}
         placement="topCenter"
+        visible={dropdownVisible}
+        onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}
       >
         <Button
           key="publish-button"

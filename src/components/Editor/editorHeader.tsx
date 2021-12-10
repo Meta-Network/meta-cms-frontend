@@ -1,25 +1,28 @@
-import React, { Fragment, useCallback } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import { history, useIntl } from 'umi';
 import { Tooltip, Dropdown } from 'antd';
 import styles from './editorHeader.less';
 import { LeftOutlined, DownOutlined } from '@ant-design/icons';
+import Submit from '@/components/Submit/editor';
 
 interface Props {
   readonly draftMode: 0 | 1 | 2;
   settings: JSX.Element;
-  submit: JSX.Element;
+  handlePublish: (gateway: boolean) => void;
   // headerCloudDraftUpload: JSX.Element;
   // headerCloudDraftDownload: JSX.Element;
 }
 
 const EditorHeader: React.FC<Props> = ({
   draftMode,
+  handlePublish,
   // headerCloudDraftUpload,
   // headerCloudDraftDownload,
-  submit,
   settings,
 }) => {
   const intl = useIntl();
+  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+
   /**
    * back page
    */
@@ -68,7 +71,15 @@ const EditorHeader: React.FC<Props> = ({
               id: 'editor.submit.tip',
             })}
           >
-            <Dropdown overlayClassName={styles.headerDropdown} trigger={['click']} overlay={submit}>
+            <Dropdown
+              overlayClassName={styles.headerDropdown}
+              trigger={['click']}
+              overlay={
+                <Submit handlePublish={handlePublish} setDropdownVisible={setDropdownVisible} />
+              }
+              visible={dropdownVisible}
+              onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}
+            >
               <span className={styles.headerPublish}>
                 {intl.formatMessage({
                   id: 'component.button.submit',
