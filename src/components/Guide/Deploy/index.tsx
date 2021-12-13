@@ -262,7 +262,11 @@ export default () => {
             intl.formatMessage({ id: 'messages.deployment.deploying' }),
             0,
           );
-          const deployAndPublish = await deployAndPublishSite(configId as number);
+          const deployAndPublish = await deployAndPublishSite({
+            configId: configId as number,
+            authorPublishMetaSpaceRequestMetadataStorageType: 'ipfs',
+            authorPublishMetaSpaceRequestMetadataRefer: '',
+          });
 
           if (deployAndPublish.message === 'Ok') {
             updateProcessing({

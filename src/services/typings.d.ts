@@ -92,7 +92,14 @@ declare namespace CMS {
     };
   };
 
-  type LocalDraftStorageType = 'ipfs';
+  type MetadataStorageType = 'ipfs';
+
+  type metadata = {
+    authorDigestRequestMetadataStorageType: MetadataStorageType;
+    authorDigestRequestMetadataRefer: string;
+    authorDigestSignatureMetadataStorageType: MetadataStorageType;
+    authorDigestSignatureMetadataRefer: string;
+  };
 
   type LocalDraft = {
     title?: string;
@@ -102,9 +109,9 @@ declare namespace CMS {
     categories?: string[];
     content?: string;
     license?: string;
-    authorDigestRequestMetadataStorageType?: LocalDraftStorageType;
+    authorDigestRequestMetadataStorageType?: MetadataStorageType;
     authorDigestRequestMetadataRefer?: string;
-    authorDigestSignatureMetadataStorageType?: LocalDraftStorageType;
+    authorDigestSignatureMetadataStorageType?: MetadataStorageType;
     authorDigestSignatureMetadataRefer?: string;
   };
 
@@ -124,13 +131,13 @@ declare namespace CMS {
     updatedAt: Date;
     content?: string;
   };
-
   type Post = {
     id: number;
     createdAt: Date;
     updatedAt: Date;
     userId: number;
     title: string;
+    titleInStorage: string;
     cover: string;
     summary: string;
     platform: string;
@@ -146,8 +153,6 @@ declare namespace CMS {
       state: 'SUCCESS';
     }[];
   } & PostMetadata;
-
-  type MetadataStorageType = 'ipfs';
 
   type PostMetadata = {
     authorPublicKey: string;
@@ -200,6 +205,30 @@ declare namespace CMS {
     dataType: 'HEXO' | string;
     publishDir: 'public';
   };
+  type PostState = 'pending' | 'published';
+  type PostStoragePublishData = {
+    configIds: number[];
+    posts: {
+      title: string;
+      titleInStorage: string;
+      cover: string;
+      summary: string;
+      tags: string[];
+      categories: string[];
+      source: string;
+      license: string;
+      platform: string;
+      state: PostState;
+      authorDigestRequestMetadataStorageType: MetadataStorageType;
+      authorDigestRequestMetadataRefer: string;
+      authorDigestSignatureMetadataStorageType: MetadataStorageType;
+      authorDigestSignatureMetadataRefer: string;
+      createdAt: string;
+      updatedAt: string;
+    }[];
+  };
+  // 可能会有变动 暂时命名区分
+  type PostStorageUpdateData = PostStoragePublishData;
 }
 
 declare namespace GLOBAL {

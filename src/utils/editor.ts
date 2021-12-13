@@ -5,12 +5,14 @@ import {
   generateKeys,
   authorDigest,
   authorDigestSign,
+  authorPublishMetaSpaceRequest,
 } from '@metaio/meta-signature-util';
 import type {
   KeyPair,
   PostMetadata,
   AuthorDigestMetadata,
   AuthorPostSignatureMetadata,
+  BaseSignatureMetadata,
 } from '@metaio/meta-signature-util';
 import { storeGet, storeSet } from './store';
 import {
@@ -211,4 +213,23 @@ export const generateStorageLink = (platform: CMS.StoragePlatform, url: string) 
 
 export const generateDataViewerLink = (type: CMS.MetadataStorageType, refer: string): string => {
   return `${META_NETWORK_DATA_VIEWER_URL}/${type}/${refer}`;
+};
+
+/**
+ *publish MetaSpace Request
+ * @param { serverDomain }
+ * serverDomain The author claims to publish their Meta Space to this domain
+ * @returns
+ */
+export const publishMetaSpaceRequest = ({
+  serverDomain,
+}: {
+  serverDomain: string;
+}): BaseSignatureMetadata => {
+  const seedStore: string[] = JSON.parse(storeGet(KEY_META_CMS_METADATA_SEED) || '[]');
+  if (!seedStore.length) {
+    throw new Error('empty seed');
+  }
+  const keys: KeyPair = generateKeys(seedStore);
+  return authorPublishMetaSpaceRequest.generate(keys, serverDomain);
 };

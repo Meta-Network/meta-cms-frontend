@@ -7,6 +7,7 @@ import Submit from '@/components/Submit/editor';
 
 interface Props {
   readonly draftMode: 0 | 1 | 2;
+  readonly loading: boolean;
   settings: JSX.Element;
   handlePublish: (gateway: boolean) => void;
   // headerCloudDraftUpload: JSX.Element;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const EditorHeader: React.FC<Props> = ({
+  loading,
   draftMode,
   handlePublish,
   // headerCloudDraftUpload,
@@ -75,7 +77,11 @@ const EditorHeader: React.FC<Props> = ({
               overlayClassName={styles.headerDropdown}
               trigger={['click']}
               overlay={
-                <Submit handlePublish={handlePublish} setDropdownVisible={setDropdownVisible} />
+                <Submit
+                  loading={loading}
+                  handlePublish={handlePublish}
+                  setDropdownVisible={setDropdownVisible}
+                />
               }
               visible={dropdownVisible}
               onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}

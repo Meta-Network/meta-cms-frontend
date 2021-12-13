@@ -28,6 +28,7 @@ import { useIntl } from 'umi';
 import GenerateKey from './generate';
 
 interface Props {
+  readonly loading: boolean;
   handlePublish: (gateway: boolean) => void;
   setDropdownVisible: (visible: boolean) => void;
 }
@@ -36,7 +37,7 @@ const { Text, Link } = Typography;
 const { Option } = Select;
 const STORAGE_PLATFORM = 'github';
 
-const Submit: FC<Props> = ({ handlePublish, setDropdownVisible }) => {
+const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
   const intl = useIntl();
 
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
@@ -279,12 +280,12 @@ const Submit: FC<Props> = ({ handlePublish, setDropdownVisible }) => {
 
         <Form.Item className={styles.footer}>
           <Space>
-            <Button onClick={() => setDropdownVisible(false)}>
+            <Button onClick={() => setDropdownVisible(false)} loading={loading}>
               {intl.formatMessage({
                 id: 'component.button.cancel',
               })}
             </Button>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={loading}>
               {intl.formatMessage({
                 id: 'component.button.submit',
               })}

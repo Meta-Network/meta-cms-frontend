@@ -6,6 +6,7 @@ import { deployAndPublishSite } from '@/services/api/meta-cms';
 // import PublishButtonPopover from '@/components/menu/PublishSiteButton/PublishButtonPopover';
 import styles from './index.less';
 import Publish from '@/components/Submit/publish';
+import { publishMetaSpaceRequest } from '@/utils/editor';
 
 export default () => {
   const intl = useIntl();
@@ -43,8 +44,16 @@ export default () => {
     const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
     setPublishLoading(true);
 
-    if (initialState?.siteConfig?.id) {
-      const response = await deployAndPublishSite(initialState?.siteConfig?.id);
+    if (initialState?.siteConfig?.id && initialState?.siteConfig?.domain) {
+      const publishMetaSpaceRequestResult = publishMetaSpaceRequest({
+        serverDomain: initialState?.siteConfig?.domain,
+      });
+
+      const response = await deployAndPublishSite({
+        configId: initialState?.siteConfig?.id,
+        authorPublishMetaSpaceRequestMetadataStorageType: 'ipfs',
+        authorPublishMetaSpaceRequestMetadataRefer: publishMetaSpaceRequestResult.claim,
+      });
       if (response.statusCode === 201) {
         notification.success({
           message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),

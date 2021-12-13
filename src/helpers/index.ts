@@ -6,7 +6,6 @@ import {
   publishPostById,
   publishPost,
   publishPostAsDraft,
-  updatePost,
   getStorageSetting,
   getPublisherSetting,
 } from '@/services/api/meta-cms';
@@ -111,14 +110,11 @@ export const postByIdAPI = async (id: number) => {
  * get default site config
  */
 export const getDefaultSiteConfigAPI = async (): Promise<CMS.SiteConfiguration | undefined> => {
-  try {
-    const res = await getDefaultSiteConfig();
-    if (res.statusCode === 200) {
-      return res.data;
-    }
-    throw new Error(res.message);
-  } catch (e) {
-    console.log(e);
+  const res = await getDefaultSiteConfig();
+  if (res.statusCode === 200) {
+    return res.data;
+  } else {
+    console.log(res.message);
     return;
   }
 };
@@ -151,22 +147,6 @@ export const publishPostAPI = async (data: CMS.LocalDraft) => {
   try {
     const res = await publishPost(data);
     if (res.statusCode === 201) {
-      return res.data;
-    }
-    throw new Error(res.message);
-  } catch (e) {
-    console.log(e);
-    return '';
-  }
-};
-
-/**
- * update draft
- */
-export const updatePostAPI = async (id: number, data: CMS.LocalDraft) => {
-  try {
-    const res = await updatePost(id, data);
-    if (res.statusCode === 200) {
       return res.data;
     }
     throw new Error(res.message);
