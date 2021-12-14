@@ -1,11 +1,11 @@
-import { useIntl } from 'umi';
+import FormattedDescription from '@/components/FormattedDescription';
+import { getSourceStatus } from '@/services/api/meta-cms';
+import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
+import syncPostsRequest from '@/utils/sync-posts-request';
+import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { Button, List, message, Spin, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-import { GridContent, PageContainer } from '@ant-design/pro-layout';
-import syncPostsRequest from '@/utils/sync-posts-request';
-import { getSourceStatus } from '@/services/api/meta-cms';
-import FormattedDescription from '@/components/FormattedDescription';
-import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
+import { useIntl } from 'umi';
 import styles from './index.less';
 
 const status: GLOBAL.SourcePlatforms = {
@@ -43,7 +43,7 @@ export default () => {
       bind: (
         <Button
           onClick={() => {
-            window.open('https://developer.matataki.io/app/44ba10e59e954bf4/oauth');
+            window.location.href = 'https://developer.matataki.io/app/44ba10e59e954bf4/oauth';
           }}
           type="primary"
         >
@@ -114,13 +114,7 @@ export default () => {
       title: ['Matataki', getStatus(sourceStatus.matataki)],
       description: intl.formatMessage({ id: 'messages.source.matatakiDescription' }),
       actions: getActions(sourceStatus.matataki),
-      avatar: (
-        <img
-          className="icon"
-          src="https://cdn.frontenduse.top/prod/img/dapp_list_matataki.8bac289.png"
-          alt="matataki icon"
-        />
-      ),
+      avatar: <img className="icon" src="/icons/custom/matataki.png" alt="matataki icon" />,
     },
   ];
 
