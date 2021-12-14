@@ -18,8 +18,8 @@ export default () => {
   useEffect(() => {
     getDefaultSiteConfig().then((config) => {
       form.setFieldsValue({
-        domain: config.data.domain,
-        platform: platformsAliases[config.data.storeType],
+        domain: config?.data?.domain,
+        platform: platformsAliases[config?.data?.storeType],
       });
     });
   }, [form]);
