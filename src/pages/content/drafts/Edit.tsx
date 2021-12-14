@@ -351,6 +351,7 @@ const Edit: React.FC = () => {
 
   /**
    * handle image upload to IPFS
+   * TODO: 如果图片失败下次跳过执行
    */
   const handleImageUploadToIpfs = useCallback(async () => {
     if (flagImageUploadToIpfs) return;
@@ -388,7 +389,12 @@ const Edit: React.FC = () => {
       for (let i = 0; i < imgListFilter.length; i++) {
         const ele = imgListFilter[i];
 
-        const result = await imageUploadByUrlAPI(ele.src);
+        const result = await imageUploadByUrlAPI(
+          ele.src.replace(
+            'https://ssimg.frontenduse.top',
+            'https://smartsignature-img.oss-cn-hongkong.aliyuncs.com',
+          ),
+        );
         if (result) {
           // _vditor.tip('上传成功', 2000);
           message.success(

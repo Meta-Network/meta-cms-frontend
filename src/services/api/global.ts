@@ -79,3 +79,9 @@ export async function fileUploadToIpfs(file: FormData | File, token: string) {
     data: file,
   });
 }
+
+export async function fetchIpfs(hash: string) {
+  return request<any>(`https://ipfs.io/ipfs/${hash}`, {
+    method: 'GET',
+  });
+}
