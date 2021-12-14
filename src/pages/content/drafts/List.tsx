@@ -13,9 +13,7 @@ export default () => {
   const intl = useIntl();
   const [postsList, setPostsList] = useState<Posts[]>([]);
 
-  /**
-   * handle delete
-   */
+  /** handle delete */
   const handleDelete = useCallback(
     async (id: number) => {
       await dbPostsUpdate(id, { delete: 1 });
@@ -29,12 +27,9 @@ export default () => {
     [intl],
   );
 
-  /**
-   * fetch posts list
-   */
+  /** fetch posts list */
   const fetchPosts = useCallback(async () => {
     const result = await dbPostsAll();
-    // console.log('result', result);
     if (result) {
       setPostsList(result);
     }
@@ -106,7 +101,7 @@ export default () => {
       title: 'STATUS',
       dataIndex: 'status',
       key: 'status',
-      width: 140,
+      width: 100,
       render: (_: any, record: Posts) => (
         <Tag key={record.id}>
           {record.post
