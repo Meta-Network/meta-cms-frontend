@@ -144,8 +144,30 @@ export async function syncPostsByPlatform(platform: string) {
   });
 }
 
+/**
+ * fetch post sync
+ * @param params
+ * @returns
+ */
 export async function fetchPostSync(params: { page: number; limit: number; state: CMS.PostState }) {
   return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post/sync', {
+    method: 'GET',
+    params: params,
+  });
+}
+
+/**
+ * fetch Posts Storage by siteConfigId
+ * doc 暂时没写 limit
+ * @param siteConfigId
+ * @param params
+ * @returns
+ */
+export async function fetchPostsStorage(
+  siteConfigId: number,
+  params: { page: number; limit: number; draft: boolean },
+) {
+  return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>(`/post/storage/${siteConfigId}`, {
     method: 'GET',
     params: params,
   });

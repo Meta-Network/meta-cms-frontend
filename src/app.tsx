@@ -4,7 +4,7 @@ import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import { fetchPostsPublished } from '@/services/api/meta-cms';
+import { fetchPostsStorage } from '@/services/api/meta-cms';
 import { dbPostsAllCount } from './db/db';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
 import MenuUserInfo from './components/menu/MenuUserInfo';
@@ -85,14 +85,21 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
   const invitationsCount =
     invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
 
-  const publishedCountRequest = await fetchPostsPublished(1, 10);
-  const publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
+  // get site config
+  const siteConfig = await getDefaultSiteConfigAPI();
+
+  let publishedCount = 0;
+  if (siteConfig?.id) {
+    const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
+      page: 1,
+      limit: 1,
+      draft: false,
+    });
+    publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
+  }
 
   // local draft count
   const localDraftCount = await dbPostsAllCount();
-
-  // get site config
-  const siteConfig = await getDefaultSiteConfigAPI();
 
   const state: GLOBAL.InitialState = {
     fetchUserInfo,

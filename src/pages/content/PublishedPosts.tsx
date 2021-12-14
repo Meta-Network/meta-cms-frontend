@@ -1,15 +1,17 @@
 import { useIntl } from 'umi';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Image, Tag, Space } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { fetchPostsPublished } from '@/services/api/meta-cms';
+import { fetchPostsStorage } from '@/services/api/meta-cms';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import FormattedDescription from '@/components/FormattedDescription';
+import { getDefaultSiteConfigAPI } from '@/helpers';
 
 export default () => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
+  const [siteConfigDefault, setSiteConfigDefault] = useState<CMS.SiteConfiguration | undefined>();
 
   const columns: ProColumns<CMS.Post>[] = [
     {
@@ -121,7 +123,26 @@ export default () => {
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {
-          const request = await fetchPostsPublished(current ?? 1, pageSize ?? 10);
+          let _siteConfigDefault: CMS.SiteConfiguration | undefined;
+
+          if (!siteConfigDefault?.id) {
+            _siteConfigDefault = await getDefaultSiteConfigAPI();
+            if (_siteConfigDefault) {
+              setSiteConfigDefault(_siteConfigDefault);
+            } else {
+              return { success: false };
+            }
+          }
+
+          const params = {
+            page: current ?? 1,
+            limit: pageSize ?? 10,
+            draft: false,
+          };
+          const request = await fetchPostsStorage(
+            siteConfigDefault?.id || _siteConfigDefault!.id,
+            params,
+          );
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
           if (request?.data) {
