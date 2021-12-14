@@ -1,10 +1,11 @@
 import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
 // import { UpOutlined } from '@ant-design/icons';
-import { Button, message, notification } from 'antd';
+import { Button, message, notification, Dropdown } from 'antd';
 import { deployAndPublishSite } from '@/services/api/meta-cms';
 // import PublishButtonPopover from '@/components/menu/PublishSiteButton/PublishButtonPopover';
 import styles from './index.less';
+import Publish from '@/components/Submit/publish';
 
 export default () => {
   const intl = useIntl();
@@ -74,16 +75,21 @@ export default () => {
         }`}
     >
       {/*<PublishButtonPopover>*/}
-      <Button
-        onClick={publishSiteRequest}
-        key="publish-button"
-        loading={publishLoading}
-        className={styles.publishButton}
-        type="primary"
+      <Dropdown
+        overlay={<Publish handlePublish={publishSiteRequest} />}
+        trigger={['click']}
+        placement="topCenter"
       >
-        {intl.formatMessage({ id: 'messages.redeployment.button' })}
-        {/*<UpOutlined />*/}
-      </Button>
+        <Button
+          key="publish-button"
+          loading={publishLoading}
+          className={styles.publishButton}
+          type="primary"
+        >
+          {intl.formatMessage({ id: 'messages.redeployment.button' })}
+          {/*<UpOutlined />*/}
+        </Button>
+      </Dropdown>
       {/*</PublishButtonPopover>*/}
     </div>
   );

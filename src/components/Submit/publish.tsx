@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import React, { Fragment, useCallback, useState, useEffect } from 'react';
 import {
-  Modal,
   Card,
   Form,
   Input,
@@ -14,19 +13,19 @@ import {
   Typography,
 } from 'antd';
 import {
-  KeyOutlined,
   EyeOutlined,
   CaretDownOutlined,
   ArrowRightOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
 import styles from './submit.less';
-import { generateSeedAndKey, generateStorageLink, verifySeedAndKey } from '@/utils/editor';
-import { getDefaultSiteConfigAPI, getStorageSettingAPI } from '@/helpers/index';
+import { generateStorageLink, verifySeedAndKey } from '@/utils/editor';
+import { getDefaultSiteConfigAPI, getPublisherSettingAPI } from '@/helpers/index';
 import { useMount } from 'ahooks';
 import { KEY_META_CMS_GATEWAY_CHECKED } from '../../../config/index';
 import { storeGet, storeSet } from '@/utils/store';
 import { useIntl } from 'umi';
+import GenerateKey from './generate';
 
 interface Props {
   handlePublish: (gateway: boolean) => void;
@@ -36,12 +35,11 @@ const { Text, Link } = Typography;
 const { Option } = Select;
 const STORAGE_PLATFORM = 'github';
 
-const Submit: FC<Props> = ({ handlePublish }) => {
+const Publish: FC<Props> = ({ handlePublish }) => {
   const intl = useIntl();
 
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
   const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
-  const [signatureLoading, setSignatureLoading] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<string>('');
   // const [gatewayLoading, setGatewayLoading] = useState<boolean>(true);
   const [gatewayChecked, setGatewayChecked] = useState<boolean>(false);
@@ -80,25 +78,6 @@ const Submit: FC<Props> = ({ handlePublish }) => {
   }, [setPublicKey]);
 
   /**
-   * handle generate publicKey
-   */
-  const handleGeneratePublicKey = useCallback(async () => {
-    setSignatureLoading(true);
-
-    try {
-      const { keys } = generateSeedAndKey();
-      setPublicKey(keys.public);
-
-      message.success(intl.formatMessage({ id: 'messages.editor.submit.generateKey.success' }));
-    } catch (error) {
-      console.log(error);
-      message.error(intl.formatMessage({ id: 'messages.editor.submit.generateKey.fail' }));
-    }
-
-    setSignatureLoading(false);
-  }, [setPublicKey, intl]);
-
-  /**
    * handle Gateway Change Checked
    */
   const handleGatewayChangeChecked = useCallback((val: boolean) => {
@@ -130,7 +109,10 @@ const Submit: FC<Props> = ({ handlePublish }) => {
     if (!defaultSiteConfigResult) {
       return;
     }
-    const storageResult = await getStorageSettingAPI(defaultSiteConfigResult.id, STORAGE_PLATFORM);
+    const storageResult = await getPublisherSettingAPI(
+      defaultSiteConfigResult.id,
+      STORAGE_PLATFORM,
+    );
     if (storageResult) {
       setStorageSetting(storageResult);
     }
@@ -155,7 +137,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
 
   return (
     <Card
-      title={intl.formatMessage({ id: 'editor.submit.title' })}
+      title={intl.formatMessage({ id: 'editor.publish.title' })}
       bodyStyle={{ padding: 0 }}
       style={{ width: 340 }}
     >
@@ -169,14 +151,14 @@ const Submit: FC<Props> = ({ handlePublish }) => {
       >
         <Form.Item
           name="github"
-          label={intl.formatMessage({ id: 'editor.submit.item.repo.label' })}
+          label={intl.formatMessage({ id: 'editor.publish.item.repo.label' })}
           className={styles.item}
         >
           <Radio value="githubPublic" checked={!!STORAGE_PLATFORM}>
             <span className={styles.itemType}>
-              {intl.formatMessage({ id: 'editor.submit.item.repo.name' })}
+              {intl.formatMessage({ id: 'editor.publish.item.repo.public.name' })}
             </span>{' '}
-            - {intl.formatMessage({ id: 'editor.submit.item.repo.description' })}
+            - {intl.formatMessage({ id: 'editor.publish.item.repo.public.description' })}
           </Radio>
           <div className={styles.itemRepo}>
             <div className={styles.itemStatus}>
@@ -202,7 +184,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
 
         <Form.Item
           name="ipfs"
-          label={intl.formatMessage({ id: 'editor.submit.item.gateway.label' })}
+          label={intl.formatMessage({ id: 'editor.publish.item.gateway.label' })}
           className={styles.item}
         >
           <Checkbox
@@ -214,7 +196,7 @@ const Submit: FC<Props> = ({ handlePublish }) => {
             <span className={styles.itemType}>
               {intl.formatMessage({ id: 'editor.submit.item.gateway.name' })}
             </span>{' '}
-            - {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
+            - {intl.formatMessage({ id: 'editor.publish.item.gateway.description' })}
           </Checkbox>
         </Form.Item>
 
@@ -306,61 +288,21 @@ const Submit: FC<Props> = ({ handlePublish }) => {
             </Button>
             <Button type="primary" htmlType="submit">
               {intl.formatMessage({
-                id: 'component.button.submit',
+                id: 'component.button.publish',
               })}
             </Button>
           </Space>
         </Form.Item>
       </Form>
-      <Modal
-        visible={visibleSignatureGenerate}
-        title={
-          <Fragment>
-            <KeyOutlined />
-            &nbsp;
-            {intl.formatMessage({
-              id: 'editor.submit.modalKey.title',
-            })}
-          </Fragment>
-        }
-        onCancel={() => setVisibleSignatureGenerate(false)}
-        footer={[
-          <Button onClick={() => setVisibleSignatureGenerate(false)}>
-            {intl.formatMessage({
-              id: 'component.button.cancel',
-            })}
-          </Button>,
-          <Button type="primary" loading={signatureLoading} onClick={handleGeneratePublicKey}>
-            {publicKey
-              ? intl.formatMessage({
-                  id: 'component.button.regenerate',
-                })
-              : intl.formatMessage({
-                  id: 'component.button.generateImmediately',
-                })}
-          </Button>,
-        ]}
-      >
-        <Space direction="vertical">
-          <div>
-            {publicKey
-              ? intl.formatMessage({
-                  id: 'editor.submit.modalKey.content.beenGenerated',
-                })
-              : intl.formatMessage({
-                  id: 'editor.submit.modalKey.content.notGenerated',
-                })}
-          </div>
-          <div>
-            {intl.formatMessage({
-              id: 'editor.submit.modalKey.content.description',
-            })}
-          </div>
-          <Input value={publicKey} placeholder="KEY" disabled />
-        </Space>
-      </Modal>
+
+      <GenerateKey
+        visibleSignatureGenerate={visibleSignatureGenerate}
+        setVisibleSignatureGenerate={setVisibleSignatureGenerate}
+        publicKey={publicKey}
+        setPublicKey={setPublicKey}
+      />
     </Card>
   );
 };
 
-export default Submit;
+export default Publish;

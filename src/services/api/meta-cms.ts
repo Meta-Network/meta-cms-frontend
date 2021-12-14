@@ -80,6 +80,19 @@ export async function getStorageSetting(configId: number, platform: CMS.StorageP
   });
 }
 
+/**
+ * get publisher setting
+ * @param configId
+ * @param platform
+ * @returns
+ */
+export async function getPublisherSetting(configId: number, platform: CMS.StoragePlatform) {
+  return request<GLOBAL.GeneralResponse<CMS.PublisherPlatformSetting>>(`/publisher/${platform}`, {
+    params: { configId },
+    method: 'GET',
+  });
+}
+
 /** 提交新的存储配置 POST /storage/{platform} */
 export async function newSitePublishSetting(
   configId: number,

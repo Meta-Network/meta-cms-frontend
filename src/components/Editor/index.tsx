@@ -63,6 +63,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
         math: {
           engine: 'KaTeX',
         },
+        actions: [],
       },
       toolbar: [
         'headings',
@@ -86,6 +87,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
         'table',
         '|',
         // 'upload',
+        'edit-mode',
         {
           name: 'upload',
           tip: intl.formatMessage({

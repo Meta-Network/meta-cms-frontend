@@ -8,6 +8,7 @@ import {
   publishPostAsDraft,
   updatePost,
   getStorageSetting,
+  getPublisherSetting,
 } from '@/services/api/meta-cms';
 import { requestStorageToken } from '@/services/api/meta-ucenter';
 
@@ -186,6 +187,25 @@ export const getStorageSettingAPI = async (
   platform: CMS.StoragePlatform,
 ): Promise<CMS.StoragePlatformSetting | undefined> => {
   const res = await getStorageSetting(configId, platform);
+  if (res.statusCode === 200) {
+    return res.data;
+  } else {
+    console.log(res.message);
+    return;
+  }
+};
+
+/**
+ * get publisher setting api
+ * @param configId
+ * @param platform
+ * @returns
+ */
+export const getPublisherSettingAPI = async (
+  configId: number,
+  platform: CMS.StoragePlatform,
+): Promise<CMS.PublisherPlatformSetting | undefined> => {
+  const res = await getPublisherSetting(configId, platform);
   if (res.statusCode === 200) {
     return res.data;
   } else {

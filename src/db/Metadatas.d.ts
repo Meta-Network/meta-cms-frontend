@@ -1,14 +1,14 @@
 import type {
-  AuthorDigestRequestMetadata,
-  AuthorSignatureMetadata,
+  AuthorDigestMetadata,
+  AuthorPostSignatureMetadata,
 } from '@metaio/meta-signature-util';
 
 export type Metadatas = {
   id?: number;
   postId: number;
   metadata: {
-    digestMetadata: AuthorDigestRequestMetadata;
-    authorSignatureMetadata: AuthorSignatureMetadata;
+    digestMetadata: AuthorDigestMetadata;
+    authorSignatureMetadata: AuthorPostSignatureMetadata;
     digestMetadataIpfs: Storage.Fleek;
     authorSignatureMetadataIpfs: Storage.Fleek;
   };
