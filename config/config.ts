@@ -16,9 +16,12 @@ export default defineConfig({
     META_STORAGE_API:
       process.env.META_STORAGE_API || 'https://fleek-storage.vercel.mttk.net/fleek/storage',
     META_SPACE_BASE_DOMAIN: process.env.META_SPACE_BASE_DOMAIN || 'metaspaces.me',
-    META_SPACE_DEFAULT_FAVICON_URL: process.env.META_SPACE_DEFAULT_FAVICON_URL || 'https://storageapi.fleek.co/casimir-crystal-team-bucket/metanetwork/users/metaio-storage/favicon.ico',
+    META_SPACE_DEFAULT_FAVICON_URL:
+      process.env.META_SPACE_DEFAULT_FAVICON_URL ||
+      'https://storageapi.fleek.co/casimir-crystal-team-bucket/metanetwork/users/metaio-storage/favicon.ico',
     FLEEK_NAME: 'https://storageapi.fleek.co',
-    META_NETWORK_DATA_VIEWER_URL: process.env.META_NETWORK_DATA_VIEWER_URL || 'https://meta-network-data-viewer.vercel.app',
+    META_NETWORK_DATA_VIEWER_URL:
+      process.env.META_NETWORK_DATA_VIEWER_URL || 'https://meta-network-data-viewer.vercel.app',
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
