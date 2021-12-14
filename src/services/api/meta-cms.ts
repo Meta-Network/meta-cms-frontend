@@ -144,6 +144,13 @@ export async function syncPostsByPlatform(platform: string) {
   });
 }
 
+export async function fetchPostSync(params: { page: number; limit: number; state: CMS.PostState }) {
+  return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post/sync', {
+    method: 'GET',
+    params: params,
+  });
+}
+
 /** 获取待同步的文章列表 GET /post */
 export async function fetchPostsPending(page: number, limit: number) {
   return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post', {

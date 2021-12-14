@@ -54,7 +54,7 @@ const Edit: React.FC = () => {
 
   const { setSiteNeedToDeploy } = useModel('storage');
 
-  // 上传 metadata
+  // upload metadata
   const uploadMetadataFn = useCallback(
     async (gateway: boolean): Promise<CMS.metadata | undefined> => {
       let metadataData: CMS.metadata = {
@@ -121,7 +121,7 @@ const Edit: React.FC = () => {
     [content, cover, intl, license, tags, title],
   );
 
-  // 更新
+  // update
   const postStorageUpdateFn = useCallback(
     async ({
       post,
@@ -194,7 +194,7 @@ const Edit: React.FC = () => {
     [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy],
   );
 
-  // 发布
+  // publish
   const postStoragePublishFn = useCallback(
     async ({ gateway, siteConfig }: { gateway: boolean; siteConfig: CMS.SiteConfiguration }) => {
       setPublishLoading(true);
@@ -258,7 +258,7 @@ const Edit: React.FC = () => {
     [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy],
   );
 
-  // 处理发布
+  // handle publish
   const handlePublish = useCallback(
     async (gateway: boolean) => {
       const { id } = history.location.query as Router.PostQuery;
@@ -318,9 +318,7 @@ const Edit: React.FC = () => {
     [title, cover, content, postStorageUpdateFn, postStoragePublishFn, intl],
   );
 
-  /**
-   * handle history url state
-   */
+  // handle history url state
   const handleHistoryState = useCallback((id: string) => {
     window.history.replaceState({}, '', `?id=${id}`);
     history.location.query!.id = id;
@@ -352,7 +350,7 @@ const Edit: React.FC = () => {
   );
 
   /**
-   * handle image upload to ipfs
+   * handle image upload to IPFS
    */
   const handleImageUploadToIpfs = useCallback(async () => {
     if (flagImageUploadToIpfs) return;

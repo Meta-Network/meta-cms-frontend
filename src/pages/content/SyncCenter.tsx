@@ -3,7 +3,7 @@ import {
   ignorePendingPost,
   publishPostById,
   getDefaultSiteConfig,
-  fetchPostsPending,
+  fetchPostSync,
   getSourceStatus,
   publishPosts,
 } from '@/services/api/meta-cms';
@@ -199,7 +199,13 @@ export default () => {
       render: (_, record) => (
         <Space>
           {record.cover ? (
-            <Image width={100} src={record.cover} />
+            <Image
+              width={100}
+              src={record.cover.replace(
+                'https://ssimg.frontenduse.top',
+                'https://smartsignature-img.oss-cn-hongkong.aliyuncs.com',
+              )}
+            />
           ) : (
             intl.formatMessage({ id: 'messages.table.noCoverExists' })
           )}
@@ -359,7 +365,12 @@ export default () => {
         }}
         request={async ({ pageSize, current }) => {
           // TODO: 分页
-          const request = await fetchPostsPending(current ?? 1, pageSize ?? 10);
+          const params = {
+            page: current ?? 1,
+            limit: pageSize ?? 10,
+            state: 'pending' as CMS.PostState,
+          };
+          const request = await fetchPostSync(params);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
           return {
