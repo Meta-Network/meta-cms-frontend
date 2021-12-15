@@ -32,6 +32,7 @@ import type { PostMetadata } from '@metaio/meta-signature-util';
 import { postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
 import moment from 'moment';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from 'config';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -389,12 +390,7 @@ const Edit: React.FC = () => {
       for (let i = 0; i < imgListFilter.length; i++) {
         const ele = imgListFilter[i];
 
-        const result = await imageUploadByUrlAPI(
-          ele.src.replace(
-            'https://ssimg.frontenduse.top',
-            'https://smartsignature-img.oss-cn-hongkong.aliyuncs.com',
-          ),
-        );
+        const result = await imageUploadByUrlAPI(ele.src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI));
         if (result) {
           // _vditor.tip('上传成功', 2000);
           message.success(

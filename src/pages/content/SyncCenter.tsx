@@ -19,6 +19,7 @@ import { assign, cloneDeep } from 'lodash';
 import { imageUploadByUrlAPI } from '@/helpers';
 import styles from './SyncCenter.less';
 import { fetchIpfs } from '@/services/api/global';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from 'config';
 
 const { confirm } = Modal;
 
@@ -117,10 +118,7 @@ export default () => {
       // image transfer ipfs
       if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
         const result = await imageUploadByUrlAPI(
-          _post.cover.replace(
-            'https://ssimg.frontenduse.top',
-            'https://smartsignature-img.oss-cn-hongkong.aliyuncs.com',
-          ),
+          _post.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI),
         );
         if (result) {
           message.success(intl.formatMessage({ id: 'messages.syncCenter.coverSavedSuccess' }));
@@ -167,13 +165,7 @@ export default () => {
       render: (_, record) => (
         <Space>
           {record.cover ? (
-            <Image
-              width={100}
-              src={record.cover.replace(
-                'https://ssimg.frontenduse.top',
-                'https://smartsignature-img.oss-cn-hongkong.aliyuncs.com',
-              )}
-            />
+            <Image width={100} src={record.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI)} />
           ) : (
             intl.formatMessage({ id: 'messages.table.noCoverExists' })
           )}
