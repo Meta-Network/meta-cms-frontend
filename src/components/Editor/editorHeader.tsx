@@ -4,9 +4,10 @@ import { Tooltip, Dropdown } from 'antd';
 import styles from './editorHeader.less';
 import { LeftOutlined, DownOutlined } from '@ant-design/icons';
 import Submit from '@/components/Submit/editor';
+import { DraftMode } from '@/services/constants';
 
 interface Props {
-  readonly draftMode: 0 | 1 | 2;
+  readonly draftMode: DraftMode;
   readonly loading: boolean;
   settings: JSX.Element;
   handlePublish: (gateway: boolean) => void;
@@ -52,11 +53,11 @@ const EditorHeader: React.FC<Props> = ({
               {intl.formatMessage({
                 id: 'editor.header.draft',
               })}
-              {draftMode === 1
+              {draftMode === DraftMode.Saving
                 ? ` - ${intl.formatMessage({
                     id: 'editor.header.draft.saving',
                   })}`
-                : draftMode === 2
+                : draftMode === DraftMode.Saved
                 ? ` - ${intl.formatMessage({
                     id: 'editor.header.draft.saved',
                   })}`

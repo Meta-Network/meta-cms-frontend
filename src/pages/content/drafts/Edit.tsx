@@ -33,6 +33,7 @@ import { postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
 import moment from 'moment';
 import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../../config';
+import { DraftMode } from '@/services/constants';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -45,7 +46,7 @@ const Edit: React.FC = () => {
   const [license, setLicense] = useState<string>('');
 
   // draft mode
-  const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
+  const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
   // vditor
   // const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
@@ -166,7 +167,7 @@ const Edit: React.FC = () => {
 
       // 文档写的 200 成功，但是实际是 201
       if (result.statusCode === 201 || result.statusCode === 200) {
-        message.success('成功');
+        message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
         // 统一 title 方便下次 更新
         const _post = {
@@ -189,10 +190,10 @@ const Edit: React.FC = () => {
       } else if (result.statusCode === 500) {
         message.error(result.message);
       } else {
-        message.error('失败');
+        message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
       }
     },
-    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy],
+    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy, intl],
   );
 
   // publish
@@ -233,7 +234,7 @@ const Edit: React.FC = () => {
 
       // 文档写的 200 成功，但是实际是 201
       if (result.statusCode === 201 || result.statusCode === 200) {
-        message.success('成功');
+        message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
         const { id } = history.location.query as Router.PostQuery;
         await dbPostsUpdate(
@@ -253,10 +254,10 @@ const Edit: React.FC = () => {
       } else if (result.statusCode === 500) {
         message.error(result.message);
       } else {
-        message.error('失败');
+        message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
       }
     },
-    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy],
+    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy, intl],
   );
 
   // handle publish
@@ -331,7 +332,7 @@ const Edit: React.FC = () => {
   const asyncContentToDB = useCallback(
     async (val: string) => {
       setContent(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({
@@ -345,7 +346,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
     [handleHistoryState],
   );
@@ -434,7 +435,7 @@ const Edit: React.FC = () => {
   const asyncCoverToDB = useCallback(
     async (url: string) => {
       setCover(url);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ cover: url });
@@ -444,7 +445,7 @@ const Edit: React.FC = () => {
         const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
     [handleHistoryState],
   );
@@ -472,11 +473,11 @@ const Edit: React.FC = () => {
   const handleChangeTitle = useCallback(
     async (val: string) => {
       setTitle(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       await asyncTitleToDB(val);
 
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
     [asyncTitleToDB],
   );
@@ -487,7 +488,7 @@ const Edit: React.FC = () => {
   const handleChangeTags = useCallback(
     async (val: string[]) => {
       setTags(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ tags: val });
@@ -498,7 +499,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
     [handleHistoryState],
   );
@@ -509,7 +510,7 @@ const Edit: React.FC = () => {
   const handleChangeLicense = useCallback(
     async (val: string) => {
       setLicense(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ license: val });
@@ -520,7 +521,7 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
     [handleHistoryState],
   );
