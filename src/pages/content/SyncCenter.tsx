@@ -19,7 +19,7 @@ import { assign, cloneDeep } from 'lodash';
 import { imageUploadByUrlAPI } from '@/helpers';
 import styles from './SyncCenter.less';
 import { fetchIpfs } from '@/services/api/global';
-import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from 'config';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
 
 const { confirm } = Modal;
 

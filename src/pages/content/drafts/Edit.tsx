@@ -32,7 +32,7 @@ import type { PostMetadata } from '@metaio/meta-signature-util';
 import { postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
 import moment from 'moment';
-import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from 'config';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../../config';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -178,7 +178,7 @@ const Edit: React.FC = () => {
         await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
 
         setSiteNeedToDeploy(true);
-        // history.push('/content/drafts');
+        history.push('/content/drafts');
       } else if (result.statusCode === 400) {
         const _message =
           typeof result.message === 'string' ? result.message : mergedMessage(result.message);
@@ -242,7 +242,7 @@ const Edit: React.FC = () => {
         );
 
         setSiteNeedToDeploy(true);
-        // history.push('/content/drafts');
+        history.push('/content/drafts');
       } else if (result.statusCode === 400) {
         const _message =
           typeof result.message === 'string' ? result.message : mergedMessage(result.message);
