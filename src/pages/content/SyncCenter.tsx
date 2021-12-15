@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import {
   ignorePendingPost,
-  publishPostById,
   getDefaultSiteConfig,
   fetchPostSync,
   getSourceStatus,
@@ -45,33 +44,6 @@ export default () => {
   });
 
   const ref = useRef<ActionType>();
-
-  const publishSinglePost = async (record: PostInfo) => {
-    if (siteConfigId === null) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.description' }),
-      });
-      return;
-    }
-    if (getLockedConfigState(siteConfigId)) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.description' }),
-      });
-      return;
-    }
-    setLockedConfig(siteConfigId, true);
-    const done = message.loading(intl.formatMessage({ id: 'messages.syncCenter.publishPost' }), 0);
-    await publishPostById(record.id, [siteConfigId]);
-    setLockedConfig(siteConfigId, false);
-    done();
-    message.success(intl.formatMessage({ id: 'messages.syncCenter.publishPostSuccess' }));
-    setSiteNeedToDeploy(true);
-    if (ref.current?.reset) {
-      await ref.current?.reset();
-    }
-  };
 
   const publishMultiplePosts = async (selectedKeys: number[]) => {
     if (siteConfigId === null) {
@@ -281,14 +253,6 @@ export default () => {
       width: 290,
       valueType: 'option',
       render: (_, record) => [
-        <Button
-          key="option-publish"
-          onClick={() => publishSinglePost(record)}
-          // loading={postsLoadings[index] === LoadingStates.Publishing}
-          // disabled={postsLoadings[index] === LoadingStates.Discarding}
-        >
-          {intl.formatMessage({ id: 'component.button.publish' })}
-        </Button>,
         <Button
           onClick={() => transferDraft(record)}
           loading={transferDraftLoading}

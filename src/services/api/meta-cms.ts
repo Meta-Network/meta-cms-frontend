@@ -261,7 +261,7 @@ export async function publishPosts(postIds: number[], configIds: number[]) {
 
 /** 取消发布一篇待同步待文章 POST /post/{postId}/ignore */
 export async function ignorePendingPost(postId: number) {
-  return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/ignore`, {
+  return request<GLOBAL.GeneralResponse<any>>(`/post/sync/${postId}/ignore`, {
     method: 'POST',
   });
 }
