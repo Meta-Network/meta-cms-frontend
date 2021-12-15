@@ -86,17 +86,18 @@ export default () => {
           });
         }
       } catch (e: any) {
+        console.error(e);
+
         if (e?.message) {
           if ((e.message as string).includes('empty seed')) {
-            message.error('没有种子');
+            message.error(intl.formatMessage({ id: 'messages.redeployment.noKey' }));
           } else if ((e.message as string).includes('upload fail')) {
-            message.error('ipfs 上传失败');
+            message.error(intl.formatMessage({ id: 'messages.redeployment.uploadIPFS.fail' }));
           } else {
-            message.error('失败');
+            message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
           }
         } else {
-          console.error(e);
-          message.error('失败');
+          message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
         }
       }
     } else {
