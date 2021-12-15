@@ -128,9 +128,9 @@ export default () => {
 
       try {
         const postResult: { content: string } = await fetchIpfs(_post.source);
-        console.log('postResult', postResult);
         if (!postResult.content) {
-          throw new Error('empty content');
+          message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
+          return;
         }
 
         // send local
@@ -149,7 +149,7 @@ export default () => {
         history.push(`/content/drafts/edit?id=${resultID}`);
       } catch (e) {
         console.error(e);
-        message.error('失败');
+        message.success(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
       } finally {
         setTransferDraftLoading(false);
       }
