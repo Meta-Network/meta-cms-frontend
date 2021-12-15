@@ -113,21 +113,13 @@ export const dbPostsAllCount = async (): Promise<number> => {
  */
 export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
   // 草稿删除了 允许重新编辑
-  const result = await db.posts
-    .filter((i) => !i.delete)
-    .reverse()
-    .sortBy('id');
-
+  const result = await db.posts.filter((i) => !i.delete).toArray();
   return result.some((post) => post.post && Number(post.post.id) === id);
 };
 
 export const dbPostsWhereByID = async (id: number): Promise<Posts | undefined> => {
   // 草稿删除了 允许重新编辑
-  const result = await db.posts
-    .filter((i) => !i.delete)
-    .reverse()
-    .sortBy('id');
-
+  const result = await db.posts.filter((i) => !i.delete).toArray();
   return result.find((post) => post.post && Number(post.post.id) === id);
 };
 
