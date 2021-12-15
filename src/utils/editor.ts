@@ -221,7 +221,8 @@ export const generateDataViewerLink = (type: CMS.MetadataStorageType, refer: str
 };
 
 /**
- *publish MetaSpace Request
+ * publish MetaSpace Request
+ * 抛出来的错误 用于外部判断做多语言显示
  * @param { serverDomain }
  * serverDomain The author claims to publish their Meta Space to this domain
  * @returns

@@ -158,7 +158,7 @@ export async function fetchPostSync(params: { page: number; limit: number; state
 
 /**
  * fetch Posts Storage by siteConfigId
- * doc 暂时没写 limit
+ * 暂不支持 limit
  * @param siteConfigId
  * @param params
  * @returns

@@ -3,10 +3,8 @@ import { history, useIntl } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
-// import { CopyOutlined } from '@ant-design/icons';
 import { dbPostsUpdate, dbPostsAll, dbMetadatasUpdateByPostId } from '@/db/db';
 import type { Posts } from '@/db/Posts';
-// import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { strSlice } from '@/utils';
 
 export default () => {
@@ -69,34 +67,6 @@ export default () => {
       key: 'summary',
       render: (val: string) => <span>{strSlice(val, 40)}</span>,
     },
-    // {
-    //   title: 'HASH',
-    //   dataIndex: 'hash',
-    //   key: 'hash',
-    //   width: 140,
-    //   render: (_: any, record: Posts) => (
-    //     <span>
-    //       {(isNaN(Number(record.post?.source)) && record.post?.source && (
-    //         <>
-    //           <span>{strSlice(record.post?.source, 10)}</span>
-    //           <CopyToClipboard
-    //             text={record.post?.source}
-    //             onCopy={() =>
-    //               message.info(
-    //                 intl.formatMessage({
-    //                   id: 'messages.copy.success',
-    //                 }),
-    //               )
-    //             }
-    //           >
-    //             <CopyOutlined />
-    //           </CopyToClipboard>
-    //         </>
-    //       )) ||
-    //         ''}
-    //     </span>
-    //   ),
-    // },
     {
       title: 'STATUS',
       dataIndex: 'status',
@@ -114,7 +84,9 @@ export default () => {
                   id: 'posts.table.status.pending',
                 })
               : record.post.state === 'published'
-              ? '已发布'
+              ? intl.formatMessage({
+                  id: 'posts.table.status.published',
+                })
               : intl.formatMessage({
                   id: 'posts.table.status.localDraft',
                 })
