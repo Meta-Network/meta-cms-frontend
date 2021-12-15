@@ -43,7 +43,7 @@ export default () => {
     const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
     setPublishLoading(true);
 
-    if (initialState?.siteConfig?.id && initialState?.siteConfig?.domain) {
+    if (initialState?.siteConfig?.id) {
       try {
         const metadataData = {
           authorPublishMetaSpaceRequestMetadataStorageType: 'ipfs' as CMS.MetadataStorageType,
@@ -51,6 +51,13 @@ export default () => {
         };
 
         if (gateway) {
+          if (!initialState?.siteConfig?.domain) {
+            message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
+            done();
+            setPublishLoading(false);
+            return;
+          }
+
           const { metadataIpfs } = await publishMetaSpaceRequest({
             serverDomain: initialState?.siteConfig?.domain,
           });
