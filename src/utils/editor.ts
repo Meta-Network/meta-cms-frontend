@@ -40,6 +40,11 @@ type UploadMetadataReturnState =
     }
   | false;
 
+type PublishMetaSpaceRequestState = {
+  metadata: BaseSignatureMetadata;
+  metadataIpfs: Storage.Fleek;
+};
+
 /**
  * generate summary
  * @returns
@@ -221,15 +226,34 @@ export const generateDataViewerLink = (type: CMS.MetadataStorageType, refer: str
  * serverDomain The author claims to publish their Meta Space to this domain
  * @returns
  */
-export const publishMetaSpaceRequest = ({
+export const publishMetaSpaceRequest = async ({
   serverDomain,
 }: {
   serverDomain: string;
-}): BaseSignatureMetadata => {
+}): Promise<PublishMetaSpaceRequestState> => {
   const seedStore: string[] = JSON.parse(storeGet(KEY_META_CMS_METADATA_SEED) || '[]');
   if (!seedStore.length) {
     throw new Error('empty seed');
   }
   const keys: KeyPair = generateKeys(seedStore);
-  return authorPublishMetaSpaceRequest.generate(keys, serverDomain);
+  const data = authorPublishMetaSpaceRequest.generate(keys, serverDomain);
+  const dataBlob = new Blob([JSON.stringify(data)], {
+    type: 'application/json',
+  });
+  const dataMetadataForm = new FormData();
+  dataMetadataForm.append(
+    'file',
+    dataBlob,
+    `metadata-authorPublishMetaSpaceRequest-${data.ts}.json`,
+  );
+
+  const dataMetadataResult = await uploadToIpfsAPI(dataMetadataForm);
+  if (!dataMetadataResult) {
+    throw new Error('upload fail');
+  }
+
+  return {
+    metadata: data,
+    metadataIpfs: dataMetadataResult,
+  };
 };

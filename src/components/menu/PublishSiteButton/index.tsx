@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 // import { UpOutlined } from '@ant-design/icons';
 import { Button, message, notification, Dropdown } from 'antd';
 import { deployAndPublishSite } from '@/services/api/meta-cms';
-// import PublishButtonPopover from '@/components/menu/PublishSiteButton/PublishButtonPopover';
 import styles from './index.less';
 import Publish from '@/components/Submit/publish';
 import { publishMetaSpaceRequest } from '@/utils/editor';
@@ -40,33 +39,58 @@ export default () => {
     }
   }, [siteNeedToDeploy]);
 
-  const publishSiteRequest = async () => {
+  const publishSiteRequest = async (gateway: boolean) => {
     const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
     setPublishLoading(true);
 
     if (initialState?.siteConfig?.id && initialState?.siteConfig?.domain) {
-      const publishMetaSpaceRequestResult = publishMetaSpaceRequest({
-        serverDomain: initialState?.siteConfig?.domain,
-      });
+      try {
+        const metadataData = {
+          authorPublishMetaSpaceRequestMetadataStorageType: 'ipfs' as CMS.MetadataStorageType,
+          authorPublishMetaSpaceRequestMetadataRefer: '',
+        };
 
-      const response = await deployAndPublishSite({
-        configId: initialState?.siteConfig?.id,
-        authorPublishMetaSpaceRequestMetadataStorageType: 'ipfs',
-        authorPublishMetaSpaceRequestMetadataRefer: publishMetaSpaceRequestResult.claim,
-      });
-      if (response.statusCode === 201) {
-        notification.success({
-          message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),
-          description: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.description' }),
-          duration: 0,
+        if (gateway) {
+          const { metadataIpfs } = await publishMetaSpaceRequest({
+            serverDomain: initialState?.siteConfig?.domain,
+          });
+
+          metadataData.authorPublishMetaSpaceRequestMetadataRefer = metadataIpfs.hash;
+        }
+
+        const response = await deployAndPublishSite({
+          configId: initialState?.siteConfig?.id,
+          ...metadataData,
         });
-        setSiteNeedToDeploy(false);
-      } else {
-        notification.error({
-          message: intl.formatMessage({ id: 'messages.redeployment.taskFailed.title' }),
-          description: intl.formatMessage({ id: 'messages.redeployment.taskFailed.description' }),
-          duration: 0,
-        });
+        if (response.statusCode === 201) {
+          notification.success({
+            message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),
+            description: intl.formatMessage({
+              id: 'messages.redeployment.taskSuccess.description',
+            }),
+            duration: 0,
+          });
+          setSiteNeedToDeploy(false);
+        } else {
+          notification.error({
+            message: intl.formatMessage({ id: 'messages.redeployment.taskFailed.title' }),
+            description: intl.formatMessage({ id: 'messages.redeployment.taskFailed.description' }),
+            duration: 0,
+          });
+        }
+      } catch (e: any) {
+        if (e?.message) {
+          if ((e.message as string).includes('empty seed')) {
+            message.error('没有种子');
+          } else if ((e.message as string).includes('upload fail')) {
+            message.error('ipfs 上传失败');
+          } else {
+            message.error('失败');
+          }
+        } else {
+          console.error(e);
+          message.error('失败');
+        }
       }
     } else {
       message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
@@ -84,7 +108,6 @@ export default () => {
             : styles.publishButtonBackgroundInvisible
         }`}
     >
-      {/*<PublishButtonPopover>*/}
       <Dropdown
         overlay={
           <Publish
@@ -108,7 +131,6 @@ export default () => {
           {/*<UpOutlined />*/}
         </Button>
       </Dropdown>
-      {/*</PublishButtonPopover>*/}
     </div>
   );
 };
