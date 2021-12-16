@@ -9,3 +9,11 @@ export const strSlice = (val: string, len: number) => {
 };
 
 export const sleep = (time: number) => new Promise((resolve) => setTimeout(resolve, time));
+
+/**
+ * merged message
+ * @param message
+ * @returns
+ */
+export const mergedMessage = (messages: string[]): string =>
+  messages.reduce((a: string, b: string) => a + (a && '、') + b, '');

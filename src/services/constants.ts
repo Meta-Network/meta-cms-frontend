@@ -5,6 +5,11 @@ export enum DeployStages {
   deploying,
 }
 
+export enum DraftMode {
+  Default,
+  Saving,
+  Saved,
+}
 export class Storage {
   static get(target: string) {
     return window.localStorage.getItem(target);

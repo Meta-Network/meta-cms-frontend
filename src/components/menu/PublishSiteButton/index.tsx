@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 // import { UpOutlined } from '@ant-design/icons';
 import { Button, message, notification, Dropdown } from 'antd';
 import { deployAndPublishSite } from '@/services/api/meta-cms';
-// import PublishButtonPopover from '@/components/menu/PublishSiteButton/PublishButtonPopover';
 import styles from './index.less';
 import Publish from '@/components/Submit/publish';
+import { publishMetaSpaceRequest } from '@/utils/editor';
 
 export default () => {
   const intl = useIntl();
@@ -13,6 +13,8 @@ export default () => {
   const [publishButtonDisplay, setPublishButtonDisplay] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
   const { siteNeedToDeploy, setSiteNeedToDeploy } = useModel('storage');
+
+  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
 
   // If publishButtonDisplay is true, display the button when scrolling
   // but hide it if scrolled to the bottom
@@ -37,30 +39,70 @@ export default () => {
     }
   }, [siteNeedToDeploy]);
 
-  const publishSiteRequest = async () => {
+  const publishSiteRequest = async (gateway: boolean) => {
     const done = message.loading(intl.formatMessage({ id: 'messages.redeployment.taskStart' }), 0);
     setPublishLoading(true);
 
     if (initialState?.siteConfig?.id) {
-      const response = await deployAndPublishSite(initialState?.siteConfig?.id);
-      if (response.statusCode === 201) {
-        notification.success({
-          message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),
-          description: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.description' }),
-          duration: 0,
+      try {
+        const metadataData = {
+          authorPublishMetaSpaceRequestMetadataStorageType: 'ipfs' as CMS.MetadataStorageType,
+          authorPublishMetaSpaceRequestMetadataRefer: '',
+        };
+
+        if (gateway) {
+          if (!initialState?.siteConfig?.domain) {
+            message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
+            done();
+            setPublishLoading(false);
+            return;
+          }
+
+          const { metadataIpfs } = await publishMetaSpaceRequest({
+            serverDomain: initialState?.siteConfig?.domain,
+          });
+
+          metadataData.authorPublishMetaSpaceRequestMetadataRefer = metadataIpfs.hash;
+        }
+
+        const response = await deployAndPublishSite({
+          configId: initialState?.siteConfig?.id,
+          ...metadataData,
         });
-        setSiteNeedToDeploy(false);
-      } else {
-        notification.error({
-          message: intl.formatMessage({ id: 'messages.redeployment.taskFailed.title' }),
-          description: intl.formatMessage({ id: 'messages.redeployment.taskFailed.description' }),
-          duration: 0,
-        });
+        if (response.statusCode === 201) {
+          notification.success({
+            message: intl.formatMessage({ id: 'messages.redeployment.taskSuccess.title' }),
+            description: intl.formatMessage({
+              id: 'messages.redeployment.taskSuccess.description',
+            }),
+            duration: 0,
+          });
+          setSiteNeedToDeploy(false);
+        } else {
+          notification.error({
+            message: intl.formatMessage({ id: 'messages.redeployment.taskFailed.title' }),
+            description: intl.formatMessage({ id: 'messages.redeployment.taskFailed.description' }),
+            duration: 0,
+          });
+        }
+      } catch (e: any) {
+        console.error(e);
+
+        if (e?.message) {
+          if ((e.message as string).includes('empty seed')) {
+            message.error(intl.formatMessage({ id: 'messages.redeployment.noKey' }));
+          } else if ((e.message as string).includes('upload fail')) {
+            message.error(intl.formatMessage({ id: 'messages.redeployment.uploadIPFS.fail' }));
+          } else {
+            message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
+          }
+        } else {
+          message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
+        }
       }
     } else {
       message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
     }
-
     done();
     setPublishLoading(false);
   };
@@ -74,11 +116,18 @@ export default () => {
             : styles.publishButtonBackgroundInvisible
         }`}
     >
-      {/*<PublishButtonPopover>*/}
       <Dropdown
-        overlay={<Publish handlePublish={publishSiteRequest} />}
+        overlay={
+          <Publish
+            loading={publishLoading}
+            setDropdownVisible={setDropdownVisible}
+            handlePublish={publishSiteRequest}
+          />
+        }
         trigger={['click']}
         placement="topCenter"
+        visible={dropdownVisible}
+        onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}
       >
         <Button
           key="publish-button"
@@ -90,7 +139,6 @@ export default () => {
           {/*<UpOutlined />*/}
         </Button>
       </Dropdown>
-      {/*</PublishButtonPopover>*/}
     </div>
   );
 };

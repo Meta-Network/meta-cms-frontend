@@ -5,12 +5,14 @@ import {
   generateKeys,
   authorDigest,
   authorDigestSign,
+  authorPublishMetaSpaceRequest,
 } from '@metaio/meta-signature-util';
 import type {
   KeyPair,
   PostMetadata,
   AuthorDigestMetadata,
   AuthorPostSignatureMetadata,
+  BaseSignatureMetadata,
 } from '@metaio/meta-signature-util';
 import { storeGet, storeSet } from './store';
 import {
@@ -37,6 +39,11 @@ type UploadMetadataReturnState =
       authorSignatureMetadataIpfs: Storage.Fleek;
     }
   | false;
+
+type PublishMetaSpaceRequestState = {
+  metadata: BaseSignatureMetadata;
+  metadataIpfs: Storage.Fleek;
+};
 
 /**
  * generate summary
@@ -211,4 +218,43 @@ export const generateStorageLink = (platform: CMS.StoragePlatform, url: string) 
 
 export const generateDataViewerLink = (type: CMS.MetadataStorageType, refer: string): string => {
   return `${META_NETWORK_DATA_VIEWER_URL}/${type}/${refer}`;
+};
+
+/**
+ * publish MetaSpace Request
+ * 抛出来的错误 用于外部判断做多语言显示
+ * @param { serverDomain }
+ * serverDomain The author claims to publish their Meta Space to this domain
+ * @returns
+ */
+export const publishMetaSpaceRequest = async ({
+  serverDomain,
+}: {
+  serverDomain: string;
+}): Promise<PublishMetaSpaceRequestState> => {
+  const seedStore: string[] = JSON.parse(storeGet(KEY_META_CMS_METADATA_SEED) || '[]');
+  if (!seedStore.length) {
+    throw new Error('empty seed');
+  }
+  const keys: KeyPair = generateKeys(seedStore);
+  const data = authorPublishMetaSpaceRequest.generate(keys, serverDomain);
+  const dataBlob = new Blob([JSON.stringify(data)], {
+    type: 'application/json',
+  });
+  const dataMetadataForm = new FormData();
+  dataMetadataForm.append(
+    'file',
+    dataBlob,
+    `metadata-authorPublishMetaSpaceRequest-${data.ts}.json`,
+  );
+
+  const dataMetadataResult = await uploadToIpfsAPI(dataMetadataForm);
+  if (!dataMetadataResult) {
+    throw new Error('upload fail');
+  }
+
+  return {
+    metadata: data,
+    metadataIpfs: dataMetadataResult,
+  };
 };

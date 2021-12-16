@@ -15,19 +15,12 @@ import {
   MetadataTempData,
 } from '@/db/db';
 import type { Posts } from '@/db/Posts.d';
-import {
-  imageUploadByUrlAPI,
-  getDefaultSiteConfigAPI,
-  publishPendingPostAPI,
-  publishPostAPI,
-  updatePostAPI,
-} from '@/helpers';
+import { imageUploadByUrlAPI, getDefaultSiteConfigAPI } from '@/helpers';
 import { assign } from 'lodash';
 // import type Vditor from 'vditor';
 import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
-import Submit from '@/components/Submit/editor';
 // import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
 // import HeaderCloudDraftDownload from '@/components/Editor/headerCloudDraftDownload';
 import SettingsTags from '@/components/Editor/settingsTags';
@@ -36,6 +29,11 @@ import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
 import type { PostMetadata } from '@metaio/meta-signature-util';
+import { postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
+import { mergedMessage } from '@/utils';
+import moment from 'moment';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../../config';
+import { DraftMode } from '@/services/constants';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -48,137 +46,37 @@ const Edit: React.FC = () => {
   const [license, setLicense] = useState<string>('');
 
   // draft mode
-  const [draftMode, setDraftMode] = useState<0 | 1 | 2>(0); // 0 1 2
+  const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
   // vditor
   // const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
-  // 更新草稿开关
-  const [flagUpdateDraft, setFlagUpdateDraft] = useState<boolean>(false);
   // publish loading
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   const { setSiteNeedToDeploy } = useModel('storage');
 
-  /**
-   * draft publish as post
-   * post ID or draft ID
-   */
-  const draftPublishAsPost = useCallback(
-    async (postId: number) => {
-      setPublishLoading(true);
-
-      const siteConfig = await getDefaultSiteConfigAPI();
-      if (!siteConfig) {
-        message.warning(
-          intl.formatMessage({
-            id: 'messages.editor.noDefaultConfig',
-          }),
-        );
-        return false;
-      }
-
-      const postResult = await publishPendingPostAPI(postId, [siteConfig.id]);
-      if (postResult) {
-        // publish post, update db post data
-        const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: postResult, draft: null }));
-
-        message.success(
-          intl.formatMessage({
-            id: 'messages.editor.success',
-          }),
-        );
-        return true;
-      } else {
-        message.error(
-          intl.formatMessage({
-            id: 'messages.editor.fail',
-          }),
-        );
-        return false;
-      }
-    },
-    [intl],
-  );
-
-  /**
-   * update draft
-   * 在更新 title content cover 更新草稿
-   */
-  const updateDraft = useCallback(
-    async (data: CMS.LocalDraft) => {
-      if (flagUpdateDraft) return;
-
-      setFlagUpdateDraft(true);
-      const { id } = history.location.query as Router.PostQuery;
-      if (!id) {
-        setFlagUpdateDraft(false);
-        return;
-      }
-      const result = await dbPostsGet(Number(id));
-      if (!result) {
-        setFlagUpdateDraft(false);
-        return;
-      }
-
-      if (result && (result.draft || result.post)) {
-        const postId = result.draft?.id || result.post?.id;
-        const res = await updatePostAPI(Number(postId), data);
-        if (res) {
-          // update local draft data
-          if (result.draft) {
-            await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: res }));
-          } else if (result.post) {
-            await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: res }));
-          }
-        }
-      }
-      setFlagUpdateDraft(false);
-    },
-    [flagUpdateDraft],
-  );
-
-  /**
-   * post publish to post
-   * If mode is draft or post, postId is required
-   */
-  const postPublishToPost = useCallback(
-    async ({
-      mode,
-      postId,
-      gateway,
-    }: {
-      mode: 'local' | 'draft' | 'post';
-      postId?: number;
-      gateway: boolean;
-    }) => {
-      setPublishLoading(true);
-
-      const data = {
-        title: title,
-        cover: cover,
-        summary: generateSummary(),
-        content: content,
-        // tags: tags,
-        license: license,
-      };
-
-      const payload: PostMetadata = {
-        ...data,
-        categories: '',
-        tags: tags.join(),
-      };
-      const { id } = history.location.query as Router.PostQuery;
-
-      let metadataData = {
-        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+  // upload metadata
+  const uploadMetadataFn = useCallback(
+    async (gateway: boolean): Promise<CMS.metadata | undefined> => {
+      let metadataData: CMS.metadata = {
+        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.MetadataStorageType,
         authorDigestRequestMetadataRefer: '',
-        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.LocalDraftStorageType,
+        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.MetadataStorageType,
         authorDigestSignatureMetadataRefer: '',
       };
-      // if select gateway
+
       if (gateway) {
+        const payload: PostMetadata = {
+          title: title,
+          cover: cover,
+          summary: generateSummary(),
+          content: content,
+          license: license,
+          categories: '',
+          tags: tags.join(),
+        };
+
         const uploadMetadataResult = await uploadMetadata({ payload });
 
         if (uploadMetadataResult) {
@@ -188,6 +86,7 @@ const Edit: React.FC = () => {
             digestMetadataIpfs,
             authorSignatureMetadataIpfs,
           } = uploadMetadataResult;
+          const { id } = history.location.query as Router.PostQuery;
 
           // local add metadada
           await dbMetadatasAdd(
@@ -206,67 +105,162 @@ const Edit: React.FC = () => {
             authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
             authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
           });
+
+          return metadataData;
         } else {
           message.error(
             intl.formatMessage({
               id: 'messages.editor.submit.uploadMetadata.fail',
             }),
           );
-          setPublishLoading(false);
+
           return;
         }
-      }
-
-      let draftResult: CMS.Draft | '' = '';
-
-      if (mode === 'local') {
-        draftResult = await publishPostAPI({
-          ...data,
-          ...metadataData,
-          tags: tags,
-          categories: [],
-        });
-      } else if (mode === 'draft' || mode === 'post') {
-        draftResult = await updatePostAPI(Number(postId), {
-          ...data,
-          ...metadataData,
-          tags: tags,
-        });
-      }
-
-      // update local db draft data
-      if (draftResult) {
-        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ draft: draftResult }));
-
-        let _postId: number = 0;
-        if (mode === 'local') {
-          _postId = draftResult.id!;
-        } else if (mode === 'draft' || mode === 'post') {
-          _postId = postId!;
-        }
-
-        // publish
-        const postResult = await draftPublishAsPost(_postId);
-        if (postResult) {
-          setSiteNeedToDeploy(true);
-          history.push('/content/drafts');
-        }
       } else {
-        message.error(
-          intl.formatMessage({
-            id: 'messages.editor.fail',
-          }),
-        );
+        return metadataData;
       }
-      setPublishLoading(false);
     },
-    [draftPublishAsPost, title, cover, content, tags, license, setSiteNeedToDeploy, intl],
+    [content, cover, intl, license, tags, title],
   );
 
-  /**
-   * publish
-   */
+  // update
+  const postStorageUpdateFn = useCallback(
+    async ({
+      post,
+      gateway,
+      siteConfig,
+    }: {
+      post: CMS.Post;
+      gateway: boolean;
+      siteConfig: CMS.SiteConfiguration;
+    }) => {
+      setPublishLoading(true);
 
+      const metadata = await uploadMetadataFn(gateway);
+      if (!metadata) {
+        setPublishLoading(false);
+        return;
+      }
+
+      const data: any = {
+        configIds: [siteConfig.id],
+        posts: [
+          {
+            ...post,
+            title: title,
+            cover: cover,
+            summary: generateSummary(),
+            tags: tags,
+            categories: [],
+            source: content,
+            license: license,
+            state: 'published' as CMS.PostState,
+            ...metadata,
+            updatedAt: moment().toISOString(),
+          },
+        ],
+      };
+
+      const result = await postStorageUpdate(false, data);
+
+      setPublishLoading(false);
+
+      // 文档写的 200 成功，但是实际是 201
+      if (result.statusCode === 201 || result.statusCode === 200) {
+        message.success(intl.formatMessage({ id: 'messages.editor.success' }));
+
+        // 统一 title 方便下次 更新
+        const _post = {
+          ...result.data[0],
+          titleInStorage: title,
+        };
+
+        const { id } = history.location.query as Router.PostQuery;
+        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
+
+        setSiteNeedToDeploy(true);
+        history.push('/content/drafts');
+      } else if (result.statusCode === 400) {
+        const _message =
+          typeof result.message === 'string' ? result.message : mergedMessage(result.message);
+        message.error(_message);
+      } else if (result.statusCode === 409) {
+        // 'When post state is not pending or pending_edit.'
+        message.error(result.message);
+      } else if (result.statusCode === 500) {
+        message.error(result.message);
+      } else {
+        message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
+      }
+    },
+    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy, intl],
+  );
+
+  // publish
+  const postStoragePublishFn = useCallback(
+    async ({ gateway, siteConfig }: { gateway: boolean; siteConfig: CMS.SiteConfiguration }) => {
+      setPublishLoading(true);
+
+      const metadata = await uploadMetadataFn(gateway);
+      if (!metadata) {
+        setPublishLoading(false);
+        return;
+      }
+
+      const data = {
+        configIds: [siteConfig.id],
+        posts: [
+          {
+            title: title,
+            titleInStorage: title,
+            cover: cover,
+            summary: generateSummary(),
+            tags: tags,
+            categories: [],
+            source: content,
+            license: license,
+            platform: 'editor',
+            state: 'pending' as CMS.PostState,
+            ...metadata,
+            createdAt: moment().toISOString(),
+            updatedAt: moment().toISOString(),
+          },
+        ],
+      };
+
+      const result = await postStoragePublish(false, data);
+
+      setPublishLoading(false);
+
+      // 文档写的 200 成功，但是实际是 201
+      if (result.statusCode === 201 || result.statusCode === 200) {
+        message.success(intl.formatMessage({ id: 'messages.editor.success' }));
+
+        const { id } = history.location.query as Router.PostQuery;
+        await dbPostsUpdate(
+          Number(id),
+          postDataMergedUpdateAt({ post: result.data[0], draft: null }),
+        );
+
+        setSiteNeedToDeploy(true);
+        history.push('/content/drafts');
+      } else if (result.statusCode === 400) {
+        const _message =
+          typeof result.message === 'string' ? result.message : mergedMessage(result.message);
+        message.error(_message);
+      } else if (result.statusCode === 409) {
+        // 'When post state is not pending or pending_edit.'
+        message.error(result.message);
+      } else if (result.statusCode === 500) {
+        message.error(result.message);
+      } else {
+        message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
+      }
+    },
+    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy, intl],
+  );
+
+  // handle publish
   const handlePublish = useCallback(
     async (gateway: boolean) => {
       const { id } = history.location.query as Router.PostQuery;
@@ -298,33 +292,35 @@ const Edit: React.FC = () => {
         return;
       }
 
+      const siteConfig = await getDefaultSiteConfigAPI();
+      if (!siteConfig) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.noDefaultConfig',
+          }),
+        );
+        return;
+      }
+
       const result = await dbPostsGet(Number(id));
       // 转存草稿发布
-      if (result && result.draft) {
-        postPublishToPost({
-          mode: 'draft',
-          postId: result.draft.id,
+      if (result && result.post) {
+        postStorageUpdateFn({
+          post: result.post,
           gateway,
-        });
-      } else if (result && result.post) {
-        postPublishToPost({
-          mode: 'post',
-          postId: result.post.id,
-          gateway,
+          siteConfig,
         });
       } else {
-        postPublishToPost({
-          mode: 'local',
+        postStoragePublishFn({
           gateway,
+          siteConfig,
         });
       }
     },
-    [title, cover, content, postPublishToPost, intl],
+    [title, cover, content, postStorageUpdateFn, postStoragePublishFn, intl],
   );
 
-  /**
-   * handle history url state
-   */
+  // handle history url state
   const handleHistoryState = useCallback((id: string) => {
     window.history.replaceState({}, '', `?id=${id}`);
     history.location.query!.id = id;
@@ -336,7 +332,7 @@ const Edit: React.FC = () => {
   const asyncContentToDB = useCallback(
     async (val: string) => {
       setContent(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({
@@ -350,13 +346,14 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
     [handleHistoryState],
   );
 
   /**
-   * handle image upload to ipfs
+   * handle image upload to IPFS
+   * TODO: 如果图片失败下次跳过执行
    */
   const handleImageUploadToIpfs = useCallback(async () => {
     if (flagImageUploadToIpfs) return;
@@ -394,7 +391,7 @@ const Edit: React.FC = () => {
       for (let i = 0; i < imgListFilter.length; i++) {
         const ele = imgListFilter[i];
 
-        const result = await imageUploadByUrlAPI(ele.src);
+        const result = await imageUploadByUrlAPI(ele.src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI));
         if (result) {
           // _vditor.tip('上传成功', 2000);
           message.success(
@@ -428,14 +425,8 @@ const Edit: React.FC = () => {
     async (val: string) => {
       await asyncContentToDB(val);
       await handleImageUploadToIpfs();
-
-      // update draft content and sumary
-      await updateDraft({
-        content: val,
-        summary: generateSummary(),
-      });
     },
-    [asyncContentToDB, handleImageUploadToIpfs, updateDraft],
+    [asyncContentToDB, handleImageUploadToIpfs],
   );
 
   /**
@@ -444,7 +435,7 @@ const Edit: React.FC = () => {
   const asyncCoverToDB = useCallback(
     async (url: string) => {
       setCover(url);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ cover: url });
@@ -454,15 +445,9 @@ const Edit: React.FC = () => {
         const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
-
-      // update draft cover
-      await updateDraft({
-        cover: url,
-      });
-
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState, updateDraft],
+    [handleHistoryState],
   );
 
   /**
@@ -478,11 +463,6 @@ const Edit: React.FC = () => {
         const resultID = await dbPostsAdd(assign(PostTempData(), data));
         handleHistoryState(String(resultID));
       }
-
-      // update draft title
-      await updateDraft({
-        title: val,
-      });
     },
     { wait: 800 },
   );
@@ -493,11 +473,11 @@ const Edit: React.FC = () => {
   const handleChangeTitle = useCallback(
     async (val: string) => {
       setTitle(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       await asyncTitleToDB(val);
 
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
     [asyncTitleToDB],
   );
@@ -508,7 +488,7 @@ const Edit: React.FC = () => {
   const handleChangeTags = useCallback(
     async (val: string[]) => {
       setTags(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ tags: val });
@@ -519,14 +499,9 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // update draft tags
-      await updateDraft({
-        tags: val,
-      });
-
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState, updateDraft],
+    [handleHistoryState],
   );
 
   /**
@@ -535,7 +510,7 @@ const Edit: React.FC = () => {
   const handleChangeLicense = useCallback(
     async (val: string) => {
       setLicense(val);
-      setDraftMode(1);
+      setDraftMode(DraftMode.Saving);
 
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ license: val });
@@ -546,14 +521,9 @@ const Edit: React.FC = () => {
         handleHistoryState(String(resultID));
       }
 
-      // update draft license
-      await updateDraft({
-        license: val,
-      });
-
-      setDraftMode(2);
+      setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState, updateDraft],
+    [handleHistoryState],
   );
 
   /**
@@ -614,7 +584,8 @@ const Edit: React.FC = () => {
             </Fragment>
           </Settings>
         }
-        submit={<Submit handlePublish={handlePublish} />}
+        loading={publishLoading}
+        handlePublish={handlePublish}
       />
       <section className={styles.edit}>
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />

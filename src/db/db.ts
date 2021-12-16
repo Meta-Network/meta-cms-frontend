@@ -10,7 +10,7 @@ export class StoreDB extends Dexie {
   metadatas!: Table<Metadatas, number>;
   constructor() {
     super('StoreDB');
-    this.version(10)
+    this.version(11)
       .stores({
         posts:
           '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, createdAt, updatedAt',
@@ -28,7 +28,7 @@ export class StoreDB extends Dexie {
           post.hash = post.hash || '';
           post.status = post.status || 'pending';
           post.timestamp = post.timestamp || Date.now();
-          post.delete = post.delete || 0;
+          post.delete = post.delete || false;
           post.post = post.post || null;
           post.draft = post.draft || null;
           post.tags = post.tags || [];
@@ -38,7 +38,7 @@ export class StoreDB extends Dexie {
         });
         tx.metadatas.toCollection().modify((metadata: Metadatas) => {
           // console.log('Metadatas', metadata);
-          metadata.delete = metadata.delete || 0;
+          metadata.delete = metadata.delete || false;
         });
       });
   }
@@ -86,7 +86,7 @@ export const dbPostsDelete = async (id: number): Promise<void> => {
  * @returns
  */
 export const dbPostsDeleteAll = async (): Promise<number> => {
-  return await db.posts.where('delete').anyOf(0, 1).delete();
+  return await db.posts.toCollection().delete();
 };
 
 /**
@@ -94,7 +94,10 @@ export const dbPostsDeleteAll = async (): Promise<number> => {
  * @returns
  */
 export const dbPostsAll = async (): Promise<Posts[] | undefined> => {
-  return await db.posts.where('delete').equals(0).reverse().sortBy('updatedAt');
+  return await db.posts
+    .filter((i) => !i.delete)
+    .reverse()
+    .sortBy('updatedAt');
 };
 
 /**
@@ -102,7 +105,7 @@ export const dbPostsAll = async (): Promise<Posts[] | undefined> => {
  * @returns
  */
 export const dbPostsAllCount = async (): Promise<number> => {
-  return await db.posts.where('delete').equals(0).count();
+  return await db.posts.filter((i) => !i.delete).count();
 };
 
 /**
@@ -110,13 +113,13 @@ export const dbPostsAllCount = async (): Promise<number> => {
  */
 export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
   // 草稿删除了 允许重新编辑
-  const result = await db.posts.where('delete').equals(0).reverse().sortBy('id');
+  const result = await db.posts.filter((i) => !i.delete).toArray();
   return result.some((post) => post.post && Number(post.post.id) === id);
 };
 
 export const dbPostsWhereByID = async (id: number): Promise<Posts | undefined> => {
   // 草稿删除了 允许重新编辑
-  const result = await db.posts.where('delete').equals(0).reverse().sortBy('id');
+  const result = await db.posts.filter((i) => !i.delete).toArray();
   return result.find((post) => post.post && Number(post.post.id) === id);
 };
 
@@ -129,7 +132,7 @@ export const PostTempData = (): Posts => ({
   hash: '',
   status: 'pending',
   timestamp: Date.now(),
-  delete: 0,
+  delete: false,
   post: null,
   draft: null,
   tags: [],
@@ -142,7 +145,7 @@ export const PostTempData = (): Posts => ({
 
 // metadata data temp
 export const MetadataTempData = (): MetadataTempDataState => ({
-  delete: 0,
+  delete: false,
   createdAt: moment().toISOString(),
   updatedAt: moment().toISOString(),
 });
@@ -171,5 +174,5 @@ export const dbMetadatasUpdateByPostId = async <T>(postId: number, data: T): Pro
  * @returns
  */
 export const dbMetadatasDeleteAll = async (): Promise<number> => {
-  return await db.metadatas.where('delete').anyOf(0, 1).delete();
+  return await db.metadatas.toCollection().delete();
 };

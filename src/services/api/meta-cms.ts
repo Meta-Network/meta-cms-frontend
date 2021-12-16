@@ -109,12 +109,14 @@ export async function newSitePublishSetting(
 }
 
 /** 提交新的存储配置 POST /tasks/deploy-publish */
-export async function deployAndPublishSite(configId: number) {
+export async function deployAndPublishSite(data: {
+  configId: number;
+  authorPublishMetaSpaceRequestMetadataStorageType: string;
+  authorPublishMetaSpaceRequestMetadataRefer: string;
+}) {
   return request<GLOBAL.GeneralResponse<any>>('/tasks/deploy-publish', {
     method: 'POST',
-    data: {
-      configId,
-    },
+    data: data,
   });
 }
 
@@ -139,6 +141,35 @@ export async function getDefaultSiteConfig() {
 export async function syncPostsByPlatform(platform: string) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/sync/${platform}`, {
     method: 'POST',
+  });
+}
+
+/**
+ * fetch post sync
+ * @param params
+ * @returns
+ */
+export async function fetchPostSync(params: { page: number; limit: number; state: CMS.PostState }) {
+  return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>('/post/sync', {
+    method: 'GET',
+    params: params,
+  });
+}
+
+/**
+ * fetch Posts Storage by siteConfigId
+ * 暂不支持 limit
+ * @param siteConfigId
+ * @param params
+ * @returns
+ */
+export async function fetchPostsStorage(
+  siteConfigId: number,
+  params: { page: number; limit: number; draft: boolean },
+) {
+  return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>(`/post/storage/${siteConfigId}`, {
+    method: 'GET',
+    params: params,
   });
 }
 
@@ -220,19 +251,6 @@ export async function publishPost(data: CMS.LocalDraft) {
   });
 }
 
-/**
- * update draft
- * @param postId
- * @param data
- * @returns
- */
-export async function updatePost(postId: number, data: CMS.LocalDraft) {
-  return request<GLOBAL.GeneralResponse<CMS.Draft>>(`/post/${postId}`, {
-    method: 'PATCH',
-    data,
-  });
-}
-
 /** 发布若干篇待同步待文章 POST /post/publish */
 export async function publishPosts(postIds: number[], configIds: number[]) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/publish`, {
@@ -243,8 +261,43 @@ export async function publishPosts(postIds: number[], configIds: number[]) {
 
 /** 取消发布一篇待同步待文章 POST /post/{postId}/ignore */
 export async function ignorePendingPost(postId: number) {
-  return request<GLOBAL.GeneralResponse<any>>(`/post/${postId}/ignore`, {
+  return request<GLOBAL.GeneralResponse<any>>(`/post/sync/${postId}/ignore`, {
     method: 'POST',
+  });
+}
+/**
+ * 发布到用户储存
+ * Publish posts to user storage, state must be pending or pending_edit.
+ * If draft is true, post will publish as draft. For example: in Hexo platform, when draft is set true, will create a post file in _drafts folder.
+ * @param draft
+ * @param data
+ * @returns
+ */
+export async function postStoragePublish(draft: boolean, data: CMS.PostStoragePublishData) {
+  return request<GLOBAL.GeneralResponse<CMS.Post[]>>('/post/storage/publish', {
+    method: 'POST',
+    params: {
+      draft: draft,
+    },
+    data: data,
+  });
+}
+
+/**
+ * 更新到用户储存
+ * Update posts in user storage, state must be published or drafted
+ * If draft is true, will update draft post. For example: in Hexo platform, when draft is set true, will update post file in _drafts folder.
+ * @param draft
+ * @param data
+ * @returns
+ */
+export async function postStorageUpdate(draft: boolean, data: CMS.PostStorageUpdateData) {
+  return request<GLOBAL.GeneralResponse<CMS.Post>>('/post/storage/update', {
+    method: 'POST',
+    params: {
+      draft: draft,
+    },
+    data: data,
   });
 }
 

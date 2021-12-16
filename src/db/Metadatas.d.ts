@@ -12,13 +12,13 @@ export type Metadatas = {
     digestMetadataIpfs: Storage.Fleek;
     authorSignatureMetadataIpfs: Storage.Fleek;
   };
-  delete: 0 | 1;
+  delete: boolean;
   createdAt: string;
   updatedAt: string;
 };
 
 export type MetadataTempDataState = {
-  delete: 0 | 1;
+  delete: boolean;
   createdAt: string;
   updatedAt: string;
 };

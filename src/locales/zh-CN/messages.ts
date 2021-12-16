@@ -135,6 +135,8 @@ export default {
   'messages.redeployment.taskFailed.description': 'Meta Space 发布失败，请重新尝试或向开发团队反馈',
   'messages.redeployment.noSiteConfig': '您尚未创建 Meta Space',
   'messages.redeployment.button': '发布我的 Meta Space',
+  'messages.redeployment.uploadIPFS.fail': 'IPFS 上传失败',
+  'messages.redeployment.noKey': '没有 KEY',
   'messages.copy.success': '已复制到剪贴板',
   'messages.editor.noDefaultConfig': '获取默认配置失败',
   'messages.editor.success': '发布成功',

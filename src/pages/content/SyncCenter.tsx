@@ -1,9 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import {
   ignorePendingPost,
-  publishPostById,
   getDefaultSiteConfig,
-  fetchPostsPending,
+  fetchPostSync,
   getSourceStatus,
   publishPosts,
 } from '@/services/api/meta-cms';
@@ -17,8 +16,10 @@ import syncPostsRequest from '../../utils/sync-posts-request';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist, PostTempData } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
-import { imageUploadByUrlAPI, postByIdAPI, publishPostAsDraftAPI } from '@/helpers';
+import { imageUploadByUrlAPI } from '@/helpers';
 import styles from './SyncCenter.less';
+import { fetchIpfs } from '@/services/api/global';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
 
 const { confirm } = Modal;
 
@@ -44,33 +45,6 @@ export default () => {
   });
 
   const ref = useRef<ActionType>();
-
-  const publishSinglePost = async (record: PostInfo) => {
-    if (siteConfigId === null) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.description' }),
-      });
-      return;
-    }
-    if (getLockedConfigState(siteConfigId)) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.description' }),
-      });
-      return;
-    }
-    setLockedConfig(siteConfigId, true);
-    const done = message.loading(intl.formatMessage({ id: 'messages.syncCenter.publishPost' }), 0);
-    await publishPostById(record.id, [siteConfigId]);
-    setLockedConfig(siteConfigId, false);
-    done();
-    message.success(intl.formatMessage({ id: 'messages.syncCenter.publishPostSuccess' }));
-    setSiteNeedToDeploy(true);
-    if (ref.current?.reset) {
-      await ref.current?.reset();
-    }
-  };
 
   const publishMultiplePosts = async (selectedKeys: number[]) => {
     if (siteConfigId === null) {
@@ -125,7 +99,6 @@ export default () => {
         setTransferDraftLoading(false);
 
         const currentDraft = await dbPostsWhereByID(post.id);
-        console.log('currentDraft', currentDraft);
         const _url = currentDraft
           ? `/content/drafts/edit?id=${currentDraft.id}`
           : '/content/drafts';
@@ -140,53 +113,46 @@ export default () => {
         return;
       }
 
-      // console.log('post', post);
       const _post = cloneDeep(post);
 
       // image transfer ipfs
       if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
-        const result = await imageUploadByUrlAPI(_post.cover);
+        const result = await imageUploadByUrlAPI(
+          _post.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI),
+        );
         if (result) {
           message.success(intl.formatMessage({ id: 'messages.syncCenter.coverSavedSuccess' }));
           _post.cover = result.publicUrl;
         }
       }
 
-      // post publish draft
-      const _draft = await publishPostAsDraftAPI(Number(_post.id));
-      if (!_draft) {
-        message.error(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
+      try {
+        const postResult: { content: string } = await fetchIpfs(_post.source);
+        if (!postResult.content) {
+          message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
+          return;
+        }
+
+        // send local
+        const resultID = await dbPostsAdd(
+          assign(PostTempData(), {
+            cover: _post.cover,
+            title: _post.title,
+            summary: _post.summary || '',
+            content: postResult.content,
+            post: _post,
+            tags: _post.tags || [],
+            license: '',
+          }),
+        );
+
+        history.push(`/content/drafts/edit?id=${resultID}`);
+      } catch (e) {
+        console.error(e);
+        message.success(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
+      } finally {
         setTransferDraftLoading(false);
-        return;
       }
-      message.success(intl.formatMessage({ id: 'messages.syncCenter.savedSuccess' }));
-
-      // get draft content
-      const _draftData = await postByIdAPI(Number(_draft.id));
-      if (!_draftData) {
-        message.error(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
-        setTransferDraftLoading(false);
-        return;
-      }
-      message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentSuccess' }));
-
-      // send local
-      const resultID = await dbPostsAdd(
-        assign(PostTempData(), {
-          cover: _post.cover,
-          title: _post.title,
-          summary: _post.summary || '',
-          content: _draftData.content,
-          post: _post,
-          draft: _draftData,
-          tags: _draftData.tags || _post.tags || [],
-          license: _draftData.license || _post.license || '',
-        }),
-      );
-
-      history.push(`/content/drafts/edit?id=${resultID}`);
-
-      setTransferDraftLoading(false);
     },
     [intl],
   );
@@ -199,7 +165,7 @@ export default () => {
       render: (_, record) => (
         <Space>
           {record.cover ? (
-            <Image width={100} src={record.cover} />
+            <Image width={100} src={record.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI)} />
           ) : (
             intl.formatMessage({ id: 'messages.table.noCoverExists' })
           )}
@@ -280,14 +246,6 @@ export default () => {
       valueType: 'option',
       render: (_, record) => [
         <Button
-          key="option-publish"
-          onClick={() => publishSinglePost(record)}
-          // loading={postsLoadings[index] === LoadingStates.Publishing}
-          // disabled={postsLoadings[index] === LoadingStates.Discarding}
-        >
-          {intl.formatMessage({ id: 'component.button.publish' })}
-        </Button>,
-        <Button
           onClick={() => transferDraft(record)}
           loading={transferDraftLoading}
           ghost
@@ -359,7 +317,12 @@ export default () => {
         }}
         request={async ({ pageSize, current }) => {
           // TODO: 分页
-          const request = await fetchPostsPending(current ?? 1, pageSize ?? 10);
+          const params = {
+            page: current ?? 1,
+            limit: pageSize ?? 10,
+            state: 'pending' as CMS.PostState,
+          };
+          const request = await fetchPostSync(params);
           // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
           // 如果需要转化参数可以在这里进行修改
           return {
