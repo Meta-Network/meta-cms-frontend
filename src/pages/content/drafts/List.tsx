@@ -6,6 +6,7 @@ import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
 import { dbPostsUpdate, dbPostsAll, dbMetadatasUpdateByPostId } from '@/db/db';
 import type { Posts } from '@/db/Posts';
 import { strSlice } from '@/utils';
+import { queryCurrentUser } from '@/services/api/meta-ucenter';
 
 export default () => {
   const intl = useIntl();
@@ -26,8 +27,8 @@ export default () => {
   );
 
   /** fetch posts list */
-  const fetchPosts = useCallback(async () => {
-    const result = await dbPostsAll();
+  const fetchPosts = useCallback(async (userId: number) => {
+    const result = await dbPostsAll(userId);
     if (result) {
       setPostsList(result);
     }
@@ -148,8 +149,16 @@ export default () => {
     },
   ];
 
+  /** fetch current user */
+  const fetchCurrentUser = useCallback(async () => {
+    const result = await queryCurrentUser();
+    if (result.statusCode === 200) {
+      fetchPosts(result.data.id);
+    }
+  }, [fetchPosts]);
+
   useMount(() => {
-    fetchPosts();
+    fetchCurrentUser();
   });
 
   return (

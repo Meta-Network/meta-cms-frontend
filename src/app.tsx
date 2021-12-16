@@ -98,20 +98,21 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
   }
 
-  // local draft count
-  const localDraftCount = await dbPostsAllCount();
-
   const state: GLOBAL.InitialState = {
     fetchUserInfo,
     invitationsCount,
     publishedCount,
-    localDraftCount,
+    localDraftCount: 0,
     siteConfig,
   };
 
   if (history.location.pathname !== '/user/login') {
     const currentUser = await fetchUserInfo();
-    if (currentUser) state.currentUser = currentUser;
+    if (currentUser) {
+      state.currentUser = currentUser;
+      // local draft count
+      state.localDraftCount = await dbPostsAllCount(currentUser!.id);
+    }
   }
 
   if (isMobile()) {

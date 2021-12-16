@@ -10,10 +10,10 @@ export class StoreDB extends Dexie {
   metadatas!: Table<Metadatas, number>;
   constructor() {
     super('StoreDB');
-    this.version(11)
+    this.version(12)
       .stores({
         posts:
-          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, createdAt, updatedAt',
+          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, userId ,createdAt, updatedAt',
         metadatas: '++id, postId, metadata, delete, createdAt, updatedAt',
       })
       .upgrade((tx: Transaction | any) => {
@@ -33,6 +33,7 @@ export class StoreDB extends Dexie {
           post.draft = post.draft || null;
           post.tags = post.tags || [];
           post.license = post.license || License;
+          post.userId = post.userId || 0;
           post.createdAt = post.createdAt || time;
           post.updatedAt = post.updatedAt || time;
         });
@@ -91,25 +92,29 @@ export const dbPostsDeleteAll = async (): Promise<number> => {
 
 /**
  * db posts all
+ * @param userId
  * @returns
  */
-export const dbPostsAll = async (): Promise<Posts[] | undefined> => {
+export const dbPostsAll = async (userId: number): Promise<Posts[] | undefined> => {
   return await db.posts
-    .filter((i) => !i.delete)
+    .filter((i) => !i.delete && i.userId === userId)
     .reverse()
     .sortBy('updatedAt');
 };
 
 /**
  * db posts all counter
+ * @param userId
  * @returns
  */
-export const dbPostsAllCount = async (): Promise<number> => {
-  return await db.posts.filter((i) => !i.delete).count();
+export const dbPostsAllCount = async (userId: number): Promise<number> => {
+  return await db.posts.filter((i) => !i.delete && i.userId === userId).count();
 };
 
 /**
  * db posts where exist by id
+ * @param id
+ * @returns
  */
 export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
   // 草稿删除了 允许重新编辑
@@ -137,6 +142,7 @@ export const PostTempData = (): Posts => ({
   draft: null,
   tags: [],
   license: License,
+  userId: 0,
   createdAt: moment().toISOString(),
   updatedAt: moment().toISOString(),
 });

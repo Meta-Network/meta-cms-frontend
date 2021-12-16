@@ -34,16 +34,17 @@ import { mergedMessage } from '@/utils';
 import moment from 'moment';
 import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../../config';
 import { DraftMode } from '@/services/constants';
+import { queryCurrentUser } from '@/services/api/meta-ucenter';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
-  // post data
   const [postData, setPostData] = useState<Posts>({} as Posts);
   const [cover, setCover] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [license, setLicense] = useState<string>('');
+  const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
 
   // draft mode
   const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
@@ -55,6 +56,11 @@ const Edit: React.FC = () => {
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   const { setSiteNeedToDeploy } = useModel('storage');
+
+  const postTempDataMergedUserId = useCallback(
+    () => assign(PostTempData(), { userId: currentUser?.id }),
+    [currentUser],
+  );
 
   // upload metadata
   const uploadMetadataFn = useCallback(
@@ -342,13 +348,13 @@ const Edit: React.FC = () => {
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId],
   );
 
   /**
@@ -442,12 +448,12 @@ const Edit: React.FC = () => {
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId],
   );
 
   /**
@@ -460,7 +466,7 @@ const Edit: React.FC = () => {
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
     },
@@ -495,13 +501,13 @@ const Edit: React.FC = () => {
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId],
   );
 
   /**
@@ -517,13 +523,13 @@ const Edit: React.FC = () => {
       if (id) {
         await dbPostsUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId],
   );
 
   /**
@@ -554,8 +560,19 @@ const Edit: React.FC = () => {
     }
   }, [handleImageUploadToIpfs]);
 
+  /** fetch current user */
+  const fetchCurrentUser = useCallback(async () => {
+    const result = await queryCurrentUser();
+    if (result.statusCode === 200) {
+      setCurrentUser(result.data);
+    } else {
+      history.push('/content/drafts');
+    }
+  }, []);
+
   useMount(() => {
     fetchDBContent();
+    fetchCurrentUser();
   });
 
   useEffect(() => {
