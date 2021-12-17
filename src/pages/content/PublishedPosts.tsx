@@ -116,7 +116,7 @@ export default () => {
   return (
     <PageContainer
       breadcrumb={{}}
-      title={intl.formatMessage({ id: 'messages.published.table.title' })}
+      title={intl.formatMessage({ id: 'messages.published.title' })}
       content={<FormattedDescription id="messages.published.description" />}
     >
       <ProTable<CMS.Post>

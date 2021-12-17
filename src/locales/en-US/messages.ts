@@ -49,14 +49,16 @@ export default {
     'The storage repository already exists, please set a new name',
   'messages.store.form.repoName': 'Please set the name of the storage repository',
   'messages.store.form.repoNameAvailable': 'This name is available!',
+  'messages.store.form.sameRepoName':
+    'The names of the repositories should not be the same, please set a new name',
   'messages.invitation.title': 'Invitation code management',
   'messages.invitation.description':
     'Manage the invitation codes you have here.\nYou can edit the invitation information below to customize the information that the other party will accept after sending.',
-  'messages.invitation.cardTitle': 'Invitation code #{id}',
+  'messages.invitation.inviteMessage':
+    'Hi, Meta Network Natives are inviting you to be their neighbors!，visit https://home.metanetwork.online，join us with your invitation code! ',
   'messages.info.updateSuccess': 'Information update completed',
   'messages.info.updateFailed': 'Information update failed',
   'messages.info.copySuccess': 'Copy successfully',
-  'messages.invitation.cardLabel': 'Invitation code',
   'messages.invitation.editInfoHere': 'You can edit the information here',
   'messages.invitation.inviteeLabel': 'Invited people',
   'messages.invitation.inviteeName': 'The name of the invitee',
@@ -180,7 +182,6 @@ export default {
   'messages.editor.submit.generateKey.fail': 'Generated failed',
   'messages.editor.submit.bindStorage': 'Please bind GitHub',
   'messages.editor.submit.uploadMetadata.fail': 'Failed to upload metadata, please try again!',
-  'messages.invitation.card.title': 'Invitation code #{codeId}',
   'messages.delete.success': 'deleted successfully',
   'messages.delete.fail': 'delete failed',
   'messages.dashboard.lastPublishDate': 'Last publish date: {time, time, ::yyyyMMddHHmmss}',

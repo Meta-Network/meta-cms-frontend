@@ -22,7 +22,6 @@ export default {
   'component.button.regenerate': '重新生成',
   'component.status.alreadyBound': '已绑定',
   'component.status.notBound': '未绑定',
-  'component.badge.invitationAvailable': '邀请码可用',
-  'component.badge.invitationUsed': '邀请码已使用',
+  'component.status.used': '已使用',
   'component.full.tip': '如遇到页面失去反馈，可手动关闭！',
 };
