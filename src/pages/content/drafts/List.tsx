@@ -1,38 +1,47 @@
-import { useState, useCallback } from 'react';
-import { history, useIntl } from 'umi';
+import { useState, useCallback, useEffect } from 'react';
+import { history, useIntl, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { useMount } from 'ahooks';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
-import { dbPostsUpdate, dbPostsAll, dbMetadatasUpdateByPostId } from '@/db/db';
+import { dbPostsUpdate, dbMetadatasUpdateByPostId } from '@/db/db';
 import type { Posts } from '@/db/Posts';
 import { strSlice } from '@/utils';
-import { queryCurrentUser } from '@/services/api/meta-ucenter';
+import { twoWaySync, deleteDraft } from '@/utils/gun';
+import type { GunDraft } from '@/utils/gun';
 
 export default () => {
   const intl = useIntl();
-  const [postsList, setPostsList] = useState<Posts[]>([]);
+  const [postsList, setPostsList] = useState<GunDraft[]>([]);
+  const { initialState } = useModel('@@initialState');
 
   /** handle delete */
   const handleDelete = useCallback(
-    async (id: number) => {
+    async (id: number, key?: string) => {
       await dbPostsUpdate(id, { delete: 1 });
       await dbMetadatasUpdateByPostId(id, { delete: 1 });
+
+      if (key) {
+        deleteDraft({
+          userId: initialState!.currentUser!.id,
+          key: key,
+        });
+      }
+
       message.success(
         intl.formatMessage({
           id: 'posts.table.action.delete.success',
         }),
       );
     },
-    [intl],
+    [intl, initialState],
   );
 
   /** fetch posts list */
-  const fetchPosts = useCallback(async (userId: number) => {
-    const result = await dbPostsAll(userId);
-    if (result) {
-      setPostsList(result);
+  const fetchPosts = useCallback(async () => {
+    if (initialState?.currentUser) {
+      const response = await twoWaySync(initialState.currentUser);
+      setPostsList(response);
     }
-  }, []);
+  }, [initialState]);
 
   const columns = [
     {
@@ -102,7 +111,7 @@ export default () => {
       dataIndex: 'status',
       key: 'status',
       width: 180,
-      render: (val: string, record: Posts) => (
+      render: (val: string, record: GunDraft) => (
         <Space>
           {val === 'pending' ? (
             <Button
@@ -127,7 +136,7 @@ export default () => {
             onConfirm={async (e) => {
               e?.stopPropagation();
               console.log(record);
-              await handleDelete(Number(record.id));
+              await handleDelete(Number(record.id), record?.key);
               await fetchPosts();
             }}
             onCancel={(e) => e?.stopPropagation()}
@@ -149,17 +158,9 @@ export default () => {
     },
   ];
 
-  /** fetch current user */
-  const fetchCurrentUser = useCallback(async () => {
-    const result = await queryCurrentUser();
-    if (result.statusCode === 200) {
-      fetchPosts(result.data.id);
-    }
+  useEffect(() => {
+    fetchPosts();
   }, [fetchPosts]);
-
-  useMount(() => {
-    fetchCurrentUser();
-  });
 
   return (
     <PageContainer
