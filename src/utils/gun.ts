@@ -9,6 +9,7 @@ import {
   KEY_GUN_ROOT_DRAFT,
   KEY_META_CMS_GUN_SEED,
   KEY_META_CMS_GUN_PAIR,
+  GUN_PEERS,
 } from '../../config';
 import { storeGet, storeSet } from './store';
 import { generateSeed, generateKeys } from '@metaio/meta-signature-util';
@@ -88,7 +89,7 @@ export const signIn = (gun: any): Promise<void> => {
 export const initGun = () => {
   console.log('> Gun constructor!');
   const gun = new Gun({
-    peers: ['http://gun-manhattan.herokuapp.com/gun'],
+    peers: GUN_PEERS,
   });
 
   signIn(gun);
