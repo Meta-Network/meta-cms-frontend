@@ -1,13 +1,17 @@
-import { fetchPostsPublished } from '@/services/api/meta-cms';
+import { useState } from 'react';
+import { fetchPostsStorage } from '@/services/api/meta-cms';
 import { FormattedMessage, useIntl } from 'umi';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Button, Image, Space, Typography } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 import { generateDataViewerLink } from '@/utils/editor';
+import { FetchPostsStorageParamsState } from '@/services/constants';
+import { getDefaultSiteConfigAPI } from '@/helpers';
 
 export default () => {
   const intl = useIntl();
+  const [siteConfigDefault, setSiteConfigDefault] = useState<CMS.SiteConfiguration | undefined>();
 
   const columns: ProColumns<CMS.Post>[] = [
     {
@@ -108,15 +112,31 @@ export default () => {
     },
   ];
 
-  async function fetchPostsSubmitted(page: number, limit: number) {
-    return await fetchPostsPublished(page, limit);
-  }
-
   return (
     <ProTable<CMS.Post>
       columns={columns}
       request={async ({ pageSize, current }) => {
-        const request = await fetchPostsSubmitted(current ?? 1, pageSize ?? 10);
+        let _siteConfigDefault: CMS.SiteConfiguration | undefined;
+
+        if (!siteConfigDefault?.id) {
+          _siteConfigDefault = await getDefaultSiteConfigAPI();
+          if (_siteConfigDefault) {
+            setSiteConfigDefault(_siteConfigDefault);
+          } else {
+            return { success: false };
+          }
+        }
+
+        const params = {
+          page: current ?? 1,
+          limit: pageSize ?? 10,
+          state: FetchPostsStorageParamsState.Posted,
+        };
+        const request = await fetchPostsStorage(
+          siteConfigDefault?.id || _siteConfigDefault!.id,
+          params,
+        );
+
         // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
         // 如果需要转化参数可以在这里进行修改
         if (request?.data) {

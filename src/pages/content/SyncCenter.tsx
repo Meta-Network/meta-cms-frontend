@@ -20,6 +20,8 @@ import { imageUploadByUrlAPI } from '@/helpers';
 import styles from './SyncCenter.less';
 import { fetchIpfs } from '@/services/api/global';
 import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
+import { useMount } from 'ahooks';
+import { queryCurrentUser } from '@/services/api/meta-ucenter';
 
 const { confirm } = Modal;
 
@@ -33,14 +35,11 @@ export default () => {
   const [transferDraftLoading, setTransferDraftLoading] = useState<boolean>(false);
   const { getLockedConfigState, setLockedConfig } = useModel('global');
   const { setSiteNeedToDeploy } = useModel('storage');
-  // const [siteConfiguration, setSiteConfiguration] = useState<CMS.SiteConfiguration>(
-  //   {} as CMS.SiteConfiguration,
-  // );
+  const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
 
   getDefaultSiteConfig().then((response) => {
     if (response.statusCode === 200) {
       setSiteConfigId(response.data.id);
-      // setSiteConfiguration(response.data);
     }
   });
 
@@ -91,6 +90,10 @@ export default () => {
    */
   const transferDraft = useCallback(
     async (post: CMS.Post) => {
+      if (!currentUser?.id) {
+        return;
+      }
+
       setTransferDraftLoading(true);
 
       // check save as draft
@@ -143,6 +146,7 @@ export default () => {
             post: _post,
             tags: _post.tags || [],
             license: '',
+            userId: currentUser?.id,
           }),
         );
 
@@ -154,8 +158,20 @@ export default () => {
         setTransferDraftLoading(false);
       }
     },
-    [intl],
+    [intl, currentUser],
   );
+
+  /** fetch current user */
+  const fetchCurrentUser = useCallback(async () => {
+    const result = await queryCurrentUser();
+    if (result.statusCode === 200) {
+      setCurrentUser(result.data);
+    }
+  }, []);
+
+  useMount(() => {
+    fetchCurrentUser();
+  });
 
   const columns: ProColumns<PostInfo>[] = [
     {
