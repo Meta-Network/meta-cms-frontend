@@ -31,6 +31,12 @@ export enum StorageKeys {
   ThemeSetting = 'themeSetting',
 }
 
+export enum FetchPostsStorageParamsState {
+  Drafted = 'drafted',
+  Posted = 'posted',
+  Published = 'published',
+}
+
 export const Storages = [
   {
     title: 'guide.domain.title',

@@ -7,6 +7,7 @@ import { fetchPostsStorage } from '@/services/api/meta-cms';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import FormattedDescription from '@/components/FormattedDescription';
 import { getDefaultSiteConfigAPI } from '@/helpers';
+import { FetchPostsStorageParamsState } from '@/services/constants';
 
 export default () => {
   const intl = useIntl();
@@ -137,7 +138,7 @@ export default () => {
           const params = {
             page: current ?? 1,
             limit: pageSize ?? 10,
-            draft: false,
+            state: FetchPostsStorageParamsState.Published,
           };
           const request = await fetchPostsStorage(
             siteConfigDefault?.id || _siteConfigDefault!.id,
