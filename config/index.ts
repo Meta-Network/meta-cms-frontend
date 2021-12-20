@@ -20,6 +20,6 @@ export const OSS_MATATAKI_FEUSE = 'https://ssimg.frontenduse.top';
 export const OSS_MATATAKI = 'https://smartsignature-img.oss-cn-hongkong.aliyuncs.com';
 
 // Gun Config
-export const GUN_PEERS = ['http://gun-manhattan.herokuapp.com/gun'];
+export const GUN_PEERS = ['https://gun-manhattan.herokuapp.com/gun'];
 export const KEY_GUN_ROOT = 'meta.io_v7';
 export const KEY_GUN_ROOT_DRAFT = 'cms_draft';
