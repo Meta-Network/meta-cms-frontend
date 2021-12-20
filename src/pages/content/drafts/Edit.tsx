@@ -16,7 +16,7 @@ import {
 } from '@/db/db';
 import type { Posts } from '@/db/Posts.d';
 import { imageUploadByUrlAPI, getDefaultSiteConfigAPI } from '@/helpers';
-import { assign } from 'lodash';
+import { assign, cloneDeep } from 'lodash';
 // import type Vditor from 'vditor';
 import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
@@ -32,29 +32,174 @@ import type { PostMetadata } from '@metaio/meta-signature-util';
 import { postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
 import moment from 'moment';
-import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../../config';
+import {
+  OSS_MATATAKI,
+  OSS_MATATAKI_FEUSE,
+  KEY_GUN_ROOT,
+  KEY_GUN_ROOT_DRAFT,
+  KEY_META_CMS_GUN_PAIR,
+} from '../../../../config';
 import { DraftMode } from '@/services/constants';
+import Gun from 'gun';
+import {
+  fetchGunDraftsAndUpdateLocal,
+  syncNewDraft,
+  syncDraft,
+  fetchGunDrafts,
+  signIn,
+} from '@/utils/gun';
+import { storeGet } from '@/utils/store';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
-  // post data
   const [postData, setPostData] = useState<Posts>({} as Posts);
   const [cover, setCover] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [license, setLicense] = useState<string>('');
-
-  // draft mode
   const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
   // vditor
   // const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
-  // publish loading
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   const { setSiteNeedToDeploy } = useModel('storage');
+  const { initialState } = useModel('@@initialState');
+
+  const postTempDataMergedUserId = useCallback(
+    () => assign(PostTempData(), { userId: initialState?.currentUser?.id }),
+    [initialState],
+  );
+
+  // watch current draft
+  const watchCurrentDraft = useCallback(
+    async (id: number) => {
+      if (!initialState?.currentUser?.id) {
+        return;
+      }
+      const draft = await dbPostsGet(id);
+
+      if (!draft) {
+        return;
+      }
+
+      const { currentUser } = initialState;
+      const userScope = `user_${currentUser.id}`;
+      const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
+
+      // 获取所有草稿找到 key
+      const gunAllDrafts = await fetchGunDrafts({
+        gunDraft: _gun,
+        scope: userScope,
+        userId: currentUser.id,
+      });
+
+      const draftFind: any = gunAllDrafts.find(
+        (i) => String(i.timestamp) === String(draft.timestamp) && i.userId === currentUser.id,
+      );
+
+      const updateDraftFn = async (data: string) => {
+        const pair = JSON.parse(storeGet(KEY_META_CMS_GUN_PAIR) || '""');
+        if (!pair) {
+          return;
+        }
+
+        // 解密
+        const msg = await Gun.SEA.verify(data, pair.pub);
+        const gunDraft = (await Gun.SEA.decrypt(msg, pair)) as Posts;
+
+        // 如果文章变动
+        if (
+          moment(draft.updatedAt).isBefore(gunDraft.updatedAt) &&
+          draft.userId === gunDraft.userId
+        ) {
+          // 监测到更新，立即本地更新
+          const _data = assign(draft, gunDraft);
+          const updateData: any = cloneDeep(_data);
+          delete updateData.key;
+
+          await dbPostsUpdate(updateData.id!, updateData);
+        }
+      };
+
+      if (draftFind && draftFind?.key) {
+        _gun
+          .get(userScope)
+          .get(draftFind.key)
+          .on((data: any) => {
+            if (data) {
+              updateDraftFn(data);
+            }
+          });
+      }
+    },
+    [initialState],
+  );
+
+  // handle history url state
+  const handleHistoryState = useCallback(
+    (id: string) => {
+      window.history.replaceState({}, '', `?id=${id}`);
+      history.location.query!.id = id;
+
+      if (initialState?.currentUser?.id) {
+        // 同步新草稿
+        syncNewDraft({
+          id: Number(id),
+          userId: initialState.currentUser.id!,
+        });
+      }
+    },
+    [initialState],
+  );
+
+  // 处理更新
+  const handleUpdate = useCallback(
+    async (id: number, data: any) => {
+      // local update
+      await dbPostsUpdate(id, data);
+
+      // gun.js update
+      // 更新到 gun.js
+      if (!initialState?.currentUser?.id) {
+        return;
+      }
+
+      const { currentUser } = initialState;
+      const draft = await dbPostsGet(id);
+
+      const userScope = `user_${currentUser.id}`;
+      const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
+
+      const gunAllDrafts = await fetchGunDrafts({
+        gunDraft: _gun,
+        scope: userScope,
+        userId: currentUser.id,
+      });
+
+      const draftFind: any = gunAllDrafts.find(
+        (i) => String(i.timestamp) === String(draft?.timestamp) && i.userId === currentUser.id,
+      );
+
+      // 更新草稿
+      if (draftFind && draftFind?.key) {
+        syncDraft({
+          userId: currentUser.id,
+          key: draftFind?.key,
+          data: draft,
+        });
+      } else {
+        // 如果文章在 gun 被删了
+        syncNewDraft({
+          id: id,
+          userId: currentUser.id,
+        });
+      }
+    },
+    [initialState],
+  );
 
   // upload metadata
   const uploadMetadataFn = useCallback(
@@ -176,7 +321,7 @@ const Edit: React.FC = () => {
         };
 
         const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
+        await handleUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
 
         setSiteNeedToDeploy(true);
         history.push('/content/drafts');
@@ -193,7 +338,17 @@ const Edit: React.FC = () => {
         message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
       }
     },
-    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy, intl],
+    [
+      title,
+      cover,
+      content,
+      tags,
+      license,
+      uploadMetadataFn,
+      setSiteNeedToDeploy,
+      intl,
+      handleUpdate,
+    ],
   );
 
   // publish
@@ -237,7 +392,7 @@ const Edit: React.FC = () => {
         message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
         const { id } = history.location.query as Router.PostQuery;
-        await dbPostsUpdate(
+        await handleUpdate(
           Number(id),
           postDataMergedUpdateAt({ post: result.data[0], draft: null }),
         );
@@ -257,7 +412,17 @@ const Edit: React.FC = () => {
         message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
       }
     },
-    [title, cover, content, tags, license, uploadMetadataFn, setSiteNeedToDeploy, intl],
+    [
+      title,
+      cover,
+      content,
+      tags,
+      license,
+      uploadMetadataFn,
+      setSiteNeedToDeploy,
+      handleUpdate,
+      intl,
+    ],
   );
 
   // handle publish
@@ -320,12 +485,6 @@ const Edit: React.FC = () => {
     [title, cover, content, postStorageUpdateFn, postStoragePublishFn, intl],
   );
 
-  // handle history url state
-  const handleHistoryState = useCallback((id: string) => {
-    window.history.replaceState({}, '', `?id=${id}`);
-    history.location.query!.id = id;
-  }, []);
-
   /**
    * async content to DB
    */
@@ -340,15 +499,15 @@ const Edit: React.FC = () => {
         summary: generateSummary(),
       });
       if (id) {
-        await dbPostsUpdate(Number(id), data);
+        await handleUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId, handleUpdate],
   );
 
   /**
@@ -440,14 +599,14 @@ const Edit: React.FC = () => {
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ cover: url });
       if (id) {
-        await dbPostsUpdate(Number(id), data);
+        await handleUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId, handleUpdate],
   );
 
   /**
@@ -458,9 +617,9 @@ const Edit: React.FC = () => {
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ title: val });
       if (id) {
-        await dbPostsUpdate(Number(id), data);
+        await handleUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
     },
@@ -493,15 +652,15 @@ const Edit: React.FC = () => {
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ tags: val });
       if (id) {
-        await dbPostsUpdate(Number(id), data);
+        await handleUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId, handleUpdate],
   );
 
   /**
@@ -515,15 +674,15 @@ const Edit: React.FC = () => {
       const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({ license: val });
       if (id) {
-        await dbPostsUpdate(Number(id), data);
+        await handleUpdate(Number(id), data);
       } else {
-        const resultID = await dbPostsAdd(assign(PostTempData(), data));
+        const resultID = await dbPostsAdd(assign(postTempDataMergedUserId(), data));
         handleHistoryState(String(resultID));
       }
 
       setDraftMode(DraftMode.Saved);
     },
-    [handleHistoryState],
+    [handleHistoryState, postTempDataMergedUserId, handleUpdate],
   );
 
   /**
@@ -546,16 +705,31 @@ const Edit: React.FC = () => {
 
         // TODO：need modify
         setTimeout(() => {
-          (window as any).vditor!.setValue(resultPost.content);
-          // handle all image
-          handleImageUploadToIpfs();
+          if ((window as any).vditor) {
+            (window as any).vditor!.setValue(resultPost.content);
+            // handle all image
+            handleImageUploadToIpfs();
+          }
         }, 1000);
       }
     }
   }, [handleImageUploadToIpfs]);
 
   useMount(() => {
-    fetchDBContent();
+    if (initialState?.currentUser) {
+      fetchGunDraftsAndUpdateLocal(initialState.currentUser).then(() => {
+        fetchDBContent();
+      });
+
+      // 初始化监听
+      const { id } = history.location.query as Router.PostQuery;
+      if (id) {
+        // 有草稿的监听
+        signIn((window as any).gun).then(() => {
+          watchCurrentDraft(Number(id));
+        });
+      }
+    }
   });
 
   useEffect(() => {

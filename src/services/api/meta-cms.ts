@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { extendWithErrorHandler } from '@/services/api/base-request';
+import type { FetchPostsStorageParamsState } from '../constants';
 
 const request = extendWithErrorHandler({
   credentials: 'include',
@@ -165,7 +166,7 @@ export async function fetchPostSync(params: { page: number; limit: number; state
  */
 export async function fetchPostsStorage(
   siteConfigId: number,
-  params: { page: number; limit: number; draft: boolean },
+  params: { page: number; limit: number; state: FetchPostsStorageParamsState },
 ) {
   return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>(`/post/storage/${siteConfigId}`, {
     method: 'GET',

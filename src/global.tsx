@@ -1,9 +1,14 @@
 import { Button, message, notification } from 'antd';
 import { useIntl } from 'umi';
 import defaultSettings from '../config/defaultSettings';
+import { initGun } from './utils/gun';
 
 const { pwa } = defaultSettings;
 const isHttps = document.location.protocol === 'https:';
+
+if (!(window as any).gun) {
+  initGun();
+}
 
 // if pwa is true
 if (pwa) {
