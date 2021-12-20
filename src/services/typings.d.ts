@@ -384,3 +384,14 @@ declare namespace NETWORK {
     inviterUserId: number;
   };
 }
+
+declare namespace MATATAKI {
+  type GenericPostMetadata = {
+    content?: string;
+    iv?: string;
+    encryptedData?: string;
+  };
+  type PostMetadata = {
+    content: string;
+  };
+}
