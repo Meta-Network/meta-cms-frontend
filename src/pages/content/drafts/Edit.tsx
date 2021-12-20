@@ -109,8 +109,7 @@ const Edit: React.FC = () => {
           moment(draft.updatedAt).isBefore(gunDraft.updatedAt) &&
           draft.userId === gunDraft.userId
         ) {
-          console.log('监测到更新，立即本地更新');
-
+          // 监测到更新，立即本地更新
           const _data = assign(draft, gunDraft);
           const updateData: any = cloneDeep(_data);
           delete updateData.key;
@@ -719,8 +718,7 @@ const Edit: React.FC = () => {
       // 初始化监听
       const { id } = history.location.query as Router.PostQuery;
       if (id) {
-        // console.log('有草稿的监听');
-
+        // 有草稿的监听
         signIn((window as any).gun).then(() => {
           watchCurrentDraft(Number(id));
         });
