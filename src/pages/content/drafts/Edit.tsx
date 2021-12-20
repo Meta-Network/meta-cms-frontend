@@ -41,7 +41,13 @@ import {
 } from '../../../../config';
 import { DraftMode } from '@/services/constants';
 import Gun from 'gun';
-import { twoWaySync, syncNewDraft, syncDraft, fetchGunDrafts, signIn } from '@/utils/gun';
+import {
+  fetchGunDraftsAndUpdateLocal,
+  syncNewDraft,
+  syncDraft,
+  fetchGunDrafts,
+  signIn,
+} from '@/utils/gun';
 import { storeGet } from '@/utils/store';
 
 const Edit: React.FC = () => {
@@ -711,7 +717,7 @@ const Edit: React.FC = () => {
 
   useMount(() => {
     if (initialState?.currentUser) {
-      twoWaySync(initialState.currentUser).then(() => {
+      fetchGunDraftsAndUpdateLocal(initialState.currentUser).then(() => {
         fetchDBContent();
       });
 

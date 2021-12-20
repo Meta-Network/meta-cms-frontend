@@ -5,7 +5,7 @@ import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
 import { dbPostsUpdate, dbMetadatasUpdateByPostId } from '@/db/db';
 import type { Posts } from '@/db/Posts';
 import { strSlice } from '@/utils';
-import { twoWaySync, deleteDraft } from '@/utils/gun';
+import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
 import type { GunDraft } from '@/utils/gun';
 
 export default () => {
@@ -38,7 +38,7 @@ export default () => {
   /** fetch posts list */
   const fetchPosts = useCallback(async () => {
     if (initialState?.currentUser) {
-      const response = await twoWaySync(initialState.currentUser);
+      const response = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
       setPostsList(response);
     }
   }, [initialState]);

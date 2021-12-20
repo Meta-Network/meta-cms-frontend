@@ -25,11 +25,10 @@ type SyncLocalDraftsArgs = {
   drafts: Posts[];
   gunDrafts: GunDraft[];
 };
-// type SyncGunDraftsArgs = {
-//   gunDraft: any;
-//   scope: string;
-//   drafts: any[];
-// };
+type SyncGunDraftsArgs = {
+  drafts: GunDraft[];
+  userId: number;
+};
 type SyncNewDraftArgs = {
   id: number;
   userId: number;
@@ -51,7 +50,7 @@ export const signIn = (gun: any): Promise<void> => {
    *  没有 用户注册, 生成 pair
    */
 
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
     // pair
     const gunPair = JSON.parse(storeGet(KEY_META_CMS_GUN_PAIR) || '""');
     if (gunPair) {
@@ -72,6 +71,7 @@ export const signIn = (gun: any): Promise<void> => {
         resolve();
       } else {
         console.log('fail');
+        reject();
       }
     } else {
       const seed: string[] = generateSeed();
@@ -208,30 +208,117 @@ export const syncLocalDrafts = ({ drafts, gunDrafts }: SyncLocalDraftsArgs): Pro
 };
 
 /**
+ * sync New Draft
+ * @param param0
+ * @returns
+ */
+export const syncNewDraft = async ({ id, userId }: SyncNewDraftArgs): Promise<void> => {
+  await signIn((window as any).gun);
+
+  const userScope = `user_${userId}`;
+  const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
+  const draft = await dbPostsGet(id);
+
+  const pair = JSON.parse(storeGet(KEY_META_CMS_GUN_PAIR) || '""');
+  if (!pair) {
+    return;
+  }
+
+  // 加密
+  const enc = await Gun.SEA.encrypt(JSON.stringify(draft), pair);
+  const dataMsg = await Gun.SEA.sign(enc, pair);
+
+  _gun.get(userScope).set(dataMsg);
+};
+
+/**
+ * sync Draft
+ * @param param0
+ */
+export const syncDraft = async ({ userId, key, data }: SyncDraftArgs): Promise<void> => {
+  await signIn((window as any).gun);
+
+  const userScope = `user_${userId}`;
+  const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
+
+  const pair = JSON.parse(storeGet(KEY_META_CMS_GUN_PAIR) || '""');
+  if (!pair) {
+    return;
+  }
+
+  // 加密
+  const enc = await Gun.SEA.encrypt(JSON.stringify(data), pair);
+  const dataMsg = await Gun.SEA.sign(enc, pair);
+
+  _gun.get(userScope).get(key).put(dataMsg);
+};
+
+/**
  * sync gun drafts
  * @param param0 SyncGunDraftsArgs
  * @returns
  */
-// export const syncGunDrafts = ({ gunDraft, scope, drafts }: SyncGunDraftsArgs): Promise<void> => {
-//   return new Promise((resolve) => {
-//     const draftsClone = cloneDeep(drafts);
-//     for (let i = 0; i < draftsClone.length; i++) {
-//       const ele = draftsClone[i];
-//       if (ele.key) {
-//         gunDraft.get(scope).get(ele.key).put(JSON.stringify(ele));
-//       } else {
-//         // gunDraft.get(scope).set(JSON.stringify(ele));
-//       }
-//     }
-//     resolve();
-//   });
-// };
+export const syncGunDrafts = ({ drafts, userId }: SyncGunDraftsArgs): Promise<void> => {
+  return new Promise(async (resolve) => {
+    const draftsClone = cloneDeep(drafts);
+    for (let i = 0; i < draftsClone.length; i++) {
+      const ele = draftsClone[i];
+      if (ele.key) {
+        await syncDraft({
+          userId,
+          key: ele.key,
+          data: ele,
+        });
+      } else {
+        await syncNewDraft({
+          id: ele.id!,
+          userId,
+        });
+      }
+    }
+    resolve();
+  });
+};
 
 /**
  * two way sync
  * @param user
  */
-export const twoWaySync = async (user: GLOBAL.CurrentUser): Promise<GunDraft[]> => {
+export const fetchGunDraftsAndUpdateLocal = async (
+  user: GLOBAL.CurrentUser,
+): Promise<GunDraft[]> => {
+  /**
+   * 获取所有本地文章
+   * 获取 gun.js 所有文章
+   * 更新本地文章
+   */
+
+  // 获取所有本地文章
+  const drafts = (await dbPostsAll(user.id)) || [];
+  // console.log('drafts', drafts);
+
+  // 获取 gun.js 所有文章
+  const userScope = `user_${user.id}`;
+  const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
+
+  const _gunDrafts: any[] = await fetchGunDrafts({
+    gunDraft: _gun,
+    scope: userScope,
+    userId: user.id,
+  });
+  // console.log('_gunDrafts', _gunDrafts);
+
+  // 更新本地文章
+  const allDrafts: any[] = await syncLocalDrafts({
+    drafts: drafts,
+    gunDrafts: _gunDrafts,
+  });
+  // console.log('allDrafts', allDrafts);
+
+  return allDrafts;
+};
+
+export const twoWaySyncDrafts = async (user: GLOBAL.CurrentUser): Promise<GunDraft[]> => {
   /**
    * 获取所有本地文章
    * 获取 gun.js 所有文章
@@ -262,64 +349,21 @@ export const twoWaySync = async (user: GLOBAL.CurrentUser): Promise<GunDraft[]> 
   // console.log('allDrafts', allDrafts);
 
   // 更新远端文章
-  // await syncGunDrafts({
-  //   gunDraft: _gun,
-  //   scope: userScope,
-  //   drafts: allDrafts,
-  // });
+  await syncGunDrafts({
+    drafts: allDrafts,
+    userId: user.id,
+  });
 
   return allDrafts;
-};
-
-/**
- * sync New Draft
- * @param param0
- * @returns
- */
-export const syncNewDraft = async ({ id, userId }: SyncNewDraftArgs): Promise<void> => {
-  const userScope = `user_${userId}`;
-  const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
-  const draft = await dbPostsGet(id);
-
-  const pair = JSON.parse(storeGet(KEY_META_CMS_GUN_PAIR) || '""');
-  if (!pair) {
-    return;
-  }
-
-  // 加密
-  const enc = await Gun.SEA.encrypt(JSON.stringify(draft), pair);
-  const dataMsg = await Gun.SEA.sign(enc, pair);
-
-  _gun.get(userScope).set(dataMsg);
-};
-
-/**
- * sync Draft
- * @param param0
- */
-export const syncDraft = async ({ userId, key, data }: SyncDraftArgs): Promise<void> => {
-  signIn((window as any).gun);
-
-  const userScope = `user_${userId}`;
-  const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
-
-  const pair = JSON.parse(storeGet(KEY_META_CMS_GUN_PAIR) || '""');
-  if (!pair) {
-    return;
-  }
-
-  // 加密
-  const enc = await Gun.SEA.encrypt(JSON.stringify(data), pair);
-  const dataMsg = await Gun.SEA.sign(enc, pair);
-
-  _gun.get(userScope).get(key).put(dataMsg);
 };
 
 /**
  * delete draft
  * @param param0
  */
-export const deleteDraft = ({ userId, key }: DeleteDraftArgs) => {
+export const deleteDraft = async ({ userId, key }: DeleteDraftArgs) => {
+  await signIn((window as any).gun);
+
   const userScope = `user_${userId}`;
   const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
   _gun.get(userScope).get(key).put(null);

@@ -21,5 +21,5 @@ export const OSS_MATATAKI = 'https://smartsignature-img.oss-cn-hongkong.aliyuncs
 
 // Gun Config
 export const GUN_PEERS = ['http://gun-manhattan.herokuapp.com/gun'];
-export const KEY_GUN_ROOT = 'meta.io_v6';
+export const KEY_GUN_ROOT = 'meta.io_v7';
 export const KEY_GUN_ROOT_DRAFT = 'cms_draft';
