@@ -4,6 +4,7 @@ declare namespace CMS {
     userId: number;
     createdAt: Date;
     updatedAt: Date;
+    username: string;
     platform: string;
     accessToken: string;
     active: boolean;
@@ -333,13 +334,14 @@ declare namespace GLOBAL {
     };
   };
 
-  type SourcePlatformProperties = {
+  type SourcePlatformStatusProperties = {
     name: string;
+    username: string;
     active: boolean;
   };
 
-  type SourcePlatforms = {
-    matataki: SourcePlatformProperties;
+  type SourcePlatformStatus = {
+    matataki: SourcePlatformStatusProperties;
   };
 
   type StoreProvider = 'GitHub' | 'Gitee';

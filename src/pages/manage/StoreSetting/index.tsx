@@ -50,7 +50,7 @@ export default () => {
             `(${username})`,
           ],
           actions: [
-            <Button danger>{intl.formatMessage({ id: 'component.button.unbind' })}</Button>,
+            <Button disabled>{intl.formatMessage({ id: 'component.button.unbind' })}</Button>,
           ],
         };
       }
@@ -62,7 +62,7 @@ export default () => {
           </Tag>,
         ],
         actions: [
-          <Button onClick={() => bindRequest(store)} type="primary">
+          <Button disabled onClick={() => bindRequest(store)} type="primary">
             {intl.formatMessage({ id: 'component.button.bind' })}
           </Button>,
         ],
@@ -108,9 +108,11 @@ export default () => {
               rowKey={(record) => record.name}
               dataSource={stores}
               renderItem={(store) => {
-                if (store.actions.length && store.title.length) {
+                if (store.title.length) {
                   return (
-                    <List.Item actions={store.actions}>
+                    // <List.Item actions={store.actions}>
+                    // TODO: no actions are supported now
+                    <List.Item>
                       <List.Item.Meta
                         avatar={store.avatar}
                         title={store.title}
