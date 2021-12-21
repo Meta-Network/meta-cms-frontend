@@ -22,7 +22,7 @@ export default {
   'menu.moreInfo.policy': 'Policy',
   'menu.moreInfo.terms': 'Terms',
   'menu.moreInfo.privacyPolicy': 'Privacy Policy',
-  'menu.moreInfo.versions': 'Version record',
+  'menu.moreInfo.home': 'Home',
   'menu.post.create': 'Create',
   'menu.settings': 'Settings',
 };

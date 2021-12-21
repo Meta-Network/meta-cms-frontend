@@ -15,6 +15,7 @@ import { queryCurrentUser, queryInvitations, refreshTokens } from './services/ap
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 import { getDefaultSiteConfigAPI } from './helpers/index';
 import { FetchPostsStorageParamsState } from './services/constants';
+import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 
 const { Text } = Typography;
 
@@ -195,6 +196,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push('/user/login');
       }
     },
-    links: [<MenuLanguageSwitch key="MenuLanguageSwitch" />, <MenuMoreInfo key="MenuMoreInfo" />],
+    links: [
+      <MenuLanguageSwitch key="MenuLanguageSwitch" />,
+      <MenuMoreInfo key="MenuMoreInfo" />,
+      <MenuFeedbackButton key="MenuFeedbackButton" />,
+    ],
   };
 };
