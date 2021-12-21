@@ -27,8 +27,8 @@ const ImportSeedAndPairComponents: React.FC<ImportSeedAndPairComponentsState> = 
 }) => {
   const [seedAndPairInput, setSeedAndPairInput] = useState('');
   // handle import
-  const handleImport = useCallback(() => {
-    saveSeedAndPair(seedAndPairInput);
+  const handleImport = useCallback(async () => {
+    await saveSeedAndPair(seedAndPairInput);
     getSeedAndPairFn();
 
     message.success('导入成功');
@@ -83,8 +83,13 @@ export default () => {
     }
 
     setSyncDraftsLoading(true);
-    await twoWaySyncDrafts(initialState.currentUser);
-    setSyncDraftsLoading(false);
+    try {
+      await twoWaySyncDrafts(initialState.currentUser);
+    } catch (e) {
+      console.error('e', e);
+    } finally {
+      setSyncDraftsLoading(false);
+    }
   }, [initialState]);
 
   // sync seed and pair
@@ -157,9 +162,6 @@ export default () => {
           <Popconfirm
             title={'您确定要双向同步草稿内容吗？'}
             onConfirm={twoWaySyncDraftsFn}
-            okButtonProps={{
-              loading: syncDraftsLoading,
-            }}
             okText={intl.formatMessage({
               id: 'component.button.yes',
             })}
@@ -190,6 +192,7 @@ export default () => {
       handleDeleteAllLocalDraft,
       twoWaySyncDraftsFn,
       generateSeedAndPairFn,
+      getSeedAndPairFn,
       intl,
       seedAndPair,
       seedPublicKey,

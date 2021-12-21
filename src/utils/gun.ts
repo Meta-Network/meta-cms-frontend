@@ -2,7 +2,6 @@ import { assign, cloneDeep } from 'lodash';
 import moment from 'moment';
 import Gun from 'gun';
 import 'gun/sea';
-import type { Posts } from '@/db/Posts.d';
 import { dbPostsUpdate, dbPostsAdd, dbPostsAll, dbPostsGet } from '@/db/db';
 import {
   KEY_GUN_ROOT,
@@ -15,40 +14,31 @@ import { storeGet, storeSet } from './store';
 import { generateSeed, generateKeys } from '@metaio/meta-signature-util';
 import type { KeyPair } from '@metaio/meta-signature-util';
 
-export type GunDraft = Posts & { key?: string };
-type FetchGunDraftsArgs = {
-  gunDraft: any;
-  scope: string;
-  userId: number;
-};
-type SyncLocalDraftsArgs = {
-  drafts: Posts[];
-  gunDrafts: GunDraft[];
-};
-type SyncGunDraftsArgs = {
-  drafts: GunDraft[];
-  userId: number;
-};
-type SyncNewDraftArgs = {
-  id: number;
-  userId: number;
-};
-type SyncDraftArgs = {
-  userId: number;
-  key: string;
-  data: any;
-};
-type DeleteDraftArgs = {
-  userId: number;
-  key: string;
-};
-
-export const signIn = (gun: any): Promise<void> => {
+export const signIn = (gun: any): Promise<string> => {
   /**
    * 判断本地是否生成了用户
    *  有 用户登录
    *  没有 用户注册, 生成 pair
    */
+
+  // TODO: 后面再来接入
+  // const userGun = gun.user().recall({ sessionStorage: true });
+
+  const createUser = (user: string, pass: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      gun.user().create(user, pass, (ack: GunType.GunCreateCb) => {
+        if (ack.err) {
+          console.error('ack', ack);
+          reject(ack.err);
+        } else if (ack.ok === 0 || ack.pub) {
+          console.log('success');
+          resolve('success');
+        } else {
+          reject('未知错误');
+        }
+      });
+    });
+  };
 
   return new Promise(async (resolve, reject) => {
     // pair
@@ -57,7 +47,6 @@ export const signIn = (gun: any): Promise<void> => {
       //
     } else {
       const pair = await Gun.SEA.pair();
-
       storeSet(KEY_META_CMS_GUN_PAIR, JSON.stringify(pair));
     }
 
@@ -65,23 +54,38 @@ export const signIn = (gun: any): Promise<void> => {
     if (gunSeed.length) {
       const keys: KeyPair = generateKeys(gunSeed);
 
-      const user = gun.user().auth(keys.public, keys.private);
-      if (user.is) {
-        console.log('success');
-        resolve();
-      } else {
-        console.log('fail');
-        reject();
-      }
+      gun.user().auth(keys.public, keys.private, (at: GunType.GunAuthCb) => {
+        if (at.err) {
+          console.error('at', at);
+          if (at.err.includes('Wrong user or password.')) {
+            createUser(keys.public, keys.private)
+              .then((response) => {
+                resolve(response);
+              })
+              .catch((e) => {
+                reject(e);
+              });
+          } else {
+            reject(at.err);
+          }
+        } else {
+          console.log('auth success');
+          resolve('success');
+        }
+      });
     } else {
       const seed: string[] = generateSeed();
       const keys: KeyPair = generateKeys(seed);
 
       storeSet(KEY_META_CMS_GUN_SEED, JSON.stringify(seed));
 
-      gun.user().create(keys.public, keys.private, () => {
-        resolve();
-      });
+      createUser(keys.public, keys.private)
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((e) => {
+          reject(e);
+        });
     }
   });
 };
@@ -105,7 +109,7 @@ export const fetchGunDrafts = ({
   gunDraft,
   scope,
   userId,
-}: FetchGunDraftsArgs): Promise<GunDraft[]> => {
+}: GunType.FetchGunDraftsArgs): Promise<GunType.GunDraft[]> => {
   return new Promise((resolve, reject) => {
     try {
       gunDraft.get(scope).once(async (data: any) => {
@@ -125,7 +129,7 @@ export const fetchGunDrafts = ({
           if (data[key]) {
             // 解密
             const msg = await Gun.SEA.verify(data[key], pair.pub);
-            const dec = (await Gun.SEA.decrypt(msg, pair)) as GunDraft;
+            const dec = (await Gun.SEA.decrypt(msg, pair)) as GunType.GunDraft;
 
             if (dec) {
               dec.key = key;
@@ -149,7 +153,10 @@ export const fetchGunDrafts = ({
  * @param param0
  * @returns
  */
-export const syncLocalDrafts = ({ drafts, gunDrafts }: SyncLocalDraftsArgs): Promise<any[]> => {
+export const syncLocalDrafts = ({
+  drafts,
+  gunDrafts,
+}: GunType.SyncLocalDraftsArgs): Promise<any[]> => {
   return new Promise(async (resolve, reject) => {
     try {
       const _draftsClone = cloneDeep(drafts);
@@ -212,7 +219,7 @@ export const syncLocalDrafts = ({ drafts, gunDrafts }: SyncLocalDraftsArgs): Pro
  * @param param0
  * @returns
  */
-export const syncNewDraft = async ({ id, userId }: SyncNewDraftArgs): Promise<void> => {
+export const syncNewDraft = async ({ id, userId }: GunType.SyncNewDraftArgs): Promise<void> => {
   await signIn((window as any).gun);
 
   const userScope = `user_${userId}`;
@@ -235,7 +242,7 @@ export const syncNewDraft = async ({ id, userId }: SyncNewDraftArgs): Promise<vo
  * sync Draft
  * @param param0
  */
-export const syncDraft = async ({ userId, key, data }: SyncDraftArgs): Promise<void> => {
+export const syncDraft = async ({ userId, key, data }: GunType.SyncDraftArgs): Promise<void> => {
   await signIn((window as any).gun);
 
   const userScope = `user_${userId}`;
@@ -258,7 +265,7 @@ export const syncDraft = async ({ userId, key, data }: SyncDraftArgs): Promise<v
  * @param param0 SyncGunDraftsArgs
  * @returns
  */
-export const syncGunDrafts = ({ drafts, userId }: SyncGunDraftsArgs): Promise<void> => {
+export const syncGunDrafts = ({ drafts, userId }: GunType.SyncGunDraftsArgs): Promise<void> => {
   return new Promise(async (resolve) => {
     const draftsClone = cloneDeep(drafts);
     for (let i = 0; i < draftsClone.length; i++) {
@@ -286,7 +293,7 @@ export const syncGunDrafts = ({ drafts, userId }: SyncGunDraftsArgs): Promise<vo
  */
 export const fetchGunDraftsAndUpdateLocal = async (
   user: GLOBAL.CurrentUser,
-): Promise<GunDraft[]> => {
+): Promise<GunType.GunDraft[]> => {
   /**
    * 获取所有本地文章
    * 获取 gun.js 所有文章
@@ -318,7 +325,7 @@ export const fetchGunDraftsAndUpdateLocal = async (
   return allDrafts;
 };
 
-export const twoWaySyncDrafts = async (user: GLOBAL.CurrentUser): Promise<GunDraft[]> => {
+export const twoWaySyncDrafts = async (user: GLOBAL.CurrentUser): Promise<GunType.GunDraft[]> => {
   /**
    * 获取所有本地文章
    * 获取 gun.js 所有文章
@@ -361,7 +368,7 @@ export const twoWaySyncDrafts = async (user: GLOBAL.CurrentUser): Promise<GunDra
  * delete draft
  * @param param0
  */
-export const deleteDraft = async ({ userId, key }: DeleteDraftArgs) => {
+export const deleteDraft = async ({ userId, key }: GunType.DeleteDraftArgs) => {
   await signIn((window as any).gun);
 
   const userScope = `user_${userId}`;
@@ -378,6 +385,9 @@ export const generateSeedAndPair = async () => {
 
   storeSet(KEY_META_CMS_GUN_SEED, JSON.stringify(seed));
   storeSet(KEY_META_CMS_GUN_PAIR, JSON.stringify(pair));
+
+  sessionStorage.clear();
+  await signIn((window as any).gun);
 };
 
 /**
@@ -394,7 +404,7 @@ export const getSeedAndPair = () => {
 /**
  * save seed pair
  */
-export const saveSeedAndPair = (seedAndPair: string) => {
+export const saveSeedAndPair = async (seedAndPair: string) => {
   if (!seedAndPair) {
     return;
   }
@@ -402,4 +412,7 @@ export const saveSeedAndPair = (seedAndPair: string) => {
   const [seed, pair] = JSON.parse(seedAndPair);
   storeSet(KEY_META_CMS_GUN_SEED, seed);
   storeSet(KEY_META_CMS_GUN_PAIR, pair);
+
+  sessionStorage.clear();
+  await signIn((window as any).gun);
 };
