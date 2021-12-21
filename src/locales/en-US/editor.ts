@@ -46,7 +46,7 @@ export default {
   'editor.publish.item.gateway.label': 'Backup storage',
   'editor.publish.item.gateway.description': 'Store all and cannot be deleted',
   'editor.tips.content':
-    'When you submit an article and choose to directly store your metadata in IPFS, it will not go through any backend or database of Meta Network, reducing the possibility of man-in-the-middle attacks. If you want the content to be displayed in your Meta Space, you need to return to the CMS for publishing after submission.',
+    'When you submit an article and choose to directly store your metadata in IPFS, it will reducing the possibility of man-in-the-middle attacks as much as possible. If you want the content to be displayed in your Meta Space, you need to return to the CMS for publishing after submission.',
   'editor.originalLink.title': 'Original link',
   'editor.originalLink.noOriginalLink': 'No original link',
   'editor.learn.content': 'Quickly learn the Meta Space editor',
