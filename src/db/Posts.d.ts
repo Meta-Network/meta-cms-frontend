@@ -12,6 +12,7 @@ export interface Posts {
   draft: CMS.Draft | null;
   tags: string[];
   license: string;
+  userId: number;
   createdAt: string;
   updatedAt: string;
 }

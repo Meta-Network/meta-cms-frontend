@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { extendWithErrorHandler } from '@/services/api/base-request';
+import type { FetchPostsStorageParamsState } from '../constants';
 
 const request = extendWithErrorHandler({
   credentials: 'include',
@@ -165,7 +166,7 @@ export async function fetchPostSync(params: { page: number; limit: number; state
  */
 export async function fetchPostsStorage(
   siteConfigId: number,
-  params: { page: number; limit: number; draft: boolean },
+  params: { page: number; limit: number; state: FetchPostsStorageParamsState },
 ) {
   return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>(`/post/storage/${siteConfigId}`, {
     method: 'GET',
@@ -365,4 +366,19 @@ export async function imageUploadByUrl(url: string) {
     method: 'POST',
     data: { url },
   });
+}
+
+/**
+ * Decrypt restricted matataki post
+ */
+export async function decryptMatatakiPost(iv: string, encryptedData: string) {
+  const response = await request<GLOBAL.GeneralResponse<MATATAKI.PostMetadata>>(
+    `/post/decrypt/matataki`,
+    {
+      method: 'POST',
+      data: { iv, encryptedData },
+    },
+  );
+
+  return response.data;
 }

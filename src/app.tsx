@@ -14,6 +14,8 @@ import PublishSiteButton from './components/menu/PublishSiteButton';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 import { getDefaultSiteConfigAPI } from './helpers/index';
+import { FetchPostsStorageParamsState } from './services/constants';
+import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 
 const { Text } = Typography;
 
@@ -93,25 +95,26 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
       page: 1,
       limit: 1,
-      draft: false,
+      state: FetchPostsStorageParamsState.Published,
     });
     publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
   }
-
-  // local draft count
-  const localDraftCount = await dbPostsAllCount();
 
   const state: GLOBAL.InitialState = {
     fetchUserInfo,
     invitationsCount,
     publishedCount,
-    localDraftCount,
+    localDraftCount: 0,
     siteConfig,
   };
 
   if (history.location.pathname !== '/user/login') {
     const currentUser = await fetchUserInfo();
-    if (currentUser) state.currentUser = currentUser;
+    if (currentUser) {
+      state.currentUser = currentUser;
+      // local draft count
+      state.localDraftCount = await dbPostsAllCount(currentUser!.id);
+    }
   }
 
   if (isMobile()) {
@@ -193,6 +196,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         history.push('/user/login');
       }
     },
-    links: [<MenuLanguageSwitch key="MenuLanguageSwitch" />, <MenuMoreInfo key="MenuMoreInfo" />],
+    links: [
+      <MenuLanguageSwitch key="MenuLanguageSwitch" />,
+      <MenuMoreInfo key="MenuMoreInfo" />,
+      <MenuFeedbackButton key="MenuFeedbackButton" />,
+    ],
   };
 };

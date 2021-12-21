@@ -205,7 +205,7 @@ const SettingsCopyrightNotice: FC<Props> = ({ license, handleChangeLicense }) =>
                     <Radio value={'sa'}>
                       {intl.formatMessage({ id: 'editor.license.creativeCommons.sa' })}&nbsp;
                       <Tooltip
-                        title={intl.formatMessage({ id: 'editor.license.creativeCommons.sa.tip' })}
+                        title={intl.formatMessage({ id: 'editor.license.creativeCommons.sa.top' })}
                         placement="top"
                       >
                         <InfoCircleOutlined />
