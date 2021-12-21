@@ -368,3 +368,38 @@ export const deleteDraft = async ({ userId, key }: DeleteDraftArgs) => {
   const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
   _gun.get(userScope).get(key).put(null);
 };
+
+/**
+ * generate seed pair
+ */
+export const generateSeedAndPair = async () => {
+  const seed: string[] = generateSeed();
+  const pair = await Gun.SEA.pair();
+
+  storeSet(KEY_META_CMS_GUN_SEED, JSON.stringify(seed));
+  storeSet(KEY_META_CMS_GUN_PAIR, JSON.stringify(pair));
+};
+
+/**
+ * get seed pair
+ * @returns
+ */
+export const getSeedAndPair = () => {
+  // TODO: 复制出来的格式并不好看，可以考虑加密成一串字符然后导入再解密 待考虑
+  const seed = storeGet(KEY_META_CMS_GUN_SEED);
+  const pair = storeGet(KEY_META_CMS_GUN_PAIR);
+  return JSON.stringify([seed, pair]);
+};
+
+/**
+ * save seed pair
+ */
+export const saveSeedAndPair = (seedAndPair: string) => {
+  if (!seedAndPair) {
+    return;
+  }
+
+  const [seed, pair] = JSON.parse(seedAndPair);
+  storeSet(KEY_META_CMS_GUN_SEED, seed);
+  storeSet(KEY_META_CMS_GUN_PAIR, pair);
+};
