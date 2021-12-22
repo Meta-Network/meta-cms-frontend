@@ -193,6 +193,8 @@ export default {
   'messages.editor.notification.title': 'Notification',
   'messages.editor.publish.notification.fail':
     'We are very sorry that the article submission storage failed, please try again or send us feedback and Meta Team will do our best to improve it.',
+  'messages.editor.publish.tip':
+    'Please be patient as the article is being submitted and decentralised storage is taking a long time. Meta Team will further optimize the experience in the future.',
   'messages.editor.uploadAllImages.notification': 'Images are being decentralised in storage.',
   'messages.editor.uploadAllImages.success':
     'The decentralised storage of images is complete, thanks for your patience.',

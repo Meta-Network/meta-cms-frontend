@@ -883,7 +883,13 @@ const Edit: React.FC = () => {
         <Editor asyncContentToDB={handleAsyncContentToDB} />
       </section>
 
-      <FullLoading loading={publishLoading} setLoading={setPublishLoading} />
+      <FullLoading
+        loading={publishLoading}
+        setLoading={setPublishLoading}
+        tip={intl.formatMessage({
+          id: 'messages.editor.publish.tip',
+        })}
+      />
     </section>
   );
 };
