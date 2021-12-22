@@ -18,7 +18,7 @@ export default () => {
         <Result
           status="error"
           title={<FormattedMessage id="guide.result.bindPlatformErrorTitle" />}
-          subTitle={<FormattedMessage id="guide.result.description" />}
+          subTitle={<FormattedMessage id="guide.result.bindPlatformErrorDescription" />}
         />
       </Card>
     );

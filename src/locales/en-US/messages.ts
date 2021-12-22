@@ -142,7 +142,7 @@ export default {
   'messages.syncCenter.getContentFail': 'Failed to obtain content',
   'messages.domain.updated': 'The domain name was successfully updated',
   'messages.domain.shouldNotBeEmpty': 'Domain name cannot be empty',
-  'messages.domain.shouldMatchRegex': '3~16 length: 0~9,a~z,A~Z',
+  'messages.domain.shouldMatchRegex': "3~16 length: 0~9,a~z,A~Z,'_'",
   'messages.domain.isForbidden':
     'This domain name is disabled or already exists, please pick another one',
   'messages.domain.isValid': 'This domain name is available!',
