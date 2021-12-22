@@ -41,7 +41,7 @@ export default {
   'editor.publish.item.gateway.label': '备份存储',
   'editor.publish.item.gateway.description': '存储全文，且无法删除',
   'editor.tips.content':
-    '当您提交文章并选择在 IPFS 直接存证您的元数据时，不会经过 Meta Network 的任何后台或数据库，减少中间人攻击的可能性。若要让内容在您的 Meta Space 中显示，则需要您在提交完成后返回 CMS 进行发布。',
+    '当您提交文章并选择在 IPFS 直接存证您的元数据时，会最大可能减少中间人攻击的可能性。若要让内容在您的 Meta Space 中显示，则需要您在提交完成后返回 CMS 进行发布。',
   'editor.originalLink.title': '原文链接',
   'editor.originalLink.noOriginalLink': '没有原文链接',
   'editor.learn.content': '快速学习 Meta Space 编辑器',

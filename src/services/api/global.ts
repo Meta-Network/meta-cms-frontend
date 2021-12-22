@@ -81,7 +81,7 @@ export async function fileUploadToIpfs(file: FormData | File, token: string) {
 }
 
 export async function fetchIpfs(hash: string) {
-  return request<any>(`https://ipfs.io/ipfs/${hash}`, {
+  return request<MATATAKI.GenericPostMetadata>(`https://ipfs.io/ipfs/${hash}`, {
     method: 'GET',
   });
 }

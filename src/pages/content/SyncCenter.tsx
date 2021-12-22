@@ -5,6 +5,7 @@ import {
   fetchPostSync,
   getSourceStatus,
   publishPosts,
+  decryptMatatakiPost,
 } from '@/services/api/meta-cms';
 import { useIntl, useModel, history } from 'umi';
 import ProTable from '@ant-design/pro-table';
@@ -130,7 +131,11 @@ export default () => {
       }
 
       try {
-        const postResult: { content: string } = await fetchIpfs(_post.source);
+        let postResult = await fetchIpfs(_post.source);
+        if (!postResult.content && postResult.iv && postResult.encryptedData) {
+          postResult = await decryptMatatakiPost(postResult.iv, postResult.encryptedData);
+        }
+
         if (!postResult.content) {
           message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
           return;

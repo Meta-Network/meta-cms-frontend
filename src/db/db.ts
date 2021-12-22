@@ -1,12 +1,11 @@
 import type { Table, Transaction } from 'dexie';
 import Dexie from 'dexie';
-import type { Posts } from './Posts';
 import type { Metadatas, MetadataTempDataState } from './Metadatas';
 import moment from 'moment';
 import { License } from '../../config';
 
 export class StoreDB extends Dexie {
-  posts!: Table<Posts, number>;
+  posts!: Table<PostType.Posts, number>;
   metadatas!: Table<Metadatas, number>;
   constructor() {
     super('StoreDB');
@@ -19,7 +18,7 @@ export class StoreDB extends Dexie {
       .upgrade((tx: Transaction | any) => {
         const time = moment().toISOString();
         // TODO: modify typescript
-        tx.posts.toCollection().modify((post: Posts) => {
+        tx.posts.toCollection().modify((post: PostType.Posts) => {
           // console.log('post', post);
           post.cover = post.cover || '';
           post.title = post.title || '';
@@ -62,7 +61,7 @@ export const dbPostsUpdate = async <T>(id: number, data: T): Promise<number> => 
  * @param data
  * @returns
  */
-export const dbPostsAdd = async (data: Posts): Promise<number> => {
+export const dbPostsAdd = async (data: PostType.Posts): Promise<number> => {
   return await db.posts.add(data);
 };
 
@@ -71,7 +70,7 @@ export const dbPostsAdd = async (data: Posts): Promise<number> => {
  * @param id
  * @returns
  */
-export const dbPostsGet = async (id: number): Promise<Posts | undefined> => {
+export const dbPostsGet = async (id: number): Promise<PostType.Posts | undefined> => {
   return await db.posts.get(id);
 };
 
@@ -95,7 +94,7 @@ export const dbPostsDeleteAll = async (): Promise<number> => {
  * @param userId
  * @returns
  */
-export const dbPostsAll = async (userId: number): Promise<Posts[] | undefined> => {
+export const dbPostsAll = async (userId: number): Promise<PostType.Posts[] | undefined> => {
   return await db.posts
     .filter((i) => !i.delete && i.userId === userId)
     .reverse()
@@ -122,14 +121,14 @@ export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
   return result.some((post) => post.post && Number(post.post.id) === id);
 };
 
-export const dbPostsWhereByID = async (id: number): Promise<Posts | undefined> => {
+export const dbPostsWhereByID = async (id: number): Promise<PostType.Posts | undefined> => {
   // 草稿删除了 允许重新编辑
   const result = await db.posts.filter((i) => !i.delete).toArray();
   return result.find((post) => post.post && Number(post.post.id) === id);
 };
 
 // post data temp
-export const PostTempData = (): Posts => ({
+export const PostTempData = (): PostType.Posts => ({
   cover: '',
   title: '',
   summary: '',

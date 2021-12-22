@@ -33,7 +33,12 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
   }, []);
 
   const init = useCallback(() => {
+    const _height =
+      window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
     const vditor = new Vditor('vditor', {
+      width: '100%',
+      height: _height - 206,
       cache: {
         enable: false,
       },
