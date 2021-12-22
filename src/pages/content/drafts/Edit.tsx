@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useCallback, useEffect } from 'react';
 import { history, useIntl, useModel } from 'umi';
-import { Input, message } from 'antd';
+import { Input, message, notification } from 'antd';
 import Editor from '@/components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
@@ -13,8 +13,9 @@ import {
   PostTempData,
   dbMetadatasAdd,
   MetadataTempData,
+  dbPostsWhereExistByTitle,
 } from '@/db/db';
-import { imageUploadByUrlAPI, getDefaultSiteConfigAPI } from '@/helpers';
+import { imageUploadByUrlAPI } from '@/helpers';
 import { assign, cloneDeep } from 'lodash';
 // import type Vditor from 'vditor';
 import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
@@ -28,7 +29,7 @@ import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
 import type { PostMetadata } from '@metaio/meta-signature-util';
-import { postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
+import { fetchPostsStorage, postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
 import moment from 'moment';
 import {
@@ -38,7 +39,7 @@ import {
   KEY_GUN_ROOT_DRAFT,
   KEY_META_CMS_GUN_PAIR,
 } from '../../../../config';
-import { DraftMode } from '@/services/constants';
+import { DraftMode, FetchPostsStorageParamsState } from '@/services/constants';
 import Gun from 'gun';
 import {
   fetchGunDraftsAndUpdateLocal,
@@ -48,6 +49,9 @@ import {
   signIn,
 } from '@/utils/gun';
 import { storeGet } from '@/utils/store';
+
+const keyUploadAllImages = 'keyUploadAllImages';
+const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -315,8 +319,9 @@ const Edit: React.FC = () => {
 
         // 统一 title 方便下次 更新
         const _post = {
-          ...result.data[0],
+          ...result.data.posts[0],
           titleInStorage: title,
+          stateId: result.data.stateIds[0],
         };
 
         const { id } = history.location.query as Router.PostQuery;
@@ -335,6 +340,18 @@ const Edit: React.FC = () => {
         message.error(result.message);
       } else {
         message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
+      }
+
+      if (!(result.statusCode === 201 || result.statusCode === 200)) {
+        notification.open({
+          message: intl.formatMessage({
+            id: 'messages.editor.notification.title',
+          }),
+          description: intl.formatMessage({
+            id: 'messages.editor.publish.notification.fail',
+          }),
+          duration: null,
+        });
       }
     },
     [
@@ -390,11 +407,13 @@ const Edit: React.FC = () => {
       if (result.statusCode === 201 || result.statusCode === 200) {
         message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
+        const _post = {
+          ...result.data.posts[0],
+          stateId: result.data.stateIds[0],
+        };
+
         const { id } = history.location.query as Router.PostQuery;
-        await handleUpdate(
-          Number(id),
-          postDataMergedUpdateAt({ post: result.data[0], draft: null }),
-        );
+        await handleUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
 
         setSiteNeedToDeploy(true);
         history.push('/content/drafts');
@@ -410,6 +429,18 @@ const Edit: React.FC = () => {
       } else {
         message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
       }
+
+      if (!(result.statusCode === 201 || result.statusCode === 200)) {
+        notification.open({
+          message: intl.formatMessage({
+            id: 'messages.editor.notification.title',
+          }),
+          description: intl.formatMessage({
+            id: 'messages.editor.publish.notification.fail',
+          }),
+          duration: null,
+        });
+      }
     },
     [
       title,
@@ -422,6 +453,47 @@ const Edit: React.FC = () => {
       handleUpdate,
       intl,
     ],
+  );
+
+  const checkTitle = useCallback(
+    async ({ titleValue, id }: { titleValue: string; id: number }): Promise<boolean> => {
+      /**
+       * check local draft
+       * check repo post
+       */
+
+      if (!initialState?.currentUser && !initialState?.siteConfig) {
+        return false;
+      }
+
+      const isLocalExist = await dbPostsWhereExistByTitle({
+        title: titleValue,
+        id,
+        userId: initialState.currentUser!.id,
+      });
+      // console.log('isLocalExist', isLocalExist);
+
+      if (isLocalExist) {
+        return false;
+      }
+
+      const allPostsResult = await fetchPostsStorage(initialState.siteConfig!.id, {
+        state: FetchPostsStorageParamsState.Posted,
+      });
+
+      if (allPostsResult.statusCode !== 200) {
+        return false;
+      }
+      const isExistPost = allPostsResult.data.items.some((i) => i.title === titleValue);
+      // console.log('isExistPost', isExistPost);
+
+      if (isExistPost) {
+        return false;
+      }
+
+      return true;
+    },
+    [initialState],
   );
 
   // handle publish
@@ -446,6 +518,17 @@ const Edit: React.FC = () => {
         return;
       }
 
+      // check title
+      if (
+        !(await checkTitle({
+          titleValue: title,
+          id: Number(id),
+        }))
+      ) {
+        message.warning('标题重复，请修改');
+        return;
+      }
+
       // check cover format
       if (cover && !cover.includes(FLEEK_NAME)) {
         message.success(
@@ -456,7 +539,7 @@ const Edit: React.FC = () => {
         return;
       }
 
-      const siteConfig = await getDefaultSiteConfigAPI();
+      const siteConfig = initialState?.siteConfig;
       if (!siteConfig) {
         message.warning(
           intl.formatMessage({
@@ -481,7 +564,16 @@ const Edit: React.FC = () => {
         });
       }
     },
-    [title, cover, content, postStorageUpdateFn, postStoragePublishFn, intl],
+    [
+      title,
+      cover,
+      content,
+      postStorageUpdateFn,
+      postStoragePublishFn,
+      checkTitle,
+      initialState,
+      intl,
+    ],
   );
 
   /**
@@ -546,21 +638,37 @@ const Edit: React.FC = () => {
     if (imgListFilter.length > 0) {
       _vditor.disabled();
 
+      notification.open({
+        key: keyUploadAllImages,
+        message: intl.formatMessage({
+          id: 'messages.editor.notification.title',
+        }),
+        description: intl.formatMessage({
+          id: 'messages.editor.uploadAllImages.notification',
+        }),
+        duration: null,
+      });
+
       for (let i = 0; i < imgListFilter.length; i++) {
         const ele = imgListFilter[i];
 
         const result = await imageUploadByUrlAPI(ele.src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI));
         if (result) {
           // _vditor.tip('上传成功', 2000);
-          message.success(
-            intl.formatMessage({
-              id: 'messages.editor.upload.image.success',
-            }),
-          );
           ele.src = result.publicUrl;
           ele.alt = result.key;
         }
       }
+
+      notification.close(keyUploadAllImages);
+
+      message.destroy(keyUploadAllImagesMessage);
+      message.success({
+        key: keyUploadAllImagesMessage,
+        content: intl.formatMessage({
+          id: 'messages.editor.uploadAllImages.success',
+        }),
+      });
 
       // console.log('imgList', imgList);
 
@@ -768,14 +876,20 @@ const Edit: React.FC = () => {
             id: 'editor.title',
           })}
           className={styles.title}
-          maxLength={30}
+          maxLength={100}
           value={title}
           onChange={(e) => handleChangeTitle(e.target.value)}
         />
         <Editor asyncContentToDB={handleAsyncContentToDB} />
       </section>
 
-      <FullLoading loading={publishLoading} setLoading={setPublishLoading} />
+      <FullLoading
+        loading={publishLoading}
+        setLoading={setPublishLoading}
+        tip={intl.formatMessage({
+          id: 'messages.editor.publish.tip',
+        })}
+      />
     </section>
   );
 };

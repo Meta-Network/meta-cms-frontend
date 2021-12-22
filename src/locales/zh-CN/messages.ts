@@ -170,4 +170,11 @@ export default {
   'messages.dashboard.settings': '设置项',
   'messages.invitation.inviteMessage':
     'Hi，Meta Network原住民正在邀请您来做邻居，快去 https://home.metanetwork.online，通过您的邀请码来入驻吧！',
+  'messages.editor.notification.title': '通知',
+  'messages.editor.publish.notification.fail':
+    '非常抱歉，提交文章存储失败，请再次尝试或向我们反馈，Meta Team 将会全力改进。',
+  'messages.editor.publish.tip':
+    '正在提交文章中，非托管式存储耗时较久，请耐心等待。未来将会进一步优化体验。',
+  'messages.editor.uploadAllImages.notification': '所有图片正在去中心化转存中。',
+  'messages.editor.uploadAllImages.success': '图片去中心化转存完成，感谢耐心等待。',
 };

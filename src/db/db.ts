@@ -127,6 +127,26 @@ export const dbPostsWhereByID = async (id: number): Promise<PostType.Posts | und
   return result.find((post) => post.post && Number(post.post.id) === id);
 };
 
+/**
+ * dbPostsWhereExistByTitle
+ * @param title
+ * @param userId
+ * @returns
+ */
+export const dbPostsWhereExistByTitle = async ({
+  title,
+  id,
+  userId,
+}: {
+  title: string;
+  id: number;
+  userId: number;
+}): Promise<boolean> => {
+  // 草稿删除了，并且是自己的草稿，排除当前文章
+  const result = await db.posts.filter((i) => !i.delete && i.userId === userId).toArray();
+  return result.some((post) => post.id !== id && post.title === title);
+};
+
 // post data temp
 export const PostTempData = (): PostType.Posts => ({
   cover: '',

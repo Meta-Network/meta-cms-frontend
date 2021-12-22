@@ -6,6 +6,8 @@ import { dbPostsUpdate, dbMetadatasUpdateByPostId } from '@/db/db';
 import { strSlice } from '@/utils';
 import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
 import moment from 'moment';
+import { fetchPostsStorageState } from '@/services/api/meta-cms';
+import { TaskCommonState } from '@/services/constants';
 
 export default () => {
   const intl = useIntl();
@@ -37,7 +39,29 @@ export default () => {
   /** fetch posts list */
   const fetchPosts = useCallback(async () => {
     if (initialState?.currentUser) {
+      // 获取草稿
       const response = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
+
+      // 获取草稿状态
+      const allHasStateIds = response.filter((i) => i?.post && i.post.stateId);
+      const allStateIds = allHasStateIds.map((i) => i.post!.stateId) as number[];
+      if (allStateIds.length) {
+        const allStates = await fetchPostsStorageState({ stateIds: allStateIds });
+        const allStatesMap = new Map();
+
+        if (allStates.statusCode === 200) {
+          allStates.data.map((i) => {
+            allStatesMap.set(i.id, i);
+          });
+        }
+
+        response.forEach((i) => {
+          if (allStatesMap.get(i?.post?.stateId)) {
+            i.post!.stateIdData = allStatesMap.get(i.post!.stateId);
+          }
+        });
+      }
+
       const responseSort = response.sort((a, b) =>
         Number(moment(a.updatedAt).isBefore(b.updatedAt)),
       );
@@ -72,7 +96,7 @@ export default () => {
         title: 'TITLE',
         dataIndex: 'title',
         key: 'title',
-        render: (val: string) => <span>{val}</span>,
+        render: (val: string) => <span>{strSlice(val, 40)}</span>,
       },
       {
         title: 'SUMMARY',
@@ -88,20 +112,28 @@ export default () => {
         render: (_: any, record: PostType.Posts) => (
           <Tag key={record.id}>
             {record.post
-              ? record.post.state === 'drafted'
-                ? intl.formatMessage({
-                    id: 'posts.table.status.cloudDraft',
-                  })
-                : record.post.state === 'pending'
-                ? intl.formatMessage({
-                    id: 'posts.table.status.pending',
-                  })
-                : record.post.state === 'published'
-                ? intl.formatMessage({
-                    id: 'posts.table.status.published',
-                  })
+              ? record.post.stateId
+                ? record.post.stateIdData.state === TaskCommonState.TODO
+                  ? intl.formatMessage({
+                      id: 'posts.table.status.todo',
+                    })
+                  : record.post.stateIdData.state === TaskCommonState.DOING
+                  ? intl.formatMessage({
+                      id: 'posts.table.status.doing',
+                    })
+                  : record.post.stateIdData.state === TaskCommonState.SUCCESS
+                  ? intl.formatMessage({
+                      id: 'posts.table.status.success',
+                    })
+                  : record.post.stateIdData.state === TaskCommonState.FAIL
+                  ? intl.formatMessage({
+                      id: 'posts.table.status.fail',
+                    })
+                  : intl.formatMessage({
+                      id: 'posts.table.status.other',
+                    })
                 : intl.formatMessage({
-                    id: 'posts.table.status.localDraft',
+                    id: 'posts.table.status.other',
                   })
               : intl.formatMessage({
                   id: 'posts.table.status.localDraft',

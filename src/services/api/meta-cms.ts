@@ -166,9 +166,20 @@ export async function fetchPostSync(params: { page: number; limit: number; state
  */
 export async function fetchPostsStorage(
   siteConfigId: number,
-  params: { page: number; limit: number; state: FetchPostsStorageParamsState },
+  params: { page?: number; limit?: number; state: FetchPostsStorageParamsState },
 ) {
   return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>(`/post/storage/${siteConfigId}`, {
+    method: 'GET',
+    params: params,
+  });
+}
+/**
+ * fetch Posts Storage State by stateIds
+ * @param params
+ * @returns
+ */
+export async function fetchPostsStorageState(params: { stateIds: number[] }) {
+  return request<GLOBAL.GeneralResponse<CMS.FetchPostsStorageState[]>>(`/post/storage/state`, {
     method: 'GET',
     params: params,
   });
@@ -275,7 +286,7 @@ export async function ignorePendingPost(postId: number) {
  * @returns
  */
 export async function postStoragePublish(draft: boolean, data: CMS.PostStoragePublishData) {
-  return request<GLOBAL.GeneralResponse<CMS.Post[]>>('/post/storage/publish', {
+  return request<GLOBAL.GeneralResponse<CMS.PostStoragePublish>>('/post/storage/publish', {
     method: 'POST',
     params: {
       draft: draft,
@@ -293,7 +304,7 @@ export async function postStoragePublish(draft: boolean, data: CMS.PostStoragePu
  * @returns
  */
 export async function postStorageUpdate(draft: boolean, data: CMS.PostStorageUpdateData) {
-  return request<GLOBAL.GeneralResponse<CMS.Post>>('/post/storage/update', {
+  return request<GLOBAL.GeneralResponse<CMS.PostStoragePublish>>('/post/storage/update', {
     method: 'POST',
     params: {
       draft: draft,
