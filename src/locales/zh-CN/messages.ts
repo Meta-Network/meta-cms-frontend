@@ -39,14 +39,13 @@ export default {
   'messages.store.repoNameAlreadyExists': '该存储仓库已存在，请设定一个新的名称',
   'messages.store.form.repoName': '请设定存储仓库的名称',
   'messages.store.form.repoNameAvailable': '可以使用该名称！',
+  'messages.store.form.sameRepoName': '仓库名称不可以重复，请重新设定名称',
   'messages.invitation.title': '邀请码管理',
   'messages.invitation.description':
     '在这里管理你拥有的邀请码。\n你可以在下方编辑邀请信息，定制发送后对方会接受的信息。',
-  'messages.invitation.cardTitle': '邀请码 #{id}',
   'messages.info.updateSuccess': '信息更新完成',
   'messages.info.updateFailed': '信息更新失败',
   'messages.info.copySuccess': '复制成功',
-  'messages.invitation.cardLabel': '邀请代码',
   'messages.invitation.editInfoHere': '可以在此处编辑信息',
   'messages.invitation.inviteeLabel': '受邀人',
   'messages.invitation.inviteeName': '受邀人的称呼',
@@ -161,7 +160,6 @@ export default {
   'messages.editor.submit.generateKey.fail': '生成失败',
   'messages.editor.submit.bindStorage': '请绑定 GitHub',
   'messages.editor.submit.uploadMetadata.fail': '上传 metadata 失败, 请重试！',
-  'messages.invitation.card.title': '邀请码 #{codeId}',
   'messages.delete.success': '删除成功',
   'messages.delete.fail': '删除失败',
   'messages.dashboard.lastPublishDate': '上次发布时间：{time, time, ::yyyyMMddHHmmss}',
@@ -170,4 +168,6 @@ export default {
   'messages.dashboard.publishing': '正在发布中...',
   'messages.dashboard.submitted': '已提交',
   'messages.dashboard.settings': '设置项',
+  'messages.invitation.inviteMessage':
+    'Hi，Meta Network原住民正在邀请您来做邻居，快去 https://home.metanetwork.online，通过您的邀请码来入驻吧！',
 };

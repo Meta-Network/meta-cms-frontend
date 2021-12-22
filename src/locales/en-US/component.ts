@@ -22,7 +22,6 @@ export default {
   'component.button.regenerate': 'regenerate',
   'component.status.alreadyBound': 'Already bound',
   'component.status.notBound': 'Not bound',
-  'component.badge.invitationAvailable': 'Invitation code available',
-  'component.badge.invitationUsed': 'Used invitation code',
+  'component.status.used': 'Used',
   'component.full.tip': 'If the page does not respond, you can manually close it!',
 };

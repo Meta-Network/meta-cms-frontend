@@ -1,17 +1,19 @@
-import FormattedDescription from '@/components/FormattedDescription';
-import { getSourceStatus } from '@/services/api/meta-cms';
-import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
-import syncPostsRequest from '@/utils/sync-posts-request';
-import { GridContent, PageContainer } from '@ant-design/pro-layout';
-import { Button, List, message, Spin, Tag } from 'antd';
-import { useEffect, useState } from 'react';
 import { useIntl } from 'umi';
+import { useEffect, useState } from 'react';
+import { Button, List, message, Spin, Tag } from 'antd';
+import { GridContent, PageContainer } from '@ant-design/pro-layout';
+import { getSourceStatus } from '@/services/api/meta-cms';
+import syncPostsRequest from '@/utils/sync-posts-request';
+import FormattedDescription from '@/components/FormattedDescription';
+import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
 import styles from './index.less';
 
-const status: GLOBAL.SourcePlatforms = {
+/* The default status for every platform */
+const status: GLOBAL.SourcePlatformStatus = {
   matataki: {
     name: 'matataki',
     active: false,
+    username: '',
   },
 };
 
@@ -20,9 +22,40 @@ export default () => {
   const [pageLoading, setPageLoading] = useState<boolean>(true);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [unbindLoading, setUnbindLoading] = useState<boolean>(false);
-  const [sourceStatus, setSourceStatus] = useState<GLOBAL.SourcePlatforms>(status);
+  const [sourceStatus, setSourceStatus] = useState<GLOBAL.SourcePlatformStatus>(status);
 
-  const actions = {
+  const getStatus = (platform: GLOBAL.SourcePlatformStatusProperties) =>
+    platform.active ? (
+      <Tag key={`${platform.name}_bind`} className="status" color="blue">
+        {intl.formatMessage({ id: 'component.status.alreadyBound' })}
+      </Tag>
+    ) : (
+      <Tag key={`${platform.name}_not_bind`} className="status" color="red">
+        {intl.formatMessage({ id: 'component.status.notBound' })}
+      </Tag>
+    );
+
+  const loadSourceStatus = async () => {
+    const result = await getSourceStatus();
+    setSourceStatus((source: GLOBAL.SourcePlatformStatus) => {
+      const newStatus = { ...source };
+      result.data.forEach((service: CMS.SourceStatusResponse) => {
+        if (newStatus[service.platform]) {
+          newStatus[service.platform].active = service.active;
+          newStatus[service.platform].username = service.username;
+        }
+      });
+      return newStatus;
+    });
+    setPageLoading(false);
+  };
+
+  useEffect(() => {
+    loadSourceStatus();
+  }, []);
+
+  /* Actions on page for every platform */
+  const actionsOnPage = {
     matataki: {
       sync: (
         <Button
@@ -53,20 +86,24 @@ export default () => {
       unbind: (
         <Button
           loading={unbindLoading}
-          onClick={() => {
+          onClick={async () => {
             setUnbindLoading(true);
             const done = message.loading(
               intl.formatMessage({ id: 'messages.source.unbinding' }),
               0,
             );
-            deleteSourcePlatformToken('matataki').then((result) => {
-              if (result.statusCode === 200) {
-                message.success(intl.formatMessage({ id: 'messages.source.unbindSuccess' }), 0);
-              } else {
-                message.error(intl.formatMessage({ id: 'messages.source.unbindFailed' }), 0);
-              }
-              done();
-              setUnbindLoading(false);
+            const result = await deleteSourcePlatformToken('matataki');
+            if (result.statusCode === 200) {
+              message.success(intl.formatMessage({ id: 'messages.source.unbindSuccess' }), 5);
+            } else {
+              message.error(intl.formatMessage({ id: 'messages.source.unbindFailed' }), 5);
+            }
+            await done();
+            setUnbindLoading(false);
+            setSourceStatus((source: GLOBAL.SourcePlatformStatus) => {
+              const copy = { ...source };
+              copy.matataki.active = false;
+              return copy;
             });
           }}
           type="primary"
@@ -78,40 +115,15 @@ export default () => {
     },
   };
 
-  const getStatus = (platform: GLOBAL.SourcePlatformProperties) =>
-    platform.active ? (
-      <Tag key={`${platform.name}_bind`} className="status" color="blue">
-        {intl.formatMessage({ id: 'component.status.alreadyBound' })}
-      </Tag>
-    ) : (
-      <Tag key={`${platform.name}_not_bind`} className="status" color="red">
-        {intl.formatMessage({ id: 'component.status.notBound' })}
-      </Tag>
-    );
-
-  const getActions = (platform: GLOBAL.SourcePlatformProperties) =>
+  const getActions = (platform: GLOBAL.SourcePlatformStatusProperties) =>
     platform.active
-      ? [actions[platform.name].sync, actions[platform.name].unbind]
-      : [actions[platform.name].bind];
+      ? [actionsOnPage[platform.name].sync, actionsOnPage[platform.name].unbind]
+      : [actionsOnPage[platform.name].bind];
 
-  useEffect(() => {
-    getSourceStatus().then((result) => {
-      setSourceStatus((source: GLOBAL.SourcePlatforms) => {
-        const copy = { ...source };
-        result.data.forEach((service: CMS.SourceStatusResponse) => {
-          if (copy[service.platform]) {
-            copy[service.platform].active = service.active;
-          }
-        });
-        return copy;
-      });
-      setPageLoading(false);
-    });
-  }, []);
-
-  const sourcePlatforms = [
+  const sourcePlatformsInformation = [
     {
-      title: ['Matataki', getStatus(sourceStatus.matataki)],
+      // Matataki [tag] (username)
+      title: ['Matataki', getStatus(sourceStatus.matataki), `(${sourceStatus.matataki.username})`],
       description: intl.formatMessage({ id: 'messages.source.matatakiDescription' }),
       actions: getActions(sourceStatus.matataki),
       avatar: <img className="icon" src="/icons/custom/matataki.png" alt="matataki icon" />,
@@ -131,7 +143,7 @@ export default () => {
           ) : (
             <List
               itemLayout="horizontal"
-              dataSource={sourcePlatforms}
+              dataSource={sourcePlatformsInformation}
               renderItem={(item) => (
                 <List.Item actions={item.actions}>
                   <List.Item.Meta

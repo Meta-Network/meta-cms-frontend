@@ -56,8 +56,12 @@ export default () => {
       return Promise.resolve();
     };
   const updateRepoSettings = async (values: { storeRepo: string; publishRepo: string }) => {
-    setStoreSetting((prev) => ({ ...prev, repos: values }));
-    message.success(intl.formatMessage({ id: 'messages.store.setRepoName' }, values));
+    if (values.storeRepo !== values.publishRepo) {
+      setStoreSetting((prev) => ({ ...prev, repos: values }));
+      message.success(intl.formatMessage({ id: 'messages.store.setRepoName' }, values));
+    } else {
+      message.error(intl.formatMessage({ id: 'messages.store.form.sameRepoName' }, values));
+    }
   };
 
   return (

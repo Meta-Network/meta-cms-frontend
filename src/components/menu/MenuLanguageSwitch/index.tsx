@@ -1,7 +1,8 @@
+import { setLocale } from 'umi';
+import { useState } from 'react';
 import { GlobalOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Typography } from 'antd';
 import style from './index.less';
-import { setLocale } from 'umi';
 
 const languages = [
   {
@@ -29,13 +30,25 @@ const menu = (
   </Menu>
 );
 
-export default () => (
-  <Dropdown
-    overlay={menu}
-    placement="topLeft"
-    overlayClassName={style.menuLanguageSwitch}
-    trigger={['click']}
-  >
-    <GlobalOutlined />
-  </Dropdown>
-);
+export default () => {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div
+      onClick={() => {
+        setVisible((v) => !v);
+        return;
+      }}
+    >
+      <Dropdown
+        overlay={menu}
+        placement="topLeft"
+        visible={visible}
+        onVisibleChange={(isVisible) => setVisible(isVisible)}
+        overlayClassName={style.menuLanguageSwitch}
+      >
+        <GlobalOutlined />
+      </Dropdown>
+    </div>
+  );
+};
