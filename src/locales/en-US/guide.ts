@@ -39,9 +39,9 @@ export default {
   'guide.result.titleWithPlatform':
     'You have successfully authorized {platform} as a storage repository',
   'guide.result.titleNoPlatform': 'You have successfully authorized the storage repository',
-  'guide.result.bindPlatformErrorTitle': 'Github account has already used',
+  'guide.result.bindPlatformErrorTitle': 'GitHub account has already used',
   'guide.result.bindPlatformErrorDescription':
-    'A Github account can only be binding to one Meta Space Account',
+    'A GitHub account can only be binding to one Meta Space Account',
   'guide.result.description': 'Now you can close this browser page',
   'guide.config.form.title': 'Title',
   'guide.config.form.titlePlaceholder': 'Your Meta Space title',
