@@ -23,3 +23,6 @@ export const OSS_MATATAKI = 'https://smartsignature-img.oss-cn-hongkong.aliyuncs
 export const GUN_PEERS = ['https://gun-manhattan.herokuapp.com/gun'];
 export const KEY_GUN_ROOT = 'meta.io_v7';
 export const KEY_GUN_ROOT_DRAFT = 'cms_draft';
+
+export const EDITOR_LEARN =
+  'https://meta-io.gitbook.io/meta-wiki/how-to-use/how-to-create-content-for-meta-space';
