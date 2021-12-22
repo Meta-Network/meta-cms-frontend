@@ -190,4 +190,10 @@ export default {
   'messages.dashboard.publishing': 'Publishing...',
   'messages.dashboard.submitted': 'Submitted',
   'messages.dashboard.settings': 'Settings',
+  'messages.editor.notification.title': 'Notification',
+  'messages.editor.publish.notification.fail':
+    'We are very sorry that the article submission storage failed, please try again or send us feedback and Meta Team will do our best to improve it.',
+  'messages.editor.uploadAllImages.notification': 'Images are being decentralised in storage.',
+  'messages.editor.uploadAllImages.success':
+    'The decentralised storage of images is complete, thanks for your patience.',
 };

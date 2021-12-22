@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useCallback, useEffect } from 'react';
 import { history, useIntl, useModel } from 'umi';
-import { Input, message } from 'antd';
+import { Input, message, notification } from 'antd';
 import Editor from '@/components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
@@ -49,6 +49,9 @@ import {
   signIn,
 } from '@/utils/gun';
 import { storeGet } from '@/utils/store';
+
+const keyUploadAllImages = 'keyUploadAllImages';
+const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
@@ -338,6 +341,18 @@ const Edit: React.FC = () => {
       } else {
         message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
       }
+
+      if (!(result.statusCode === 201 || result.statusCode === 200)) {
+        notification.open({
+          message: intl.formatMessage({
+            id: 'messages.editor.notification.title',
+          }),
+          description: intl.formatMessage({
+            id: 'messages.editor.publish.notification.fail',
+          }),
+          duration: null,
+        });
+      }
     },
     [
       title,
@@ -413,6 +428,18 @@ const Edit: React.FC = () => {
         message.error(result.message);
       } else {
         message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
+      }
+
+      if (!(result.statusCode === 201 || result.statusCode === 200)) {
+        notification.open({
+          message: intl.formatMessage({
+            id: 'messages.editor.notification.title',
+          }),
+          description: intl.formatMessage({
+            id: 'messages.editor.publish.notification.fail',
+          }),
+          duration: null,
+        });
       }
     },
     [
@@ -611,21 +638,37 @@ const Edit: React.FC = () => {
     if (imgListFilter.length > 0) {
       _vditor.disabled();
 
+      notification.open({
+        key: keyUploadAllImages,
+        message: intl.formatMessage({
+          id: 'messages.editor.notification.title',
+        }),
+        description: intl.formatMessage({
+          id: 'messages.editor.uploadAllImages.notification',
+        }),
+        duration: null,
+      });
+
       for (let i = 0; i < imgListFilter.length; i++) {
         const ele = imgListFilter[i];
 
         const result = await imageUploadByUrlAPI(ele.src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI));
         if (result) {
           // _vditor.tip('上传成功', 2000);
-          message.success(
-            intl.formatMessage({
-              id: 'messages.editor.upload.image.success',
-            }),
-          );
           ele.src = result.publicUrl;
           ele.alt = result.key;
         }
       }
+
+      notification.close(keyUploadAllImages);
+
+      message.destroy(keyUploadAllImagesMessage);
+      message.success({
+        key: keyUploadAllImagesMessage,
+        content: intl.formatMessage({
+          id: 'messages.editor.uploadAllImages.success',
+        }),
+      });
 
       // console.log('imgList', imgList);
 
