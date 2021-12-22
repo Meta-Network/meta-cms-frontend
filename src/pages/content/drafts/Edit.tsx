@@ -833,7 +833,7 @@ const Edit: React.FC = () => {
             id: 'editor.title',
           })}
           className={styles.title}
-          maxLength={30}
+          maxLength={100}
           value={title}
           onChange={(e) => handleChangeTitle(e.target.value)}
         />
