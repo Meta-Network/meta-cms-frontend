@@ -166,7 +166,7 @@ export async function fetchPostSync(params: { page: number; limit: number; state
  */
 export async function fetchPostsStorage(
   siteConfigId: number,
-  params: { page: number; limit: number; state: FetchPostsStorageParamsState },
+  params: { page?: number; limit?: number; state: FetchPostsStorageParamsState },
 ) {
   return request<GLOBAL.GeneralResponse<CMS.ExistsPostsResponse>>(`/post/storage/${siteConfigId}`, {
     method: 'GET',

@@ -13,8 +13,9 @@ import {
   PostTempData,
   dbMetadatasAdd,
   MetadataTempData,
+  dbPostsWhereExistByTitle,
 } from '@/db/db';
-import { imageUploadByUrlAPI, getDefaultSiteConfigAPI } from '@/helpers';
+import { imageUploadByUrlAPI } from '@/helpers';
 import { assign, cloneDeep } from 'lodash';
 // import type Vditor from 'vditor';
 import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
@@ -28,7 +29,7 @@ import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
 import type { PostMetadata } from '@metaio/meta-signature-util';
-import { postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
+import { fetchPostsStorage, postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
 import moment from 'moment';
 import {
@@ -38,7 +39,7 @@ import {
   KEY_GUN_ROOT_DRAFT,
   KEY_META_CMS_GUN_PAIR,
 } from '../../../../config';
-import { DraftMode } from '@/services/constants';
+import { DraftMode, FetchPostsStorageParamsState } from '@/services/constants';
 import Gun from 'gun';
 import {
   fetchGunDraftsAndUpdateLocal,
@@ -427,6 +428,47 @@ const Edit: React.FC = () => {
     ],
   );
 
+  const checkTitle = useCallback(
+    async ({ titleValue, id }: { titleValue: string; id: number }): Promise<boolean> => {
+      /**
+       * check local draft
+       * check repo post
+       */
+
+      if (!initialState?.currentUser && !initialState?.siteConfig) {
+        return false;
+      }
+
+      const isLocalExist = await dbPostsWhereExistByTitle({
+        title: titleValue,
+        id,
+        userId: initialState.currentUser!.id,
+      });
+      // console.log('isLocalExist', isLocalExist);
+
+      if (isLocalExist) {
+        return false;
+      }
+
+      const allPostsResult = await fetchPostsStorage(initialState.siteConfig!.id, {
+        state: FetchPostsStorageParamsState.Posted,
+      });
+
+      if (allPostsResult.statusCode !== 200) {
+        return false;
+      }
+      const isExistPost = allPostsResult.data.items.some((i) => i.title === titleValue);
+      // console.log('isExistPost', isExistPost);
+
+      if (isExistPost) {
+        return false;
+      }
+
+      return true;
+    },
+    [initialState],
+  );
+
   // handle publish
   const handlePublish = useCallback(
     async (gateway: boolean) => {
@@ -449,6 +491,17 @@ const Edit: React.FC = () => {
         return;
       }
 
+      // check title
+      if (
+        !(await checkTitle({
+          titleValue: title,
+          id: Number(id),
+        }))
+      ) {
+        message.warning('标题重复，请修改');
+        return;
+      }
+
       // check cover format
       if (cover && !cover.includes(FLEEK_NAME)) {
         message.success(
@@ -459,7 +512,7 @@ const Edit: React.FC = () => {
         return;
       }
 
-      const siteConfig = await getDefaultSiteConfigAPI();
+      const siteConfig = initialState?.siteConfig;
       if (!siteConfig) {
         message.warning(
           intl.formatMessage({
@@ -484,7 +537,16 @@ const Edit: React.FC = () => {
         });
       }
     },
-    [title, cover, content, postStorageUpdateFn, postStoragePublishFn, intl],
+    [
+      title,
+      cover,
+      content,
+      postStorageUpdateFn,
+      postStoragePublishFn,
+      checkTitle,
+      initialState,
+      intl,
+    ],
   );
 
   /**
