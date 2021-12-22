@@ -14,7 +14,6 @@ import {
   dbMetadatasAdd,
   MetadataTempData,
 } from '@/db/db';
-import type { Posts } from '@/db/Posts.d';
 import { imageUploadByUrlAPI, getDefaultSiteConfigAPI } from '@/helpers';
 import { assign, cloneDeep } from 'lodash';
 // import type Vditor from 'vditor';
@@ -52,7 +51,7 @@ import { storeGet } from '@/utils/store';
 
 const Edit: React.FC = () => {
   const intl = useIntl();
-  const [postData, setPostData] = useState<Posts>({} as Posts);
+  const [postData, setPostData] = useState<PostType.Posts>({} as PostType.Posts);
   const [cover, setCover] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
@@ -108,7 +107,7 @@ const Edit: React.FC = () => {
 
         // 解密
         const msg = await Gun.SEA.verify(data, pair.pub);
-        const gunDraft = (await Gun.SEA.decrypt(msg, pair)) as Posts;
+        const gunDraft = (await Gun.SEA.decrypt(msg, pair)) as PostType.Posts;
 
         // 如果文章变动
         if (

@@ -1,16 +1,15 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
 import { dbPostsUpdate, dbMetadatasUpdateByPostId } from '@/db/db';
-import type { Posts } from '@/db/Posts';
 import { strSlice } from '@/utils';
 import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
-import type { GunDraft } from '@/utils/gun';
+import moment from 'moment';
 
 export default () => {
   const intl = useIntl();
-  const [postsList, setPostsList] = useState<GunDraft[]>([]);
+  const [postsList, setPostsList] = useState<GunType.GunDraft[]>([]);
   const { initialState } = useModel('@@initialState');
 
   /** handle delete */
@@ -39,124 +38,129 @@ export default () => {
   const fetchPosts = useCallback(async () => {
     if (initialState?.currentUser) {
       const response = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
-      setPostsList(response);
+      const responseSort = response.sort((a, b) =>
+        Number(moment(a.updatedAt).isBefore(b.updatedAt)),
+      );
+      setPostsList(responseSort);
     }
   }, [initialState]);
 
-  const columns = [
-    {
-      title: 'COVER',
-      dataIndex: 'cover',
-      key: 'cover',
-      width: 100,
-      render: (val: string) => (
-        <>
-          {val ? (
-            <Image
-              onClick={(e) => e.stopPropagation()}
-              width={100}
-              height={50}
-              src={val}
-              style={{ objectFit: 'cover' }}
-            />
-          ) : (
-            <div style={{ width: 100, height: 50, backgroundColor: '#dcdcdc' }} />
-          )}
-        </>
-      ),
-    },
-    {
-      title: 'TITLE',
-      dataIndex: 'title',
-      key: 'title',
-      render: (val: string) => <span>{val}</span>,
-    },
-    {
-      title: 'SUMMARY',
-      dataIndex: 'summary',
-      key: 'summary',
-      render: (val: string) => <span>{strSlice(val, 40)}</span>,
-    },
-    {
-      title: 'STATUS',
-      dataIndex: 'status',
-      key: 'status',
-      width: 100,
-      render: (_: any, record: Posts) => (
-        <Tag key={record.id}>
-          {record.post
-            ? record.post.state === 'drafted'
-              ? intl.formatMessage({
-                  id: 'posts.table.status.cloudDraft',
-                })
-              : record.post.state === 'pending'
-              ? intl.formatMessage({
-                  id: 'posts.table.status.pending',
-                })
-              : record.post.state === 'published'
-              ? intl.formatMessage({
-                  id: 'posts.table.status.published',
-                })
+  const columns = useMemo(() => {
+    return [
+      {
+        title: 'COVER',
+        dataIndex: 'cover',
+        key: 'cover',
+        width: 100,
+        render: (val: string) => (
+          <>
+            {val ? (
+              <Image
+                onClick={(e) => e.stopPropagation()}
+                width={100}
+                height={50}
+                src={val}
+                style={{ objectFit: 'cover' }}
+              />
+            ) : (
+              <div style={{ width: 100, height: 50, backgroundColor: '#dcdcdc' }} />
+            )}
+          </>
+        ),
+      },
+      {
+        title: 'TITLE',
+        dataIndex: 'title',
+        key: 'title',
+        render: (val: string) => <span>{val}</span>,
+      },
+      {
+        title: 'SUMMARY',
+        dataIndex: 'summary',
+        key: 'summary',
+        render: (val: string) => <span>{strSlice(val, 40)}</span>,
+      },
+      {
+        title: 'STATUS',
+        dataIndex: 'status',
+        key: 'status',
+        width: 100,
+        render: (_: any, record: PostType.Posts) => (
+          <Tag key={record.id}>
+            {record.post
+              ? record.post.state === 'drafted'
+                ? intl.formatMessage({
+                    id: 'posts.table.status.cloudDraft',
+                  })
+                : record.post.state === 'pending'
+                ? intl.formatMessage({
+                    id: 'posts.table.status.pending',
+                  })
+                : record.post.state === 'published'
+                ? intl.formatMessage({
+                    id: 'posts.table.status.published',
+                  })
+                : intl.formatMessage({
+                    id: 'posts.table.status.localDraft',
+                  })
               : intl.formatMessage({
                   id: 'posts.table.status.localDraft',
-                })
-            : intl.formatMessage({
-                id: 'posts.table.status.localDraft',
+                })}
+          </Tag>
+        ),
+      },
+      {
+        title: 'ACTION',
+        dataIndex: 'status',
+        key: 'status',
+        width: 180,
+        render: (val: string, record: GunType.GunDraft) => (
+          <Space>
+            {val === 'pending' ? (
+              <Button
+                onClick={() => {
+                  history.push({
+                    pathname: '/content/drafts/edit',
+                    query: {
+                      id: String(record.id),
+                    },
+                  });
+                }}
+              >
+                {intl.formatMessage({
+                  id: 'component.button.edit',
+                })}
+              </Button>
+            ) : null}
+            <Popconfirm
+              title={intl.formatMessage({
+                id: 'posts.table.action.delete.confirm',
               })}
-        </Tag>
-      ),
-    },
-    {
-      title: 'ACTION',
-      dataIndex: 'status',
-      key: 'status',
-      width: 180,
-      render: (val: string, record: GunDraft) => (
-        <Space>
-          {val === 'pending' ? (
-            <Button
-              onClick={() => {
-                history.push({
-                  pathname: '/content/drafts/edit',
-                  query: {
-                    id: String(record.id),
-                  },
-                });
+              onConfirm={async (e) => {
+                e?.stopPropagation();
+                console.log(record);
+                await handleDelete(Number(record.id), record?.key);
+                await fetchPosts();
               }}
+              onCancel={(e) => e?.stopPropagation()}
+              okText={intl.formatMessage({
+                id: 'component.button.yes',
+              })}
+              cancelText={intl.formatMessage({
+                id: 'component.button.no',
+              })}
             >
-              {intl.formatMessage({
-                id: 'component.button.edit',
-              })}
-            </Button>
-          ) : null}
-          <Popconfirm
-            title={intl.formatMessage({
-              id: 'posts.table.action.delete.confirm',
-            })}
-            onConfirm={async (e) => {
-              e?.stopPropagation();
-              console.log(record);
-              await handleDelete(Number(record.id), record?.key);
-              await fetchPosts();
-            }}
-            onCancel={(e) => e?.stopPropagation()}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
-          >
-            <Button danger onClick={(e) => e.stopPropagation()}>
-              {intl.formatMessage({
-                id: 'component.button.delete',
-              })}
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+              <Button danger onClick={(e) => e.stopPropagation()}>
+                {intl.formatMessage({
+                  id: 'component.button.delete',
+                })}
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ];
+  }, [fetchPosts, handleDelete, intl]);
 
   useEffect(() => {
     fetchPosts();
@@ -177,7 +181,7 @@ export default () => {
       }
     >
       <Table
-        rowKey={(record: Posts) => String(record.id)}
+        rowKey={(record: PostType.Posts) => `${String(record.id)}}`}
         onRow={() => {
           return {};
         }}
