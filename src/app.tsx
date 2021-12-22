@@ -6,18 +6,19 @@ import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import { fetchPostsStorage } from '@/services/api/meta-cms';
 import { dbPostsAllCount } from './db/db';
+import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
 import MenuUserInfo from './components/menu/MenuUserInfo';
 import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
+import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 import PublishSiteButton from './components/menu/PublishSiteButton';
+import { FetchPostsStorageParamsState } from './services/constants';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
-import { getDefaultSiteConfigAPI } from './helpers/index';
-import { FetchPostsStorageParamsState } from './services/constants';
-import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 
 const { Text } = Typography;
+let userTokenCache: GLOBAL.GeneralResponse<GLOBAL.CurrentUser> | null = null;
 
 function CustomSiderMenu({
   initialState,
@@ -74,7 +75,9 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<GLOBAL.InitialState> {
   const fetchUserInfo = async () => {
     try {
-      await refreshTokens();
+      if (!userTokenCache) {
+        userTokenCache = await refreshTokens();
+      }
       const msg = await queryCurrentUser();
       return msg.data;
     } catch (error) {

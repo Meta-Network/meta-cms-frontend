@@ -8,7 +8,13 @@ import {
   QuestionOutlined,
   YoutubeOutlined,
 } from '@ant-design/icons';
-import { TelegramIcon, DiscordIcon, ElementIcon, MetaLogoIcon } from '../../Icon/index';
+import {
+  TelegramIcon,
+  DiscordIcon,
+  ElementIcon,
+  MetaLogoIcon,
+  MetaWikiIcon,
+} from '../../Icon/index';
 import style from './index.less';
 
 const menuJson = [
@@ -63,7 +69,12 @@ const menuJson = [
       {
         url: 'https://home.metanetwork.online',
         icon: <MetaLogoIcon />,
-        name: 'home',
+        name: <FormattedMessage id="menu.moreInfo.home" />,
+      },
+      {
+        url: 'https://meta-io.gitbook.io/meta-wiki',
+        icon: <MetaWikiIcon />,
+        name: 'Wiki',
       },
     ],
   },

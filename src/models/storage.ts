@@ -1,20 +1,47 @@
+import { useModel } from '@@/plugin-model/useModel';
 import { useEffect, useState } from 'react';
 
 export default () => {
-  const [themeSetting, setThemeSetting] = useState<number>(
-    JSON.parse(window.localStorage.getItem('themeSetting') || '-1'),
+  const username = useModel('@@initialState').initialState?.currentUser?.username;
+  const getLocalStorage = (key: string) => JSON.parse(window.localStorage.getItem(key) || '{}');
+  const generateSetFunction = (func: any) => {
+    return (value: any, isUpdate = false) => {
+      if (username) {
+        if (isUpdate) {
+          func((prev: any) => {
+            const copy = { ...prev };
+            copy[username] = { ...prev[username], ...value };
+            return copy;
+          });
+        } else {
+          func((prev: any) => {
+            const copy = { ...prev };
+            copy[username] = value;
+            return copy;
+          });
+        }
+      }
+    };
+  };
+
+  // const [themeSetting, setThemeSetting] = useState<Record<string, number>>(
+  //   getLocalStorage('themeSetting'),
+  // );
+
+  const [domainSettingInternal, setDomainSettingInternal] = useState<Record<string, string | null>>(
+    getLocalStorage('domainSetting'),
   );
-  const [domainSetting, setDomainSetting] = useState<string | null>(
-    JSON.parse(window.localStorage.getItem('domainSetting') || 'null'),
-  );
-  const [storeSetting, setStoreSetting] = useState<GLOBAL.StoreSetting>(
-    JSON.parse(window.localStorage.getItem('storeSetting') || '{}'),
-  );
-  const [siteSetting, setSiteSetting] = useState<GLOBAL.SiteSetting>(
-    JSON.parse(window.localStorage.getItem('siteSetting') || '{}'),
-  );
-  const [siteNeedToDeploy, setSiteNeedToDeploy] = useState<boolean>(
-    JSON.parse(window.localStorage.getItem('siteNeedToDeploy') || 'false'),
+
+  const [storeSettingInternal, setStoreSettingInternal] = useState<
+    Record<string, Partial<GLOBAL.StoreSetting>>
+  >(getLocalStorage('storeSetting'));
+
+  const [siteSettingInternal, setSiteSettingInternal] = useState<
+    Record<string, GLOBAL.SiteSetting>
+  >(getLocalStorage('siteSetting'));
+
+  const [siteNeedToDeployInternal, setSiteNeedToDeployInternal] = useState<Record<string, boolean>>(
+    getLocalStorage('siteNeedToDeploy'),
   );
 
   const setStorage = (key: string, value: any) => {
@@ -22,30 +49,46 @@ export default () => {
   };
 
   useEffect(() => {
-    setStorage('domainSetting', domainSetting);
-  }, [domainSetting]);
+    setStorage('domainSetting', domainSettingInternal);
+  }, [domainSettingInternal]);
+
+  // useEffect(() => {
+  //   setStorage('themeSetting', themeSetting);
+  // }, [themeSetting]);
 
   useEffect(() => {
-    setStorage('themeSetting', themeSetting);
-  }, [themeSetting]);
+    setStorage('storeSetting', storeSettingInternal);
+  }, [storeSettingInternal]);
 
   useEffect(() => {
-    setStorage('storeSetting', storeSetting);
-  }, [storeSetting]);
+    setStorage('siteSetting', siteSettingInternal);
+  }, [siteSettingInternal]);
 
   useEffect(() => {
-    setStorage('siteSetting', siteSetting);
-  }, [siteSetting]);
+    setStorage('siteNeedToDeploy', siteNeedToDeployInternal);
+  }, [siteNeedToDeployInternal]);
 
-  useEffect(() => {
-    setStorage('siteNeedToDeploy', siteNeedToDeploy);
-  }, [siteNeedToDeploy]);
+  const domainSetting = username ? domainSettingInternal[username] : '';
+  const setDomainSetting = generateSetFunction(setDomainSettingInternal);
+
+  const storeSetting = username
+    ? storeSettingInternal[username]
+    : ({} as Partial<GLOBAL.StoreSetting>);
+  const setStoreSetting = generateSetFunction(setStoreSettingInternal);
+
+  const siteSetting = username
+    ? siteSettingInternal[username]
+    : ({} as Partial<GLOBAL.SiteSetting>);
+  const setSiteSetting = generateSetFunction(setSiteSettingInternal);
+
+  const siteNeedToDeploy = username ? siteNeedToDeployInternal[username] : false;
+  const setSiteNeedToDeploy = generateSetFunction(setSiteNeedToDeployInternal);
 
   return {
     domainSetting,
     setDomainSetting,
-    themeSetting,
-    setThemeSetting,
+    // themeSetting,
+    // setThemeSetting,
     storeSetting,
     setStoreSetting,
     siteSetting,

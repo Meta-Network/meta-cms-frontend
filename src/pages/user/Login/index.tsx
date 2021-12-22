@@ -1,5 +1,6 @@
 export default () => {
-  window.location.href = `https://meta-network.mttk.net/oauth/login?redirect=${encodeURIComponent(
-    window.location.origin,
-  )}`;
+  const fe = new URL(META_NETWORK_FE);
+  fe.pathname = '/oauth/login';
+  fe.searchParams.set('redirect', encodeURIComponent(window.location.origin));
+  window.location.href = fe.href;
 };

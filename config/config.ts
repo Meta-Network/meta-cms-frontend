@@ -10,7 +10,8 @@ export default defineConfig({
     hmr: true,
   },
   define: {
-    META_NETWORK_API: process.env.META_NETWORK_API || 'https://meta-network-api.testenv.mttk.net/',
+    META_NETWORK_API: process.env.META_NETWORK_API || 'https://meta-network-api.testenv.mttk.net',
+    META_NETWORK_FE: process.env.META_NETWORK_FE || 'https://metanetwork.online',
     META_UCENTER_API: process.env.META_UCENTER_API || 'https://ucenter-test-api.mttk.net',
     META_CMS_API: process.env.META_CMS_API || 'https://meta-cms-api-dev.mttk.net',
     META_STORAGE_API:
@@ -32,7 +33,7 @@ export default defineConfig({
   // https://umijs.org/zh-CN/plugins/plugin-locale
   locale: {
     // default zh-CN
-    default: 'zh-CN',
+    default: 'en-US',
     antd: true,
     baseNavigator: true,
   },

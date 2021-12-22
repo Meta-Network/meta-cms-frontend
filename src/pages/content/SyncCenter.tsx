@@ -38,7 +38,7 @@ export default () => {
   const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
 
   getDefaultSiteConfig().then((response) => {
-    if (response.statusCode === 200) {
+    if (response.data) {
       setSiteConfigId(response.data.id);
     }
   });

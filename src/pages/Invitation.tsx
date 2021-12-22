@@ -59,9 +59,11 @@ export default () => {
                   disabled={item.invitee_user_id !== 0} // invitation code used
                 />
               </ProFrom>
-              <span className={styles.flexedListElement}>
-                {intl.formatMessage({ id: 'component.status.used' })}
-              </span>
+              {item.invitee_user_id !== 0 ? (
+                <span className={styles.flexedListElement}>
+                  {intl.formatMessage({ id: 'component.status.used' })}
+                </span>
+              ) : null}
             </List.Item>
           );
         }}

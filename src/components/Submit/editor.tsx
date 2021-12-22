@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { Fragment, useCallback, useState, useEffect } from 'react';
+import { Fragment, useCallback, useState, useEffect } from 'react';
 import {
   Card,
   Form,
