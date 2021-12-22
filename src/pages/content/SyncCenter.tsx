@@ -32,8 +32,7 @@ export default () => {
   const intl = useIntl();
   const [siteConfigId, setSiteConfigId] = useState<number | null>(null);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
-  // transfer draft loading
-  const [transferDraftLoading, setTransferDraftLoading] = useState<boolean>(false);
+  const [editCurrentId, setEditCurrentId] = useState<number>(0);
   const { getLockedConfigState, setLockedConfig } = useModel('global');
   const { setSiteNeedToDeploy } = useModel('storage');
   const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
@@ -95,12 +94,12 @@ export default () => {
         return;
       }
 
-      setTransferDraftLoading(true);
+      setEditCurrentId(post.id);
 
       // check save as draft
       const isExist = await dbPostsWhereExist(post.id);
       if (isExist) {
-        setTransferDraftLoading(false);
+        setEditCurrentId(0);
 
         const currentDraft = await dbPostsWhereByID(post.id);
         const _url = currentDraft
@@ -160,7 +159,7 @@ export default () => {
         console.error(e);
         message.success(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
       } finally {
-        setTransferDraftLoading(false);
+        setEditCurrentId(0);
       }
     },
     [intl, currentUser],
@@ -268,7 +267,8 @@ export default () => {
       render: (_, record) => [
         <Button
           onClick={() => transferDraft(record)}
-          loading={transferDraftLoading}
+          loading={editCurrentId === record.id}
+          disabled={editCurrentId !== 0 && editCurrentId !== record.id}
           ghost
           type="primary"
         >

@@ -96,7 +96,7 @@ export default () => {
         title: 'TITLE',
         dataIndex: 'title',
         key: 'title',
-        render: (val: string) => <span>{val}</span>,
+        render: (val: string) => <span>{strSlice(val, 40)}</span>,
       },
       {
         title: 'SUMMARY',
