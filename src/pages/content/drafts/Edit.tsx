@@ -315,8 +315,9 @@ const Edit: React.FC = () => {
 
         // 统一 title 方便下次 更新
         const _post = {
-          ...result.data[0],
+          ...result.data.posts[0],
           titleInStorage: title,
+          stateId: result.data.stateIds[0],
         };
 
         const { id } = history.location.query as Router.PostQuery;
@@ -390,11 +391,13 @@ const Edit: React.FC = () => {
       if (result.statusCode === 201 || result.statusCode === 200) {
         message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
+        const _post = {
+          ...result.data.posts[0],
+          stateId: result.data.stateIds[0],
+        };
+
         const { id } = history.location.query as Router.PostQuery;
-        await handleUpdate(
-          Number(id),
-          postDataMergedUpdateAt({ post: result.data[0], draft: null }),
-        );
+        await handleUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
 
         setSiteNeedToDeploy(true);
         history.push('/content/drafts');

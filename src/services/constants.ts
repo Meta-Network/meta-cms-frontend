@@ -88,3 +88,10 @@ export const Storages = [
     },
   },
 ];
+
+export enum TaskCommonState {
+  TODO = 'TODO',
+  DOING = 'DOING',
+  SUCCESS = 'SUCCESS',
+  FAIL = 'FAIL',
+}

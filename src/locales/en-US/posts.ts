@@ -5,6 +5,11 @@ export default {
   'posts.table.status.cloudDraft': 'Cloud draft',
   'posts.table.status.pending': 'To be released',
   'posts.table.status.published': 'Published',
+  'posts.table.status.todo': 'Queuing to submit',
+  'posts.table.status.doing': 'Submitting',
+  'posts.table.status.success': 'Submitted',
+  'posts.table.status.fail': 'Submission Failed',
+  'posts.table.status.other': 'Other status',
   'posts.table.action.delete.confirm': 'Confirm delete?',
   'posts.table.action.delete.success': 'Successfully deleted',
 };

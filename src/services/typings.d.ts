@@ -164,6 +164,36 @@ declare namespace CMS {
     serverVerificationMetadataStorageType: MetadataStorageType;
   };
 
+  type PostStoragePublish = {
+    posts: Post[];
+    stateIds: number[];
+  };
+
+  // TODO： 暂时不知道怎么导入，先重复写一份
+  enum TaskCommonState {
+    TODO = 'TODO',
+    DOING = 'DOING',
+    SUCCESS = 'SUCCESS',
+    FAIL = 'FAIL',
+  }
+
+  enum PostAction {
+    CREATE = 'CREATE',
+    UPDATE = 'UPDATE',
+    DELETE = 'DELETE',
+  }
+
+  type FetchPostsStorageState = {
+    action: PostAction;
+    createdAt: Date;
+    id: number;
+    postTitle: string;
+    siteConfig: CMS.SiteConfiguration;
+    state: TaskCommonState;
+    taskWorkspace: string;
+    updatedAt: Date;
+  };
+
   type ExistsPostsResponse = {
     items: Post[];
     meta: {
