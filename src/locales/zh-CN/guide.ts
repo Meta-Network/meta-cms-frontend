@@ -56,6 +56,8 @@ export default {
   'guide.result.titleWithPlatform': '您已成功授权 {platform} 作为存储仓库',
   'guide.result.titleNoPlatform': '您已成功授权存储仓库',
   'guide.result.description': '现在您可以关闭此浏览器页面',
+  'guide.result.bindPlatformErrorTitle': '本账号已经与另一个 Meta Network 账号所绑定',
+  'guide.result.bindPlatformErrorDescription': '请关闭本页面并尝试另一个账号',
   'guide.config.form.title': '标题',
   'guide.config.form.titlePlaceholder': '您的 Meta Space 标题',
   'guide.config.form.subtitle': '副标题',

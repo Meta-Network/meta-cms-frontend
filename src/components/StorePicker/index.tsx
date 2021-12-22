@@ -11,7 +11,7 @@ export default () => {
   const visibleState = useState(false);
   const [, setModalVisible] = visibleState;
 
-  const confirmedState = useState<string>(storeSetting.storage);
+  const confirmedState = useState<string>(storeSetting?.storage ?? '');
   const [storeConfirmed, setStoreConfirmed] = confirmedState;
 
   const [selectedStoreName, setSelectedStoreName] = useState('');
@@ -22,17 +22,17 @@ export default () => {
       description: intl.formatMessage({ id: 'guide.storage.githubDescription' }),
       avatar: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
     },
-    {
-      name: 'Gitee',
-      description: intl.formatMessage({ id: 'guide.storage.giteeDescription' }),
-      avatar: 'https://gitee.com/static/images/logo_gitee_g_red.png',
-    },
+    // {
+    //   name: 'Gitee',
+    //   description: intl.formatMessage({ id: 'guide.storage.giteeDescription' }),
+    //   avatar: 'https://gitee.com/static/images/logo_gitee_g_red.png',
+    // },
   ];
 
   useEffect(() => {
     const validating = async () => {
       if (storeConfirmed) {
-        if (storeSetting.storage && storeSetting.username) return;
+        if (storeSetting?.storage && storeSetting?.username) return;
 
         switch (storeConfirmed) {
           case 'GitHub': {
@@ -61,9 +61,14 @@ export default () => {
     validating().catch((error) => {
       setStoreConfirmed('');
       setStoreSetting({ storage: '', username: '' });
-      message.error(
-        intl.formatMessage({ id: 'guide.storage.selectStorageFailed' }, { reason: error }),
-      );
+      message
+        .error(
+          intl.formatMessage(
+            { id: 'guide.storage.selectStorageFailed' },
+            { reason: error.message },
+          ),
+        )
+        .then();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setStoreConfirmed, setStoreSetting, storeConfirmed]);
@@ -102,7 +107,7 @@ export default () => {
       <p>
         <FormattedMessage id="guide.storage.currentStorage" />
         <strong>
-          {storeConfirmed && storeSetting.username
+          {storeConfirmed && storeSetting?.username
             ? `${storeConfirmed} (${storeSetting.username})`
             : intl.formatMessage({ id: 'guide.storage.unselected' })}
         </strong>

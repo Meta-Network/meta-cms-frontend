@@ -1,17 +1,10 @@
 ﻿export default [
   {
     path: '/create',
-    component: './Guide',
+    component: './CreateSite',
     name: 'create',
     icon: 'PlusSquare',
-    // access: 'hasNoSite',
-  },
-  {
-    path: '/dashboard',
-    component: './Dashboard',
-    name: 'dashboard',
-    icon: 'dashboard',
-    access: 'hasSite',
+    access: 'hasNoSite',
   },
   {
     path: '/user',

@@ -19,7 +19,7 @@ export default () => {
 
   useEffect(() => {
     if (userRepos.length !== 0) return;
-    if (storeSetting.username) {
+    if (storeSetting?.username) {
       // TODO: This is for Github only
       getGithubReposName()
         .then((result) => {
@@ -57,7 +57,7 @@ export default () => {
     };
   const updateRepoSettings = async (values: { storeRepo: string; publishRepo: string }) => {
     if (values.storeRepo !== values.publishRepo) {
-      setStoreSetting((prev) => ({ ...prev, repos: values }));
+      setStoreSetting({ repos: values }, true);
       message.success(intl.formatMessage({ id: 'messages.store.setRepoName' }, values));
     } else {
       message.error(intl.formatMessage({ id: 'messages.store.form.sameRepoName' }, values));

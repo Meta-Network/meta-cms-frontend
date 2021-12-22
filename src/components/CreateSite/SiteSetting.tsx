@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import React, { useState } from 'react';
+import React from 'react';
 import ProForm from '@ant-design/pro-form';
 import { getLocale, useModel, useIntl } from 'umi';
 import SiteSettingFormItems from '../SiteSettingFormItems';
@@ -17,10 +17,10 @@ export default () => {
     siteSetting: Partial<GLOBAL.SiteSetting>;
     setSiteSetting: React.Dispatch<React.SetStateAction<GLOBAL.SiteSetting>>;
   } = useModel('storage');
-
-  const [faviconUrl, setFaviconUrl] = useState<string>(
-    siteSetting.favicon || META_SPACE_DEFAULT_FAVICON_URL,
-  );
+  const faviconUrl = META_SPACE_DEFAULT_FAVICON_URL;
+  // const [faviconUrl, setFaviconUrl] = useState<string>(
+  //   siteSetting.favicon || META_SPACE_DEFAULT_FAVICON_URL,
+  // );
 
   const author = initialState?.currentUser?.nickname || '';
 
@@ -49,7 +49,7 @@ export default () => {
       onFinish={handleFinishing}
       requiredMark="optional"
     >
-      <SiteSettingFormItems faviconUrl={faviconUrl} setFavIconUrl={setFaviconUrl} />
+      <SiteSettingFormItems />
     </ProForm>
   );
 };

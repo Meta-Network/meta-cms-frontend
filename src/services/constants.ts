@@ -28,7 +28,7 @@ export enum StorageKeys {
   DomainSetting = 'domainSetting',
   SiteSetting = 'siteSetting',
   StoreSetting = 'storeSetting',
-  ThemeSetting = 'themeSetting',
+  // ThemeSetting = 'themeSetting',
 }
 
 export enum FetchPostsStorageParamsState {
@@ -45,13 +45,13 @@ export const Storages = [
       return Storage.get(this.key);
     },
   },
-  {
-    title: 'guide.theme.title',
-    key: 'themeSetting',
-    get value() {
-      return Storage.get(this.key);
-    },
-  },
+  // {
+  //   title: 'guide.theme.title',
+  //   key: 'themeSetting',
+  //   get value() {
+  //     return Storage.get(this.key);
+  //   },
+  // },
   {
     title: 'guide.config.title',
     key: 'siteSetting',

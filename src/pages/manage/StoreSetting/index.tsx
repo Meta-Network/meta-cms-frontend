@@ -40,7 +40,7 @@ export default () => {
 
   const getActionsAndTitle = useMemo(
     () => (store: typeof storeNames[number], username: string) => {
-      if (username) {
+      if (username !== '') {
         return {
           title: [
             store,
@@ -73,6 +73,7 @@ export default () => {
 
   useEffect(() => {
     storeNames.forEach((name) => {
+      console.log(stores);
       getUsernameOfStore(name)
         .then((username) => {
           const { actions, title } = getActionsAndTitle(name, username);
@@ -90,7 +91,22 @@ export default () => {
             return copy;
           });
         })
-        .catch(() => null);
+        .catch(() => {
+          const { actions, title } = getActionsAndTitle(name, '');
+          setStores((previous) => {
+            const store = previous.find((e) => e.name === name);
+            if (!store) {
+              return previous;
+            }
+            const copy = previous.slice();
+            const index = previous.findIndex((e) => e.name === name);
+            store.actions = actions;
+            store.title = title;
+
+            copy[index] = store;
+            return copy;
+          });
+        });
     });
   }, [getActionsAndTitle, storeNames]);
 

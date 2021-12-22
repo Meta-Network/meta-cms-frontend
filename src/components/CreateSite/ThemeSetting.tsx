@@ -10,6 +10,7 @@ const { Paragraph } = Typography;
 
 export default () => {
   const intl = useIntl();
+  // @ts-ignore
   const { themeSetting, setThemeSetting } = useModel('storage');
   const [themes, setThemes] = useState<CMS.ThemeTemplatesResponse[]>([]);
 

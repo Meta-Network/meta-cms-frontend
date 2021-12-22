@@ -72,6 +72,7 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       console.log(error);
+      // @ts-ignore
       message.error(error.message);
     }
     setSubmitting(false);
@@ -105,6 +106,7 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       console.log(error);
+      // @ts-ignore
       message.error(error.message);
     }
     setSubmitting(false);

@@ -19,7 +19,7 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
 
   switch (key) {
     case StorageKeys.DomainSetting: {
-      result = !(await isDomainForbidden(JSON.parse(values)));
+      result = values.match(/\w{3,16}/) && !(await isDomainForbidden(values));
       break;
     }
     case StorageKeys.SiteSetting: {
@@ -32,20 +32,24 @@ export const validator = async (key: ValueOf<StorageKeys>, values: any) => {
         'keywords',
         'favicon',
       ];
-      result = keys.every((setting) => JSON.parse(values || '{}')[setting]);
+      result = keys.every((setting) => (values || '{}')[setting]);
       break;
     }
-    case StorageKeys.ThemeSetting: {
-      result = JSON.parse(values) > 0;
-      break;
-    }
+    // case StorageKeys.ThemeSetting: {
+    //   result = JSON.parse(values) > 0;
+    //   break;
+    // }
     case StorageKeys.StoreSetting: {
-      const { storage, username, repos } = JSON.parse(values || '{}');
+      const { storage, username, repos } = values || {};
       const providers: GLOBAL.StoreProvider[] = ['GitHub', 'Gitee'];
 
-      const repoNamesRequest = await getGithubReposName();
-      const repoNames = repoNamesRequest.map((name) => name.toLowerCase());
+      // TODO: handle this error
+      let repoNamesRequest: string[] = [];
+      try {
+        repoNamesRequest = await getGithubReposName();
+      } catch {}
 
+      const repoNames = repoNamesRequest.map((name) => name.toLowerCase());
       result =
         providers.includes(storage) &&
         username &&

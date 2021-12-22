@@ -39,6 +39,10 @@ export default {
   'guide.result.titleWithPlatform':
     'You have successfully authorized {platform} as a storage repository',
   'guide.result.titleNoPlatform': 'You have successfully authorized the storage repository',
+  'guide.result.bindPlatformErrorTitle':
+    'The account is already bound to another Meta network account',
+  'guide.result.bindPlatformErrorDescription':
+    'Please close this browser page and try another storage repository account again',
   'guide.result.description': 'Now you can close this browser page',
   'guide.config.form.title': 'Title',
   'guide.config.form.titlePlaceholder': 'Your Meta Space title',
