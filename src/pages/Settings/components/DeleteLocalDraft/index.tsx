@@ -3,29 +3,36 @@ import { useIntl, useModel } from 'umi';
 import { Typography, Button, Popconfirm, message, Space, Input, List, Dropdown } from 'antd';
 import { DeleteOutlined, CloudSyncOutlined } from '@ant-design/icons';
 import { dbPostsDeleteAll, dbMetadatasDeleteAll } from '@/db/db';
-import { fetchGunDraftsAndUpdateLocal, deleteDraft, twoWaySyncDrafts } from '@/utils/gun';
-import { storeGet, storeSet } from '@/utils/store';
-import { KEY_META_CMS_GUN_SEED, KEY_META_CMS_GUN_PAIR } from '../../../../../config';
+import {
+  fetchGunDraftsAndUpdateLocal,
+  deleteDraft,
+  twoWaySyncDrafts,
+  generateSeedAndPair,
+  getSeedAndPair,
+  saveSeedAndPair,
+} from '@/utils/gun';
 import styles from './index.less';
 import type { KeyPair } from '@metaio/meta-signature-util';
 import { generateKeys } from '@metaio/meta-signature-util';
+import { useMount } from 'ahooks';
 
 const { Text } = Typography;
 
-const ImportSeedAndPairComponents = () => {
+interface ImportSeedAndPairComponentsState {
+  getSeedAndPairFn: () => void;
+}
+
+const ImportSeedAndPairComponents: React.FC<ImportSeedAndPairComponentsState> = ({
+  getSeedAndPairFn,
+}) => {
   const [seedAndPairInput, setSeedAndPairInput] = useState('');
   // handle import
-  const handleImport = useCallback(() => {
-    if (!seedAndPairInput) {
-      return;
-    }
-
-    const [seed, pair] = JSON.parse(seedAndPairInput);
-    storeSet(KEY_META_CMS_GUN_SEED, seed);
-    storeSet(KEY_META_CMS_GUN_PAIR, pair);
+  const handleImport = useCallback(async () => {
+    await saveSeedAndPair(seedAndPairInput);
+    getSeedAndPairFn();
 
     message.success('导入成功');
-  }, [seedAndPairInput]);
+  }, [seedAndPairInput, getSeedAndPairFn]);
   return (
     <Space>
       <Input onChange={(e) => setSeedAndPairInput(e.target.value)} value={seedAndPairInput} />
@@ -37,7 +44,8 @@ const ImportSeedAndPairComponents = () => {
 export default () => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
-  const [syncDraftsLoading, setSyncDraftsLoading] = useState(false);
+  const [syncDraftsLoading, setSyncDraftsLoading] = useState<boolean>(false);
+  const [seedAndPair, setSeedAndPair] = useState<string>('');
 
   /**
    * handle delete all local draft
@@ -75,27 +83,38 @@ export default () => {
     }
 
     setSyncDraftsLoading(true);
-    await twoWaySyncDrafts(initialState.currentUser);
-    setSyncDraftsLoading(false);
+    try {
+      await twoWaySyncDrafts(initialState.currentUser);
+    } catch (e) {
+      console.error('e', e);
+    } finally {
+      setSyncDraftsLoading(false);
+    }
   }, [initialState]);
 
   // sync seed and pair
-  const seedAndPair = useMemo(() => {
-    // TODO: 复制出来的格式并不好看，可以考虑加密成一串字符然后导入再解密 待考虑
-    const seed = storeGet(KEY_META_CMS_GUN_SEED);
-    const pair = storeGet(KEY_META_CMS_GUN_PAIR);
-    return JSON.stringify([seed, pair]);
+  const getSeedAndPairFn = useCallback(() => {
+    const result = getSeedAndPair();
+    setSeedAndPair(result);
   }, []);
 
   // sync seed public key
   const seedPublicKey = useMemo(() => {
-    const seed = JSON.parse(storeGet(KEY_META_CMS_GUN_SEED) || '[]');
-    if (!seed.length) {
+    const _seedAndPair = JSON.parse(seedAndPair || '[]');
+    if (!_seedAndPair.length) {
       return '';
     }
+    const seed = JSON.parse(_seedAndPair[0] || '[]');
     const keys: KeyPair = generateKeys(seed);
     return keys.public;
-  }, []);
+  }, [seedAndPair]);
+
+  // generate seed pair fn
+  const generateSeedAndPairFn = useCallback(async () => {
+    await generateSeedAndPair();
+    getSeedAndPairFn();
+    message.success('生成成功');
+  }, [getSeedAndPairFn]);
 
   const list = useMemo(
     () => [
@@ -134,15 +153,15 @@ export default () => {
           <Text key="syncDraft-copy" copyable={{ text: seedAndPair }}>
             {seedPublicKey.slice(0, 6)}****{seedPublicKey.slice(-4)}
           </Text>,
-          <Dropdown overlay={<ImportSeedAndPairComponents />} trigger={['click']}>
+          <Dropdown
+            overlay={<ImportSeedAndPairComponents getSeedAndPairFn={getSeedAndPairFn} />}
+            trigger={['click']}
+          >
             <Button key="syncDraft-import">导入</Button>
           </Dropdown>,
           <Popconfirm
             title={'您确定要双向同步草稿内容吗？'}
             onConfirm={twoWaySyncDraftsFn}
-            okButtonProps={{
-              loading: syncDraftsLoading,
-            }}
             okText={intl.formatMessage({
               id: 'component.button.yes',
             })}
@@ -154,18 +173,36 @@ export default () => {
               同步
             </Button>
           </Popconfirm>,
+          <Popconfirm
+            title={'您确定要重新生成 Seed & Pair 吗？'}
+            onConfirm={generateSeedAndPairFn}
+            okText={intl.formatMessage({
+              id: 'component.button.yes',
+            })}
+            cancelText={intl.formatMessage({
+              id: 'component.button.no',
+            })}
+          >
+            <Button key="syncDraft-sync">重新生成</Button>
+          </Popconfirm>,
         ],
       },
     ],
     [
       handleDeleteAllLocalDraft,
       twoWaySyncDraftsFn,
+      generateSeedAndPairFn,
+      getSeedAndPairFn,
       intl,
       seedAndPair,
       seedPublicKey,
       syncDraftsLoading,
     ],
   );
+
+  useMount(() => {
+    getSeedAndPairFn();
+  });
 
   return (
     <List
