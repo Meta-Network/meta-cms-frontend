@@ -119,7 +119,7 @@ export default {
   'messages.syncCenter.getContentFail': '获取内容失败',
   'messages.domain.updated': '已成功更新域名',
   'messages.domain.shouldNotBeEmpty': '域名不能为空',
-  'messages.domain.shouldMatchRegex': '域名应为纯数字和字母，并为3到16位长度',
+  'messages.domain.shouldMatchRegex': '3~16 字母: 0~9,a~z,A~Z',
   'messages.domain.isForbidden': '此域名被禁用或已存在，请重新设定',
   'messages.domain.isValid': '此域名可用！',
   'messages.domain.title': '域名配置',
