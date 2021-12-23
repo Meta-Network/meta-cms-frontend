@@ -1,6 +1,6 @@
 import ProCard from '@ant-design/pro-card';
 import { Affix, Steps, Card } from 'antd';
-import { useIntl, FormattedMessage, useModel } from 'umi';
+import { useIntl, FormattedMessage, useModel, Redirect } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
@@ -14,7 +14,7 @@ import styles from './CreateSite.less';
 
 const { Step } = Steps;
 
-export default () => {
+const CreateSite = () => {
   const intl = useIntl();
 
   const steps = useMemo<{ title: string; component: JSX.Element; description?: JSX.Element }[]>(
@@ -138,3 +138,15 @@ export default () => {
     </PageContainer>
   );
 };
+
+const CheckPermission = () => {
+  const { initialState } = useModel('@@initialState');
+  const hasSite = initialState?.siteConfig?.domain;
+  if (hasSite) {
+    return <Redirect to="/" />;
+  } else {
+    return <CreateSite />;
+  }
+};
+
+export default CheckPermission;
