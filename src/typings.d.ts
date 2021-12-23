@@ -18,6 +18,7 @@ declare module 'react-fittext';
 declare module 'bizcharts-plugin-slider';
 declare module 'react-copy-to-clipboard';
 
+declare const META_NETWORK_FE: string;
 declare const META_UCENTER_API: string;
 declare const META_CMS_API: string;
 declare const META_STORAGE_API: string;

@@ -4,14 +4,13 @@ import { useIntl, FormattedMessage, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
-import Deploy from '@/components/Guide/Deploy';
+import Deploy from '@/components/CreateSite/Deploy';
 import AnchoredTitle from '@/components/AnchoredTitle';
-import SiteSetting from '@/components/Guide/SiteSetting';
-import ThemeSetting from '@/components/Guide/ThemeSetting';
-import StoreSetting from '@/components/Guide/StoreSetting';
-import DomainSetting from '@/components/Guide/DomainSetting';
+import SiteSetting from '@/components/CreateSite/SiteSetting';
+import StoreSetting from '@/components/CreateSite/StoreSetting';
+import DomainSetting from '@/components/CreateSite/DomainSetting';
 import FormattedDescription from '@/components/FormattedDescription';
-import styles from './Guide.less';
+import styles from './CreateSite.less';
 
 const { Step } = Steps;
 
@@ -25,11 +24,11 @@ export default () => {
         description: <FormattedDescription id="guide.domain.description" />,
         component: <DomainSetting />,
       },
-      {
-        title: intl.formatMessage({ id: 'guide.theme.title' }),
-        description: <FormattedDescription id="guide.theme.description" />,
-        component: <ThemeSetting />,
-      },
+      // {
+      //   title: intl.formatMessage({ id: 'guide.theme.title' }),
+      //   description: <FormattedDescription id="guide.theme.description" />,
+      //   component: <ThemeSetting />,
+      // },
       {
         title: intl.formatMessage({ id: 'guide.config.title' }),
         description: <FormattedDescription id="guide.config.description" />,

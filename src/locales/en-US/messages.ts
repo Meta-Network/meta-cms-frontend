@@ -37,9 +37,13 @@ export default {
   'messages.deployment.errorEncountered':
     'Encountered some problems when publishing, please follow the prompts to modify the settings and resubmit',
   'messages.deployment.taskFinished.title': 'Publish successful',
-  'messages.deployment.taskFinished.description': 'Meta Space has been successfully published',
+  'messages.deployment.taskFailed.title': 'Publish failed',
+  'messages.deployment.taskFinished.description':
+    'Your Meta Space creation is complete and a new invitation code has been issued',
   'messages.store.setRepoName':
     'The submitted storage repository is named {storeRepo}, publish repository is {publishRepo}',
+  'messages.deployment.taskFailed.description':
+    'Meta Space publish failed, please retry or contact us',
   'messages.store.noRepoTokenReSelect':
     'Authorization failed, please rebind the storage repository service',
   'messages.store.noRepoTokenFirstSelect':
@@ -138,6 +142,7 @@ export default {
   'messages.syncCenter.getContentFail': 'Failed to obtain content',
   'messages.domain.updated': 'The domain name was successfully updated',
   'messages.domain.shouldNotBeEmpty': 'Domain name cannot be empty',
+  'messages.domain.shouldMatchRegex': "3~16 length: 0~9,a~z,A~Z,'_'",
   'messages.domain.isForbidden':
     'This domain name is disabled or already exists, please pick another one',
   'messages.domain.isValid': 'This domain name is available!',

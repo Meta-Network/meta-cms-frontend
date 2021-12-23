@@ -1,8 +1,38 @@
 import { useIntl } from 'umi';
-import { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import { message, Upload } from 'antd';
+import React, { useState } from 'react';
+import { uploadFileToIpfs } from '@/services/api/global';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import ProForm, { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
-export default () => {
+export default ({
+  faviconUrl,
+  setFavIconUrl,
+}: {
+  faviconUrl: string;
+  setFavIconUrl: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const intl = useIntl();
+  const [uploading, setUploading] = useState<boolean>(false);
+
+  const uploadImageRequest = async ({ file }: { file: File }) => {
+    if (file.type !== 'image/vnd.microsoft.icon') {
+      message.error('请上传 .ico 格式的图片或使用默认');
+      return;
+    }
+    setUploading(true);
+    const done = message.loading('上传图片中...请稍候', 0);
+    const result = await uploadFileToIpfs(file);
+    done();
+    setUploading(false);
+
+    if (result?.statusCode === 201) {
+      message.success('图片上传成功');
+      setFavIconUrl(result.data.publicUrl);
+    } else {
+      message.error('图片上传失败');
+    }
+  };
 
   const timezones = {
     'Etc/GMT+12': intl.formatMessage({ id: 'timezones.Etc/GMT+12' }),
@@ -137,6 +167,39 @@ export default () => {
         ]}
         valueEnum={timezones}
       />
+      <ProForm.Item
+        name="favicon"
+        getValueProps={(value) => [value]}
+        valuePropName={'fileList'}
+        label={intl.formatMessage({ id: 'guide.config.form.favicon' })}
+        extra={intl.formatMessage({ id: 'guide.config.form.faviconExtra' })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({ id: 'guide.config.form.faviconPleaseEnter' }),
+          },
+        ]}
+      >
+        <Upload
+          title={intl.formatMessage({ id: 'guide.config.form.uploadFavicon' })}
+          listType="picture-card"
+          /*
+          // @ts-ignore */
+          customRequest={uploadImageRequest}
+          showUploadList={false}
+        >
+          {faviconUrl ? (
+            <img src={faviconUrl} alt="favicon preview" style={{ width: '80%', height: '80%' }} />
+          ) : (
+            <div>
+              {uploading ? <LoadingOutlined /> : <PlusOutlined />}
+              <div style={{ marginTop: 8 }}>
+                {intl.formatMessage({ id: 'component.button.upload' })}
+              </div>
+            </div>
+          )}
+        </Upload>
+      </ProForm.Item>
     </>
   );
 };

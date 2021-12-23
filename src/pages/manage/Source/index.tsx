@@ -123,7 +123,11 @@ export default () => {
   const sourcePlatformsInformation = [
     {
       // Matataki [tag] (username)
-      title: ['Matataki', getStatus(sourceStatus.matataki), `(${sourceStatus.matataki.username})`],
+      title: [
+        'Matataki',
+        getStatus(sourceStatus.matataki),
+        sourceStatus.matataki.username ? `(${sourceStatus.matataki.username})` : '',
+      ],
       description: intl.formatMessage({ id: 'messages.source.matatakiDescription' }),
       actions: getActions(sourceStatus.matataki),
       avatar: <img className="icon" src="/icons/custom/matataki.png" alt="matataki icon" />,

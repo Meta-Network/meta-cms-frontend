@@ -1,6 +1,7 @@
 import { Storages } from '@/services/constants';
+import { useModel } from '@@/plugin-model/useModel';
 import { useEffect, useRef, useState } from 'react';
-import { validator } from '@/components/Guide/Deploy/validator';
+import { validator } from '@/components/CreateSite/Deploy/validator';
 
 function usePrevious(value: any) {
   const ref = useRef();
@@ -11,6 +12,7 @@ function usePrevious(value: any) {
 }
 
 export default () => {
+  const username = useModel('@@initialState').initialState?.currentUser?.username;
   const [stepStatus, setStepStatus] = useState(Array(10));
   const [current, setCurrent] = useState<number>(0);
   const lastCurrent = usePrevious(current);
@@ -18,8 +20,13 @@ export default () => {
   useEffect(() => {
     const lastIndex = lastCurrent;
     const storage = Storages[lastIndex];
+    let value: any = false;
 
-    validator(storage.key, storage.value).then((isSuccess: boolean) => {
+    if (storage.value && username) {
+      value = JSON.parse(storage.value)[username];
+    }
+
+    validator(storage.key, value).then((isSuccess: boolean) => {
       setStepStatus((prev) => {
         const copy = prev.slice();
 
@@ -29,7 +36,7 @@ export default () => {
         return copy;
       });
     });
-  }, [current, lastCurrent]);
+  }, [current, lastCurrent, username]);
 
   return {
     current,

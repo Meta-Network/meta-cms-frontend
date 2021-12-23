@@ -41,6 +41,12 @@ export default () => {
                   new Error(intl.formatMessage({ id: 'messages.domain.shouldNotBeEmpty' })),
                 );
               }
+              if (!value.match(/^\w{3,16}$/)) {
+                setIsSuccess(false);
+                return Promise.reject(
+                  new Error(intl.formatMessage({ id: 'messages.domain.shouldMatchRegex' })),
+                );
+              }
               const isForbidden = await isDomainForbidden(value);
               if (isForbidden) {
                 setIsSuccess(false);

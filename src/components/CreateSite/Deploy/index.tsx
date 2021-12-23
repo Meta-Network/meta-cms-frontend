@@ -15,8 +15,9 @@ import { validator } from './validator';
 import styles from './index.less';
 
 export default () => {
-  const { siteSetting, storeSetting, themeSetting, domainSetting } = useModel('storage');
-  const { refresh } = useModel('@@initialState');
+  const { siteSetting, storeSetting, domainSetting } = useModel('storage');
+  const { refresh, initialState } = useModel('@@initialState');
+  const username = initialState!.currentUser!.username;
   const {
     onError,
     setOnError,
@@ -70,7 +71,17 @@ export default () => {
           const validation = await Promise.all(
             Storages.map(async ({ title, key, value }) => {
               if (key === 'deploy') return null;
-              const isSuccess = await validator(key || '', value);
+              let isSuccess: boolean;
+              console.log({
+                title,
+                key,
+                value,
+              });
+              if (value && username) {
+                isSuccess = await validator(key, JSON.parse(value)[username]);
+              } else {
+                isSuccess = await validator(key, value);
+              }
               return isSuccess
                 ? null
                 : `${intl.formatMessage({ id: title })}：${intl.formatMessage({
@@ -106,12 +117,12 @@ export default () => {
       case DeployStages.submitting: {
         const submitting = async () => {
           const infoSetting = await newSiteInfoSetting({
-            title: siteSetting.title,
-            subtitle: siteSetting.subtitle,
-            description: siteSetting.description,
-            author: siteSetting.author,
-            keywords: siteSetting.keywords,
-            favicon: new URL(siteSetting.favicon).href,
+            title: siteSetting.title!,
+            subtitle: siteSetting.subtitle!,
+            description: siteSetting.description!,
+            author: siteSetting.author!,
+            keywords: siteSetting.keywords!,
+            favicon: new URL(siteSetting.favicon!).href,
           });
 
           if (infoSetting.message === 'Ok') {
@@ -138,7 +149,7 @@ export default () => {
           const configSetting = await newSiteConfigSetting(infoSetting.data.id, {
             language: siteSetting.language,
             timezone: siteSetting.timezone,
-            templateId: themeSetting,
+            templateId: 1,
             metaSpacePrefix: domainSetting as string,
             // domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
           });
@@ -169,7 +180,7 @@ export default () => {
 
           const storageSetting = await newSiteStorageSetting(
             configSetting.data.id,
-            storeSetting.storage.toLowerCase(),
+            storeSetting!.storage!.toLowerCase(),
             {
               userName: storeSetting.username,
               repoName: storeSetting.repos!.storeRepo,
@@ -204,7 +215,7 @@ export default () => {
 
           const publishSetting = await newSitePublishSetting(
             configSetting.data.id,
-            storeSetting.storage.toLowerCase(),
+            storeSetting!.storage!.toLowerCase(),
             {
               userName: storeSetting.username,
               repoName: storeSetting.repos!.publishRepo,
