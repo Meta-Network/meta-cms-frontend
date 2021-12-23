@@ -4,7 +4,6 @@
     component: './CreateSite',
     name: 'create',
     icon: 'PlusSquare',
-    access: 'hasNoSite',
   },
   {
     path: '/user',

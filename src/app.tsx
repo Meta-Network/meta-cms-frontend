@@ -128,6 +128,7 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
+// @ts-ignore
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
     disableContentMargin: false,
@@ -135,6 +136,21 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     layout: 'side',
     headerRender: () => false,
     headerContentRender: () => false,
+    menuDataRender: (menuData) => {
+      return menuData.map((menuDataItem) => {
+        switch (menuDataItem.path as string) {
+          case '/create': {
+            const hasSite = initialState?.siteConfig?.domain;
+            if (hasSite) {
+              return null;
+            } else {
+              return menuDataItem;
+            }
+          }
+        }
+        return menuDataItem;
+      });
+    },
     menuItemRender: (menuItemProps, defaultDom) => {
       switch (menuItemProps.path) {
         // local draft counter
