@@ -18,7 +18,6 @@ import { queryCurrentUser, queryInvitations, refreshTokens } from './services/ap
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
-let userTokenCache: GLOBAL.GeneralResponse<GLOBAL.CurrentUser> | null = null;
 
 function CustomSiderMenu({
   initialState,
@@ -73,14 +72,16 @@ export const initialStateConfig = {
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<GLOBAL.InitialState> {
+  if (history.location.pathname.startsWith('/result')) {
+    return {};
+  }
   const fetchUserInfo = async () => {
     try {
-      if (!userTokenCache) {
-        userTokenCache = await refreshTokens();
-      }
+      await refreshTokens();
       const msg = await queryCurrentUser();
       return msg.data;
     } catch (error) {
+      console.log('getInitialState error: ', error);
       history.push('/user/login');
     }
     return undefined;
@@ -211,7 +212,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== '/user/login') {
+      if (
+        !initialState?.currentUser &&
+        !['/user/login', /^\/result.*$/].some((patten) => location.pathname.match(patten))
+      ) {
         history.push('/user/login');
       }
     },
