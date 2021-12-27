@@ -73,7 +73,7 @@ export default () => {
           onFinish={handleFinishing}
           requiredMark="optional"
         >
-          <SiteSettingFormItems faviconUrl={faviconUrl} setFavIconUrl={setFaviconUrl} />
+          <SiteSettingFormItems />
         </ProForm>
       </Card>
     </PageContainer>

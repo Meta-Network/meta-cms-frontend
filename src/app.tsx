@@ -58,7 +58,7 @@ function CustomSiderMenu({
         </a>
       )}
       {/* Button to redeploy the Meta Space */}
-      <PublishSiteButton />
+      {PublishSiteButton().node}
     </div>
   );
 }
@@ -86,30 +86,13 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     }
     return undefined;
   };
-
-  const invitationsCountRequest = await queryInvitations();
-  const invitationsCount =
-    invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
-
-  // get site config
-  const siteConfig = await getDefaultSiteConfigAPI();
-
-  let publishedCount = 0;
-  if (siteConfig?.id) {
-    const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
-      page: 1,
-      limit: 1,
-      state: FetchPostsStorageParamsState.Published,
-    });
-    publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
-  }
-
   const state: GLOBAL.InitialState = {
     fetchUserInfo,
-    invitationsCount,
-    publishedCount,
+    currentUser: undefined,
+    siteConfig: undefined,
+    invitationsCount: 0,
+    publishedCount: 0,
     localDraftCount: 0,
-    siteConfig,
   };
 
   if (history.location.pathname !== '/user/login') {
@@ -118,6 +101,24 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
       state.currentUser = currentUser;
       // local draft count
       state.localDraftCount = await dbPostsAllCount(currentUser!.id);
+    }
+
+    const invitationsCountRequest = await queryInvitations();
+    state.invitationsCount =
+      invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
+
+    // get site config
+    const siteConfig = await getDefaultSiteConfigAPI();
+    state.siteConfig = siteConfig;
+
+    state.publishedCount = 0;
+    if (siteConfig?.id) {
+      const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
+        page: 1,
+        limit: 1,
+        state: FetchPostsStorageParamsState.Published,
+      });
+      state.publishedCount = publishedCountRequest?.data?.meta?.totalItems ?? 0;
     }
   }
 
