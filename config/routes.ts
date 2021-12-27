@@ -110,6 +110,7 @@
   {
     path: '/result/store-setting-success',
     hideInMenu: true,
+    layout: false,
     component: './result/StoreSettingSuccess',
   },
   {

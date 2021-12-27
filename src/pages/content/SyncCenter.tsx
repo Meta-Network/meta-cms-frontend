@@ -221,21 +221,6 @@ export default () => {
       dataIndex: 'createdAt',
       valueType: 'date',
       sorter: true,
-      hideInSearch: true,
-    },
-    {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.createTime' }),
-      dataIndex: 'createdAt',
-      valueType: 'dateRange',
-      hideInTable: true,
-      search: {
-        transform: (value) => {
-          return {
-            startTime: value[0],
-            endTime: value[1],
-          };
-        },
-      },
     },
     {
       title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
@@ -243,21 +228,6 @@ export default () => {
       dataIndex: 'updatedAt',
       valueType: 'date',
       sorter: true,
-      hideInSearch: true,
-    },
-    {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
-      dataIndex: 'updatedAt',
-      valueType: 'dateRange',
-      hideInTable: true,
-      search: {
-        transform: (value) => {
-          return {
-            startTime: value[0],
-            endTime: value[1],
-          };
-        },
-      },
     },
     {
       title: intl.formatMessage({ id: 'messages.syncCenter.table.actions' }),
@@ -356,9 +326,6 @@ export default () => {
           };
         }}
         rowKey={(record) => record.id}
-        search={{
-          labelWidth: 'auto',
-        }}
         form={{
           // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
           syncToUrl: (values, type) => {
@@ -372,6 +339,7 @@ export default () => {
           },
         }}
         dateFormatter="string"
+        search={false}
         options={false}
       />
     </PageContainer>

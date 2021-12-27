@@ -18,10 +18,6 @@ export default () => {
     {
       dataIndex: 'cover',
       title: intl.formatMessage({ id: 'messages.published.table.cover' }),
-      search: false,
-      renderFormItem: (_, { defaultRender }) => {
-        return defaultRender(_);
-      },
       render: (_, record) => (
         <Space>
           {record.cover ? (
@@ -44,9 +40,6 @@ export default () => {
       dataIndex: 'category',
       filters: true,
       onFilter: true,
-      renderFormItem: (_, { defaultRender }) => {
-        return defaultRender(_);
-      },
       render: (_, record) => (
         <Tag color="yellow" key={`${record.category}_cate`}>
           {record.category}
@@ -58,9 +51,6 @@ export default () => {
       dataIndex: 'tags',
       filters: true,
       onFilter: true,
-      renderFormItem: (_, { defaultRender }) => {
-        return defaultRender(_);
-      },
       render: (_, record) =>
         record?.tags?.map((tag) => (
           <Tag color="blue" key={`${tag}_tag`}>
@@ -74,21 +64,6 @@ export default () => {
       dataIndex: 'date',
       valueType: 'date',
       sorter: true,
-      hideInSearch: true,
-    },
-    {
-      title: intl.formatMessage({ id: 'messages.published.table.createTime' }),
-      dataIndex: 'date',
-      valueType: 'dateRange',
-      hideInTable: true,
-      search: {
-        transform: (value) => {
-          return {
-            startTime: value[0],
-            endTime: value[1],
-          };
-        },
-      },
     },
     {
       title: intl.formatMessage({ id: 'messages.published.table.updateTime' }),
@@ -96,21 +71,6 @@ export default () => {
       dataIndex: 'updated',
       valueType: 'date',
       sorter: true,
-      hideInSearch: true,
-    },
-    {
-      title: intl.formatMessage({ id: 'messages.published.table.updateTime' }),
-      dataIndex: 'updated',
-      valueType: 'dateRange',
-      hideInTable: true,
-      search: {
-        transform: (value) => {
-          return {
-            startTime: value[0],
-            endTime: value[1],
-          };
-        },
-      },
     },
   ];
 
@@ -159,27 +119,13 @@ export default () => {
           return { success: false };
         }}
         rowKey={(record) => record.id}
-        search={{
-          labelWidth: 'auto',
-        }}
-        form={{
-          // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-          syncToUrl: (values, type) => {
-            if (type === 'get') {
-              return {
-                ...values,
-                created_at: [values.startTime, values.endTime],
-              };
-            }
-            return values;
-          },
-        }}
         expandable={{
           expandedRowRender: (record: CMS.Post) => (
             <p dangerouslySetInnerHTML={{ __html: record.summary }} />
           ),
         }}
         dateFormatter="string"
+        search={false}
         options={false}
       />
     </PageContainer>

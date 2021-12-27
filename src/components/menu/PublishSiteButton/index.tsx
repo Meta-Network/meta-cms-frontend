@@ -1,11 +1,10 @@
 import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
-// import { UpOutlined } from '@ant-design/icons';
 import { Button, message, notification, Dropdown } from 'antd';
 import { deployAndPublishSite } from '@/services/api/meta-cms';
-import styles from './index.less';
-import Publish from '@/components/Submit/publish';
 import { publishMetaSpaceRequest } from '@/utils/editor';
+import Publish from '@/components/Submit/publish';
+import styles from './index.less';
 
 export default () => {
   const intl = useIntl();
@@ -87,7 +86,6 @@ export default () => {
         }
       } catch (e: any) {
         console.error(e);
-
         if (e?.message) {
           if ((e.message as string).includes('empty seed')) {
             message.error(intl.formatMessage({ id: 'messages.redeployment.noKey' }));
@@ -107,38 +105,40 @@ export default () => {
     setPublishLoading(false);
   };
 
-  return (
-    <div
-      className={`${styles.publishButtonBackground}
+  return {
+    node: (
+      <div
+        className={`${styles.publishButtonBackground}
         ${
           publishButtonDisplay
             ? styles.publishButtonBackgroundVisible
             : styles.publishButtonBackgroundInvisible
         }`}
-    >
-      <Dropdown
-        overlay={
-          <Publish
-            loading={publishLoading}
-            setDropdownVisible={setDropdownVisible}
-            handlePublish={publishSiteRequest}
-          />
-        }
-        trigger={['click']}
-        placement="topCenter"
-        visible={dropdownVisible}
-        onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}
       >
-        <Button
-          key="publish-button"
-          loading={publishLoading}
-          className={styles.publishButton}
-          type="primary"
+        <Dropdown
+          overlay={
+            <Publish
+              loading={publishLoading}
+              setDropdownVisible={setDropdownVisible}
+              handlePublish={publishSiteRequest}
+            />
+          }
+          trigger={['click']}
+          placement="topCenter"
+          visible={dropdownVisible}
+          onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}
         >
-          {intl.formatMessage({ id: 'messages.redeployment.button' })}
-          {/*<UpOutlined />*/}
-        </Button>
-      </Dropdown>
-    </div>
-  );
+          <Button
+            key="publish-button"
+            loading={publishLoading}
+            className={styles.publishButton}
+            type="primary"
+          >
+            {intl.formatMessage({ id: 'messages.redeployment.button' })}
+          </Button>
+        </Dropdown>
+      </div>
+    ),
+    func: publishSiteRequest,
+  };
 };

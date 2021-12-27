@@ -1,51 +1,21 @@
-import { useCallback, useMemo, useState } from 'react';
 import { useIntl, useModel } from 'umi';
-import { Typography, Button, Popconfirm, message, Space, Input, List, Dropdown } from 'antd';
-import { DeleteOutlined, CloudSyncOutlined } from '@ant-design/icons';
+import Publish from '@/components/Submit/publish';
+import { DeleteOutlined } from '@ant-design/icons';
+import { useCallback, useMemo, useState } from 'react';
+import PublishSiteButton from '@/components/menu/PublishSiteButton';
+import { Button, Popconfirm, message, List, Dropdown } from 'antd';
 import { dbPostsDeleteAll, dbMetadatasDeleteAll } from '@/db/db';
-import {
-  fetchGunDraftsAndUpdateLocal,
-  deleteDraft,
-  twoWaySyncDrafts,
-  generateSeedAndPair,
-  getSeedAndPair,
-  saveSeedAndPair,
-} from '@/utils/gun';
+import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
 import styles from './index.less';
-import type { KeyPair } from '@metaio/meta-signature-util';
-import { generateKeys } from '@metaio/meta-signature-util';
-import { useMount } from 'ahooks';
-
-const { Text } = Typography;
-
-interface ImportSeedAndPairComponentsState {
-  getSeedAndPairFn: () => void;
-}
-
-const ImportSeedAndPairComponents: React.FC<ImportSeedAndPairComponentsState> = ({
-  getSeedAndPairFn,
-}) => {
-  const [seedAndPairInput, setSeedAndPairInput] = useState('');
-  // handle import
-  const handleImport = useCallback(async () => {
-    await saveSeedAndPair(seedAndPairInput);
-    getSeedAndPairFn();
-
-    message.success('导入成功');
-  }, [seedAndPairInput, getSeedAndPairFn]);
-  return (
-    <Space>
-      <Input onChange={(e) => setSeedAndPairInput(e.target.value)} value={seedAndPairInput} />
-      <Button onClick={handleImport}>确定</Button>
-    </Space>
-  );
-};
 
 export default () => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
-  const [syncDraftsLoading, setSyncDraftsLoading] = useState<boolean>(false);
-  const [seedAndPair, setSeedAndPair] = useState<string>('');
+
+  const [publishLoading, setPublishLoading] = useState<boolean>(false);
+  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+
+  const publishSiteRequest = PublishSiteButton().func;
 
   /**
    * handle delete all local draft
@@ -55,7 +25,7 @@ export default () => {
       return;
     }
 
-    // 删除本地所有文章 mettadata 数据
+    // 删除本地所有文章 metadata 数据
     await dbPostsDeleteAll();
     await dbMetadatasDeleteAll();
 
@@ -75,46 +45,6 @@ export default () => {
       }),
     );
   }, [intl, initialState]);
-
-  // two way sync drafts
-  const twoWaySyncDraftsFn = useCallback(async () => {
-    if (!initialState?.currentUser) {
-      return;
-    }
-
-    setSyncDraftsLoading(true);
-    try {
-      await twoWaySyncDrafts(initialState.currentUser);
-    } catch (e) {
-      console.error('e', e);
-    } finally {
-      setSyncDraftsLoading(false);
-    }
-  }, [initialState]);
-
-  // sync seed and pair
-  const getSeedAndPairFn = useCallback(() => {
-    const result = getSeedAndPair();
-    setSeedAndPair(result);
-  }, []);
-
-  // sync seed public key
-  const seedPublicKey = useMemo(() => {
-    const _seedAndPair = JSON.parse(seedAndPair || '[]');
-    if (!_seedAndPair.length) {
-      return '';
-    }
-    const seed = JSON.parse(_seedAndPair[0] || '[]');
-    const keys: KeyPair = generateKeys(seed);
-    return keys.public;
-  }, [seedAndPair]);
-
-  // generate seed pair fn
-  const generateSeedAndPairFn = useCallback(async () => {
-    await generateSeedAndPair();
-    getSeedAndPairFn();
-    message.success('生成成功');
-  }, [getSeedAndPairFn]);
 
   const list = useMemo(
     () => [
@@ -145,64 +75,45 @@ export default () => {
         ],
       },
       {
-        name: 'syncDraft',
-        title: '草稿同步',
-        description: '可以复制 Seed & Pair 到其他需要同步的设备使用。',
-        icon: <CloudSyncOutlined />,
+        name: 'publishSite',
+        title: intl.formatMessage({
+          id: 'messages.redeployment.button',
+        }),
+        description: intl.formatMessage({
+          id: 'messages.redeployment.description',
+        }),
+        icon: null,
         actions: [
-          <Text key="syncDraft-copy" copyable={{ text: seedAndPair }}>
-            {seedPublicKey.slice(0, 6)}****{seedPublicKey.slice(-4)}
-          </Text>,
           <Dropdown
-            overlay={<ImportSeedAndPairComponents getSeedAndPairFn={getSeedAndPairFn} />}
+            overlay={
+              <Publish
+                loading={publishLoading}
+                setDropdownVisible={setDropdownVisible}
+                handlePublish={(gateway) => {
+                  setPublishLoading(true);
+                  publishSiteRequest(gateway).then(() => setPublishLoading(false));
+                }}
+              />
+            }
             trigger={['click']}
+            placement="topCenter"
+            visible={dropdownVisible}
+            onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}
           >
-            <Button key="syncDraft-import">导入</Button>
-          </Dropdown>,
-          <Popconfirm
-            title={'您确定要双向同步草稿内容吗？'}
-            onConfirm={twoWaySyncDraftsFn}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
-          >
-            <Button key="syncDraft-sync" loading={syncDraftsLoading}>
-              同步
+            <Button
+              key="publish-button"
+              loading={publishLoading}
+              className={styles.publishButton}
+              type="primary"
+            >
+              {intl.formatMessage({ id: 'messages.redeployment.button' })}
             </Button>
-          </Popconfirm>,
-          <Popconfirm
-            title={'您确定要重新生成 Seed & Pair 吗？'}
-            onConfirm={generateSeedAndPairFn}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
-          >
-            <Button key="syncDraft-sync">重新生成</Button>
-          </Popconfirm>,
+          </Dropdown>,
         ],
       },
     ],
-    [
-      handleDeleteAllLocalDraft,
-      twoWaySyncDraftsFn,
-      generateSeedAndPairFn,
-      getSeedAndPairFn,
-      intl,
-      seedAndPair,
-      seedPublicKey,
-      syncDraftsLoading,
-    ],
+    [dropdownVisible, handleDeleteAllLocalDraft, intl, publishLoading, publishSiteRequest],
   );
-
-  useMount(() => {
-    getSeedAndPairFn();
-  });
 
   return (
     <List

@@ -18,7 +18,6 @@ import { queryCurrentUser, queryInvitations, refreshTokens } from './services/ap
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
-let userTokenCache: GLOBAL.GeneralResponse<GLOBAL.CurrentUser> | null = null;
 
 function CustomSiderMenu({
   initialState,
@@ -59,7 +58,7 @@ function CustomSiderMenu({
         </a>
       )}
       {/* Button to redeploy the Meta Space */}
-      <PublishSiteButton />
+      {PublishSiteButton().node}
     </div>
   );
 }
@@ -73,42 +72,27 @@ export const initialStateConfig = {
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<GLOBAL.InitialState> {
+  if (history.location.pathname.startsWith('/result')) {
+    return {};
+  }
   const fetchUserInfo = async () => {
     try {
-      if (!userTokenCache) {
-        userTokenCache = await refreshTokens();
-      }
+      await refreshTokens();
       const msg = await queryCurrentUser();
       return msg.data;
     } catch (error) {
+      console.log('getInitialState error: ', error);
       history.push('/user/login');
     }
     return undefined;
   };
-
-  const invitationsCountRequest = await queryInvitations();
-  const invitationsCount =
-    invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
-
-  // get site config
-  const siteConfig = await getDefaultSiteConfigAPI();
-
-  let publishedCount = 0;
-  if (siteConfig?.id) {
-    const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
-      page: 1,
-      limit: 1,
-      state: FetchPostsStorageParamsState.Published,
-    });
-    publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
-  }
-
   const state: GLOBAL.InitialState = {
     fetchUserInfo,
-    invitationsCount,
-    publishedCount,
+    currentUser: undefined,
+    siteConfig: undefined,
+    invitationsCount: 0,
+    publishedCount: 0,
     localDraftCount: 0,
-    siteConfig,
   };
 
   if (history.location.pathname !== '/user/login') {
@@ -117,6 +101,24 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
       state.currentUser = currentUser;
       // local draft count
       state.localDraftCount = await dbPostsAllCount(currentUser!.id);
+    }
+
+    const invitationsCountRequest = await queryInvitations();
+    state.invitationsCount =
+      invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
+
+    // get site config
+    const siteConfig = await getDefaultSiteConfigAPI();
+    state.siteConfig = siteConfig;
+
+    state.publishedCount = 0;
+    if (siteConfig?.id) {
+      const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
+        page: 1,
+        limit: 1,
+        state: FetchPostsStorageParamsState.Published,
+      });
+      state.publishedCount = publishedCountRequest?.data?.meta?.totalItems ?? 0;
     }
   }
 
@@ -211,7 +213,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== '/user/login') {
+      if (
+        !initialState?.currentUser &&
+        !['/user/login', /^\/result.*$/].some((patten) => location.pathname.match(patten))
+      ) {
         history.push('/user/login');
       }
     },

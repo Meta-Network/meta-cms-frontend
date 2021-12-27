@@ -1,5 +1,5 @@
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
-import { Card, Result } from 'antd';
+import { Result } from 'antd';
 
 export default () => {
   const platforms = ['GitHub', 'Gitee'];
@@ -14,23 +14,19 @@ export default () => {
 
   if (error) {
     return (
-      <Card>
-        <Result
-          status="error"
-          title={<FormattedMessage id="guide.result.bindPlatformErrorTitle" />}
-          subTitle={<FormattedMessage id="guide.result.bindPlatformErrorDescription" />}
-        />
-      </Card>
+      <Result
+        status="error"
+        title={<FormattedMessage id="guide.result.bindPlatformErrorTitle" />}
+        subTitle={<FormattedMessage id="guide.result.bindPlatformErrorDescription" />}
+      />
     );
   } else {
     return (
-      <Card>
-        <Result
-          status="success"
-          title={title}
-          subTitle={<FormattedMessage id="guide.result.description" />}
-        />
-      </Card>
+      <Result
+        status="success"
+        title={title}
+        subTitle={<FormattedMessage id="guide.result.description" />}
+      />
     );
   }
 };

@@ -161,6 +161,8 @@ export default {
     'Meta Space failed to publish, please try again or report to the development team',
   'messages.redeployment.noSiteConfig': 'You have not created a Meta Space',
   'messages.redeployment.button': 'Publish my Meta Space',
+  'messages.redeployment.description':
+    'To see the new updates of posts and site configration in my Meta Space',
   'messages.redeployment.uploadIPFS.fail': 'IPFS upload failed',
   'messages.redeployment.noKey': 'No KEY',
   'messages.copy.success': 'Copied to clipboard',
