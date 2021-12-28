@@ -76,6 +76,8 @@ export default () => {
             }),
             duration: 0,
           });
+          setDropdownVisible(false);
+          setPublishButtonDisplay(false);
           setSiteNeedToDeploy(false);
         } else {
           notification.error({

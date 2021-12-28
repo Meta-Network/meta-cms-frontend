@@ -1,8 +1,9 @@
+import { getMyHexGrid } from '@/services/api/meta-network';
 import { isMobile } from 'is-mobile';
-import { history, Link } from 'umi';
+import { history, Link, useIntl } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
-import { Typography, Avatar, Card, Dropdown } from 'antd';
+import { Typography, Avatar, Card, Dropdown, notification } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import { fetchPostsStorage } from '@/services/api/meta-cms';
 import { dbPostsAllCount } from './db/db';
@@ -18,6 +19,7 @@ import { queryCurrentUser, queryInvitations, refreshTokens } from './services/ap
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
+let noHexGridOccupiedMessaged = false;
 
 function CustomSiderMenu({
   initialState,
@@ -26,6 +28,23 @@ function CustomSiderMenu({
   initialState: GLOBAL.InitialState | undefined;
   menuItemProps: SiderMenuProps;
 }) {
+  const intl = useIntl();
+  const checkIfHasNoHexGridOccupied = async () => {
+    const hexGridInfo = await getMyHexGrid();
+    if (hexGridInfo.statusCode === 200 && !hexGridInfo.data && !noHexGridOccupiedMessaged) {
+      noHexGridOccupiedMessaged = true;
+      notification.warn({
+        message: intl.formatMessage({ id: 'messages.status.noHexGridExists.title' }),
+        description: intl.formatMessage({ id: 'messages.status.noHexGridExists.description' }),
+        duration: 0,
+      });
+      setTimeout(() => {
+        window.location.href = META_NETWORK_FE;
+      }, 5000);
+    }
+  };
+  checkIfHasNoHexGridOccupied();
+
   return (
     <div className="menu-extra-cards">
       <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click']}>
@@ -72,9 +91,15 @@ export const initialStateConfig = {
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<GLOBAL.InitialState> {
+  // don't login if page is a result
   if (history.location.pathname.startsWith('/result')) {
     return {};
   }
+
+  if (isMobile()) {
+    history.push('/result/mobile');
+  }
+
   const fetchUserInfo = async () => {
     try {
       await refreshTokens();
@@ -86,6 +111,7 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     }
     return undefined;
   };
+
   const state: GLOBAL.InitialState = {
     fetchUserInfo,
     currentUser: undefined,
@@ -120,10 +146,6 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
       });
       state.publishedCount = publishedCountRequest?.data?.meta?.totalItems ?? 0;
     }
-  }
-
-  if (isMobile()) {
-    history.push('/result/mobile');
   }
 
   return state;

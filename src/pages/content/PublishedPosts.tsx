@@ -127,6 +127,10 @@ export default () => {
         dateFormatter="string"
         search={false}
         options={false}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: false,
+        }}
       />
     </PageContainer>
   );
