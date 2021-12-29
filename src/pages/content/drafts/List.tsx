@@ -17,8 +17,8 @@ export default () => {
   /** handle delete */
   const handleDelete = useCallback(
     async (id: number, key?: string) => {
-      await dbPostsUpdate(id, { delete: 1 });
-      await dbMetadatasUpdateByPostId(id, { delete: 1 });
+      await dbPostsUpdate(id, { delete: true });
+      await dbMetadatasUpdateByPostId(id, { delete: true });
 
       if (key) {
         deleteDraft({

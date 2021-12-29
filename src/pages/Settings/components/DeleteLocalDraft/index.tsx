@@ -1,10 +1,16 @@
 import { useIntl, useModel } from 'umi';
 import Publish from '@/components/Submit/publish';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useCallback, useMemo, useState } from 'react';
 import PublishSiteButton from '@/components/menu/PublishSiteButton';
 import { Button, Popconfirm, message, List, Dropdown } from 'antd';
-import { dbPostsDeleteAll, dbMetadatasDeleteAll } from '@/db/db';
+import {
+  dbPostsDeleteAll,
+  dbMetadatasDeleteAll,
+  dbPostsDelete,
+  dbMetadatasDelete,
+  dbPostsDeleteCurrent,
+} from '@/db/db';
 import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
 import styles from './index.less';
 
@@ -14,6 +20,8 @@ export default () => {
 
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
+  const [deleteDraftLoading, setDeleteDraftLoading] = useState<boolean>(false);
+  const [deleteCacheLoading, setDeleteCacheLoading] = useState<boolean>(false);
 
   const publishSiteRequest = PublishSiteButton().func;
 
@@ -25,19 +33,32 @@ export default () => {
       return;
     }
 
-    // 删除本地所有文章 metadata 数据
-    await dbPostsDeleteAll();
-    await dbMetadatasDeleteAll();
+    setDeleteDraftLoading(true);
 
-    // 删除用户的 gun 文章
+    // 删除用户的文章
     const gunDraftsResult = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
 
     for (let i = 0; i < gunDraftsResult.length; i++) {
       const ele = gunDraftsResult[i];
+      console.log('ele', ele);
+
+      if (ele.userId !== initialState.currentUser.id) {
+        continue;
+      }
+
+      if (ele.id) {
+        await dbPostsDelete(ele.id);
+        await dbMetadatasDelete(ele.id);
+      }
       if (ele.key) {
         await deleteDraft({ userId: initialState.currentUser.id, key: ele.key });
       }
     }
+
+    // 删除当前用户的所有草稿（清理 delete 为 true 的本地草稿）
+    await dbPostsDeleteCurrent(initialState.currentUser.id);
+
+    setDeleteDraftLoading(false);
 
     message.success(
       intl.formatMessage({
@@ -46,12 +67,26 @@ export default () => {
     );
   }, [intl, initialState]);
 
+  const clearCache = useCallback(async () => {
+    setDeleteCacheLoading(true);
+    // 清除 IndexedDB
+    // 删除本地所有文章 metadata 数据
+    await dbPostsDeleteAll();
+    await dbMetadatasDeleteAll();
+    // LocalStorage Cookies SessionStorage 因为里面存了一些别的数据，暂时不清理
+
+    setDeleteCacheLoading(false);
+    message.success('成功');
+  }, []);
+
   const list = useMemo(
     () => [
       {
         name: 'deleteDraft',
         title: '删除本地草稿',
-        description: '删除本地所有草稿，包含本地其他用户的草稿。',
+        description: intl.formatMessage({
+          id: 'setting.deleteLocalDraft.all',
+        }),
         icon: <DeleteOutlined />,
         actions: [
           <Popconfirm
@@ -66,7 +101,7 @@ export default () => {
               id: 'component.button.no',
             })}
           >
-            <Button type="primary" danger key="deleteDraft-delete">
+            <Button type="primary" danger key="deleteDraft-delete" loading={deleteDraftLoading}>
               {intl.formatMessage({
                 id: 'component.button.delete',
               })}
@@ -111,8 +146,39 @@ export default () => {
           </Dropdown>,
         ],
       },
+      {
+        name: 'deleteDraft',
+        title: '清空本地缓存',
+        description: '清空本地缓存',
+        icon: <ExclamationCircleOutlined />,
+        actions: [
+          <Popconfirm
+            title={'您确定要清空本地缓存吗？'}
+            onConfirm={clearCache}
+            okText={intl.formatMessage({
+              id: 'component.button.yes',
+            })}
+            cancelText={intl.formatMessage({
+              id: 'component.button.no',
+            })}
+          >
+            <Button type="primary" danger key="deleteDraft-delete" loading={deleteCacheLoading}>
+              清空
+            </Button>
+          </Popconfirm>,
+        ],
+      },
     ],
-    [dropdownVisible, handleDeleteAllLocalDraft, intl, publishLoading, publishSiteRequest],
+    [
+      dropdownVisible,
+      handleDeleteAllLocalDraft,
+      clearCache,
+      intl,
+      publishLoading,
+      publishSiteRequest,
+      deleteDraftLoading,
+      deleteCacheLoading,
+    ],
   );
 
   return (
