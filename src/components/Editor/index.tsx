@@ -38,7 +38,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
 
     const vditor = new Vditor('vditor', {
       width: '100%',
-      height: _height - 206,
+      height: _height,
       cache: {
         enable: false,
       },
