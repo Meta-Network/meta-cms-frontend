@@ -841,7 +841,7 @@ const Edit: React.FC = () => {
 
   useEffect(() => {
     // 10s handle all image
-    const timer = setInterval(handleImageUploadToIpfs, 1000 * 10);
+    const timer = setInterval(handleImageUploadToIpfs, 1000 * 30);
     return () => clearInterval(timer);
   }, [handleImageUploadToIpfs]);
 

@@ -82,6 +82,15 @@ export const dbPostsDelete = async (id: number): Promise<void> => {
 };
 
 /**
+ * db posts delete current user
+ * @param userId
+ * @returns
+ */
+export const dbPostsDeleteCurrent = async (userId: number): Promise<number> => {
+  return await db.posts.where('userId').equals(userId).delete();
+};
+
+/**
  * db posts delete all
  * @returns
  */
@@ -192,6 +201,15 @@ export const dbMetadatasAdd = async (data: Metadatas): Promise<number> => {
  */
 export const dbMetadatasUpdateByPostId = async <T>(postId: number, data: T): Promise<number> => {
   return await db.metadatas.where('postId').equals(postId).modify(data);
+};
+
+/**
+ * db metadatas delete
+ * @param postId
+ * @returns
+ */
+export const dbMetadatasDelete = async (postId: number): Promise<number> => {
+  return await db.metadatas.where('postId').equals(postId).delete();
 };
 
 /**
