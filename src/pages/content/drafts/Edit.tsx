@@ -314,7 +314,11 @@ const Edit: React.FC = () => {
       setPublishLoading(false);
 
       // 文档写的 200 成功，但是实际是 201
-      if (result.statusCode === 201 || result.statusCode === 200) {
+      if (
+        (result.statusCode === 201 || result.statusCode === 200) &&
+        result.data?.posts[0] &&
+        result.data?.stateIds[0]
+      ) {
         message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
         // 统一 title 方便下次 更新
@@ -404,7 +408,11 @@ const Edit: React.FC = () => {
       setPublishLoading(false);
 
       // 文档写的 200 成功，但是实际是 201
-      if (result.statusCode === 201 || result.statusCode === 200) {
+      if (
+        (result.statusCode === 201 || result.statusCode === 200) &&
+        result.data?.posts[0] &&
+        result.data?.stateIds[0]
+      ) {
         message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
         const _post = {
