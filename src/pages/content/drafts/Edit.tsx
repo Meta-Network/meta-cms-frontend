@@ -16,7 +16,7 @@ import {
   dbPostsWhereExistByTitle,
 } from '@/db/db';
 import { imageUploadByUrlAPI } from '@/helpers';
-import { assign, cloneDeep } from 'lodash';
+import { assign, cloneDeep, uniq } from 'lodash';
 // import type Vditor from 'vditor';
 import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
@@ -62,6 +62,8 @@ const Edit: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [license, setLicense] = useState<string>('');
   const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
+  const [contentImagesSrc, setContentImagesSrc] = useState<string[]>([]);
+
   // vditor
   // const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
@@ -634,12 +636,13 @@ const Edit: React.FC = () => {
     const imgListFilter = imgList.filter((i) => {
       const reg = new RegExp('[a-zA-z]+://[^s]*');
 
-      // get img src
       const result = i.outerHTML.match('src=".*?"');
       const _src = result ? result[0].slice(5, -1) : '';
       // console.log('_src', _src);
 
-      return i.src && !i.src.includes(FLEEK_NAME) && reg.test(_src);
+      return (
+        i.src && !i.src.includes(FLEEK_NAME) && reg.test(_src) && !contentImagesSrc.includes(_src)
+      );
     });
     // console.log('imgListFilter', imgListFilter);
 
@@ -665,6 +668,11 @@ const Edit: React.FC = () => {
           // _vditor.tip('上传成功', 2000);
           ele.src = result.publicUrl;
           ele.alt = result.key;
+        } else {
+          // 保存失败的图片地址
+          const _list = cloneDeep(contentImagesSrc);
+          _list.push(ele.src);
+          setContentImagesSrc(uniq(_list));
         }
       }
 
@@ -690,7 +698,7 @@ const Edit: React.FC = () => {
     }
 
     setFlagImageUploadToIpfs(false);
-  }, [flagImageUploadToIpfs, asyncContentToDB, intl]);
+  }, [flagImageUploadToIpfs, asyncContentToDB, intl, contentImagesSrc]);
 
   /**
    * handle async content to db
@@ -848,7 +856,7 @@ const Edit: React.FC = () => {
   });
 
   useEffect(() => {
-    // 10s handle all image
+    // 30s handle all image
     const timer = setInterval(handleImageUploadToIpfs, 1000 * 30);
     return () => clearInterval(timer);
   }, [handleImageUploadToIpfs]);
