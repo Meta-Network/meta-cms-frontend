@@ -5,7 +5,7 @@ import Editor from '@/components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
-import { useMount, useThrottleFn } from 'ahooks';
+import { useMount, useThrottleFn, useEventEmitter } from 'ahooks';
 import {
   dbPostsUpdate,
   dbPostsAdd,
@@ -63,6 +63,7 @@ const Edit: React.FC = () => {
   const [license, setLicense] = useState<string>('');
   const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
   const [contentImagesSrc, setContentImagesSrc] = useState<string[]>([]);
+  const focus$ = useEventEmitter<string>();
 
   // vditor
   // const [vditor, setVditor] = useState<Vditor>();
@@ -700,16 +701,14 @@ const Edit: React.FC = () => {
     setFlagImageUploadToIpfs(false);
   }, [flagImageUploadToIpfs, asyncContentToDB, intl, contentImagesSrc]);
 
-  /**
-   * handle async content to db
-   */
-  const handleAsyncContentToDB = useCallback(
-    async (val: string) => {
-      await asyncContentToDB(val);
+  // handle async content to db
+  const handleAsyncContentToDB = useCallback(async () => {
+    if ((window as any)?.vditor) {
+      const value = (window as any).vditor.getValue();
+      await asyncContentToDB(value);
       await handleImageUploadToIpfs();
-    },
-    [asyncContentToDB, handleImageUploadToIpfs],
-  );
+    }
+  }, [asyncContentToDB, handleImageUploadToIpfs]);
 
   /**
    * async cover to DB
@@ -861,6 +860,12 @@ const Edit: React.FC = () => {
     return () => clearInterval(timer);
   }, [handleImageUploadToIpfs]);
 
+  focus$.useSubscription((val: string) => {
+    if (val === 'editor-input') {
+      handleAsyncContentToDB();
+    }
+  });
+
   return (
     <section className={styles.container}>
       <EditorHeader
@@ -896,7 +901,7 @@ const Edit: React.FC = () => {
           value={title}
           onChange={(e) => handleChangeTitle(e.target.value)}
         />
-        <Editor asyncContentToDB={handleAsyncContentToDB} />
+        <Editor focus$={focus$} />
       </section>
 
       <FullLoading
