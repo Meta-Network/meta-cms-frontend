@@ -95,3 +95,9 @@ export enum TaskCommonState {
   SUCCESS = 'SUCCESS',
   FAIL = 'FAIL',
 }
+
+export enum GatewayType {
+  Default = '',
+  Ipfs = 'ipfs',
+  Arweave = 'arweave',
+}

@@ -25,3 +25,5 @@ export const KEY_GUN_ROOT_DRAFT = 'cms_draft';
 
 export const EDITOR_LEARN =
   'https://meta-io.gitbook.io/meta-wiki/how-to-use/how-to-create-content-for-meta-space';
+
+export const STORAGE_PLATFORM = 'github';
