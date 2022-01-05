@@ -51,7 +51,7 @@ export default () => {
               cover={<Image src={item.previewImage} />}
               className={themeSetting === index + 1 ? styles.selectedTheme : ''}
               actions={[
-                <a target="_blank" href={item.previewSite}>
+                <a target="_blank" href={item.previewSite} rel="noreferrer">
                   <ArrowRightOutlined />
                   <FormattedMessage id="component.button.preview" />
                 </a>,
