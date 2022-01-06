@@ -23,8 +23,8 @@ const GatewayIpfs: FC<Props> = ({ publicKey, setVisibleSignatureGenerate }) => {
   const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
 
   return (
-    <section>
-      <section className={styles.itemGateway}>
+    <section className={styles.gateway}>
+      <section>
         <div className={styles.flexAlignItemCenter}>
           <div className={styles.itemStatus}>
             <span className={styles.done} />

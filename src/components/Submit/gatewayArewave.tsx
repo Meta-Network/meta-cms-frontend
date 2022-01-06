@@ -17,7 +17,7 @@ const GatewayArewave: FC<Props> = ({ publicKey, setVisibleSignatureGenerate }) =
   const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
 
   return (
-    <section>
+    <section className={styles.gateway}>
       <section className={styles.itemGateway}>
         <div className={styles.flexAlignItemCenter}>
           <div className={styles.itemStatus}>

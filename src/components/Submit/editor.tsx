@@ -11,7 +11,6 @@ import { useIntl } from 'umi';
 import GenerateKey from './generate';
 import GatewayIpfs from './gatewayIpfs';
 import Storage from './storage';
-import GatewayArewave from './gatewayArewave';
 import { GatewayType } from '@/services/constants';
 
 interface Props {
@@ -72,7 +71,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
 
   const gatewayTypeChange = useCallback(
     (checkedValue: (GatewayType.Ipfs | GatewayType.Arweave)[]) => {
-      console.log('checkedValue', checkedValue);
+      // console.log('checkedValue', checkedValue);
 
       let val = GatewayType.Default;
       if (checkedValue.length) {
@@ -92,7 +91,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
   useMount(() => {
     fetchStorageSetting();
     // get Gateway Checked
-    setGatewayType(storeGet(KEY_META_CMS_GATEWAY_CHECKED) || '');
+    setGatewayType(storeGet(KEY_META_CMS_GATEWAY_CHECKED) || GatewayType.Default);
   });
 
   return (
@@ -113,20 +112,22 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
         <Form.Item
           label={intl.formatMessage({ id: 'editor.submit.item.repo.label' })}
           className={styles.item}
+          style={{ marginTop: 20 }}
         >
-          <Radio value="githubPublic" checked={!!STORAGE_PLATFORM}>
+          <Radio value="githubPrivate" checked={!!STORAGE_PLATFORM}>
             <span className={styles.itemType}>
               {intl.formatMessage({ id: 'editor.submit.item.repo.private.name' })}
             </span>
             {' - '}
             {intl.formatMessage({ id: 'editor.submit.item.repo.private.description' })}
           </Radio>
-          <Storage storageSetting={storageSetting} />
         </Form.Item>
+        <Storage storageSetting={storageSetting} />
         {/* 存证服务 */}
         <Form.Item
           label={intl.formatMessage({ id: 'editor.submit.item.gateway.label' })}
           className={styles.item}
+          style={{ marginTop: 20 }}
         >
           <Checkbox.Group onChange={(val: any) => gatewayTypeChange(val)} value={[gatewayType]}>
             <Space direction="vertical">
@@ -137,26 +138,15 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
                 {' - '}
                 {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
               </Checkbox>
-              <Checkbox value="arweave">
-                <span className={styles.itemType}>Arweave</span>
-                {' - '}
-                {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
-              </Checkbox>
             </Space>
           </Checkbox.Group>
-
-          {gatewayType === 'ipfs' ? (
-            <GatewayIpfs
-              publicKey={publicKey}
-              setVisibleSignatureGenerate={setVisibleSignatureGenerate}
-            />
-          ) : gatewayType === 'arweave' ? (
-            <GatewayArewave
-              publicKey={publicKey}
-              setVisibleSignatureGenerate={setVisibleSignatureGenerate}
-            />
-          ) : null}
         </Form.Item>
+        {gatewayType === GatewayType.Ipfs && (
+          <GatewayIpfs
+            publicKey={publicKey}
+            setVisibleSignatureGenerate={setVisibleSignatureGenerate}
+          />
+        )}
 
         <Form.Item className={styles.footer}>
           <Space>

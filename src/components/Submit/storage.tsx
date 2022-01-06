@@ -16,8 +16,8 @@ const Storage: FC<Props> = ({ storageSetting }) => {
   const intl = useIntl();
 
   return (
-    <>
-      <div className={styles.itemRepo}>
+    <section className={styles.storage}>
+      <div className={styles.statusBox}>
         <div className={styles.itemStatus}>
           <span className={storageSetting ? styles.done : styles.undone} />
         </div>
@@ -37,7 +37,7 @@ const Storage: FC<Props> = ({ storageSetting }) => {
       ) : (
         <Text>{intl.formatMessage({ id: 'editor.submit.item.repo.noBuild' })}</Text>
       )}
-    </>
+    </section>
   );
 };
 
