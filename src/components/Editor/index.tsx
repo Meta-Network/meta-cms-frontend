@@ -7,8 +7,10 @@ import { fetchTokenAPI } from '@/helpers';
 import { useIntl } from 'umi';
 import { message } from 'antd';
 import { useMount } from 'ahooks';
+import type { EventEmitter } from 'ahooks/lib/useEventEmitter';
+
 interface Props {
-  asyncContentToDB: (val: string) => void;
+  focus$: EventEmitter<string>;
 }
 
 interface UploadFormat {
@@ -23,7 +25,7 @@ interface UploadFormat {
 const e = React.createElement;
 let _TOKEN = '';
 
-const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB }) {
+const Editor: React.FC<Props> = React.memo(function Editor({ focus$ }) {
   const intl = useIntl();
   const vditorRef = createRef<HTMLDivElement>();
 
@@ -224,14 +226,14 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
           message.error(msg);
         },
       },
-      input(val: string) {
-        asyncContentToDB(val);
+      input() {
+        focus$.emit('editor-input');
       },
     });
 
     // TODO: need modify
     (window as any).vditor = vditor;
-  }, [asyncContentToDB, intl]);
+  }, [focus$, intl]);
 
   useMount(() => {
     init();
