@@ -1,9 +1,8 @@
-import { getMyHexGrid } from '@/services/api/meta-network';
 import { isMobile } from 'is-mobile';
-import { history, Link, useIntl } from 'umi';
+import { history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
-import { Typography, Avatar, Card, Dropdown, notification } from 'antd';
+import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import { fetchPostsStorage } from '@/services/api/meta-cms';
 import { dbPostsAllCount } from './db/db';
@@ -19,7 +18,7 @@ import { queryCurrentUser, queryInvitations, refreshTokens } from './services/ap
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
-let noHexGridOccupiedMessaged = false;
+// let noHexGridOccupiedMessaged = false;
 
 function CustomSiderMenu({
   initialState,
@@ -28,22 +27,22 @@ function CustomSiderMenu({
   initialState: GLOBAL.InitialState | undefined;
   menuItemProps: SiderMenuProps;
 }) {
-  const intl = useIntl();
-  const checkIfHasNoHexGridOccupied = async () => {
-    const hexGridInfo = await getMyHexGrid();
-    if (hexGridInfo.statusCode === 200 && !hexGridInfo.data && !noHexGridOccupiedMessaged) {
-      noHexGridOccupiedMessaged = true;
-      notification.warn({
-        message: intl.formatMessage({ id: 'messages.status.noHexGridExists.title' }),
-        description: intl.formatMessage({ id: 'messages.status.noHexGridExists.description' }),
-        duration: 0,
-      });
-      setTimeout(() => {
-        window.location.href = META_NETWORK_FE;
-      }, 5000);
-    }
-  };
-  checkIfHasNoHexGridOccupied();
+  // const intl = useIntl();
+  // const checkIfHasNoHexGridOccupied = async () => {
+  //   const hexGridInfo = await getMyHexGrid();
+  //   if (hexGridInfo.statusCode === 200 && !hexGridInfo.data && !noHexGridOccupiedMessaged) {
+  //     noHexGridOccupiedMessaged = true;
+  //     notification.warn({
+  //       message: intl.formatMessage({ id: 'messages.status.noHexGridExists.title' }),
+  //       description: intl.formatMessage({ id: 'messages.status.noHexGridExists.description' }),
+  //       duration: 0,
+  //     });
+  //     setTimeout(() => {
+  //       window.location.href = META_NETWORK_FE;
+  //     }, 5000);
+  //   }
+  // };
+  // checkIfHasNoHexGridOccupied();
 
   return (
     <div className="menu-extra-cards">
@@ -121,14 +120,14 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     localDraftCount: 0,
   };
 
-  if (history.location.pathname !== '/user/login') {
-    const currentUser = await fetchUserInfo();
-    if (currentUser) {
-      state.currentUser = currentUser;
-      // local draft count
-      state.localDraftCount = await dbPostsAllCount(currentUser!.id);
-    }
+  const currentUser = await fetchUserInfo();
+  if (currentUser) {
+    state.currentUser = currentUser;
+    // local draft count
+    state.localDraftCount = await dbPostsAllCount(currentUser!.id);
+  }
 
+  if (history.location.pathname !== '/user/login') {
     const invitationsCountRequest = await queryInvitations();
     state.invitationsCount =
       invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
