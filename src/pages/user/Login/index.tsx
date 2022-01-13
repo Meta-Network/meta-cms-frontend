@@ -3,4 +3,5 @@ export default () => {
   fe.pathname = '/login';
   fe.searchParams.set('redirect', encodeURIComponent(window.location.origin));
   window.location.href = fe.href;
+  return <></>;
 };
