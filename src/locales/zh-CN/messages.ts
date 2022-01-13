@@ -1,7 +1,5 @@
 export default {
   'messages.table.noCoverExists': '无封面图',
-  'messages.status.noHexGridExists.title': '尚未占领地块',
-  'messages.status.noHexGridExists.description': '权限不够，5秒后自动跳转回 Meta Network',
   'messages.domain.enterPrefixDomain': '设定个性化域名（他人访问的网址）',
   'messages.publish.currentStore': '当前选择的存储服务',
   'messages.publish.noStoreSelected': '尚未选择存储服务',

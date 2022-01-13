@@ -1,8 +1,5 @@
 export default {
   'messages.table.noCoverExists': 'No cover image',
-  'messages.status.noHexGridExists.title': 'Hexo not yet occupied',
-  'messages.status.noHexGridExists.description':
-    'Insufficient permission, redirect to Meta Network after 5 seconds',
   'messages.domain.enterPrefixDomain':
     'Set a personalized domain name (web address visited by others)',
   'messages.publish.currentStore': 'The currently selected storage service',
