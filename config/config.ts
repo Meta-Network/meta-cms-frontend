@@ -33,10 +33,11 @@ export default defineConfig({
   },
   // https://umijs.org/zh-CN/plugins/plugin-locale
   locale: {
-    // default zh-CN
+    // default en-US
     default: 'en-US',
     antd: true,
-    baseNavigator: true,
+    baseNavigator: false,
+    useLocalStorage: true,
   },
   dynamicImport: {
     loading: '@ant-design/pro-layout/es/PageLoading',
