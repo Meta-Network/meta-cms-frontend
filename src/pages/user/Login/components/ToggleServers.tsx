@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ExclamationOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import { useIntl } from 'umi';
@@ -8,6 +8,11 @@ import styles from './index.less';
 const ToggleServers: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const intl = useIntl();
+
+  const serverHost = useMemo(() => {
+    const url = new URL(META_NETWORK_FE);
+    return url.host;
+  }, []);
 
   return (
     <section className={styles.toggleServersWrapper}>
@@ -22,8 +27,8 @@ const ToggleServers: React.FC = () => {
       </section>
       <section className={styles.toggleServersLine}>
         <div>
-          <Tooltip placement="right" title={process.env.NEXT_PUBLIC_META_NETWORK_URL}>
-            <span className={styles.toggleServersServer}>metanetwork.online</span>
+          <Tooltip placement="right" title={META_NETWORK_FE}>
+            <span className={styles.toggleServersServer}>{serverHost}</span>
           </Tooltip>
           <p className={styles.toggleServersDescription}>
             {intl.formatMessage({ id: 'login.accountHostedTips' })}
