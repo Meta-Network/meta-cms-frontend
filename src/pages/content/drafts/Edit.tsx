@@ -5,7 +5,7 @@ import Editor from '@/components/Editor';
 import styles from './Edit.less';
 import UploadImage from '@/components/Editor/uploadImage';
 import EditorHeader from '@/components/Editor/editorHeader';
-import { useMount, useThrottleFn } from 'ahooks';
+import { useMount, useThrottleFn, useEventEmitter } from 'ahooks';
 import {
   dbPostsUpdate,
   dbPostsAdd,
@@ -16,7 +16,7 @@ import {
   dbPostsWhereExistByTitle,
 } from '@/db/db';
 import { imageUploadByUrlAPI } from '@/helpers';
-import { assign, cloneDeep } from 'lodash';
+import { assign, cloneDeep, uniq } from 'lodash';
 // import type Vditor from 'vditor';
 import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
@@ -62,6 +62,9 @@ const Edit: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [license, setLicense] = useState<string>('');
   const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
+  const [contentImagesSrc, setContentImagesSrc] = useState<string[]>([]);
+  const focus$ = useEventEmitter<string>();
+
   // vditor
   // const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
@@ -634,12 +637,13 @@ const Edit: React.FC = () => {
     const imgListFilter = imgList.filter((i) => {
       const reg = new RegExp('[a-zA-z]+://[^s]*');
 
-      // get img src
       const result = i.outerHTML.match('src=".*?"');
       const _src = result ? result[0].slice(5, -1) : '';
       // console.log('_src', _src);
 
-      return i.src && !i.src.includes(FLEEK_NAME) && reg.test(_src);
+      return (
+        i.src && !i.src.includes(FLEEK_NAME) && reg.test(_src) && !contentImagesSrc.includes(_src)
+      );
     });
     // console.log('imgListFilter', imgListFilter);
 
@@ -665,6 +669,11 @@ const Edit: React.FC = () => {
           // _vditor.tip('上传成功', 2000);
           ele.src = result.publicUrl;
           ele.alt = result.key;
+        } else {
+          // 保存失败的图片地址
+          const _list = cloneDeep(contentImagesSrc);
+          _list.push(ele.src);
+          setContentImagesSrc(uniq(_list));
         }
       }
 
@@ -690,18 +699,16 @@ const Edit: React.FC = () => {
     }
 
     setFlagImageUploadToIpfs(false);
-  }, [flagImageUploadToIpfs, asyncContentToDB, intl]);
+  }, [flagImageUploadToIpfs, asyncContentToDB, intl, contentImagesSrc]);
 
-  /**
-   * handle async content to db
-   */
-  const handleAsyncContentToDB = useCallback(
-    async (val: string) => {
-      await asyncContentToDB(val);
+  // handle async content to db
+  const handleAsyncContentToDB = useCallback(async () => {
+    if ((window as any)?.vditor) {
+      const value = (window as any).vditor.getValue();
+      await asyncContentToDB(value);
       await handleImageUploadToIpfs();
-    },
-    [asyncContentToDB, handleImageUploadToIpfs],
-  );
+    }
+  }, [asyncContentToDB, handleImageUploadToIpfs]);
 
   /**
    * async cover to DB
@@ -848,10 +855,16 @@ const Edit: React.FC = () => {
   });
 
   useEffect(() => {
-    // 10s handle all image
+    // 30s handle all image
     const timer = setInterval(handleImageUploadToIpfs, 1000 * 30);
     return () => clearInterval(timer);
   }, [handleImageUploadToIpfs]);
+
+  focus$.useSubscription((val: string) => {
+    if (val === 'editor-input') {
+      handleAsyncContentToDB();
+    }
+  });
 
   return (
     <section className={styles.container}>
@@ -888,7 +901,7 @@ const Edit: React.FC = () => {
           value={title}
           onChange={(e) => handleChangeTitle(e.target.value)}
         />
-        <Editor asyncContentToDB={handleAsyncContentToDB} />
+        <Editor focus$={focus$} />
       </section>
 
       <FullLoading
