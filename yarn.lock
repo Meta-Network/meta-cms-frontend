@@ -4860,11 +4860,6 @@ color-name@~1.1.4:
   resolved "https://registry.npm.taobao.org/color-name/download/color-name-1.1.4.tgz"
   integrity sha1-wqCah6y95pVD3m9j+jmVyCbFNqI=
 
-colord@^2.9.2:
-  version "2.9.2"
-  resolved "https://registry.npmmirror.com/colord/download/colord-2.9.2.tgz"
-  integrity sha512-Uqbg+J445nc1TKn4FoDPS6ZZqAvEDnwrH42yo8B40JSOgSLxMZ/gt3h4nmCtPLQeXhjJJkqBx7SCY35WnIixaQ==
-
 colorette@^2.0.16:
   version "2.0.16"
   resolved "https://registry.npmmirror.com/colorette/download/colorette-2.0.16.tgz"
@@ -5101,7 +5096,7 @@ cosmiconfig@^5.0.0, cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
+cosmiconfig@^7.0.0:
   version "7.0.1"
   resolved "https://registry.nlark.com/cosmiconfig/download/cosmiconfig-7.0.1.tgz"
   integrity sha1-cU11ZSLKzoZ4Z8y0R0xdAbuuXW0=
@@ -5259,14 +5254,6 @@ css-select@^4.1.3:
     domhandler "^4.3.0"
     domutils "^2.8.0"
     nth-check "^2.0.1"
-
-css-tree@^2.0.1:
-  version "2.0.4"
-  resolved "https://registry.npmmirror.com/css-tree/download/css-tree-2.0.4.tgz#be44314f17e9ac85fe894a5888941782e1123c29"
-  integrity sha512-b4IS9ZUMtGBiNjzYbcj9JhYbyei99R3ai2CSxlu8GQDnoPA/P+NU85hAm0eKDc/Zp660rpK6tFJQ2OSdacMHVg==
-  dependencies:
-    mdn-data "2.0.23"
-    source-map-js "^1.0.1"
 
 css-what@^5.0.1, css-what@^5.1.0:
   version "5.1.0"
@@ -6760,7 +6747,7 @@ fast-diff@^1.1.2:
   resolved "https://registry.npm.taobao.org/fast-diff/download/fast-diff-1.2.0.tgz"
   integrity sha1-c+4RmC2Gyq95WYKNUZz+kn+sXwM=
 
-fast-glob@^3.0.3, fast-glob@^3.1.1, fast-glob@^3.2.4, fast-glob@^3.2.5, fast-glob@^3.2.7:
+fast-glob@^3.0.3, fast-glob@^3.1.1, fast-glob@^3.2.4, fast-glob@^3.2.5:
   version "3.2.7"
   resolved "https://registry.nlark.com/fast-glob/download/fast-glob-3.2.7.tgz"
   integrity sha1-/Wy3otfpqnp4RhEehaGW1rL3ZqE=
@@ -7771,7 +7758,7 @@ ignore@^4.0.6:
   resolved "https://registry.npmmirror.com/ignore/download/ignore-4.0.6.tgz"
   integrity sha1-dQ49tYYgh7RzfrrIIH/9HvJ7Jfw=
 
-ignore@^5.1.1, ignore@^5.1.4, ignore@^5.1.8, ignore@^5.2.0:
+ignore@^5.1.1, ignore@^5.1.4, ignore@^5.1.8:
   version "5.2.0"
   resolved "https://registry.npmmirror.com/ignore/download/ignore-5.2.0.tgz"
   integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
@@ -8233,11 +8220,6 @@ is-plain-object@^2.0.3, is-plain-object@^2.0.4:
   integrity sha1-LBY7P6+xtgbZ0Xko8FwqHDjgdnc=
   dependencies:
     isobject "^3.0.1"
-
-is-plain-object@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.nlark.com/is-plain-object/download/is-plain-object-5.0.0.tgz"
-  integrity sha1-RCf1CrNCnpAl6n1S6QQ6nvQVk0Q=
 
 is-potential-custom-element-name@^1.0.1:
   version "1.0.1"
@@ -9207,11 +9189,6 @@ known-css-properties@^0.21.0:
   resolved "https://registry.npmmirror.com/known-css-properties/download/known-css-properties-0.21.0.tgz"
   integrity sha1-FfvQu7g0R/POCdivJH7UfGjt6A0=
 
-known-css-properties@^0.24.0:
-  version "0.24.0"
-  resolved "https://registry.npmmirror.com/known-css-properties/download/known-css-properties-0.24.0.tgz"
-  integrity sha512-RTSoaUAfLvpR357vWzAz/50Q/BmHfmE6ETSWfutT0AJiw10e6CmcdYRQJlLRd95B53D0Y2aD1jSxD3V3ySF+PA==
-
 latest-version@^5.0.0:
   version "5.1.0"
   resolved "https://registry.nlark.com/latest-version/download/latest-version-5.1.0.tgz?cache=0&sync_timestamp=1626951813699&other_urls=https%3A%2F%2Fregistry.nlark.com%2Flatest-version%2Fdownload%2Flatest-version-5.1.0.tgz"
@@ -9619,11 +9596,6 @@ mdast-util-to-string@^2.0.0:
   version "2.0.0"
   resolved "https://registry.nlark.com/mdast-util-to-string/download/mdast-util-to-string-2.0.0.tgz"
   integrity sha1-uM/mpxPhCRy1tyj8SIhaR2f4uXs=
-
-mdn-data@2.0.23:
-  version "2.0.23"
-  resolved "https://registry.npmmirror.com/mdn-data/download/mdn-data-2.0.23.tgz#dfb6c41e50a0edb808cf340973ab29321b70808e"
-  integrity sha512-IonVb7pfla2U4zW8rc7XGrtgq11BvYeCxWN8HS+KFBnLDE7XDK9AAMVhRuG6fj9BBsjc69Fqsp6WEActEdNTDQ==
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -11257,11 +11229,6 @@ postcss-safe-parser@4.0.2, postcss-safe-parser@^4.0.2:
   dependencies:
     postcss "^7.0.26"
 
-postcss-safe-parser@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.nlark.com/postcss-safe-parser/download/postcss-safe-parser-6.0.0.tgz?cache=0&sync_timestamp=1623651933144&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fpostcss-safe-parser%2Fdownload%2Fpostcss-safe-parser-6.0.0.tgz"
-  integrity sha1-u0wpiUFxqUvFyZa5owMX70Aq2qE=
-
 postcss-sass@^0.4.4:
   version "0.4.4"
   resolved "https://registry.nlark.com/postcss-sass/download/postcss-sass-0.4.4.tgz"
@@ -11302,7 +11269,7 @@ postcss-selector-parser@^5.0.0-rc.3, postcss-selector-parser@^5.0.0-rc.4:
     indexes-of "^1.0.1"
     uniq "^1.0.1"
 
-postcss-selector-parser@^6.0.2, postcss-selector-parser@^6.0.5, postcss-selector-parser@^6.0.6, postcss-selector-parser@^6.0.7:
+postcss-selector-parser@^6.0.2, postcss-selector-parser@^6.0.5:
   version "6.0.8"
   resolved "https://registry.npmmirror.com/postcss-selector-parser/download/postcss-selector-parser-6.0.8.tgz"
   integrity sha512-D5PG53d209Z1Uhcc0qAZ5U3t5HagH3cxu+WLZ22jt3gLUpXM4eXXfiO14jiDWST3NNooX/E8wISfOhZ9eIjGTQ==
@@ -11345,6 +11312,15 @@ postcss@7.0.32:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
+postcss@8.4.4:
+  version "8.4.4"
+  resolved "https://registry.npmmirror.com/postcss/download/postcss-8.4.4.tgz#d53d4ec6a75fd62557a66bb41978bf47ff0c2869"
+  integrity sha512-joU6fBsN6EIer28Lj6GDFoC/5yOZzLCfn0zHAn/MYXI7aPt4m4hK5KC5ovEZXy+lnCjmYIbQWngvju2ddyEr8Q==
+  dependencies:
+    nanoid "^3.1.30"
+    picocolors "^1.0.0"
+    source-map-js "^1.0.1"
+
 postcss@^7.0.0, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2, postcss@^7.0.21, postcss@^7.0.26, postcss@^7.0.32, postcss@^7.0.35, postcss@^7.0.5, postcss@^7.0.6:
   version "7.0.39"
   resolved "https://registry.npmmirror.com/postcss/download/postcss-7.0.39.tgz"
@@ -11353,7 +11329,7 @@ postcss@^7.0.0, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2, postcss@^7.0.2
     picocolors "^0.2.1"
     source-map "^0.6.1"
 
-postcss@^8.1.2, postcss@^8.3.11, postcss@^8.3.6:
+postcss@^8.1.2, postcss@^8.3.6:
   version "8.4.5"
   resolved "https://registry.npmmirror.com/postcss/download/postcss-8.4.5.tgz"
   integrity sha512-jBDboWM8qpaqwkMwItqTQTiFikhs/67OYVvblFFTM7MrZjt6yMKd6r2kgXizEbTTljacm4NldIlZnhbjr84QYg==
@@ -13997,7 +13973,7 @@ style-search@^0.1.0:
   resolved "https://registry.npm.taobao.org/style-search/download/style-search-0.1.0.tgz"
   integrity sha1-eVjHk+R+MuB9K1yv5cC/jhLneQI=
 
-stylelint-config-css-modules@^2.2.0, stylelint-config-css-modules@^2.3.0:
+stylelint-config-css-modules@^2.2.0:
   version "2.3.0"
   resolved "https://registry.npmmirror.com/stylelint-config-css-modules/download/stylelint-config-css-modules-2.3.0.tgz?cache=0&sync_timestamp=1635235738362&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fstylelint-config-css-modules%2Fdownload%2Fstylelint-config-css-modules-2.3.0.tgz"
   integrity sha1-v3mqrgnKn9rDf91RjRpAp3mqB2c=
@@ -14007,20 +13983,10 @@ stylelint-config-prettier@^8.0.1:
   resolved "https://registry.npmmirror.com/stylelint-config-prettier/download/stylelint-config-prettier-8.0.2.tgz"
   integrity sha1-2p3jPaTFaJPL5+Jt8jmnN0BF4U4=
 
-stylelint-config-prettier@^9.0.3:
-  version "9.0.3"
-  resolved "https://registry.npmmirror.com/stylelint-config-prettier/download/stylelint-config-prettier-9.0.3.tgz#0dccebeff359dcc393c9229184408b08964d561c"
-  integrity sha1-Dczr7/NZ3MOTySKRhECLCJZNVhw=
-
 stylelint-config-recommended@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmmirror.com/stylelint-config-recommended/download/stylelint-config-recommended-3.0.0.tgz"
   integrity sha1-4OVHQ0AWxVOf4mUK/VgEmi/R1lc=
-
-stylelint-config-recommended@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.npmmirror.com/stylelint-config-recommended/download/stylelint-config-recommended-6.0.0.tgz#fd2523a322836005ad9bf473d3e5534719c09f9d"
-  integrity sha1-/SUjoyKDYAWtm/Rz0+VTRxnAn50=
 
 stylelint-config-standard@^20.0.0:
   version "20.0.0"
@@ -14029,40 +13995,10 @@ stylelint-config-standard@^20.0.0:
   dependencies:
     stylelint-config-recommended "^3.0.0"
 
-stylelint-config-standard@^24.0.0:
-  version "24.0.0"
-  resolved "https://registry.npmmirror.com/stylelint-config-standard/download/stylelint-config-standard-24.0.0.tgz#6823f207ab997ae0b641f9a636d007cc44d77541"
-  integrity sha512-+RtU7fbNT+VlNbdXJvnjc3USNPZRiRVp/d2DxOF/vBDDTi0kH5RX2Ny6errdtZJH3boO+bmqIYEllEmok4jiuw==
-  dependencies:
-    stylelint-config-recommended "^6.0.0"
-
-stylelint-csstree-validator@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmmirror.com/stylelint-csstree-validator/download/stylelint-csstree-validator-2.0.0.tgz#1bd0b609596e3d5d78c3f4f0e1fe35e184f7e774"
-  integrity sha512-nAnG4CynM4P4POUCGVz/PnrByKcgdD2isKlmAccoxykkaH1IuEposiOJcUQlAp/kXD/T0ZRwlDbqMGgrHRbhog==
-  dependencies:
-    css-tree "^2.0.1"
-
 stylelint-declaration-block-no-ignored-properties@^2.1.0:
   version "2.5.0"
   resolved "https://registry.npmmirror.com/stylelint-declaration-block-no-ignored-properties/download/stylelint-declaration-block-no-ignored-properties-2.5.0.tgz?cache=0&sync_timestamp=1636704710981&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fstylelint-declaration-block-no-ignored-properties%2Fdownload%2Fstylelint-declaration-block-no-ignored-properties-2.5.0.tgz"
   integrity sha512-UNz5nUC5GMgMb6GPc/pHUTC0+ydxTdj2mUn7XcKRdwQoiUzzUmWWdSf1aFv2UzrW4x8JYNReE1u5JOj7g0ThJw==
-
-stylelint-declaration-block-no-ignored-properties@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.npmmirror.com/stylelint-declaration-block-no-ignored-properties/download/stylelint-declaration-block-no-ignored-properties-2.5.0.tgz?cache=0&sync_timestamp=1636704710981&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fstylelint-declaration-block-no-ignored-properties%2Fdownload%2Fstylelint-declaration-block-no-ignored-properties-2.5.0.tgz#7cfe61c118ef5aa89f2bfdc2a78aa34bd2dacb87"
-  integrity sha512-UNz5nUC5GMgMb6GPc/pHUTC0+ydxTdj2mUn7XcKRdwQoiUzzUmWWdSf1aFv2UzrW4x8JYNReE1u5JOj7g0ThJw==
-
-stylelint-scss@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.npmmirror.com/stylelint-scss/download/stylelint-scss-4.1.0.tgz#39b808696f8152081163d970449257ff80b5c041"
-  integrity sha512-BNYTo7MMamhFOlcaAWp2dMpjg6hPyM/FFqfDIYzmYVLMmQJqc8lWRIiTqP4UX5bresj9Vo0dKC6odSh43VP2NA==
-  dependencies:
-    lodash "^4.17.21"
-    postcss-media-query-parser "^0.2.3"
-    postcss-resolve-nested-selector "^0.1.1"
-    postcss-selector-parser "^6.0.6"
-    postcss-value-parser "^4.1.0"
 
 stylelint@^13.0.0:
   version "13.13.1"
@@ -14115,51 +14051,6 @@ stylelint@^13.0.0:
     sugarss "^2.0.0"
     svg-tags "^1.0.0"
     table "^6.6.0"
-    v8-compile-cache "^2.3.0"
-    write-file-atomic "^3.0.3"
-
-stylelint@^14.2.0:
-  version "14.2.0"
-  resolved "https://registry.npmmirror.com/stylelint/download/stylelint-14.2.0.tgz#da4f0f4580e66911c38c376ed82447b78e32b0fb"
-  integrity sha512-i0DrmDXFNpDsWiwx6SPRs4/pyw4kvZgqpDGvsTslQMY7hpUl6r33aQvNSn6cnTg2wtZ9rreFElI7XAKpOWi1vQ==
-  dependencies:
-    balanced-match "^2.0.0"
-    colord "^2.9.2"
-    cosmiconfig "^7.0.1"
-    debug "^4.3.3"
-    execall "^2.0.0"
-    fast-glob "^3.2.7"
-    fastest-levenshtein "^1.0.12"
-    file-entry-cache "^6.0.1"
-    get-stdin "^8.0.0"
-    global-modules "^2.0.0"
-    globby "^11.0.4"
-    globjoin "^0.1.4"
-    html-tags "^3.1.0"
-    ignore "^5.2.0"
-    import-lazy "^4.0.0"
-    imurmurhash "^0.1.4"
-    is-plain-object "^5.0.0"
-    known-css-properties "^0.24.0"
-    mathml-tag-names "^2.1.3"
-    meow "^9.0.0"
-    micromatch "^4.0.4"
-    normalize-path "^3.0.0"
-    normalize-selector "^0.2.0"
-    picocolors "^1.0.0"
-    postcss "^8.3.11"
-    postcss-media-query-parser "^0.2.3"
-    postcss-resolve-nested-selector "^0.1.1"
-    postcss-safe-parser "^6.0.0"
-    postcss-selector-parser "^6.0.7"
-    postcss-value-parser "^4.1.0"
-    resolve-from "^5.0.0"
-    specificity "^0.4.1"
-    string-width "^4.2.3"
-    strip-ansi "^6.0.1"
-    style-search "^0.1.0"
-    svg-tags "^1.0.0"
-    table "^6.7.5"
     v8-compile-cache "^2.3.0"
     write-file-atomic "^3.0.3"
 
@@ -14265,7 +14156,7 @@ symbol-tree@^3.2.2, symbol-tree@^3.2.4:
   resolved "https://registry.nlark.com/symbol-tree/download/symbol-tree-3.2.4.tgz"
   integrity sha1-QwY30ki6d+B4iDlR+5qg7tfGP6I=
 
-table@^6.0.9, table@^6.6.0, table@^6.7.5:
+table@^6.0.9, table@^6.6.0:
   version "6.7.5"
   resolved "https://registry.npmmirror.com/table/download/table-6.7.5.tgz"
   integrity sha512-LFNeryOqiQHqCVKzhkymKwt6ozeRhlm8IL1mE8rNUurkir4heF6PzMyRgaTa4tlyPTGGgXuvVOF/OLWiH09Lqw==

@@ -17,7 +17,7 @@
     "lint:fix": "eslint --fix --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src && npm run lint:style",
     "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "lint:prettier": "prettier -c --write \"src/**/*\" --end-of-line auto",
-    "lint:style": "stylelint --fix \"src/**/*.less\" --syntax less",
+    "lint:style": "stylelint --fix \"src/**/*.less\" --custom-syntax postcss-less",
     "openapi": "umi openapi",
     "precommit": "lint-staged",
     "prettier": "prettier -c --write \"src/**/*\"",
@@ -35,6 +35,7 @@
     "tsc": "tsc --noEmit"
   },
   "lint-staged": {
+    "**/*.less": "stylelint --fix \"src/**/*.less\" --custom-syntax postcss-less",
     "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
     "**/*.{js,jsx,tsx,ts,less,md,json}": [
       "prettier --write"
@@ -115,6 +116,7 @@
     "jsdom-global": "^3.0.2",
     "lint-staged": "^12.1.5",
     "mockjs": "^1.0.1-beta3",
+    "postcss": "8.4.4",
     "prettier": "^2.3.2",
     "puppeteer-core": "^13.0.1",
     "typescript": "^4.2.2"
