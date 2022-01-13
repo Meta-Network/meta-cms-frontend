@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tooltip } from 'antd';
 import { WechatOutlined, GithubOutlined, TwitterOutlined } from '@ant-design/icons';
-// import { EmailIcon } from '../../Icon/Index';
+import { EmailIcon } from '../../../../components/Icon';
 import styles from './index.less';
 
 // Toggle 登录方式
@@ -13,8 +13,7 @@ const ToggleMode: React.FC = () => {
         <li className={styles.toggleModeItem}>
           <Tooltip placement="bottom" title={`Email ${'登录'}`}>
             <button className={styles.toggleModeBtn}>
-              {/* <EmailIcon /> */}
-              <WechatOutlined className="icon" />
+              <EmailIcon />
             </button>
           </Tooltip>
         </li>
