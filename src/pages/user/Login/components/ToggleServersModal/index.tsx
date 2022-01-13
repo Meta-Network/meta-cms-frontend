@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
+import { useIntl } from 'umi';
 import CustomModal from '../../../../../components/CustomModal';
 import styles from './index.less';
 
@@ -12,17 +13,17 @@ const Occupied: React.FC<Props> = React.memo(function Occupied({
   isModalVisible,
   setIsModalVisible,
 }) {
+  const intl = useIntl();
+
   const Content: React.FC = () => {
     return (
       <div>
         <p className={styles.contentTextTips}>
-          {
-            '通过自定义服务器选项，你可以自行指定并登录其他 META NETWORK 主服务器。此功能暂未对外开放。'
-          }
+          {intl.formatMessage({ id: 'login.serverOptionsDescription' })}
         </p>
         <section className={styles.contentFooter}>
           <Button className="custom-primary" onClick={() => setIsModalVisible(false)}>
-            {'忽略'}
+            {intl.formatMessage({ id: 'component.button.ignore' })}
           </Button>
         </section>
       </div>
@@ -33,7 +34,9 @@ const Occupied: React.FC<Props> = React.memo(function Occupied({
     <CustomModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}>
       <section className={styles.content}>
         <section className={styles.contentHead}>
-          <span className={styles.contentHeadTitle}>{'服务器选项'}</span>
+          <span className={styles.contentHeadTitle}>
+            {intl.formatMessage({ id: 'login.serverOptions' })}
+          </span>
         </section>
         <Content />
       </section>

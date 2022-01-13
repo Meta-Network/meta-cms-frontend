@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Tooltip } from 'antd';
-import { history } from 'umi';
+import { history, useIntl } from 'umi';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import EmailLogin from './EmailLogin';
 import EmailRegister from './EmailRegister';
@@ -12,6 +12,8 @@ import styles from './index.less';
 interface Props {}
 
 const Email: React.FC<Props> = () => {
+  const intl = useIntl();
+
   // email 登录模式
   const [emailMode, setEmailMode] = useState<LoginType.EmailMode>('login');
 
@@ -30,14 +32,18 @@ const Email: React.FC<Props> = () => {
 
   return (
     <>
-      <Tooltip title={'返回首页'}>
+      <Tooltip title={intl.formatMessage({ id: 'login.backToHomepage' })}>
         <Button
           className={styles.buttonBack}
           icon={<ArrowLeftOutlined />}
           onClick={() => history.push('/')}
         />
       </Tooltip>
-      <p className={styles.buttonMethods}>{emailMode === 'login' ? '登录' : '创建账号'}</p>
+      <p className={styles.buttonMethods}>
+        {emailMode === 'login'
+          ? intl.formatMessage({ id: 'login.signIn' })
+          : intl.formatMessage({ id: 'login.createAccount' })}
+      </p>
       <ToggleServers />
       {emailMode === 'login' ? (
         <EmailLogin setEmailModeFn={setEmailModeFn} />

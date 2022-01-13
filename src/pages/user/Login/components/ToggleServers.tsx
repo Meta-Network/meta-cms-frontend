@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { ExclamationOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
+import { useIntl } from 'umi';
 import ToggleServersModal from './ToggleServersModal';
 import styles from './index.less';
 
 const ToggleServers: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const intl = useIntl();
 
   return (
     <section className={styles.toggleServersWrapper}>
       <section className={styles.toggleServersHead}>
-        <span className={styles.toggleServersTitle}>{'账号托管于'}</span>
+        <span className={styles.toggleServersTitle}>
+          {intl.formatMessage({ id: 'login.accountHosted' })}
+        </span>
         <ExclamationOutlined
           className={styles.toggleServersHeadIcon}
           onClick={() => setIsModalVisible(true)}
@@ -22,10 +26,12 @@ const ToggleServers: React.FC = () => {
             <span className={styles.toggleServersServer}>metanetwork.online</span>
           </Tooltip>
           <p className={styles.toggleServersDescription}>
-            {'免费加入最大的公共服务器，得到最新的服务'}
+            {intl.formatMessage({ id: 'login.accountHostedTips' })}
           </p>
         </div>
-        <section className={styles.toggleServersEdit}>{'编辑'}</section>
+        <section className={styles.toggleServersEdit}>
+          {intl.formatMessage({ id: 'component.button.edit' })}
+        </section>
       </section>
       <ToggleServersModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} />
     </section>

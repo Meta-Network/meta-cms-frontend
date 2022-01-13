@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Form, Input, message, Button } from 'antd';
 import { trim } from 'lodash';
-import { history, useModel } from 'umi';
+import { history, useModel, useIntl } from 'umi';
 import styles from './index.less';
 import EmailCode from './EmailCode';
 import { KEY_IS_LOGIN, rules } from '../../../../../config/index';
@@ -19,6 +19,7 @@ interface Props {
 }
 
 const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
+  const intl = useIntl();
   const [formResister] = Form.useForm();
   const [loading] = useState(false);
   const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>(null as any);
@@ -59,7 +60,9 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
           hcaptchaToken: 'hcaptcha_token_here',
         });
         if (resEmailSignup.statusCode === 201) {
-          message.success({ content: '注册成功' });
+          message.success({
+            content: intl.formatMessage({ id: 'messages.login.signUpSuccessfully' }),
+          });
 
           // 记录登陆
           storeSet(KEY_IS_LOGIN, 'true');
@@ -72,16 +75,18 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
         }
       } catch (e: any) {
         if (e?.data?.statusCode === 403) {
-          message.warning({ content: '频繁操作验证码已失效，请重新获取' });
+          message.warning({ content: intl.formatMessage({ id: 'messages.login.codeHasExpired' }) });
         } else if (e?.data?.statusCode === 400) {
-          message.warning({ content: '验证码不匹配' });
+          message.warning({
+            content: intl.formatMessage({ id: 'messages.login.wrongCaptchaCode' }),
+          });
         } else {
-          message.warning({ content: '失败' });
+          message.warning({ content: intl.formatMessage({ id: 'messages.fail' }) });
           console.error(e);
         }
       }
     },
-    [updateUsername, inviteCode],
+    [updateUsername, inviteCode, intl],
   );
 
   const onFinishFailedEmail = (errorInfo: any): void => {
@@ -100,23 +105,23 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
       const _timer = setTimeout(async () => {
         const values = await formResister.getFieldsValue();
         if (!trim(values.email)) {
-          reject('请输入邮箱');
+          reject(intl.formatMessage({ id: 'messages.login.enterEmail' }));
           return;
         }
         try {
           const res = await accountsEmailVerify({ account: trim(values.email) });
           if (res.statusCode === 200) {
             if (res.data.isExists) {
-              reject('邮箱已注册');
+              reject(intl.formatMessage({ id: 'messages.login.emailHasBeenSignUp' }));
             } else {
               resolve();
             }
           } else {
-            reject('验证失败');
+            reject(intl.formatMessage({ id: 'messages.login.verificationFailed' }));
           }
         } catch (e: any) {
           console.log('Failed:', e);
-          reject('验证失败');
+          reject(intl.formatMessage({ id: 'messages.login.verificationFailed' }));
         } finally {
         }
       }, 500);
@@ -141,12 +146,12 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
             const res = await usersUsernameValidate({ username: trim(values.username) });
             if (res.statusCode === 200) {
               if (res.data.isExists) {
-                reject('用户名已存在');
+                reject(intl.formatMessage({ id: 'messages.login.usernameExist' }));
               } else {
                 resolve();
               }
             } else {
-              reject('验证失败');
+              reject(intl.formatMessage({ id: 'messages.login.verificationFailed' }));
             }
           } catch (e: any) {
             console.log('Failed:', e);
@@ -154,14 +159,17 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
             if (e?.data?.message) {
               if (Array.isArray(e.data.message)) {
                 _message =
-                  '验证失败' +
+                  intl.formatMessage({ id: 'messages.login.verificationFailed' }) +
                   ' ' +
                   e.data.message.reduce((a: string, b: string) => a + (a && '、') + b, '');
               } else {
-                _message = '验证失败' + ' ' + e.data.message;
+                _message =
+                  intl.formatMessage({ id: 'messages.login.verificationFailed' }) +
+                  ' ' +
+                  e.data.message;
               }
             } else {
-              _message = '验证失败';
+              _message = intl.formatMessage({ id: 'messages.login.verificationFailed' });
             }
             reject(_message);
           }
@@ -169,7 +177,12 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
 
         setTimerUsername(_timer);
       } else {
-        reject(`用户名仅允许 小写, 数字, "-" 且长度为 ${rules.username.min}-${rules.username.max}`);
+        reject(
+          intl.formatMessage(
+            { id: 'messages.login.usernameRules' },
+            { min: rules.username.min, max: rules.username.max },
+          ),
+        );
       }
     });
   };
@@ -188,11 +201,16 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
         className={styles.formEmailItem}
         label=""
         name="username"
-        rules={[{ required: true, message: '请输入用户名' }, { validator: verifyUsernameRule }]}
+        rules={[
+          { required: true, message: intl.formatMessage({ id: 'messages.login.enterUsername' }) },
+          { validator: verifyUsernameRule },
+        ]}
       >
         <Input
           className="form-input"
-          placeholder={`${'请输入用户名'}(${'不可修改'})`}
+          placeholder={`${intl.formatMessage({
+            id: 'messages.login.enterUsername',
+          })}(${intl.formatMessage({ id: 'messages.login.cannotBeModified' })})`}
           autoComplete="new-text"
         />
       </Form.Item>
@@ -202,11 +220,19 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
         label=""
         name="email"
         rules={[
-          { required: true, type: 'email', message: '请输入有效邮箱' },
+          {
+            required: true,
+            type: 'email',
+            message: intl.formatMessage({ id: 'messages.login.enterValidEmail' }),
+          },
           { validator: verifyEmailRule },
         ]}
       >
-        <Input className="form-input" placeholder={'请输入邮箱'} autoComplete="new-text" />
+        <Input
+          className="form-input"
+          placeholder={intl.formatMessage({ id: 'messages.login.enterEmail' })}
+          autoComplete="new-text"
+        />
       </Form.Item>
 
       <section className={styles.formEmailCode}>
@@ -214,11 +240,16 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
           className={styles.formEmailItem}
           label=""
           name="code"
-          rules={[{ required: true, message: '请输入验证码' }]}
+          rules={[
+            {
+              required: true,
+              message: intl.formatMessage({ id: 'messages.login.enterVerificationCode' }),
+            },
+          ]}
         >
           <Input
             className="form-input"
-            placeholder={'请输入验证码'}
+            placeholder={intl.formatMessage({ id: 'messages.login.enterVerificationCode' })}
             autoComplete="off"
             maxLength={8}
           />
@@ -229,14 +260,14 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
       <Form.Item className={styles.formEmailItem}>
         <section className={styles.formEmailAction}>
           <Button htmlType="submit" loading={loading} className={styles.formEmailBtn}>
-            注册
+            {intl.formatMessage({ id: 'login.signUp' })}
           </Button>
           <button
             type="button"
             onClick={() => setEmailModeFn('login')}
             className={styles.formEmailBtnText}
           >
-            登录
+            {intl.formatMessage({ id: 'login.signIn' })}
           </button>
         </section>
       </Form.Item>

@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Form, Input, message, Button } from 'antd';
 import { trim } from 'lodash';
+import { useIntl } from 'umi';
 import { invitationsValidate } from '@/services/api/meta-ucenter';
 import styles from './index.less';
 
@@ -13,6 +14,7 @@ interface Props {
 const EmailRegisterCode: React.FC<Props> = ({ setStep, setInviteCode, setEmailModeFn }) => {
   const [formResister] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const intl = useIntl();
 
   // 注册
   const onFinishEmail = useCallback(
@@ -27,27 +29,35 @@ const EmailRegisterCode: React.FC<Props> = ({ setStep, setInviteCode, setEmailMo
         });
         if (res.statusCode === 200) {
           if (!res.data.exists) {
-            message.warning({ content: '邀请码不正确' });
+            message.warning({
+              content: intl.formatMessage({ id: 'messages.login.enterInvitationCodeError' }),
+            });
           }
 
           if (res.data.available) {
             setStep(1);
             setInviteCode(inviteCode);
           } else {
-            message.warning({ content: '邀请码已失效' });
+            message.warning({
+              content: intl.formatMessage({ id: 'messages.login.enterInvitationCodeInvalid' }),
+            });
           }
         } else {
           console.error(res.message);
-          message.warning({ content: '邀请码不正确' });
+          message.warning({
+            content: intl.formatMessage({ id: 'messages.login.enterInvitationCodeError' }),
+          });
         }
       } catch (e: any) {
         console.error(e);
-        message.warning({ content: '邀请码不正确' });
+        message.warning({
+          content: intl.formatMessage({ id: 'messages.login.enterInvitationCodeError' }),
+        });
       } finally {
         setLoading(false);
       }
     },
-    [setStep, setInviteCode],
+    [setStep, setInviteCode, intl],
   );
 
   const onFinishFailedEmail = (errorInfo: any): void => {
@@ -68,31 +78,42 @@ const EmailRegisterCode: React.FC<Props> = ({ setStep, setInviteCode, setEmailMo
         label=""
         className={styles.formEmailItem}
         name="inviteCode"
-        rules={[{ required: true, message: '请输入邀请码' }]}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({ id: 'messages.login.enterInvitationCode' }),
+          },
+        ]}
       >
-        <Input className="form-input" placeholder={'请输入邀请码'} autoComplete="new-text" />
+        <Input
+          className="form-input"
+          placeholder={intl.formatMessage({ id: 'messages.login.enterInvitationCode' })}
+          autoComplete="new-text"
+        />
       </Form.Item>
       <section>
-        <p className={styles.formEmailRegisterCodeDescriptionTitle}>{'如何获取邀请码?'}</p>
+        <p className={styles.formEmailRegisterCodeDescriptionTitle}>
+          {intl.formatMessage({ id: 'login.invitationCodeHelpTitle' })}
+        </p>
         <section className={styles.formEmailRegisterCodeDescriptionText}>
-          1.如果您是 Matataki 用户请在官网中登录后查看 消息通知，我们已经向您发送了邀请码
+          {intl.formatMessage({ id: 'login.invitationCodeHelpRule.one' })}
         </section>
         <section className={styles.formEmailRegisterCodeDescriptionText}>
-          2.如果您是新用户请向已经登入的用户请求获得邀请码（每个新用户完成建站后可获得3个邀请码）
+          {intl.formatMessage({ id: 'login.invitationCodeHelpRule.two' })}
         </section>
       </section>
 
       <Form.Item className={styles.formEmailItem}>
         <section className={styles.formEmailAction}>
           <Button htmlType="submit" loading={loading} className={styles.formEmailBtn}>
-            下一步
+            {intl.formatMessage({ id: 'login.next' })}
           </Button>
           <button
             type="button"
             onClick={() => setEmailModeFn('login')}
             className={styles.formEmailBtnText}
           >
-            登录
+            {intl.formatMessage({ id: 'login.signIn' })}
           </button>
         </section>
       </Form.Item>
