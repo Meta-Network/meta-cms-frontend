@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image } from 'antd';
+import { history, useModel } from 'umi';
 import Email from './components/Email';
 import LogoAuth from '../../../assets/svg/login_auth.svg';
 import styles from './index.less';
 
 const Login: React.FC = () => {
   const [mode] = useState<'email'>('email'); // email ...
+  const { initialState } = useModel('@@initialState');
+
+  useEffect(() => {
+    if (initialState?.currentUser) {
+      history.push('/');
+    }
+  }, [initialState]);
 
   return (
     <section className={styles.wrapper}>

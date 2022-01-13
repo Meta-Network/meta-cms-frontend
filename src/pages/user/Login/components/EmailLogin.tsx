@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { trim } from 'lodash';
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import { emailLogin } from '@/services/api/meta-ucenter';
 import EmailCode from './EmailCode';
 import { storeSet } from '../../../../utils/store';
@@ -15,6 +15,7 @@ interface Props {
 const Email: React.FC<Props> = ({ setEmailModeFn }) => {
   const [formLogin] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { refresh } = useModel('@@initialState');
 
   /**
    * 用户登录
@@ -37,6 +38,8 @@ const Email: React.FC<Props> = ({ setEmailModeFn }) => {
 
         // 记录登录
         storeSet(KEY_IS_LOGIN, 'true');
+
+        await refresh();
 
         history.push('/');
       } else {

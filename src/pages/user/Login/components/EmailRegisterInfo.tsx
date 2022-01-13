@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Form, Input, message, Button } from 'antd';
 import { trim } from 'lodash';
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import styles from './index.less';
 import EmailCode from './EmailCode';
 import { KEY_IS_LOGIN, rules } from '../../../../../config/index';
@@ -23,22 +23,28 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
   const [loading] = useState(false);
   const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>(null as any);
   const [timerUsername, setTimerUsername] = useState<ReturnType<typeof setTimeout>>(null as any);
+  const { refresh } = useModel('@@initialState');
 
   // 更新用户名
-  const updateUsername = useCallback(async (data: LoginType.UsersMeUsernameState) => {
-    try {
-      const res = await usersMeUsername(data);
-      if (res.statusCode === 200) {
-        // console.log(res.message)
-      } else {
-        console.error(res.message);
+  const updateUsername = useCallback(
+    async (data: LoginType.UsersMeUsernameState) => {
+      try {
+        const res = await usersMeUsername(data);
+        if (res.statusCode === 200) {
+          // console.log(res.message)
+        } else {
+          console.error(res.message);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        await refresh();
+
+        history.push('/');
       }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      history.push('/');
-    }
-  }, []);
+    },
+    [refresh],
+  );
 
   // 注册
   const onFinishEmail = useCallback(
