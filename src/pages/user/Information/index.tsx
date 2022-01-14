@@ -30,7 +30,6 @@ const BaseView: React.FC = () => {
     setUpdateUserAvatarLoading(true);
     const result = await uploadFileToIpfs(file);
     done();
-    setUpdateUserAvatarLoading(false);
 
     if (result?.statusCode === 201) {
       const url = result.data.publicUrl;
@@ -38,13 +37,15 @@ const BaseView: React.FC = () => {
       if (updateUserAvatarResult.statusCode === 200) {
         message.success(intl.formatMessage({ id: 'messages.profile.updateSuccess' }));
         setUserAvatar(url);
-        refreshUserInfo();
+        await refreshUserInfo();
       } else {
         message.error(intl.formatMessage({ id: 'messages.profile.updateFailed' }));
       }
     } else {
       message.error(intl.formatMessage({ id: 'messages.profile.updateFailed' }));
     }
+
+    setUpdateUserAvatarLoading(false);
   };
 
   const handleFinish = async (values: GLOBAL.UserInfo) => {
@@ -55,14 +56,16 @@ const BaseView: React.FC = () => {
     setUpdateUserInfoLoading(true);
     const updateUserInfoResult = await updateUserInfo(values);
     done();
-    setUpdateUserInfoLoading(false);
 
     if (updateUserInfoResult.statusCode === 200) {
       message.success(intl.formatMessage({ id: 'messages.profile.updateSuccess' }));
-      refreshUserInfo();
+
+      await refreshUserInfo();
     } else {
       message.success(intl.formatMessage({ id: 'messages.profile.updateFailed' }));
     }
+
+    setUpdateUserInfoLoading(false);
   };
 
   const AvatarView = ({ currentAvatar }: { currentAvatar: string }) => (
