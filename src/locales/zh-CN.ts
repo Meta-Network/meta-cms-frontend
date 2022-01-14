@@ -6,6 +6,7 @@ import setting from './zh-CN/setting';
 import messages from './zh-CN/messages';
 import component from './zh-CN/component';
 import timezones from './zh-CN/timezones';
+import login from './zh-CN/login';
 
 export default {
   ...menu,
@@ -16,4 +17,5 @@ export default {
   ...messages,
   ...component,
   ...timezones,
+  ...login,
 };

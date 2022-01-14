@@ -27,3 +27,22 @@ export const EDITOR_LEARN =
   'https://meta-io.gitbook.io/meta-wiki/how-to-use/how-to-create-content-for-meta-space';
 
 export const STORAGE_PLATFORM = 'github';
+
+export const KEY_IS_LOGIN = 'META_CMS_IS_LOGIN';
+
+// rules
+export const rules = {
+  usernameReg: '^[a-z0-9-]{3,15}$',
+  username: {
+    min: 3,
+    max: 15,
+  },
+  nickname: {
+    min: 1,
+    max: 32,
+  },
+  bio: {
+    min: 1,
+    max: 200,
+  },
+};

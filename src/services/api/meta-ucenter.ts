@@ -136,3 +136,73 @@ export async function requestStorageToken() {
     method: 'POST',
   });
 }
+
+/**
+ * 验证邀请码的可用性
+ * @param data
+ * @returns
+ */
+export const invitationsValidate = (data: GLOBAL.InvitationsValidateProps) => {
+  return request<GLOBAL.GeneralResponse<GLOBAL.InvitationsValidateState>>('/invitations/validate', {
+    method: 'POST',
+    data,
+  });
+};
+
+/**
+ * 验证用户名是否存在
+ * @param data
+ * @returns
+ */
+export const usersUsernameValidate = (data: LoginType.UsersMeUsernameState) => {
+  return request<GLOBAL.GeneralResponse<LoginType.UsersUsernameValidate>>(
+    '/users/username/validate',
+    {
+      method: 'POST',
+      data,
+    },
+  );
+};
+
+/**
+ * 验证邮箱是否存在
+ * @param data
+ * @returns
+ */
+export const accountsEmailVerify = (data: LoginType.AccountsEmailVerifyData) => {
+  return request<GLOBAL.GeneralResponse<LoginType.AccountsEmailVerify>>(
+    '/accounts/email/is-exists',
+    {
+      method: 'POST',
+      data,
+    },
+  );
+};
+
+/**
+ * 注册
+ * @param signature 邀请码
+ * @param data
+ * @returns
+ */
+export const accountsEmailSignup = (signature: string, data: GLOBAL.EmailLoginParams) => {
+  return request<GLOBAL.GeneralResponse<LoginType.AccountsEmailSignupResult>>(
+    `/accounts/email/signup/${signature}`,
+    {
+      method: 'POST',
+      data,
+    },
+  );
+};
+
+/**
+ * 更新用户的用户名
+ * @param data
+ * @returns
+ */
+export const usersMeUsername = (data: LoginType.UsersMeUsernameState) => {
+  return request<GLOBAL.GeneralResponse<string>>('/users/me/username', {
+    method: 'PUT',
+    data,
+  });
+};

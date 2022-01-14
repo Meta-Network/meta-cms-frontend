@@ -305,6 +305,7 @@ declare namespace GLOBAL {
 
   type VerificationCodeParams = {
     key: string;
+    hcaptchaToken?: string;
   };
 
   type EmailLoginParams = {
@@ -375,6 +376,15 @@ declare namespace GLOBAL {
   };
 
   type StoreProvider = 'GitHub' | 'Gitee';
+
+  type InvitationsValidateProps = {
+    invitation: string;
+  };
+
+  type InvitationsValidateState = {
+    available: boolean;
+    exists: boolean;
+  };
 }
 
 declare namespace Storage {

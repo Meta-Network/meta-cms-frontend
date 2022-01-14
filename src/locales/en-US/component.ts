@@ -20,6 +20,8 @@ export default {
   'component.button.submit': 'submit',
   'component.button.generateImmediately': 'Generate immediately',
   'component.button.regenerate': 'regenerate',
+  'component.button.send': 'Send',
+  'component.button.ignore': 'Ignore',
   'component.status.alreadyBound': 'Already bound',
   'component.status.notBound': 'Not bound',
   'component.status.used': 'Used',

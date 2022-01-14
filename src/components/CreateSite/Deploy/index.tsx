@@ -17,7 +17,7 @@ import styles from './index.less';
 export default () => {
   const { siteSetting, storeSetting, domainSetting } = useModel('storage');
   const { refresh, initialState } = useModel('@@initialState');
-  const username = initialState!.currentUser!.username;
+  const username = initialState?.currentUser?.username || '_guest';
   const {
     onError,
     setOnError,

@@ -205,4 +205,31 @@ export default {
   'messages.editor.uploadAllImages.notification': 'Images are being decentralised in storage.',
   'messages.editor.uploadAllImages.success':
     'The decentralised storage of images is complete, thanks for your patience.',
+  'messages.login.enterEmail': 'Please enter your email address',
+  'messages.login.enterValidEmail': 'Please enter a valid email address',
+  'messages.login.sendSuccessfully': 'Sent successfully',
+  'messages.login.sendFailed': 'Sending failed',
+  'messages.login.invalidEmailAddress': 'Invalid email address',
+  'messages.login.getEmailCodeMany':
+    'Too many times to get the verification code, please try again later',
+  'messages.login.getEmailCodeManySeconds':
+    'Too many times to get the verification code, please try again in { seconds }',
+  'messages.login.enterVerificationCode': 'Please enter the verification code',
+  'messages.login.loginSuccessful': 'Login successful',
+  'messages.login.wrongCaptchaCode': 'Wrong captcha code',
+  'messages.login.accountNotExist': 'Account does not exist, please register first',
+  'messages.login.codeHasExpired':
+    'Frequent operation verification code has expired, please re-acquire',
+  'messages.fail': 'Fail',
+  'messages.login.enterInvitationCode': 'Please enter the invitation code',
+  'messages.login.enterInvitationCodeError': 'The invitation code is incorrect',
+  'messages.login.enterInvitationCodeInvalid': 'The invitation code has expired',
+  'messages.login.enterUsername': 'Please enter your username',
+  'messages.login.cannotBeModified': 'Cannot be modified',
+  'messages.login.signUpSuccessfully': 'Registered successfully',
+  'messages.login.emailHasBeenSignUp': 'This email has already been registered.',
+  'messages.login.verificationFailed': 'Verification failed',
+  'messages.login.usernameExist': 'The username you have chosen already exists',
+  'messages.login.usernameRules':
+    'User name only allows lowercase, numbers, "-" and the length is { min }-{ max } and must be between  { min } and { max } characters.',
 };
