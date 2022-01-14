@@ -26,7 +26,7 @@ const BaseView: React.FC = () => {
    * @param param0
    */
   const uploadImageRequest = async ({ file }: { file: File }) => {
-    const done = message.loading('上传图片中...请稍候', 0);
+    const done = message.loading(intl.formatMessage({ id: 'messages.profile.uploadImageWait' }), 0);
     setUpdateUserAvatarLoading(true);
     const result = await uploadFileToIpfs(file);
     done();
@@ -36,19 +36,22 @@ const BaseView: React.FC = () => {
       const url = result.data.publicUrl;
       const updateUserAvatarResult = await updateUserInfo({ avatar: url });
       if (updateUserAvatarResult.statusCode === 200) {
-        message.success('头像更新成功');
+        message.success(intl.formatMessage({ id: 'messages.profile.updateSuccess' }));
         setUserAvatar(url);
         refreshUserInfo();
       } else {
-        message.error('头像更新失败');
+        message.error(intl.formatMessage({ id: 'messages.profile.updateFailed' }));
       }
     } else {
-      message.error('图片上传失败。');
+      message.error(intl.formatMessage({ id: 'messages.profile.updateFailed' }));
     }
   };
 
   const handleFinish = async (values: GLOBAL.UserInfo) => {
-    const done = message.loading('更新用户信息...请稍候', 0);
+    const done = message.loading(
+      intl.formatMessage({ id: 'messages.profile.updateUserInfoWait' }),
+      0,
+    );
     setUpdateUserInfoLoading(true);
     const updateUserInfoResult = await updateUserInfo(values);
     done();
@@ -58,7 +61,7 @@ const BaseView: React.FC = () => {
       message.success(intl.formatMessage({ id: 'messages.profile.updateSuccess' }));
       refreshUserInfo();
     } else {
-      message.success('更新失败');
+      message.success(intl.formatMessage({ id: 'messages.profile.updateFailed' }));
     }
   };
 
@@ -132,7 +135,13 @@ const BaseView: React.FC = () => {
                   {
                     min: rules.nickname.min,
                     max: rules.nickname.max,
-                    message: '长度 {{ min }}-{{ max }}',
+                    message: intl.formatMessage(
+                      { id: 'messages.profile.form.lengthMinAndMax' },
+                      {
+                        min: rules.nickname.min,
+                        max: rules.nickname.max,
+                      },
+                    ),
                   },
                 ]}
               />
@@ -144,7 +153,17 @@ const BaseView: React.FC = () => {
                     required: true,
                     message: intl.formatMessage({ id: 'messages.profile.form.pleaseEnterBio' }),
                   },
-                  { min: rules.bio.min, max: rules.bio.max, message: '长度 {{ min }}-{{ max }}' },
+                  {
+                    min: rules.bio.min,
+                    max: rules.bio.max,
+                    message: intl.formatMessage(
+                      { id: 'messages.profile.form.lengthMinAndMax' },
+                      {
+                        min: rules.bio.min,
+                        max: rules.bio.max,
+                      },
+                    ),
+                  },
                 ]}
                 placeholder={intl.formatMessage({ id: 'messages.profile.form.bio' })}
               />
