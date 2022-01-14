@@ -117,7 +117,7 @@ const BaseView: React.FC = () => {
                       key="submit"
                       loading={updateUserInfoLoading}
                     >
-                      更新
+                      {intl.formatMessage({ id: 'component.button.update' })}
                     </Button>,
                   ];
                 },
