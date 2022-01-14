@@ -23,7 +23,7 @@ const Email: React.FC<Props> = ({ setEmailModeFn }) => {
    * @param values
    */
   const onFinishEmail = async (values: any): Promise<void> => {
-    console.log('Success:', values);
+    // console.log('Success:', values);
 
     const { email, code } = values;
     try {

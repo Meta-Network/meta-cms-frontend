@@ -21,7 +21,7 @@ interface Props {
 const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
   const intl = useIntl();
   const [formResister] = Form.useForm();
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>(null as any);
   const [timerUsername, setTimerUsername] = useState<ReturnType<typeof setTimeout>>(null as any);
   const { refresh } = useModel('@@initialState');
@@ -40,8 +40,9 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
         console.error(e);
       } finally {
         await refresh();
+        setLoading(false);
 
-        history.push('/');
+        history.push('/user/info');
       }
     },
     [refresh],
@@ -50,7 +51,9 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
   // 注册
   const onFinishEmail = useCallback(
     async (values: any): Promise<void> => {
-      console.log('Success:', values);
+      // console.log('Success:', values);
+
+      setLoading(true);
 
       const { email, code, username } = values;
       try {
@@ -72,8 +75,10 @@ const EmailRegisterInfo: React.FC<Props> = ({ inviteCode, setEmailModeFn }) => {
           });
         } else {
           message.warning({ content: resEmailSignup.message });
+          setLoading(false);
         }
       } catch (e: any) {
+        setLoading(false);
         if (e?.data?.statusCode === 403) {
           message.warning({ content: intl.formatMessage({ id: 'messages.login.codeHasExpired' }) });
         } else if (e?.data?.statusCode === 400) {
