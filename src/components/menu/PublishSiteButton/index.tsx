@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button, message, notification, Dropdown } from 'antd';
 import { deployAndPublishSite } from '@/services/api/meta-cms';
 import { publishMetaSpaceRequest } from '@/utils/editor';
-import Publish from '@/components/Submit/publish';
+import Publish from '@/components/Submit/editor';
 import styles from './index.less';
 
 export default () => {
