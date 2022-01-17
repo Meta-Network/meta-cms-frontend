@@ -181,7 +181,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
             </Button>
             <Button type="primary" htmlType="submit" loading={loading}>
               {intl.formatMessage({
-                id: 'component.button.publish',
+                id: 'component.button.startPublishing',
               })}
             </Button>
           </Space>

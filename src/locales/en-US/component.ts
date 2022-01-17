@@ -23,6 +23,7 @@ export default {
   'component.button.send': 'Send',
   'component.button.ignore': 'Ignore',
   'component.button.update': 'Update',
+  'component.button.startPublishing': 'Start publishing',
   'component.status.alreadyBound': 'Already bound',
   'component.status.notBound': 'Not bound',
   'component.status.used': 'Used',

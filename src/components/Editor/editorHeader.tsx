@@ -89,7 +89,7 @@ const EditorHeader: React.FC<Props> = ({
             >
               <span className={styles.headerPublish}>
                 {intl.formatMessage({
-                  id: 'component.button.submit',
+                  id: 'component.button.publish',
                 })}
                 <DownOutlined className={styles.headerIconText} />
               </span>
