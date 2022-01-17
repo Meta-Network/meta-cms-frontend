@@ -107,7 +107,7 @@ const CloseModalSvg = () => (
     />
   </svg>
 );
-export const CloseModalIcon: React.FC<{ className: string; onClick: () => void }> = (props) => (
+export const CloseModalIcon: React.FC<IconsType.IconsProps> = (props) => (
   <Icon component={CloseModalSvg} {...props} />
 );
 
@@ -132,3 +132,25 @@ const EmailSvg = () => (
   </svg>
 );
 export const EmailIcon: React.FC = (props) => <Icon component={EmailSvg} {...props} />;
+
+const ColumnsSvg = () => (
+  <svg
+    className="icon"
+    viewBox="0 0 1024 1024"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    p-id="1582"
+  >
+    <path
+      d="M846.367347 929.959184H177.632653c-45.97551 0-83.591837-37.616327-83.591837-83.591837V177.632653c0-45.97551 37.616327-83.591837 83.591837-83.591837h668.734694c45.97551 0 83.591837 37.616327 83.591837 83.591837v668.734694c0 45.97551-37.616327 83.591837-83.591837 83.591837zM177.632653 135.836735c-22.987755 0-41.795918 18.808163-41.795918 41.795918v668.734694c0 22.987755 18.808163 41.795918 41.795918 41.795918h668.734694c22.987755 0 41.795918-18.808163 41.795918-41.795918V177.632653c0-22.987755-18.808163-41.795918-41.795918-41.795918H177.632653z"
+      p-id="1583"
+    />
+    <path
+      d="M397.061224 929.959184c-11.493878 0-20.897959-9.404082-20.897959-20.89796V114.938776c0-11.493878 9.404082-20.897959 20.897959-20.89796s20.897959 9.404082 20.89796 20.89796v794.122448c0 11.493878-9.404082 20.897959-20.89796 20.89796z"
+      p-id="1584"
+    />
+  </svg>
+);
+export const ColumnsIcon: React.FC<IconsType.IconsProps> = (props) => (
+  <Icon component={ColumnsSvg} {...props} />
+);

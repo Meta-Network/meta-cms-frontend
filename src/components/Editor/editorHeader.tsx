@@ -67,7 +67,7 @@ const EditorHeader: React.FC<Props> = ({
           {/* {headerCloudDraftUpload} */}
           {/* {headerCloudDraftDownload} */}
         </span>
-        <span>
+        <span className={styles.action}>
           <Tooltip
             placement="left"
             title={intl.formatMessage({
