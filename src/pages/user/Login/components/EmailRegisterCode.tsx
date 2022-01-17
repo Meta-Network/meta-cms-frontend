@@ -19,7 +19,7 @@ const EmailRegisterCode: React.FC<Props> = ({ setStep, setInviteCode, setEmailMo
   // 注册
   const onFinishEmail = useCallback(
     async (values: any): Promise<void> => {
-      console.log('Success:', values);
+      // console.log('Success:', values);
 
       setLoading(true);
       const { inviteCode } = values;

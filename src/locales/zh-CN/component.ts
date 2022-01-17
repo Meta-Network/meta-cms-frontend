@@ -22,6 +22,7 @@ export default {
   'component.button.regenerate': '重新生成',
   'component.button.send': '发送',
   'component.button.ignore': '忽略',
+  'component.button.update': '更新',
   'component.status.alreadyBound': '已绑定',
   'component.status.notBound': '未绑定',
   'component.status.used': '已使用',
