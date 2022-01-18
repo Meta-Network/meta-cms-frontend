@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -98,12 +99,26 @@ export default () => {
         key: 'title',
         render: (val: string) => <span>{strSlice(val, 40)}</span>,
       },
-      // {
-      //   title: 'SUMMARY',
-      //   dataIndex: 'summary',
-      //   key: 'summary',
-      //   render: (val: string) => <span>{strSlice(val, 40)}</span>,
-      // },
+      {
+        title: 'CREATE AT',
+        dataIndex: 'createdAt',
+        key: 'createdAt',
+        render: (val: string) => (
+          <span>
+            {val.split('T')[0]} {val.split('T')[1].split('.')[0]}
+          </span>
+        ),
+      },
+      {
+        title: 'UPDATE AT',
+        dataIndex: 'updatedAt',
+        key: 'updatedAt',
+        render: (val: string) => (
+          <span>
+            {val.split('T')[0]} {val.split('T')[1].split('.')[0]}
+          </span>
+        ),
+      },
       {
         title: 'STATUS',
         dataIndex: 'status',
