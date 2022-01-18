@@ -98,12 +98,12 @@ export default () => {
         key: 'title',
         render: (val: string) => <span>{strSlice(val, 40)}</span>,
       },
-      {
-        title: 'SUMMARY',
-        dataIndex: 'summary',
-        key: 'summary',
-        render: (val: string) => <span>{strSlice(val, 40)}</span>,
-      },
+      // {
+      //   title: 'SUMMARY',
+      //   dataIndex: 'summary',
+      //   key: 'summary',
+      //   render: (val: string) => <span>{strSlice(val, 40)}</span>,
+      // },
       {
         title: 'STATUS',
         dataIndex: 'status',

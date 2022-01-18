@@ -60,6 +60,7 @@
     "antd": "^4.14.0",
     "antd-img-crop": "^4.0.2",
     "base64-url": "^2.3.3",
+    "caniuse-lite": "^1.0.30001300",
     "classnames": "^2.2.6",
     "dexie": "^3.0.3",
     "dexie-react-hooks": "^1.0.7",
