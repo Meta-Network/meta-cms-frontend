@@ -915,6 +915,7 @@ const Edit: React.FC = () => {
       />
 
       <PublishingTip
+        cover={cover}
         visiblePublishingTip={visiblePublishingTip}
         setVisiblePublishingTip={setVisiblePublishingTip}
       />

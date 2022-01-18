@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
-import { Modal, Spin, Typography } from 'antd';
+import { Modal, Spin, Typography, Image } from 'antd';
 import { NavLink } from 'umi';
 import styles from './index.less';
 import { PublishingTipStepStateType } from '@/services/constants';
@@ -9,11 +9,12 @@ import { FinishIcon } from '@/components/Icon';
 const { Link } = Typography;
 
 interface Props {
+  readonly cover: string;
   readonly visiblePublishingTip: boolean;
   setVisiblePublishingTip: (val: boolean) => void;
 }
 
-const PublishingTip: FC<Props> = ({ visiblePublishingTip, setVisiblePublishingTip }) => {
+const PublishingTip: FC<Props> = ({ cover, visiblePublishingTip, setVisiblePublishingTip }) => {
   const [stepState, setStepState] = useState<PublishingTipStepStateType>(
     PublishingTipStepStateType.Loading,
   );
@@ -27,11 +28,16 @@ const PublishingTip: FC<Props> = ({ visiblePublishingTip, setVisiblePublishingTi
   };
 
   useEffect(() => {
+    let time: NodeJS.Timer;
     if (visiblePublishingTip) {
-      setInterval(() => {
+      time = setInterval(() => {
         setStepState(PublishingTipStepStateType.Finish);
       }, 5000);
+    } else {
+      setStepState(PublishingTipStepStateType.Loading);
     }
+
+    return () => clearInterval(time);
   }, [visiblePublishingTip]);
 
   return (
@@ -47,7 +53,9 @@ const PublishingTip: FC<Props> = ({ visiblePublishingTip, setVisiblePublishingTi
       maskClosable={false}
     >
       <section className={styles.cover}>
-        <img src="https://www.yikaojixun.com/uploads/701675e17f04c0a80fd5b7ba61a3d731.jpg" alt="" />
+        {cover && (
+          <Image width={'100%'} height={'100%'} src={cover} alt={'Cover'} preview={false} />
+        )}
         <section className={styles.coverLoading}>
           {stepState === PublishingTipStepStateType.Loading ? (
             <Spin className={styles.coverLoadingSpin} tip="Loading..." />
