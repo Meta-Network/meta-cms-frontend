@@ -1,3 +1,6 @@
 declare namespace IconsType {
-  type IconsProps = { className: string; onClick: () => void };
+  type IconsProps = {
+    className?: string;
+    onClick?: () => void;
+  };
 }

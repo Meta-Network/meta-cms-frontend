@@ -101,3 +101,8 @@ export enum GatewayType {
   Ipfs = 'ipfs',
   Arweave = 'arweave',
 }
+
+export enum PublishingTipStepStateType {
+  Loading = 'loading',
+  Finish = 'finish',
+}

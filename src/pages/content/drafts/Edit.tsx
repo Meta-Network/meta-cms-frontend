@@ -49,6 +49,7 @@ import {
   signIn,
 } from '@/utils/gun';
 import { storeGet } from '@/utils/store';
+import PublishingTip from '@/components/Editor/PublishingTip';
 
 const keyUploadAllImages = 'keyUploadAllImages';
 const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
@@ -64,6 +65,7 @@ const Edit: React.FC = () => {
   const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
   const [contentImagesSrc, setContentImagesSrc] = useState<string[]>([]);
   const focus$ = useEventEmitter<string>();
+  const [visiblePublishingTip, setVisiblePublishingTip] = useState<boolean>(false);
 
   // vditor
   // const [vditor, setVditor] = useState<Vditor>();
@@ -335,7 +337,7 @@ const Edit: React.FC = () => {
         await handleUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
 
         setSiteNeedToDeploy(true);
-        history.push('/content/drafts');
+        setVisiblePublishingTip(true);
       } else if (result.statusCode === 400) {
         const _message =
           typeof result.message === 'string' ? result.message : mergedMessage(result.message);
@@ -427,7 +429,7 @@ const Edit: React.FC = () => {
         await handleUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
 
         setSiteNeedToDeploy(true);
-        history.push('/content/drafts');
+        setVisiblePublishingTip(true);
       } else if (result.statusCode === 400) {
         const _message =
           typeof result.message === 'string' ? result.message : mergedMessage(result.message);
@@ -910,6 +912,11 @@ const Edit: React.FC = () => {
         tip={intl.formatMessage({
           id: 'messages.editor.publish.tip',
         })}
+      />
+
+      <PublishingTip
+        visiblePublishingTip={visiblePublishingTip}
+        setVisiblePublishingTip={setVisiblePublishingTip}
       />
     </section>
   );
