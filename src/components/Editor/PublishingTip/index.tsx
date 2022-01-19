@@ -90,12 +90,7 @@ const PublishingTip: FC<Props> = ({ cover, visiblePublishingTip, setVisiblePubli
           ) : null}
         </section>
         <p className={styles.description}>技术说明：</p>
-        <Link
-          underline
-          href="https://meta-io.gitbook.io/meta-wiki"
-          target="_blank"
-          className={styles.descriptionLink}
-        >
+        <Link underline href={META_WIKI} target="_blank" className={styles.descriptionLink}>
           您的文章是如何去平台发布到 Meta Space 中的？
         </Link>
       </section>

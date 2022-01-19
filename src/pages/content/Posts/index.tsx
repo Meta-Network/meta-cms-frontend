@@ -65,12 +65,7 @@ export default () => {
       content={
         <p>
           检查和管理您的全部作品{' '}
-          <Link
-            underline
-            href="https://meta-io.gitbook.io/meta-wiki"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
             了解更多
           </Link>
         </p>

@@ -72,7 +72,7 @@ const menuJson = [
         name: <FormattedMessage id="menu.moreInfo.home" />,
       },
       {
-        url: 'https://meta-io.gitbook.io/meta-wiki',
+        url: META_WIKI,
         icon: <MetaWikiIcon />,
         name: 'Wiki',
       },
