@@ -63,9 +63,12 @@ export default () => {
         });
       }
 
-      const responseSort = response.sort((a, b) =>
-        Number(moment(a.updatedAt).isBefore(b.updatedAt)),
-      );
+      const responseSort = response
+        .filter((item) => {
+          return item.post == null;
+        })
+        .sort((a, b) => Number(moment(a.updatedAt).isBefore(b.updatedAt)));
+
       setPostsList(responseSort);
     }
   }, [initialState]);
@@ -237,6 +240,12 @@ export default () => {
           {intl.formatMessage({
             id: 'posts.intro.description',
           })}
+          <a target="_blank" href="#">
+            {' '}
+            {intl.formatMessage({
+              id: 'posts.intro.learnMore',
+            })}
+          </a>
         </div>
       }
     >
