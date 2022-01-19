@@ -76,7 +76,9 @@ export default () => {
   const columns = useMemo(() => {
     return [
       {
-        title: 'COVER',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.cover',
+        }),
         dataIndex: 'cover',
         key: 'cover',
         width: 100,
@@ -97,13 +99,17 @@ export default () => {
         ),
       },
       {
-        title: 'TITLE',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.title',
+        }),
         dataIndex: 'title',
         key: 'title',
         render: (val: string) => <span>{strSlice(val, 40)}</span>,
       },
       {
-        title: 'CREATE AT',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.createdAt',
+        }),
         dataIndex: 'createdAt',
         key: 'createdAt',
         render: (val: string) => (
@@ -113,7 +119,9 @@ export default () => {
         ),
       },
       {
-        title: 'UPDATE AT',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.updatedAt',
+        }),
         dataIndex: 'updatedAt',
         key: 'updatedAt',
         render: (val: string) => (
@@ -123,7 +131,9 @@ export default () => {
         ),
       },
       {
-        title: 'STATUS',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.status',
+        }),
         dataIndex: 'status',
         key: 'status',
         width: 100,
@@ -160,7 +170,9 @@ export default () => {
         ),
       },
       {
-        title: 'ACTION',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.action',
+        }),
         dataIndex: 'status',
         key: 'status',
         width: 180,
