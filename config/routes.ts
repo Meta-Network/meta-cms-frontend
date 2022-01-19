@@ -46,14 +46,24 @@
         component: './content/drafts/List',
       },
       {
+        path: '/content/all-posts/index',
+        name: 'allPosts',
+        component: './content/AllPosts',
+      },
+      {
+        path: '/content/all-posts/publishing',
+        name: 'allPosts.publishing',
+        component: './content/AllPosts',
+      },
+      {
+        path: '/content/all-posts/published',
+        name: 'allPosts.published',
+        component: './content/AllPosts',
+      },
+      {
         path: '/content/sync-center',
         name: 'syncCenter',
         component: './content/SyncCenter',
-      },
-      {
-        path: '/content/published-posts',
-        name: 'publishedPosts',
-        component: './content/PublishedPosts',
       },
       {
         path: '/content/drafts/edit',
