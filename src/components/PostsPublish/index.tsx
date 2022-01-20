@@ -35,7 +35,9 @@ const PostsPublish: FC<Props> = ({}) => {
       </Space>
       <Space style={{ color: 'green' }}>
         <PublishIcon className={styles.icon} />
-        <Text style={{ color: 'green' }}>已发布</Text>
+        <Text style={{ color: 'green' }}>
+          已发布 <span>#1</span>
+        </Text>
       </Space>
     </>
   );
