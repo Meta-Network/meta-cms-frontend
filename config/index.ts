@@ -22,10 +22,6 @@ export const OSS_MATATAKI = 'https://smartsignature-img.oss-cn-hongkong.aliyuncs
 // Gun Config
 export const KEY_GUN_ROOT = 'meta.io_v7';
 export const KEY_GUN_ROOT_DRAFT = 'cms_draft';
-
-export const EDITOR_LEARN =
-  'https://meta-io.gitbook.io/meta-wiki/how-to-use/how-to-create-content-for-meta-space';
-
 export const STORAGE_PLATFORM = 'github';
 
 export const KEY_IS_LOGIN = 'META_CMS_IS_LOGIN';

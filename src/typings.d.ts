@@ -28,3 +28,5 @@ declare const META_SPACE_DEFAULT_FAVICON_URL: string;
 declare const FLEEK_NAME: string;
 declare const META_NETWORK_DATA_VIEWER_URL: string;
 declare const META_GUN_PEERS: string[];
+declare const META_WIKI: string;
+declare const META_WIKI_EDITOR_LEARN: string;

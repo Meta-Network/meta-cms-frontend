@@ -46,14 +46,24 @@
         component: './content/drafts/List',
       },
       {
+        path: '/content/posts',
+        name: '全部作品',
+        component: './content/Posts/index',
+      },
+      {
+        path: '/content/publishing',
+        name: '发布中',
+        component: './content/Publishing/index',
+      },
+      {
+        path: '/content/published',
+        name: 'publishedPosts',
+        component: './content/Published/index',
+      },
+      {
         path: '/content/sync-center',
         name: 'syncCenter',
         component: './content/SyncCenter',
-      },
-      {
-        path: '/content/published-posts',
-        name: 'publishedPosts',
-        component: './content/PublishedPosts',
       },
       {
         path: '/content/drafts/edit',

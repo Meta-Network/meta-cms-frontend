@@ -67,7 +67,7 @@ const EditorHeader: React.FC<Props> = ({
           {/* {headerCloudDraftUpload} */}
           {/* {headerCloudDraftDownload} */}
         </span>
-        <span>
+        <span className={styles.action}>
           <Tooltip
             placement="left"
             title={intl.formatMessage({
@@ -89,7 +89,7 @@ const EditorHeader: React.FC<Props> = ({
             >
               <span className={styles.headerPublish}>
                 {intl.formatMessage({
-                  id: 'component.button.submit',
+                  id: 'component.button.publish',
                 })}
                 <DownOutlined className={styles.headerIconText} />
               </span>

@@ -1,5 +1,5 @@
 import { useIntl, useModel } from 'umi';
-import Publish from '@/components/Submit/publish';
+import Publish from '@/components/Submit/editor';
 import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useCallback, useMemo, useState } from 'react';
 import PublishSiteButton from '@/components/menu/PublishSiteButton';
