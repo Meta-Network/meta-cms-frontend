@@ -9,7 +9,7 @@ const { Text, Link } = Typography;
 
 interface Props {}
 
-const PostsCertificate: FC<Props> = ({}) => {
+const PostsAuthorisation: FC<Props> = ({}) => {
   // const intl = useIntl();
 
   /**
@@ -35,7 +35,9 @@ const PostsCertificate: FC<Props> = ({}) => {
         <Text style={{ color: 'red' }}>存证失败</Text>
       </Space>
       <Space style={{ color: 'gray' }}>
-        <Link style={{ color: 'gray' }}>xxxxxxxxxx</Link>
+        <Link underline style={{ color: 'gray' }}>
+          xxxxxxxxxx
+        </Link>
         <CopyOutlined />
         <ShareIcon className={styles.icon} />
       </Space>
@@ -43,4 +45,4 @@ const PostsCertificate: FC<Props> = ({}) => {
   );
 };
 
-export default PostsCertificate;
+export default PostsAuthorisation;

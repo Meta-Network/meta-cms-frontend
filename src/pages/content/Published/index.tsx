@@ -11,7 +11,7 @@ import { fetchPostsStorage } from '@/services/api/meta-cms';
 import PostsCover from '@/components/PostsCover';
 import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
-import PostsCertificate from '@/components/PostsCertificate';
+import PostsAuthorisation from '@/components/PostsAuthorisation';
 import PostsDate from '@/components/PostsDate';
 
 const { Link } = Typography;
@@ -48,9 +48,9 @@ export default () => {
       render: (_, record) => <PostsDate time={record.updatedAt} />,
     },
     {
-      dataIndex: 'certificate',
+      dataIndex: 'authorisation',
       title: '存证',
-      render: () => <PostsCertificate />,
+      render: () => <PostsAuthorisation />,
     },
   ];
 
