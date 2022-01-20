@@ -3,11 +3,16 @@ import { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 // import FormattedDescription from '@/components/FormattedDescription';
-import { Typography, Space, Image } from 'antd';
+import { Typography } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import { FetchPostsStorageParamsState } from '@/services/constants';
 import { fetchPostsStorage } from '@/services/api/meta-cms';
+import PostsCover from '@/components/PostsCover';
+import PostsSubmit from '@/components/PostsSubmit';
+import PostsPublish from '@/components/PostsPublish';
+import PostsCertificate from '@/components/PostsCertificate';
+import PostsDate from '@/components/PostsDate';
 
 const { Link } = Typography;
 
@@ -20,15 +25,7 @@ export default () => {
     {
       dataIndex: 'cover',
       title: '封面图',
-      render: (_, record) => (
-        <Space>
-          {record.cover ? (
-            <Image width={100} src={record.cover} />
-          ) : (
-            intl.formatMessage({ id: 'messages.table.noCoverExists' })
-          )}
-        </Space>
-      ),
+      render: (_, record) => <PostsCover src={record.cover} />,
     },
     {
       dataIndex: 'title',
@@ -38,18 +35,22 @@ export default () => {
     {
       dataIndex: 'submit',
       title: 'Submit 状态',
+      render: () => <PostsSubmit />,
     },
     {
       dataIndex: 'publish',
       title: 'Publish 状态',
+      render: () => <PostsPublish />,
     },
     {
       dataIndex: 'date',
       title: '请求日期',
+      render: (_, record) => <PostsDate time={record.updatedAt} />,
     },
     {
       dataIndex: 'certificate',
       title: '存证',
+      render: () => <PostsCertificate />,
     },
   ];
 
