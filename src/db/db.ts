@@ -120,6 +120,15 @@ export const dbPostsAllCount = async (userId: number): Promise<number> => {
 };
 
 /**
+ * db drafts allcounter
+ * @param userId
+ * @returns
+ */
+export const dbDraftsAllCount = async (userId: number): Promise<number> => {
+  return await db.posts.filter((i) => !i.delete && i.userId === userId && i.post == null).count();
+};
+
+/**
  * db posts where exist by id
  * @param id
  * @returns

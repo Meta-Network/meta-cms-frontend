@@ -5,7 +5,7 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import { fetchPostsStorage } from '@/services/api/meta-cms';
-import { dbPostsAllCount } from './db/db';
+import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
 import MenuUserInfo from './components/menu/MenuUserInfo';
@@ -107,7 +107,7 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     state.currentUser = currentUser;
 
     // local draft count
-    state.localDraftCount = await dbPostsAllCount(currentUser!.id);
+    state.localDraftCount = await dbDraftsAllCount(currentUser!.id);
 
     const invitationsCountRequest = await queryInvitations();
     state.invitationsCount =
