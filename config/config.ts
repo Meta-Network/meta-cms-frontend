@@ -24,6 +24,8 @@ export default defineConfig({
     META_NETWORK_DATA_VIEWER_URL:
       process.env.META_NETWORK_DATA_VIEWER_URL || 'https://meta-network-data-viewer.vercel.app',
     META_GUN_PEERS: process.env.META_GUN_PEERS!.split(','),
+    META_WIKI: process.env.META_WIKI,
+    META_WIKI_EDITOR_LEARN: process.env.META_WIKI_EDITOR_LEARN,
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
