@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 // import FormattedDescription from '@/components/FormattedDescription';
-import { Typography, Button, Checkbox } from 'antd';
+import { Typography, Button, Checkbox, Empty } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import { FetchPostsStorageParamsState } from '@/services/constants';
@@ -73,6 +73,11 @@ export default () => {
       }
     >
       <ProTable<CMS.Post>
+        locale={{
+          emptyText: (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有可以发布的内容啦～" />
+          ),
+        }}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {
