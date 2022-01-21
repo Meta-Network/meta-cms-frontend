@@ -11,7 +11,7 @@ import { fetchPostsStorage } from '@/services/api/meta-cms';
 import PostsCover from '@/components/PostsCover';
 import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
-import PostsAuthorisation from '@/components/PostsAuthorisation';
+import PostsCertificate from '@/components/PostsCertificate';
 import PostsDate from '@/components/PostsDate';
 
 const { Link } = Typography;
@@ -50,7 +50,7 @@ export default () => {
     {
       dataIndex: 'authorisation',
       title: '存证',
-      render: () => <PostsAuthorisation />,
+      render: () => <PostsCertificate />,
     },
   ];
 

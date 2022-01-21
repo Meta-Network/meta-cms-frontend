@@ -9,7 +9,7 @@ const { Text, Link } = Typography;
 
 interface Props {}
 
-const PostsAuthorisation: FC<Props> = ({}) => {
+const PostsCertificate: FC<Props> = ({}) => {
   // const intl = useIntl();
 
   /**
@@ -45,4 +45,4 @@ const PostsAuthorisation: FC<Props> = ({}) => {
   );
 };
 
-export default PostsAuthorisation;
+export default PostsCertificate;
