@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Drawer } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
+import { ColumnsIcon } from '@/components/Icon/index';
 import styles from './settings.less';
 
 const Settings: React.FC = ({ children }) => {
@@ -17,7 +17,7 @@ const Settings: React.FC = ({ children }) => {
 
   return (
     <span className={styles.wrapper}>
-      <SettingOutlined onClick={showDrawer} className={styles.toggleIcon} />
+      <ColumnsIcon onClick={showDrawer} className={styles.toggleIcon} />
       <Drawer
         title={intl.formatMessage({
           id: 'editor.header.settings.title',

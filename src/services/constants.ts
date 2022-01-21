@@ -120,3 +120,7 @@ export enum AuthorisationStatusEnum {
   ERROR = 'error',
   NONE = 'none',
 }
+export enum PublishingTipStepStateType {
+  Loading = 'loading',
+  Finish = 'finish',
+}

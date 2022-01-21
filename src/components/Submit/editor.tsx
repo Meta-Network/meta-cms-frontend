@@ -3,7 +3,11 @@ import { useCallback, useState, useEffect } from 'react';
 import { Card, Form, Button, Checkbox, Radio, Space, message } from 'antd';
 import styles from './submit.less';
 import { verifySeedAndKey } from '@/utils/editor';
-import { getDefaultSiteConfigAPI, getStorageSettingAPI } from '@/helpers/index';
+import {
+  getDefaultSiteConfigAPI,
+  getPublisherSettingAPI,
+  getStorageSettingAPI,
+} from '@/helpers/index';
 import { useMount } from 'ahooks';
 import { KEY_META_CMS_GATEWAY_CHECKED, STORAGE_PLATFORM } from '../../../config/index';
 import { storeGet, storeSet } from '@/utils/store';
@@ -19,12 +23,17 @@ interface Props {
   setDropdownVisible: (visible: boolean) => void;
 }
 
+const onFinishFailed = (errorInfo: any) => {
+  console.log('Failed:', errorInfo);
+};
+
 const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
   const intl = useIntl();
 
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<string>('');
-  const [storageSetting, setStorageSetting] = useState<CMS.StoragePlatformSetting>();
+  const [storagePublicSetting, setStoragePublicSetting] = useState<CMS.StoragePlatformSetting>();
+  const [storagePrivateSetting, setStoragePrivateSetting] = useState<CMS.StoragePlatformSetting>();
   const [gatewayType, setGatewayType] = useState<GatewayType>(GatewayType.Default);
 
   const onFinish = (values: any) => {
@@ -35,16 +44,12 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
       return;
     }
 
-    if (!storageSetting) {
+    if (!storagePublicSetting && !storagePrivateSetting) {
       message.warning(intl.formatMessage({ id: 'messages.editor.submit.bindStorage' }));
       return;
     }
 
     handlePublish(!!gatewayType);
-  };
-
-  const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
   };
 
   // get seed and key
@@ -57,15 +62,31 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
     }
   }, [setPublicKey]);
 
-  // fetch Storage Setting
+  /**
+   * fetch Storage Setting
+   * public private
+   */
   const fetchStorageSetting = useCallback(async () => {
     const defaultSiteConfigResult = await getDefaultSiteConfigAPI();
     if (!defaultSiteConfigResult) {
       return;
     }
-    const storageResult = await getStorageSettingAPI(defaultSiteConfigResult.id, STORAGE_PLATFORM);
-    if (storageResult) {
-      setStorageSetting(storageResult);
+
+    const storagePublicResult = await getPublisherSettingAPI(
+      defaultSiteConfigResult.id,
+      STORAGE_PLATFORM,
+    );
+
+    const storagePrivateResult = await getStorageSettingAPI(
+      defaultSiteConfigResult.id,
+      STORAGE_PLATFORM,
+    );
+
+    if (storagePublicResult) {
+      setStoragePublicSetting(storagePublicResult);
+    }
+    if (storagePrivateResult) {
+      setStoragePrivateSetting(storagePrivateResult);
     }
   }, []);
 
@@ -98,7 +119,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
     <Card
       title={intl.formatMessage({ id: 'editor.submit.title' })}
       bodyStyle={{ padding: 0 }}
-      style={{ width: 340 }}
+      style={{ width: 360 }}
     >
       <Form
         name="SubmitEditor"
@@ -114,7 +135,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
           className={styles.item}
           style={{ marginTop: 20 }}
         >
-          <Radio value="githubPrivate" checked={!!STORAGE_PLATFORM}>
+          <Radio value="githubStorage" checked={!!STORAGE_PLATFORM}>
             <span className={styles.itemType}>
               {intl.formatMessage({ id: 'editor.submit.item.repo.private.name' })}
             </span>
@@ -122,7 +143,10 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
             {intl.formatMessage({ id: 'editor.submit.item.repo.private.description' })}
           </Radio>
         </Form.Item>
-        <Storage storageSetting={storageSetting} />
+        <Storage
+          storagePublicSetting={storagePublicSetting}
+          storagePrivateSetting={storagePrivateSetting}
+        />
         {/* 存证服务 */}
         <Form.Item
           label={intl.formatMessage({ id: 'editor.submit.item.gateway.label' })}
@@ -157,7 +181,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
             </Button>
             <Button type="primary" htmlType="submit" loading={loading}>
               {intl.formatMessage({
-                id: 'component.button.submit',
+                id: 'component.button.startPublishing',
               })}
             </Button>
           </Space>
