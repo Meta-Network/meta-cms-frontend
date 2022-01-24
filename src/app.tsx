@@ -213,7 +213,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       <CustomSiderMenu initialState={initialState} menuItemProps={menuItemProps} />
     ),
     onPageChange: async () => {
-      // 同步草稿数量
+      /**
+       * 同步草稿数量
+       * 增加、更新、删除、页面切换
+       */
       if (initialState?.currentUser?.id) {
         const localDraftCount = await dbPostsAllCount(initialState?.currentUser?.id);
 
