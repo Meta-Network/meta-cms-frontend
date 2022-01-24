@@ -114,6 +114,7 @@ export default () => {
         key: 'createdAt',
         render: (val: string) => (
           <span>
+            {/* val - Current date and time expressed according to ISO 8601, example: 2022-01-24T06:54:40.738Z */}
             {val.split('T')[0]} {val.split('T')[1].split('.')[0]}
           </span>
         ),
