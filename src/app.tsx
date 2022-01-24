@@ -133,7 +133,7 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 // @ts-ignore
-export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
     disableContentMargin: false,
     siderWidth: 300,
@@ -212,7 +212,20 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     menuExtraRender: (menuItemProps) => (
       <CustomSiderMenu initialState={initialState} menuItemProps={menuItemProps} />
     ),
-    onPageChange: () => {
+    onPageChange: async () => {
+      /**
+       * 同步草稿数量
+       * 增加、更新、删除、页面切换
+       */
+      if (initialState?.currentUser?.id) {
+        const localDraftCount = await dbPostsAllCount(initialState?.currentUser?.id);
+
+        setInitialState((s) => ({
+          ...s,
+          localDraftCount: localDraftCount,
+        }));
+      }
+
       const { location } = history;
       // 如果没有登录，重定向到 login
       if (

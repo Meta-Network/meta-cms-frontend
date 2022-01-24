@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
-import { dbPostsUpdate, dbMetadatasUpdateByPostId } from '@/db/db';
+import { dbPostsUpdate, dbMetadatasUpdateByPostId, dbPostsAllCount } from '@/db/db';
 import { strSlice } from '@/utils';
 import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
 import moment from 'moment';
@@ -12,7 +12,7 @@ import { TaskCommonState } from '@/services/constants';
 export default () => {
   const intl = useIntl();
   const [postsList, setPostsList] = useState<GunType.GunDraft[]>([]);
-  const { initialState } = useModel('@@initialState');
+  const { initialState, setInitialState } = useModel('@@initialState');
 
   /** handle delete */
   const handleDelete = useCallback(
@@ -173,6 +173,19 @@ export default () => {
                 console.log(record);
                 await handleDelete(Number(record.id), record?.key);
                 await fetchPosts();
+
+                /**
+                 * 同步草稿数量
+                 * 增加、更新、删除、页面切换
+                 */
+                if (initialState?.currentUser?.id) {
+                  const localDraftCount = await dbPostsAllCount(initialState?.currentUser?.id);
+
+                  setInitialState((s) => ({
+                    ...s,
+                    localDraftCount: localDraftCount,
+                  }));
+                }
               }}
               onCancel={(e) => e?.stopPropagation()}
               okText={intl.formatMessage({
@@ -192,7 +205,7 @@ export default () => {
         ),
       },
     ];
-  }, [fetchPosts, handleDelete, intl]);
+  }, [fetchPosts, handleDelete, intl, initialState, setInitialState]);
 
   useEffect(() => {
     fetchPosts();
