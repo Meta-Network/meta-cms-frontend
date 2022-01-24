@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -62,9 +63,12 @@ export default () => {
         });
       }
 
-      const responseSort = response.sort((a, b) =>
-        Number(moment(a.updatedAt).isBefore(b.updatedAt)),
-      );
+      const responseSort = response
+        .filter((item) => {
+          return item.post == null;
+        })
+        .sort((a, b) => Number(moment(a.updatedAt).isBefore(b.updatedAt)));
+
       setPostsList(responseSort);
     }
   }, [initialState]);
@@ -72,7 +76,9 @@ export default () => {
   const columns = useMemo(() => {
     return [
       {
-        title: 'COVER',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.cover',
+        }),
         dataIndex: 'cover',
         key: 'cover',
         width: 100,
@@ -93,19 +99,42 @@ export default () => {
         ),
       },
       {
-        title: 'TITLE',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.title',
+        }),
         dataIndex: 'title',
         key: 'title',
         render: (val: string) => <span>{strSlice(val, 40)}</span>,
       },
       {
-        title: 'SUMMARY',
-        dataIndex: 'summary',
-        key: 'summary',
-        render: (val: string) => <span>{strSlice(val, 40)}</span>,
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.createdAt',
+        }),
+        dataIndex: 'createdAt',
+        key: 'createdAt',
+        render: (isoDate: string) => (
+          <span>
+            {/* 2022-01-24T06:54:40.738Z -> 2022-01-24 06:54:40 */}
+            {isoDate.split('T')[0]} {isoDate.split('T')[1].split('.')[0]}
+          </span>
+        ),
       },
       {
-        title: 'STATUS',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.updatedAt',
+        }),
+        dataIndex: 'updatedAt',
+        key: 'updatedAt',
+        render: (val: string) => (
+          <span>
+            {val.split('T')[0]} {val.split('T')[1].split('.')[0]}
+          </span>
+        ),
+      },
+      {
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.status',
+        }),
         dataIndex: 'status',
         key: 'status',
         width: 100,
@@ -142,7 +171,9 @@ export default () => {
         ),
       },
       {
-        title: 'ACTION',
+        title: intl.formatMessage({
+          id: 'posts.drafts.table.action',
+        }),
         dataIndex: 'status',
         key: 'status',
         width: 180,
@@ -222,6 +253,12 @@ export default () => {
           {intl.formatMessage({
             id: 'posts.intro.description',
           })}
+          <a target="_blank" href="#">
+            {' '}
+            {intl.formatMessage({
+              id: 'posts.intro.learnMore',
+            })}
+          </a>
         </div>
       }
     >
