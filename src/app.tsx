@@ -218,7 +218,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
        * 增加、更新、删除、页面切换
        */
       if (initialState?.currentUser?.id) {
-        const localDraftCount = await dbPostsAllCount(initialState?.currentUser?.id);
+        const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
 
         setInitialState((s) => ({
           ...s,
