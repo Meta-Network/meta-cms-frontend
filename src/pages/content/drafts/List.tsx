@@ -236,14 +236,6 @@ export default () => {
         </p>
       }
     >
-      {/* <Table
-        rowKey={(record: PostType.Posts) => `${String(record.id)}}`}
-        onRow={() => {
-          return {};
-        }}
-        columns={columns}
-        dataSource={postsList}
-      /> */}
       <ProTable<GunType.GunDraft>
         columns={columns}
         actionRef={actionRef}
