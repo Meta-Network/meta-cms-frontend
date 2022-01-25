@@ -46,26 +46,6 @@ export default () => {
       // 获取草稿
       const response = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
 
-      // 获取草稿状态
-      // const allHasStateIds = response.filter((i) => i?.post && i.post.stateId);
-      // const allStateIds = allHasStateIds.map((i) => i.post!.stateId) as number[];
-      // if (allStateIds.length) {
-      //   const allStates = await fetchPostsStorageState({ stateIds: allStateIds });
-      //   const allStatesMap = new Map();
-
-      //   if (allStates.statusCode === 200) {
-      //     allStates.data.map((i) => {
-      //       allStatesMap.set(i.id, i);
-      //     });
-      //   }
-
-      //   response.forEach((i) => {
-      //     if (allStatesMap.get(i?.post?.stateId)) {
-      //       i.post!.stateIdData = allStatesMap.get(i.post!.stateId);
-      //     }
-      //   });
-      // }
-
       // 过滤 排序
       const responseSort = response
         .filter((item) => {
@@ -112,38 +92,7 @@ export default () => {
         id: 'posts.drafts.table.status',
       }),
       width: 100,
-      render: () => (
-        // <Tag key={record.id}>
-        //   {record.post
-        //     ? record.post.stateId
-        //       ? record.post.stateIdData.state === TaskCommonState.TODO
-        //         ? intl.formatMessage({
-        //             id: 'posts.table.status.todo',
-        //           })
-        //         : record.post.stateIdData.state === TaskCommonState.DOING
-        //         ? intl.formatMessage({
-        //             id: 'posts.table.status.doing',
-        //           })
-        //         : record.post.stateIdData.state === TaskCommonState.SUCCESS
-        //         ? intl.formatMessage({
-        //             id: 'posts.table.status.success',
-        //           })
-        //         : record.post.stateIdData.state === TaskCommonState.FAIL
-        //         ? intl.formatMessage({
-        //             id: 'posts.table.status.fail',
-        //           })
-        //         : intl.formatMessage({
-        //             id: 'posts.table.status.other',
-        //           })
-        //       : intl.formatMessage({
-        //           id: 'posts.table.status.other',
-        //         })
-        //     : intl.formatMessage({
-        //         id: 'posts.table.status.localDraft',
-        //       })}
-        // </Tag>
-        <PostsStorage />
-      ),
+      render: () => <PostsStorage />,
     },
     {
       title: intl.formatMessage({
