@@ -4,7 +4,7 @@ import moment from 'moment';
 const { Text } = Typography;
 
 interface Props {
-  readonly time: Date;
+  readonly time: Date | string;
 }
 
 const PostsDate: FC<Props> = ({ time }) => {
