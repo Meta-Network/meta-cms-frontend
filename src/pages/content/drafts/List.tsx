@@ -220,14 +220,10 @@ export default () => {
     <PageContainer
       className="custom-container"
       breadcrumb={{}}
-      title={intl.formatMessage({
-        id: 'posts.intro.title',
-      })}
+      title={'草稿'}
       content={
         <p>
-          {intl.formatMessage({
-            id: 'posts.intro.description',
-          })}
+          检查和管理已经创建的草稿{' '}
           <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
             {intl.formatMessage({
               id: 'posts.intro.learnMore',
