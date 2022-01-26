@@ -1,18 +1,21 @@
-/* eslint-disable prettier/prettier */
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Table, Tag, Button, Image, Space, Popconfirm, message } from 'antd';
-import { dbPostsUpdate, dbMetadatasUpdateByPostId, dbPostsAllCount } from '@/db/db';
-import { strSlice } from '@/utils';
+import { Button, Space, Popconfirm, message, Typography } from 'antd';
+import { dbPostsUpdate, dbMetadatasUpdateByPostId, dbDraftsAllCount } from '@/db/db';
 import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
 import moment from 'moment';
-import { fetchPostsStorageState } from '@/services/api/meta-cms';
-import { TaskCommonState } from '@/services/constants';
+import ProTable from '@ant-design/pro-table';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import PostsCover from '@/components/PostsCover';
+import PostsDate from '@/components/PostsDate';
+import PostsStorage from '@/components/PostsStorage';
+
+const { Link } = Typography;
 
 export default () => {
+  const actionRef = useRef<ActionType>();
   const intl = useIntl();
-  const [postsList, setPostsList] = useState<GunType.GunDraft[]>([]);
   const { initialState, setInitialState } = useModel('@@initialState');
 
   /** handle delete */
@@ -43,200 +46,120 @@ export default () => {
       // 获取草稿
       const response = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
 
-      // 获取草稿状态
-      const allHasStateIds = response.filter((i) => i?.post && i.post.stateId);
-      const allStateIds = allHasStateIds.map((i) => i.post!.stateId) as number[];
-      if (allStateIds.length) {
-        const allStates = await fetchPostsStorageState({ stateIds: allStateIds });
-        const allStatesMap = new Map();
-
-        if (allStates.statusCode === 200) {
-          allStates.data.map((i) => {
-            allStatesMap.set(i.id, i);
-          });
-        }
-
-        response.forEach((i) => {
-          if (allStatesMap.get(i?.post?.stateId)) {
-            i.post!.stateIdData = allStatesMap.get(i.post!.stateId);
-          }
-        });
-      }
-
+      // 过滤 排序
       const responseSort = response
         .filter((item) => {
           return item.post == null;
         })
         .sort((a, b) => Number(moment(a.updatedAt).isBefore(b.updatedAt)));
 
-      setPostsList(responseSort);
+      return responseSort;
+    } else {
+      return [];
     }
   }, [initialState]);
 
-  const columns = useMemo(() => {
-    return [
-      {
-        title: intl.formatMessage({
-          id: 'posts.drafts.table.cover',
-        }),
-        dataIndex: 'cover',
-        key: 'cover',
-        width: 100,
-        render: (val: string) => (
-          <>
-            {val ? (
-              <Image
-                onClick={(e) => e.stopPropagation()}
-                width={100}
-                height={50}
-                src={val}
-                style={{ objectFit: 'cover' }}
-              />
-            ) : (
-              <div style={{ width: 100, height: 50, backgroundColor: '#dcdcdc' }} />
-            )}
-          </>
-        ),
-      },
-      {
-        title: intl.formatMessage({
-          id: 'posts.drafts.table.title',
-        }),
-        dataIndex: 'title',
-        key: 'title',
-        render: (val: string) => <span>{strSlice(val, 40)}</span>,
-      },
-      {
-        title: intl.formatMessage({
-          id: 'posts.drafts.table.createdAt',
-        }),
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        render: (isoDate: string) => (
-          <span>
-            {/* 2022-01-24T06:54:40.738Z -> 2022-01-24 06:54:40 */}
-            {isoDate.split('T')[0]} {isoDate.split('T')[1].split('.')[0]}
-          </span>
-        ),
-      },
-      {
-        title: intl.formatMessage({
-          id: 'posts.drafts.table.updatedAt',
-        }),
-        dataIndex: 'updatedAt',
-        key: 'updatedAt',
-        render: (val: string) => (
-          <span>
-            {val.split('T')[0]} {val.split('T')[1].split('.')[0]}
-          </span>
-        ),
-      },
-      {
-        title: intl.formatMessage({
-          id: 'posts.drafts.table.status',
-        }),
-        dataIndex: 'status',
-        key: 'status',
-        width: 100,
-        render: (_: any, record: PostType.Posts) => (
-          <Tag key={record.id}>
-            {record.post
-              ? record.post.stateId
-                ? record.post.stateIdData.state === TaskCommonState.TODO
-                  ? intl.formatMessage({
-                      id: 'posts.table.status.todo',
-                    })
-                  : record.post.stateIdData.state === TaskCommonState.DOING
-                  ? intl.formatMessage({
-                      id: 'posts.table.status.doing',
-                    })
-                  : record.post.stateIdData.state === TaskCommonState.SUCCESS
-                  ? intl.formatMessage({
-                      id: 'posts.table.status.success',
-                    })
-                  : record.post.stateIdData.state === TaskCommonState.FAIL
-                  ? intl.formatMessage({
-                      id: 'posts.table.status.fail',
-                    })
-                  : intl.formatMessage({
-                      id: 'posts.table.status.other',
-                    })
-                : intl.formatMessage({
-                    id: 'posts.table.status.other',
-                  })
-              : intl.formatMessage({
-                  id: 'posts.table.status.localDraft',
-                })}
-          </Tag>
-        ),
-      },
-      {
-        title: intl.formatMessage({
-          id: 'posts.drafts.table.action',
-        }),
-        dataIndex: 'status',
-        key: 'status',
-        width: 180,
-        render: (val: string, record: GunType.GunDraft) => (
-          <Space>
-            {val === 'pending' ? (
-              <Button
-                onClick={() => {
-                  history.push({
-                    pathname: '/content/drafts/edit',
-                    query: {
-                      id: String(record.id),
-                    },
-                  });
-                }}
-              >
-                {intl.formatMessage({
-                  id: 'component.button.edit',
-                })}
-              </Button>
-            ) : null}
-            <Popconfirm
-              title={intl.formatMessage({
-                id: 'posts.table.action.delete.confirm',
-              })}
-              onConfirm={async (e) => {
-                e?.stopPropagation();
-                console.log(record);
-                await handleDelete(Number(record.id), record?.key);
-                await fetchPosts();
-
-                /**
-                 * 同步草稿数量
-                 * 增加、更新、删除、页面切换
-                 */
-                if (initialState?.currentUser?.id) {
-                  const localDraftCount = await dbPostsAllCount(initialState?.currentUser?.id);
-
-                  setInitialState((s) => ({
-                    ...s,
-                    localDraftCount: localDraftCount,
-                  }));
-                }
+  const columns: ProColumns<GunType.GunDraft>[] = [
+    {
+      dataIndex: 'cover',
+      title: intl.formatMessage({
+        id: 'posts.drafts.table.cover',
+      }),
+      render: (_, record) => <PostsCover src={record.cover} />,
+    },
+    {
+      dataIndex: 'title',
+      title: intl.formatMessage({ id: 'posts.drafts.table.title' }),
+      ellipsis: true,
+    },
+    {
+      dataIndex: 'createdAt',
+      title: intl.formatMessage({
+        id: 'posts.drafts.table.createdAt',
+      }),
+      render: (_, record) => <PostsDate time={record.createdAt} />,
+    },
+    {
+      dataIndex: 'updatedAt',
+      title: intl.formatMessage({
+        id: 'posts.drafts.table.updatedAt',
+      }),
+      render: (_, record) => <PostsDate time={record.updatedAt} />,
+    },
+    {
+      dataIndex: 'status',
+      title: intl.formatMessage({
+        id: 'posts.drafts.table.status',
+      }),
+      width: 100,
+      render: () => <PostsStorage />,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'posts.drafts.table.action',
+      }),
+      dataIndex: 'status',
+      key: 'status',
+      width: 180,
+      render: (_, record: GunType.GunDraft) => (
+        <Space>
+          {record.status === 'pending' && (
+            <Button
+              onClick={() => {
+                history.push({
+                  pathname: '/content/drafts/edit',
+                  query: {
+                    id: String(record.id),
+                  },
+                });
               }}
-              onCancel={(e) => e?.stopPropagation()}
-              okText={intl.formatMessage({
-                id: 'component.button.yes',
-              })}
-              cancelText={intl.formatMessage({
-                id: 'component.button.no',
-              })}
             >
-              <Button danger onClick={(e) => e.stopPropagation()}>
-                {intl.formatMessage({
-                  id: 'component.button.delete',
-                })}
-              </Button>
-            </Popconfirm>
-          </Space>
-        ),
-      },
-    ];
-  }, [fetchPosts, handleDelete, intl, initialState, setInitialState]);
+              {intl.formatMessage({
+                id: 'component.button.edit',
+              })}
+            </Button>
+          )}
+          <Popconfirm
+            title={intl.formatMessage({
+              id: 'posts.table.action.delete.confirm',
+            })}
+            onConfirm={async (e) => {
+              e?.stopPropagation();
+              console.log(record);
+              await handleDelete(Number(record.id), record?.key);
+              await fetchPosts();
+
+              /**
+               * 同步草稿数量
+               * 增加、更新、删除、页面切换
+               */
+              if (initialState?.currentUser?.id) {
+                const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
+
+                setInitialState((s) => ({
+                  ...s,
+                  localDraftCount: localDraftCount,
+                }));
+              }
+            }}
+            onCancel={(e) => e?.stopPropagation()}
+            okText={intl.formatMessage({
+              id: 'component.button.yes',
+            })}
+            cancelText={intl.formatMessage({
+              id: 'component.button.no',
+            })}
+          >
+            <Button danger onClick={(e) => e.stopPropagation()}>
+              {intl.formatMessage({
+                id: 'component.button.delete',
+              })}
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
 
   useEffect(() => {
     fetchPosts();
@@ -244,31 +167,41 @@ export default () => {
 
   return (
     <PageContainer
+      className="custom-container"
       breadcrumb={{}}
-      title={intl.formatMessage({
-        id: 'posts.intro.title',
-      })}
+      title={'草稿'}
       content={
-        <div className="text-info">
-          {intl.formatMessage({
-            id: 'posts.intro.description',
-          })}
-          <a target="_blank" href="#">
-            {' '}
+        <p>
+          检查和管理已经创建的草稿{' '}
+          <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
             {intl.formatMessage({
               id: 'posts.intro.learnMore',
             })}
-          </a>
-        </div>
+          </Link>
+        </p>
       }
     >
-      <Table
-        rowKey={(record: PostType.Posts) => `${String(record.id)}}`}
-        onRow={() => {
-          return {};
-        }}
+      <ProTable<GunType.GunDraft>
         columns={columns}
-        dataSource={postsList}
+        actionRef={actionRef}
+        request={async () => {
+          const data = await fetchPosts();
+          if (data) {
+            return {
+              data: data,
+              success: true,
+            };
+          }
+          return { success: false };
+        }}
+        rowKey={(record) => record.id!}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: false,
+        }}
+        search={false}
+        options={false}
+        size="middle"
       />
     </PageContainer>
   );
