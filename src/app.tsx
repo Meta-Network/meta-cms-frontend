@@ -204,7 +204,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             </Link>
           );
         }
-        case '/content/all-posts/index': {
+        case '/content/posts': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}
@@ -213,7 +213,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             />
           );
         }
-        case '/content/all-posts/publishing': {
+        case '/content/publishing': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}
@@ -222,7 +222,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             />
           );
         }
-        case '/content/all-posts/published': {
+        case '/content/published': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}
