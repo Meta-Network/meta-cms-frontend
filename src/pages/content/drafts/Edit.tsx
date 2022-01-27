@@ -11,14 +11,12 @@ import {
   dbPostsAdd,
   dbPostsGet,
   PostTempData,
-  dbMetadatasAdd,
-  MetadataTempData,
   dbPostsWhereExistByTitle,
 } from '@/db/db';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { assign, cloneDeep, uniq } from 'lodash';
 // import type Vditor from 'vditor';
-import { uploadMetadata, generateSummary, postDataMergedUpdateAt } from '@/utils/editor';
+import { generateSummary, postDataMergedUpdateAt, pipelinesPostOrdersData } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 // import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
@@ -28,8 +26,7 @@ import SettingsOriginalLink from '@/components/Editor/settingsOriginalLink';
 import SettingsLearnMore from '@/components/Editor/settingsLearnMore';
 import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice';
 import SettingsTips from '@/components/Editor/settingsTips';
-import type { PostMetadata } from '@metaio/meta-signature-util';
-import { fetchPostsStorage, postStoragePublish, postStorageUpdate } from '@/services/api/meta-cms';
+import { fetchPostsStorage, pipelinesPostOrders } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
 import moment from 'moment';
 import {
@@ -209,264 +206,60 @@ const Edit: React.FC = () => {
     [initialState],
   );
 
-  // upload metadata
-  const uploadMetadataFn = useCallback(
-    async (gateway: boolean): Promise<CMS.metadata | undefined> => {
-      let metadataData: CMS.metadata = {
-        authorDigestRequestMetadataStorageType: 'ipfs' as CMS.MetadataStorageType,
-        authorDigestRequestMetadataRefer: '',
-        authorDigestSignatureMetadataStorageType: 'ipfs' as CMS.MetadataStorageType,
-        authorDigestSignatureMetadataRefer: '',
-      };
+  const pipelinesPostOrdersFn = useCallback(async () => {
+    setPublishLoading(true);
 
-      if (gateway) {
-        const payload: PostMetadata = {
-          title: title,
-          cover: cover,
-          summary: generateSummary(),
-          content: content,
-          license: license,
-          categories: '',
-          tags: tags.join(),
-        };
+    const payload = {
+      title: title,
+      cover: cover,
+      summary: generateSummary(),
+      content: content,
+      license: license,
+      categories: '',
+      tags: tags.join(),
+    };
 
-        const uploadMetadataResult = await uploadMetadata({ payload });
+    const { authorPostDigest, authorPostDigestSign } = pipelinesPostOrdersData({ payload });
+    const result = await pipelinesPostOrders({
+      authorPostDigest,
+      authorPostSign: authorPostDigestSign,
+    });
 
-        if (uploadMetadataResult) {
-          const {
-            digestMetadata,
-            authorSignatureMetadata,
-            digestMetadataIpfs,
-            authorSignatureMetadataIpfs,
-          } = uploadMetadataResult;
-          const { id } = history.location.query as Router.PostQuery;
+    setPublishLoading(false);
 
-          // local add metadada
-          await dbMetadatasAdd(
-            assign(MetadataTempData(), {
-              postId: Number(id),
-              metadata: {
-                digestMetadata: digestMetadata,
-                authorSignatureMetadata: authorSignatureMetadata,
-                digestMetadataIpfs: digestMetadataIpfs,
-                authorSignatureMetadataIpfs: authorSignatureMetadataIpfs,
-              },
-            }),
-          );
+    if (result.statusCode === 201) {
+      message.success(intl.formatMessage({ id: 'messages.editor.success' }));
 
-          metadataData = assign(metadataData, {
-            authorDigestRequestMetadataRefer: digestMetadataIpfs.hash,
-            authorDigestSignatureMetadataRefer: authorSignatureMetadataIpfs.hash,
-          });
+      const { id } = history.location.query as Router.PostQuery;
+      await handleUpdate(Number(id), postDataMergedUpdateAt({ post: result.data, draft: null }));
 
-          return metadataData;
-        } else {
-          message.error(
-            intl.formatMessage({
-              id: 'messages.editor.submit.uploadMetadata.fail',
-            }),
-          );
+      setSiteNeedToDeploy(true);
+      setVisiblePublishingTip(true);
+    } else if (result.statusCode === 400) {
+      const _message =
+        typeof result.message === 'string' ? result.message : mergedMessage(result.message);
+      message.error(_message);
+    } else if (result.statusCode === 409) {
+      // 'When post state is not pending or pending_edit.'
+      message.error(result.message);
+    } else if (result.statusCode === 500) {
+      message.error(result.message);
+    } else {
+      message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
+    }
 
-          return;
-        }
-      } else {
-        return metadataData;
-      }
-    },
-    [content, cover, intl, license, tags, title],
-  );
-
-  // update
-  const postStorageUpdateFn = useCallback(
-    async ({
-      post,
-      gateway,
-      siteConfig,
-    }: {
-      post: CMS.Post;
-      gateway: boolean;
-      siteConfig: CMS.SiteConfiguration;
-    }) => {
-      setPublishLoading(true);
-
-      const metadata = await uploadMetadataFn(gateway);
-      if (!metadata) {
-        setPublishLoading(false);
-        return;
-      }
-
-      const data: any = {
-        configIds: [siteConfig.id],
-        posts: [
-          {
-            ...post,
-            title: title,
-            cover: cover,
-            summary: generateSummary(),
-            tags: tags,
-            categories: [],
-            source: content,
-            license: license,
-            state: 'published' as CMS.PostState,
-            ...metadata,
-            updatedAt: moment().toISOString(),
-          },
-        ],
-      };
-
-      const result = await postStorageUpdate(false, data);
-
-      setPublishLoading(false);
-
-      // 文档写的 200 成功，但是实际是 201
-      if (
-        (result.statusCode === 201 || result.statusCode === 200) &&
-        result.data?.posts[0] &&
-        result.data?.stateIds[0]
-      ) {
-        message.success(intl.formatMessage({ id: 'messages.editor.success' }));
-
-        // 统一 title 方便下次 更新
-        const _post = {
-          ...result.data.posts[0],
-          titleInStorage: title,
-          stateId: result.data.stateIds[0],
-        };
-
-        const { id } = history.location.query as Router.PostQuery;
-        await handleUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
-
-        setSiteNeedToDeploy(true);
-        setVisiblePublishingTip(true);
-      } else if (result.statusCode === 400) {
-        const _message =
-          typeof result.message === 'string' ? result.message : mergedMessage(result.message);
-        message.error(_message);
-      } else if (result.statusCode === 409) {
-        // 'When post state is not pending or pending_edit.'
-        message.error(result.message);
-      } else if (result.statusCode === 500) {
-        message.error(result.message);
-      } else {
-        message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
-      }
-
-      if (!(result.statusCode === 201 || result.statusCode === 200)) {
-        notification.open({
-          message: intl.formatMessage({
-            id: 'messages.editor.notification.title',
-          }),
-          description: intl.formatMessage({
-            id: 'messages.editor.publish.notification.fail',
-          }),
-          duration: null,
-        });
-      }
-    },
-    [
-      title,
-      cover,
-      content,
-      tags,
-      license,
-      uploadMetadataFn,
-      setSiteNeedToDeploy,
-      intl,
-      handleUpdate,
-    ],
-  );
-
-  // publish
-  const postStoragePublishFn = useCallback(
-    async ({ gateway, siteConfig }: { gateway: boolean; siteConfig: CMS.SiteConfiguration }) => {
-      setPublishLoading(true);
-
-      const metadata = await uploadMetadataFn(gateway);
-      if (!metadata) {
-        setPublishLoading(false);
-        return;
-      }
-
-      const data = {
-        configIds: [siteConfig.id],
-        posts: [
-          {
-            title: title,
-            titleInStorage: title,
-            cover: cover,
-            summary: generateSummary(),
-            tags: tags,
-            categories: [],
-            source: content,
-            license: license,
-            platform: 'editor',
-            state: 'pending' as CMS.PostState,
-            ...metadata,
-            createdAt: moment().toISOString(),
-            updatedAt: moment().toISOString(),
-          },
-        ],
-      };
-
-      const result = await postStoragePublish(false, data);
-
-      setPublishLoading(false);
-
-      // 文档写的 200 成功，但是实际是 201
-      if (
-        (result.statusCode === 201 || result.statusCode === 200) &&
-        result.data?.posts[0] &&
-        result.data?.stateIds[0]
-      ) {
-        message.success(intl.formatMessage({ id: 'messages.editor.success' }));
-
-        const _post = {
-          ...result.data.posts[0],
-          stateId: result.data.stateIds[0],
-        };
-
-        const { id } = history.location.query as Router.PostQuery;
-        await handleUpdate(Number(id), postDataMergedUpdateAt({ post: _post, draft: null }));
-
-        setSiteNeedToDeploy(true);
-        setVisiblePublishingTip(true);
-      } else if (result.statusCode === 400) {
-        const _message =
-          typeof result.message === 'string' ? result.message : mergedMessage(result.message);
-        message.error(_message);
-      } else if (result.statusCode === 409) {
-        // 'When post state is not pending or pending_edit.'
-        message.error(result.message);
-      } else if (result.statusCode === 500) {
-        message.error(result.message);
-      } else {
-        message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
-      }
-
-      if (!(result.statusCode === 201 || result.statusCode === 200)) {
-        notification.open({
-          message: intl.formatMessage({
-            id: 'messages.editor.notification.title',
-          }),
-          description: intl.formatMessage({
-            id: 'messages.editor.publish.notification.fail',
-          }),
-          duration: null,
-        });
-      }
-    },
-    [
-      title,
-      cover,
-      content,
-      tags,
-      license,
-      uploadMetadataFn,
-      setSiteNeedToDeploy,
-      handleUpdate,
-      intl,
-    ],
-  );
+    if (!(result.statusCode === 201 || result.statusCode === 200)) {
+      notification.open({
+        message: intl.formatMessage({
+          id: 'messages.editor.notification.title',
+        }),
+        description: intl.formatMessage({
+          id: 'messages.editor.publish.notification.fail',
+        }),
+        duration: null,
+      });
+    }
+  }, [title, cover, content, tags, license, handleUpdate, setSiteNeedToDeploy, intl]);
 
   const checkTitle = useCallback(
     async ({ titleValue, id }: { titleValue: string; id: number }): Promise<boolean> => {
@@ -510,84 +303,59 @@ const Edit: React.FC = () => {
   );
 
   // handle publish
-  const handlePublish = useCallback(
-    async (gateway: boolean) => {
-      const { id } = history.location.query as Router.PostQuery;
-      if (!id) {
-        message.warning(
-          intl.formatMessage({
-            id: 'messages.editor.tip.id',
-          }),
-        );
-        return;
-      }
+  const handlePublish = useCallback(async () => {
+    const { id } = history.location.query as Router.PostQuery;
+    if (!id) {
+      message.warning(
+        intl.formatMessage({
+          id: 'messages.editor.tip.id',
+        }),
+      );
+      return;
+    }
 
-      if (!title || !content) {
-        message.warning(
-          intl.formatMessage({
-            id: 'messages.editor.tip.titleOrContent',
-          }),
-        );
-        return;
-      }
+    if (!title || !content) {
+      message.warning(
+        intl.formatMessage({
+          id: 'messages.editor.tip.titleOrContent',
+        }),
+      );
+      return;
+    }
 
-      // check title
-      if (
-        !(await checkTitle({
-          titleValue: title,
-          id: Number(id),
-        }))
-      ) {
-        message.warning('标题重复，请修改');
-        return;
-      }
+    // check title
+    if (
+      !(await checkTitle({
+        titleValue: title,
+        id: Number(id),
+      }))
+    ) {
+      message.warning('标题重复，请修改');
+      return;
+    }
 
-      // check cover format
-      if (cover && !cover.includes(FLEEK_NAME)) {
-        message.success(
-          intl.formatMessage({
-            id: 'messages.editor.tip.coverFormat',
-          }),
-        );
-        return;
-      }
+    // check cover format
+    if (cover && !cover.includes(FLEEK_NAME)) {
+      message.success(
+        intl.formatMessage({
+          id: 'messages.editor.tip.coverFormat',
+        }),
+      );
+      return;
+    }
 
-      const siteConfig = initialState?.siteConfig;
-      if (!siteConfig) {
-        message.warning(
-          intl.formatMessage({
-            id: 'messages.editor.noDefaultConfig',
-          }),
-        );
-        return;
-      }
+    const siteConfig = initialState?.siteConfig;
+    if (!siteConfig) {
+      message.warning(
+        intl.formatMessage({
+          id: 'messages.editor.noDefaultConfig',
+        }),
+      );
+      return;
+    }
 
-      const result = await dbPostsGet(Number(id));
-      // 转存草稿发布
-      if (result && result.post) {
-        postStorageUpdateFn({
-          post: result.post,
-          gateway,
-          siteConfig,
-        });
-      } else {
-        postStoragePublishFn({
-          gateway,
-          siteConfig,
-        });
-      }
-    },
-    [
-      title,
-      cover,
-      content,
-      postStorageUpdateFn,
-      postStoragePublishFn,
-      checkTitle,
-      initialState,
-      intl,
-    ],
-  );
+    pipelinesPostOrdersFn();
+  }, [title, cover, content, pipelinesPostOrdersFn, checkTitle, initialState, intl]);
 
   /**
    * async content to DB

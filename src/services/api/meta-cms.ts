@@ -1,6 +1,15 @@
 /* eslint-disable no-await-in-loop */
 import { extendWithErrorHandler } from '@/services/api/base-request';
 import type { FetchPostsStorageParamsState } from '../constants';
+import type {
+  AuthorPostDigestMetadata,
+  AuthorPostSignatureMetadata,
+} from '@metaio/meta-signature-util';
+
+type PipelinesOrdersPayload = {
+  authorPostDigest: AuthorPostDigestMetadata;
+  authorPostSign: AuthorPostSignatureMetadata;
+};
 
 const request = extendWithErrorHandler({
   credentials: 'include',
@@ -392,4 +401,18 @@ export async function decryptMatatakiPost(iv: string, encryptedData: string) {
   );
 
   return response.data;
+}
+
+// v1
+/**
+ * pipeline
+ * 拥护请求发布文章
+ * @param payload
+ * @returns
+ */
+export async function pipelinesPostOrders(payload: PipelinesOrdersPayload) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersData>>('/v1/pipelines/post-orders', {
+    method: 'POST',
+    data: payload,
+  });
 }

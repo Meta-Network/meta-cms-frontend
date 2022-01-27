@@ -260,6 +260,85 @@ declare namespace CMS {
   };
   // 可能会有变动 暂时命名区分
   type PostStorageUpdateData = PostStoragePublishData;
+
+  // V1 pipeline
+  type PipelinesOrdersData = {
+    postOrder: {
+      id: '0xf32c16a52af678734f01addf9386f1749287401a3090e75595d50fb1824f8a55fbc7d591edae3c45097f0ccd22dafc6587be4c6f02ea4ba955480a1381201b88';
+      userId: 34;
+      serverVerificationId: '0xa8c8a48c7740533bb30a4a41d554bfa54c16b06865148ceee05057d8a565572cdaa997a5ceb78e6a89048e253296a32353e285f60a5308d2bf34192aa1493c07';
+      postMetadata: {
+        id: '0xf32c16a52af678734f01addf9386f1749287401a3090e75595d50fb1824f8a55fbc7d591edae3c45097f0ccd22dafc6587be4c6f02ea4ba955480a1381201b88';
+        title: '1643260663454';
+        cover: '';
+        summary: '1643260663454';
+        categories: '';
+        tags: '';
+        license: '';
+        authorPublicKey: '0xe33ba6543eaecddf097365e4226f3f7b7fdeadbd645a5bb45e6fb3997b894b30';
+        digest: '0x6f9c61f21d4c9e40cdbb82cb3d97cbe3ef77381d2c58cc91a7318045ff04fb7f';
+        createdAt: '2022-01-26T21:24:53.026Z';
+      };
+      createdAt: '2022-01-26T21:24:53.932Z';
+      updatedAt: '2022-01-26T21:24:53.932Z';
+      submitState: 'pending';
+      publishState: 'pending';
+      certificateStorageType: '';
+      certificateId: '';
+      certificateState: '';
+      postTaskId: '';
+      publishSiteOrderId: 0;
+      publishSiteTaskId: '';
+    };
+    serverVerification: {
+      '@context': 'https://metanetwork.online/ns/cms';
+      '@type': 'server-verification-sign';
+      '@version': '2.0.0';
+      signatureAlgorithm: 'curve25519';
+      publicKey: '0x7660c1fc42a2d9aa3f0a4551db9e63f169ecfd56571add56622a6e4824162f1f';
+      nonce: '0x0369104fd1244a10e3ef2a8d';
+      claim: "I, meta-cms.vercel.mttk.net, signed with my key 0x7660c1fc42a2d9aa3f0a4551db9e63f169ecfd56571add56622a6e4824162f1f: I verified the request signed with 0xf32c16a52af678734f01addf9386f1749287401a3090e75595d50fb1824f8a55fbc7d591edae3c45097f0ccd22dafc6587be4c6f02ea4ba955480a1381201b88 using the author's key 0xe33ba6543eaecddf097365e4226f3f7b7fdeadbd645a5bb45e6fb3997b894b30, will publish the post and upload its metadata for notarization.";
+      signature: '0xa8c8a48c7740533bb30a4a41d554bfa54c16b06865148ceee05057d8a565572cdaa997a5ceb78e6a89048e253296a32353e285f60a5308d2bf34192aa1493c07';
+      ts: 1643261092756;
+      reference: [
+        {
+          refer: '0x6f9c61f21d4c9e40cdbb82cb3d97cbe3ef77381d2c58cc91a7318045ff04fb7f';
+          rel: 'content';
+          body: {
+            '@context': 'https: //metanetwork.online/ns/cms';
+            '@type': 'author-post-digest';
+            '@version': '1.1.0';
+            algorithm: 'sha256';
+            categories: '';
+            content: '1643260663454';
+            cover: '';
+            license: '';
+            summary: '1643260663454';
+            tags: '';
+            title: '1643260663454';
+            digest: '0x6f9c61f21d4c9e40cdbb82cb3d97cbe3ef77381d2c58cc91a7318045ff04fb7f';
+            ts: 1643260663454;
+          };
+        },
+        {
+          refer: '0xf32c16a52af678734f01addf9386f1749287401a3090e75595d50fb1824f8a55fbc7d591edae3c45097f0ccd22dafc6587be4c6f02ea4ba955480a1381201b88';
+          rel: 'request';
+          body: {
+            '@context': 'https://metanetwork.online/ns/cms';
+            '@type': 'author-digest-sign';
+            '@version': '1.0.0';
+            signatureAlgorithm: 'curve25519';
+            publicKey: '0xe33ba6543eaecddf097365e4226f3f7b7fdeadbd645a5bb45e6fb3997b894b30';
+            digest: '0x6f9c61f21d4c9e40cdbb82cb3d97cbe3ef77381d2c58cc91a7318045ff04fb7f';
+            nonce: '0x8cf734a526426377f65c58c7';
+            claim: 'I authorize publishing by metaspaces.life from this device using key: 0xe33ba6543eaecddf097365e4226f3f7b7fdeadbd645a5bb45e6fb3997b894b30';
+            signature: '0xf32c16a52af678734f01addf9386f1749287401a3090e75595d50fb1824f8a55fbc7d591edae3c45097f0ccd22dafc6587be4c6f02ea4ba955480a1381201b88';
+            ts: 1643260663458;
+          };
+        },
+      ];
+    };
+  };
 }
 
 declare namespace GLOBAL {
@@ -437,3 +516,5 @@ declare namespace MATATAKI {
     content: string;
   };
 }
+
+declare namespace ApiCmsV1 {}

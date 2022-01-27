@@ -6,6 +6,8 @@ import {
   authorDigest,
   authorDigestSign,
   authorPublishMetaSpaceRequest,
+  authorPostDigest,
+  authorPostDigestSign,
 } from '@metaio/meta-signature-util';
 import type {
   KeyPair,
@@ -256,5 +258,41 @@ export const publishMetaSpaceRequest = async ({
   return {
     metadata: data,
     metadataIpfs: dataMetadataResult,
+  };
+};
+
+export const pipelinesPostOrdersData = ({
+  payload,
+}: {
+  payload: {
+    categories: string;
+    content: string;
+    cover: string;
+    license: string;
+    summary: string;
+    tags: string;
+    title: string;
+  };
+}) => {
+  const verifyResult = verifySeedAndKey();
+  if (!verifyResult) {
+    throw new Error('seed or key does not exist or does not match.');
+  }
+
+  const keys: KeyPair = generateKeys(verifyResult.seed);
+
+  const authorPostDigestResult = authorPostDigest.generate(payload);
+  console.log('authorPostDigestResult', authorPostDigestResult);
+
+  const authorPostDigestSignResult = authorPostDigestSign.generate(
+    keys,
+    META_SPACE_BASE_DOMAIN,
+    authorPostDigestResult.digest,
+  );
+  console.log('authorPostDigestSignResult', authorPostDigestSignResult);
+
+  return {
+    authorPostDigest: authorPostDigestResult,
+    authorPostDigestSign: authorPostDigestSignResult,
   };
 };
