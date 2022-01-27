@@ -31,13 +31,29 @@ export default () => {
         });
       }
 
+      // 刷新
+      await actionRef.current!.reload();
+
+      /**
+       * 同步草稿数量
+       * 增加、更新、删除、页面切换
+       */
+      if (initialState?.currentUser?.id) {
+        const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
+
+        setInitialState((s) => ({
+          ...s,
+          localDraftCount: localDraftCount,
+        }));
+      }
+
       message.success(
         intl.formatMessage({
           id: 'posts.table.action.delete.success',
         }),
       );
     },
-    [intl, initialState],
+    [intl, initialState, setInitialState],
   );
 
   /** fetch posts list */
@@ -123,24 +139,9 @@ export default () => {
             title={intl.formatMessage({
               id: 'posts.table.action.delete.confirm',
             })}
-            onConfirm={async (e) => {
-              e?.stopPropagation();
-              console.log(record);
-              await handleDelete(Number(record.id), record?.key);
-              await fetchPosts();
-
-              /**
-               * 同步草稿数量
-               * 增加、更新、删除、页面切换
-               */
-              if (initialState?.currentUser?.id) {
-                const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
-
-                setInitialState((s) => ({
-                  ...s,
-                  localDraftCount: localDraftCount,
-                }));
-              }
+            onConfirm={() => {
+              // console.log(record);
+              handleDelete(Number(record.id), record?.key);
             }}
             onCancel={(e) => e?.stopPropagation()}
             okText={intl.formatMessage({

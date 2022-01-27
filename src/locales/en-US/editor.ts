@@ -76,7 +76,7 @@ export default {
   'editor.license.creativeCommons.tip': 'Creative Commons license agreement',
   'editor.license.creativeCommons.share':
     'Do you allow your work to be reprinted, excerpted, mixed, or re-created by others?',
-  'editor.license.creativeCommons.allow': 'allow',
+  'editor.license.creativeCommons.allow': 'Allow',
   'editor.license.creativeCommons.nd': 'Not allowed',
   'editor.license.creativeCommons.nd.tip':
     'Others can no longer mix, convert, or create based on the work, and cannot distribute the modified work',
