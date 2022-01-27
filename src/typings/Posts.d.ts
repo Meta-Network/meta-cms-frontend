@@ -24,3 +24,15 @@ declare namespace PostType {
     updatedAt: string;
   };
 }
+
+declare namespace AllPostsType {
+  type PostListItem = {
+    gallery: string;
+    title: string;
+    submitStatus: SubmitStatusEnum;
+    publishStatus: PublishStatusEnum;
+    requestDate: string;
+    authorisationStatus: AuthorisationStatusEnum;
+    action?: React.ReactNode;
+  };
+}

@@ -102,6 +102,24 @@ export enum GatewayType {
   Arweave = 'arweave',
 }
 
+export enum SubmitStatusEnum {
+  WAIT = 'wait',
+  DOING = 'doing',
+  DONE = 'done',
+  ERROR = 'error',
+}
+export enum PublishStatusEnum {
+  WAIT = 'wait',
+  DOING = 'doing',
+  DONE = 'done',
+  ERROR = 'error',
+}
+export enum AuthorisationStatusEnum {
+  DOING = 'doing',
+  DONE = 'done',
+  ERROR = 'error',
+  NONE = 'none',
+}
 export enum PublishingTipStepStateType {
   Loading = 'loading',
   Finish = 'finish',

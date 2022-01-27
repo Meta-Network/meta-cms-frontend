@@ -46,19 +46,19 @@
         component: './content/drafts/List',
       },
       {
-        path: '/content/posts',
-        name: '全部作品',
-        component: './content/Posts/index',
+        path: '/content/all-posts/index',
+        name: 'allPosts',
+        component: './content/AllPosts',
       },
       {
-        path: '/content/publishing',
-        name: '发布中',
-        component: './content/Publishing/index',
+        path: '/content/all-posts/publishing',
+        name: 'allPosts.publishing',
+        component: './content/AllPosts',
       },
       {
-        path: '/content/published',
-        name: 'publishedPosts',
-        component: './content/Published/index',
+        path: '/content/all-posts/published',
+        name: 'allPosts.published',
+        component: './content/AllPosts',
       },
       {
         path: '/content/sync-center',

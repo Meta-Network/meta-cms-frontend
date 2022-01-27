@@ -204,6 +204,33 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             </Link>
           );
         }
+        case '/content/all-posts/index': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.allPostsCount || 0}
+            />
+          );
+        }
+        case '/content/all-posts/publishing': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.publishingCount || 0}
+            />
+          );
+        }
+        case '/content/all-posts/published': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.publishedCount || 0}
+            />
+          );
+        }
         default: {
           return <Link to={menuItemProps.path as string}>{defaultDom}</Link>;
         }
