@@ -410,9 +410,29 @@ export async function decryptMatatakiPost(iv: string, encryptedData: string) {
  * @param payload
  * @returns
  */
-export async function pipelinesPostOrders(payload: PipelinesOrdersPayload) {
+export async function pipelinesPostOrders(data: PipelinesOrdersPayload) {
   return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersData>>('/v1/pipelines/post-orders', {
     method: 'POST',
-    data: payload,
+    data: data,
   });
+}
+
+/**
+ * pipeline
+ * 拥护请求发布文章
+ * @param payload
+ * @returns
+ */
+export async function pipelinesPostOrdersMine(
+  params: CMS.Pagination,
+  data: PipelinesOrdersPayload,
+) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersData>>(
+    '/v1/pipelines/post-orders/mine',
+    {
+      method: 'GET',
+      params: params,
+      data: data,
+    },
+  );
 }

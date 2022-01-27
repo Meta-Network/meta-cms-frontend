@@ -339,6 +339,11 @@ declare namespace CMS {
       ];
     };
   };
+
+  type Pagination = {
+    page: number;
+    limit: number;
+  };
 }
 
 declare namespace GLOBAL {
