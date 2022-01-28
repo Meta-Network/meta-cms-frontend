@@ -4,7 +4,11 @@ import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import { fetchPostsStorage, pipelinesPostOrdersMine } from '@/services/api/meta-cms';
+import {
+  fetchPostsStorage,
+  pipelinesPostOrdersMine,
+  pipelinesPostOrdersMinePublishing,
+} from '@/services/api/meta-cms';
 import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
@@ -101,6 +105,7 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     publishedCount: 0,
     localDraftCount: 0,
     allPostsCount: 0,
+    publishingCount: 0,
   };
 
   const currentUser = await fetchUserInfo();
@@ -121,6 +126,15 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     });
     if (pipelinesPostOrdersMineResult.statusCode === 200) {
       state.allPostsCount = pipelinesPostOrdersMineResult.data.meta.totalItems;
+    }
+
+    // publishing posts count
+    const pipelinesPostOrdersMinePublishingResult = await pipelinesPostOrdersMinePublishing({
+      page: 1,
+      limit: 1,
+    });
+    if (pipelinesPostOrdersMinePublishingResult.statusCode === 200) {
+      state.publishingCount = pipelinesPostOrdersMinePublishingResult.data.meta.totalItems;
     }
 
     // get site config
