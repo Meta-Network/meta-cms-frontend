@@ -46,19 +46,19 @@
         component: './content/drafts/List',
       },
       {
-        path: '/content/all-posts/index',
+        path: '/content/posts',
         name: 'allPosts',
-        component: './content/AllPosts',
+        component: './content/Posts/index',
       },
       {
-        path: '/content/all-posts/publishing',
+        path: '/content/publishing',
         name: 'allPosts.publishing',
-        component: './content/AllPosts',
+        component: './content/Publishing/index',
       },
       {
-        path: '/content/all-posts/published',
+        path: '/content/published',
         name: 'allPosts.published',
-        component: './content/AllPosts',
+        component: './content/Published/index',
       },
       {
         path: '/content/sync-center',
