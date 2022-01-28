@@ -419,13 +419,27 @@ export async function pipelinesPostOrders(data: PipelinesOrdersPayload) {
 
 /**
  * pipeline
- * 拥护请求发布文章
+ * 全部文章
  * @param payload
  * @returns
  */
 export async function pipelinesPostOrdersMine(params: CMS.Pagination) {
   return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersMine>>(
     '/v1/pipelines/post-orders/mine',
+    {
+      method: 'GET',
+      params: params,
+    },
+  );
+}
+/**
+ * 发布中文章
+ * @param params
+ * @returns
+ */
+export async function pipelinesPostOrdersMinePublishing(params: CMS.Pagination) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersMine>>(
+    '/v1/pipelines/post-orders/mine/publishing',
     {
       method: 'GET',
       params: params,
