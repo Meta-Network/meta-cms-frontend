@@ -446,3 +446,18 @@ export async function pipelinesPostOrdersMinePublishing(params: CMS.Pagination) 
     },
   );
 }
+
+/**
+ * 发布完成文章
+ * @param params
+ * @returns
+ */
+export async function pipelinesPostOrdersMinePublished(params: CMS.Pagination) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersMine>>(
+    '/v1/pipelines/post-orders/mine/published',
+    {
+      method: 'GET',
+      params: params,
+    },
+  );
+}

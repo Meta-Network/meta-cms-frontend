@@ -46,7 +46,7 @@ export default () => {
       render: (_, record) => <PostsDate time={record.postMetadata.createdAt} />,
     },
     {
-      dataIndex: 'authorisation',
+      dataIndex: 'certificate',
       title: '存证',
       render: (_, record) => <PostsCertificate state={record.certificateState} />,
     },

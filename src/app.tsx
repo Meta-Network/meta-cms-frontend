@@ -5,9 +5,9 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
 import {
-  fetchPostsStorage,
   pipelinesPostOrdersMine,
   pipelinesPostOrdersMinePublishing,
+  pipelinesPostOrdersMinePublished,
 } from '@/services/api/meta-cms';
 import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
@@ -17,7 +17,6 @@ import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
 import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 import PublishSiteButton from './components/menu/PublishSiteButton';
-import { FetchPostsStorageParamsState } from './services/constants';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
@@ -102,10 +101,10 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     currentUser: undefined,
     siteConfig: undefined,
     invitationsCount: 0,
-    publishedCount: 0,
     localDraftCount: 0,
     allPostsCount: 0,
     publishingCount: 0,
+    publishedCount: 0,
   };
 
   const currentUser = await fetchUserInfo();
@@ -137,19 +136,18 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
       state.publishingCount = pipelinesPostOrdersMinePublishingResult.data.meta.totalItems;
     }
 
+    // published posts count
+    const pipelinesPostOrdersMinePublishedResult = await pipelinesPostOrdersMinePublished({
+      page: 1,
+      limit: 1,
+    });
+    if (pipelinesPostOrdersMinePublishedResult.statusCode === 200) {
+      state.publishedCount = pipelinesPostOrdersMinePublishedResult.data.meta.totalItems;
+    }
+
     // get site config
     const siteConfig = await getDefaultSiteConfigAPI();
     state.siteConfig = siteConfig;
-
-    state.publishedCount = 0;
-    if (siteConfig?.id) {
-      const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
-        page: 1,
-        limit: 1,
-        state: FetchPostsStorageParamsState.Published,
-      });
-      state.publishedCount = publishedCountRequest?.data?.meta?.totalItems ?? 0;
-    }
   }
 
   return state;
@@ -198,16 +196,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               path={menuItemProps.path as string}
               dom={defaultDom}
               count={initialState?.invitationsCount || 0}
-            />
-          );
-        }
-        // 已发布文章
-        case '/content/published-posts': {
-          return (
-            <MenuItemWithBadge
-              path={menuItemProps.path as string}
-              dom={defaultDom}
-              count={initialState?.publishedCount || 0}
             />
           );
         }
