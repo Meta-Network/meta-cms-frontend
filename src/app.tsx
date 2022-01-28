@@ -1,4 +1,7 @@
+import { useModel } from '@@/plugin-model/useModel';
 import { isMobile } from 'is-mobile';
+import React, { useEffect } from 'react';
+import { io } from 'socket.io-client';
 import { history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
@@ -13,7 +16,7 @@ import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
 import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 import PublishSiteButton from './components/menu/PublishSiteButton';
-import { FetchPostsStorageParamsState } from './services/constants';
+import { FetchPostsStorageParamsState, RealTimeNotificationEvent } from './services/constants';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
@@ -138,6 +141,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     disableContentMargin: false,
     siderWidth: 300,
     layout: 'side',
+    disableMobile: true,
     headerRender: () => false,
     headerContentRender: () => false,
     menuDataRender: (menuData) => {
@@ -209,7 +213,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.allPostsCount || 0}
+              count={initialState?.allPostCount || 0}
             />
           );
         }
@@ -269,3 +273,56 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     ],
   };
 };
+
+const ReactStartup = (root: any) => {
+  const { setInitialState } = useModel('@@initialState');
+
+  useEffect(() => {
+    const setCounts = (count: Partial<Record<keyof GLOBAL.InitialState, any>>) => {
+      return setInitialState((prevData) => ({
+        ...prevData,
+        ...count,
+      }));
+    };
+
+    // connect to Meta CMS backend with socket.io
+    const client = io(META_CMS_API, {
+      withCredentials: true,
+    });
+
+    client.on('connect', () => {
+      console.log('connected', client.id);
+    });
+
+    client.on(
+      RealTimeNotificationEvent.POST_COUNT_UPDATED,
+      (notification: {
+        data: {
+          allPostCount: number;
+          publishingCount: number;
+          publishedCount: number;
+          publishingAlertFlag: boolean;
+        };
+      }) => {
+        setCounts({
+          ...notification.data,
+        });
+      },
+    );
+
+    client.on(
+      RealTimeNotificationEvent.INVITATION_COUNT_UPDATED,
+      (notification: { data: number }) => {
+        setCounts({
+          invitationsCount: notification.data,
+        });
+      },
+    );
+  }, [setInitialState]);
+  console.log(root.children);
+  return root.children;
+};
+
+export function rootContainer(container: any) {
+  return React.createElement(ReactStartup, null, container);
+}

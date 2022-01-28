@@ -263,16 +263,17 @@ declare namespace CMS {
 }
 
 declare namespace GLOBAL {
-  type InitialState = {
-    currentUser?: GLOBAL.CurrentUser;
-    fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
-    invitationsCount?: number;
-    allPostsCount?: number;
-    publishingCount?: number;
-    publishedCount?: number;
-    localDraftCount?: number;
-    siteConfig?: CMS.SiteConfiguration;
-  };
+  type InitialState = Partial<{
+    currentUser: GLOBAL.CurrentUser;
+    fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
+    allPostCount: number;
+    publishingCount: number;
+    publishedCount: number;
+    invitationsCount: number;
+    localDraftCount: number;
+    publishingAlertFlag: boolean;
+    siteConfig: CMS.SiteConfiguration;
+  }>;
 
   type GeneralResponse<T> = {
     statusCode: number;

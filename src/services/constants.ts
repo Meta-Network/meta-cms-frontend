@@ -124,3 +124,10 @@ export enum PublishingTipStepStateType {
   Loading = 'loading',
   Finish = 'finish',
 }
+
+export enum RealTimeNotificationEvent {
+  POST_COUNT_UPDATED = 'post.count.updated',
+  SPACE_COUNT_UPDATED = 'space.count.updated',
+  INVITATION_COUNT_UPDATED = 'invitation.count.updated',
+  POST_PUBLISHING_STATE_UPDATED = 'post.publishing.state.updated',
+}
