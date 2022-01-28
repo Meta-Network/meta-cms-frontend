@@ -423,16 +423,12 @@ export async function pipelinesPostOrders(data: PipelinesOrdersPayload) {
  * @param payload
  * @returns
  */
-export async function pipelinesPostOrdersMine(
-  params: CMS.Pagination,
-  data: PipelinesOrdersPayload,
-) {
-  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersData>>(
+export async function pipelinesPostOrdersMine(params: CMS.Pagination) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersMine>>(
     '/v1/pipelines/post-orders/mine',
     {
       method: 'GET',
       params: params,
-      data: data,
     },
   );
 }

@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./constants.ts" />
+
 declare namespace CMS {
   type SourceStatusResponse = {
     id: number;
@@ -279,8 +282,8 @@ declare namespace CMS {
         digest: '0x6f9c61f21d4c9e40cdbb82cb3d97cbe3ef77381d2c58cc91a7318045ff04fb7f';
         createdAt: '2022-01-26T21:24:53.026Z';
       };
-      createdAt: '2022-01-26T21:24:53.932Z';
-      updatedAt: '2022-01-26T21:24:53.932Z';
+      createdAt: Date;
+      updatedAt: Date;
       submitState: 'pending';
       publishState: 'pending';
       certificateStorageType: '';
@@ -337,6 +340,50 @@ declare namespace CMS {
           };
         },
       ];
+    };
+  };
+
+  type PipelinesOrdersMineItem = {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: number;
+    submitState: PipelineOrderTaskCommonState;
+    publishState: PipelineOrderTaskCommonState;
+    serverVerificationId: string;
+    certificateStorageType: string;
+    certificateId: string;
+    certificateState: PipelineOrderTaskCommonState;
+    postTaskId: string;
+    publishSiteOrderId: number;
+    publishSiteTaskId: string;
+    postMetadata: {
+      id: string;
+      createdAt: Date;
+      title: string;
+      cover: string;
+      summary: string;
+      categories: string;
+      tags: string;
+      license: string;
+      authorPublicKey: string;
+      digest: string;
+    };
+  };
+  type PipelinesOrdersMine = {
+    items: PipelinesOrdersMineItem[];
+    meta: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+    links: {
+      first: string;
+      previous: string;
+      next: string;
+      last: string;
     };
   };
 

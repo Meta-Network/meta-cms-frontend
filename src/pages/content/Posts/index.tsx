@@ -1,14 +1,12 @@
 import { useIntl } from 'umi';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 // import FormattedDescription from '@/components/FormattedDescription';
 import { Typography, Button } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { getDefaultSiteConfigAPI } from '@/helpers';
-import { FetchPostsStorageParamsState } from '@/services/constants';
-import { fetchPostsStorage } from '@/services/api/meta-cms';
-
+import { PipelineOrderTaskCommonState } from '@/services/constants';
+import { pipelinesPostOrdersMine } from '@/services/api/meta-cms';
 import PostsCover from '@/components/PostsCover';
 import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
@@ -20,43 +18,45 @@ const { Link } = Typography;
 export default () => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
-  const [siteConfigDefault, setSiteConfigDefault] = useState<CMS.SiteConfiguration | undefined>();
 
-  const columns: ProColumns<CMS.Post>[] = [
+  const columns: ProColumns<CMS.PipelinesOrdersMineItem>[] = [
     {
       dataIndex: 'cover',
       title: '封面图',
-      render: (_, record) => <PostsCover src={record.cover} />,
+      render: (_, record) => <PostsCover src={record.postMetadata.cover} />,
     },
     {
-      dataIndex: 'title',
+      dataIndex: ['postMetadata', 'title'],
       title: intl.formatMessage({ id: 'messages.published.table.title' }),
       ellipsis: true,
     },
     {
       dataIndex: 'submit',
       title: 'Submit 状态',
-      render: () => <PostsSubmit />,
+      render: (_, record) => <PostsSubmit state={record.submitState} />,
     },
     {
       dataIndex: 'publish',
       title: 'Publish 状态',
-      render: () => <PostsPublish />,
+      render: (_, record) => <PostsPublish state={record.publishState} />,
     },
     {
       dataIndex: 'date',
       title: '请求日期',
-      render: (_, record) => <PostsDate time={record.updatedAt} />,
+      render: (_, record) => <PostsDate time={record.postMetadata.createdAt} />,
     },
     {
       dataIndex: 'authorisation',
       title: '存证',
-      render: () => <PostsCertificate />,
+      render: (_, record) => <PostsCertificate state={record.certificateState} />,
     },
     {
       dataIndex: 'action',
       title: '操作',
-      render: () => <Button>{intl.formatMessage({ id: 'posts.action.button' })}</Button>,
+      render: (_, record) =>
+        record.publishState === PipelineOrderTaskCommonState.FAILED ? (
+          <Button>{intl.formatMessage({ id: 'posts.action.button' })}</Button>
+        ) : null,
     },
   ];
 
@@ -74,40 +74,20 @@ export default () => {
         </p>
       }
     >
-      <ProTable<CMS.Post>
+      <ProTable<CMS.PipelinesOrdersMineItem>
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {
-          let _siteConfigDefault: CMS.SiteConfiguration | undefined;
-
-          if (!siteConfigDefault?.id) {
-            _siteConfigDefault = await getDefaultSiteConfigAPI();
-            if (_siteConfigDefault) {
-              setSiteConfigDefault(_siteConfigDefault);
-            } else {
-              return { success: false };
-            }
-          }
-
           const params = {
             page: current ?? 1,
             limit: pageSize ?? 10,
-            state: FetchPostsStorageParamsState.Published,
           };
-          const request = await fetchPostsStorage(
-            siteConfigDefault?.id || _siteConfigDefault!.id,
-            params,
-          );
-          // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
-          // 如果需要转化参数可以在这里进行修改
-          if (request?.data) {
+          const result = await pipelinesPostOrdersMine(params);
+          if (result.statusCode === 200) {
             return {
-              data: request.data.items,
-              // success 请返回 true，
-              // 不然 table 会停止解析数据，即使有数据
+              data: result.data.items,
               success: true,
-              // 不传会使用 data 的长度，如果是分页一定要传
-              total: request.data.meta.totalItems,
+              total: result.data.meta.totalItems,
             };
           }
           return { success: false };

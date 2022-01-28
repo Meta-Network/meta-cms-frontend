@@ -4,7 +4,7 @@ import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import { fetchPostsStorage } from '@/services/api/meta-cms';
+import { fetchPostsStorage, pipelinesPostOrdersMine } from '@/services/api/meta-cms';
 import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
@@ -100,6 +100,7 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     invitationsCount: 0,
     publishedCount: 0,
     localDraftCount: 0,
+    allPostsCount: 0,
   };
 
   const currentUser = await fetchUserInfo();
@@ -112,6 +113,15 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     const invitationsCountRequest = await queryInvitations();
     state.invitationsCount =
       invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
+
+    // all posts count
+    const pipelinesPostOrdersMineResult = await pipelinesPostOrdersMine({
+      page: 1,
+      limit: 1,
+    });
+    if (pipelinesPostOrdersMineResult.statusCode === 200) {
+      state.allPostsCount = pipelinesPostOrdersMineResult.data.meta.totalItems;
+    }
 
     // get site config
     const siteConfig = await getDefaultSiteConfigAPI();

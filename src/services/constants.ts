@@ -124,3 +124,11 @@ export enum PublishingTipStepStateType {
   Loading = 'loading',
   Finish = 'finish',
 }
+
+export enum PipelineOrderTaskCommonState {
+  NONE = '',
+  PENDING = 'pending',
+  DOING = 'doing',
+  FINISHED = 'finished',
+  FAILED = 'failed',
+}
