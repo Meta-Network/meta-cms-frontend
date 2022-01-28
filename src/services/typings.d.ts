@@ -351,6 +351,8 @@ declare namespace GLOBAL {
     currentUser?: GLOBAL.CurrentUser;
     fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
     invitationsCount?: number;
+    allPostsCount?: number;
+    publishingCount?: number;
     publishedCount?: number;
     localDraftCount?: number;
     siteConfig?: CMS.SiteConfiguration;

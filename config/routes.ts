@@ -47,17 +47,17 @@
       },
       {
         path: '/content/posts',
-        name: '全部作品',
+        name: 'allPosts',
         component: './content/Posts/index',
       },
       {
         path: '/content/publishing',
-        name: '发布中',
+        name: 'allPosts.publishing',
         component: './content/Publishing/index',
       },
       {
         path: '/content/published',
-        name: 'publishedPosts',
+        name: 'allPosts.published',
         component: './content/Published/index',
       },
       {

@@ -27,7 +27,7 @@ const Settings: React.FC = ({ children }) => {
         visible={visible}
         width={340}
       >
-        <section className={styles.container}>{children}</section>
+        {children}
       </Drawer>
     </span>
   );
