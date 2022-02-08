@@ -1,10 +1,13 @@
+import { useModel } from '@@/plugin-model/useModel';
 import { isMobile } from 'is-mobile';
+import React, { useEffect } from 'react';
+import { io } from 'socket.io-client';
 import { history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import { fetchPostsStorage } from '@/services/api/meta-cms';
+import { fetchPostCount } from '@/services/api/meta-cms';
 import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
@@ -13,7 +16,7 @@ import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
 import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 import PublishSiteButton from './components/menu/PublishSiteButton';
-import { FetchPostsStorageParamsState } from './services/constants';
+import { RealTimeNotificationEvent } from './services/constants';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
@@ -41,7 +44,9 @@ function CustomSiderMenu({
       {initialState?.siteConfig?.domain && (
         <a href={`https://${initialState.siteConfig.domain}`} target="__blank">
           <Card
-            className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
+            className={
+              menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card default-site-link'
+            }
           >
             <Card.Meta
               className="menu-site-card-meta"
@@ -53,7 +58,7 @@ function CustomSiderMenu({
                 </Text>
               }
             />
-            <ExportOutlined className="my-site-link-icon menu-extra-icons" />
+            <ExportOutlined className="default-site-link-icon menu-extra-icons" />
           </Card>
         </a>
       )}
@@ -93,13 +98,16 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     return undefined;
   };
 
-  const state: GLOBAL.InitialState = {
+  let state: GLOBAL.InitialState = {
     fetchUserInfo,
     currentUser: undefined,
     siteConfig: undefined,
+    allPostCount: 0,
+    publishingCount: 0,
     invitationsCount: 0,
     publishedCount: 0,
     localDraftCount: 0,
+    publishingAlertFlag: false,
   };
 
   const currentUser = await fetchUserInfo();
@@ -117,14 +125,10 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     const siteConfig = await getDefaultSiteConfigAPI();
     state.siteConfig = siteConfig;
 
-    state.publishedCount = 0;
     if (siteConfig?.id) {
-      const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
-        page: 1,
-        limit: 1,
-        state: FetchPostsStorageParamsState.Published,
-      });
-      state.publishedCount = publishedCountRequest?.data?.meta?.totalItems ?? 0;
+      // update post count
+      const newPostCount = (await fetchPostCount())?.data ?? {};
+      state = { ...state, ...newPostCount };
     }
   }
 
@@ -138,6 +142,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     disableContentMargin: false,
     siderWidth: 300,
     layout: 'side',
+    disableMobile: true,
     headerRender: () => false,
     headerContentRender: () => false,
     menuDataRender: (menuData) => {
@@ -167,49 +172,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             />
           );
         }
-        // 邀请码数量
-        case '/invitation': {
-          return (
-            <MenuItemWithBadge
-              path={menuItemProps.path as string}
-              dom={defaultDom}
-              count={initialState?.invitationsCount || 0}
-            />
-          );
-        }
-        // 已发布文章
-        case '/content/published-posts': {
-          return (
-            <MenuItemWithBadge
-              path={menuItemProps.path as string}
-              dom={defaultDom}
-              count={initialState?.publishedCount || 0}
-            />
-          );
-        }
-        // create post
-        case '/content/drafts/edit': {
-          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
-          return (
-            <Link
-              to={menuItemProps.path as string}
-              onClick={(e) => {
-                if (_status) {
-                  e.preventDefault();
-                  // message.warning('请先创建 Meta Space');
-                }
-              }}
-            >
-              <Text disabled={_status}>{defaultDom}</Text>
-            </Link>
-          );
-        }
         case '/content/posts': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.allPostsCount || 0}
+              count={initialState?.allPostCount || 0}
+              onAlert={initialState?.publishingAlertFlag}
             />
           );
         }
@@ -229,6 +198,33 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               dom={defaultDom}
               count={initialState?.publishedCount || 0}
             />
+          );
+        }
+        // 邀请码数量
+        case '/invitation': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.invitationsCount || 0}
+            />
+          );
+        }
+        // create post
+        case '/content/drafts/edit': {
+          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
+          return (
+            <Link
+              to={menuItemProps.path as string}
+              onClick={(e) => {
+                if (_status) {
+                  e.preventDefault();
+                  // message.warning('请先创建 Meta Space');
+                }
+              }}
+            >
+              <Text disabled={_status}>{defaultDom}</Text>
+            </Link>
           );
         }
         default: {
@@ -269,3 +265,49 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     ],
   };
 };
+
+const ReactStartup = (root: any) => {
+  const { setInitialState } = useModel('@@initialState');
+
+  useEffect(() => {
+    const setCounts = (count: Partial<Record<keyof GLOBAL.InitialState, any>>) => {
+      return setInitialState((prevData) => ({
+        ...prevData,
+        ...count,
+      }));
+    };
+
+    // connect to Meta CMS backend with socket.io
+    const client = io(META_CMS_API, {
+      withCredentials: true,
+    });
+
+    client.on('connect', () => {
+      console.log('Socket.io has been connected to the backend successfully. Id:', client.id);
+    });
+
+    client.on(
+      RealTimeNotificationEvent.POST_COUNT_UPDATED,
+      (notification: { data: CMS.PostCount }) => {
+        setCounts({
+          ...notification.data,
+        });
+      },
+    );
+
+    client.on(
+      RealTimeNotificationEvent.INVITATION_COUNT_UPDATED,
+      (notification: { data: number }) => {
+        setCounts({
+          invitationsCount: notification.data,
+        });
+      },
+    );
+  }, [setInitialState]);
+
+  return root.children;
+};
+
+export function rootContainer(container: any) {
+  return React.createElement(ReactStartup, null, container);
+}

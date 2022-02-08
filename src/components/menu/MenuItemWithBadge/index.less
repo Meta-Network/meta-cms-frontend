@@ -1,0 +1,36 @@
+.wrapper {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+:global {
+  .ant-menu-inline-collapsed-tooltip .count > sup {
+    margin-top: 1px;
+    margin-left: 10px;
+  }
+  .ant-menu-item .count > sup {
+    margin-top: 7px;
+  }
+  .ant-menu-submenu-arrow {
+    right: 39px !important;
+  }
+}
+
+.count {
+  margin-right: 24px;
+  margin-left: auto;
+  > sup {
+    background-color: #1890ff;
+  }
+}
+.countWithAlert {
+  margin-right: 0;
+}
+
+.alert {
+  margin-left: 4px;
+  color: red;
+  font-size: 1.25rem !important;
+}

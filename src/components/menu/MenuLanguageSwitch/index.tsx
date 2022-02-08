@@ -42,6 +42,7 @@ export default () => {
     >
       <Dropdown
         overlay={menu}
+        trigger={[]}
         placement="topLeft"
         visible={visible}
         onVisibleChange={(isVisible) => setVisible(isVisible)}

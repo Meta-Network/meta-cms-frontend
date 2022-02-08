@@ -2,24 +2,28 @@
 @import './styles/edit.less';
 @import './styles/custom.less';
 
-.my-site-link-icon {
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.menu-site-card-meta:hover + .my-site-link-icon,
-.my-site-link-icon:hover {
-  opacity: 1;
-}
-
-.menu-card-collapsed .my-site-link-icon {
-  display: none;
+li.ant-menu-item-only-child {
+  display: flex;
 }
 
 .header-text-description {
   p:not(:last-child) {
     margin-bottom: 6px;
   }
+}
+
+.default-site-link-icon {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.menu-site-card-meta:hover + .default-site-link-icon,
+.default-site-link-icon:hover {
+  opacity: 1;
+}
+
+.menu-card-collapsed .default-site-link-icon {
+  display: none;
 }
 
 .custom-user-menu {
@@ -36,24 +40,16 @@
   }
 }
 
-.menuCounterBadge {
-  float: right;
-}
-.menuCounterBadge > sup {
-  background-color: #1890ff;
-}
-.ant-menu-inline-collapsed-tooltip .menuCounterBadge > sup {
-  margin-top: 1px;
-  margin-left: 10px;
-}
-.ant-menu-item .menuCounterBadge > sup {
-  margin-top: 7px;
-}
-
 .ant-component-modifier() {
+  .only-in-tooltip {
+    display: none;
+  }
+  .ant-tooltip .only-in-tooltip {
+    display: inline;
+  }
+
   .custom-user-menu.ant-menu-inline-collapsed {
     width: 120px;
-
     li {
       padding: 0;
       text-align: center;

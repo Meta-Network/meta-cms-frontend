@@ -4,7 +4,7 @@ export default () => {
   const { initialState } = useModel('@@initialState');
   const hasSite = initialState?.siteConfig?.domain;
   if (hasSite) {
-    return <Redirect to="/content/drafts" />;
+    return <Redirect to="/content/posts" />;
   } else {
     return <Redirect to="/create" />;
   }
