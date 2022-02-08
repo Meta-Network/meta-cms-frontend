@@ -44,7 +44,9 @@ function CustomSiderMenu({
       {initialState?.siteConfig?.domain && (
         <a href={`https://${initialState.siteConfig.domain}`} target="__blank">
           <Card
-            className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
+            className={
+              menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card default-site-link'
+            }
           >
             <Card.Meta
               className="menu-site-card-meta"
@@ -56,7 +58,7 @@ function CustomSiderMenu({
                 </Text>
               }
             />
-            <ExportOutlined className="my-site-link-icon menu-extra-icons" />
+            <ExportOutlined className="default-site-link-icon menu-extra-icons" />
           </Card>
         </a>
       )}
@@ -100,9 +102,12 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     fetchUserInfo,
     currentUser: undefined,
     siteConfig: undefined,
+    allPostCount: 0,
+    publishingCount: 0,
     invitationsCount: 0,
     publishedCount: 0,
     localDraftCount: 0,
+    publishingAlertFlag: false,
   };
 
   const currentUser = await fetchUserInfo();
@@ -120,7 +125,6 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     const siteConfig = await getDefaultSiteConfigAPI();
     state.siteConfig = siteConfig;
 
-    state.publishedCount = 0;
     if (siteConfig?.id) {
       const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
         page: 1,
@@ -171,49 +175,13 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             />
           );
         }
-        // 邀请码数量
-        case '/invitation': {
-          return (
-            <MenuItemWithBadge
-              path={menuItemProps.path as string}
-              dom={defaultDom}
-              count={initialState?.invitationsCount || 0}
-            />
-          );
-        }
-        // 已发布文章
-        case '/content/published-posts': {
-          return (
-            <MenuItemWithBadge
-              path={menuItemProps.path as string}
-              dom={defaultDom}
-              count={initialState?.publishedCount || 0}
-            />
-          );
-        }
-        // create post
-        case '/content/drafts/edit': {
-          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
-          return (
-            <Link
-              to={menuItemProps.path as string}
-              onClick={(e) => {
-                if (_status) {
-                  e.preventDefault();
-                  // message.warning('请先创建 Meta Space');
-                }
-              }}
-            >
-              <Text disabled={_status}>{defaultDom}</Text>
-            </Link>
-          );
-        }
         case '/content/posts': {
           return (
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
               count={initialState?.allPostCount || 0}
+              onAlert={initialState?.publishingAlertFlag}
             />
           );
         }
@@ -233,6 +201,33 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               dom={defaultDom}
               count={initialState?.publishedCount || 0}
             />
+          );
+        }
+        // 邀请码数量
+        case '/invitation': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.invitationsCount || 0}
+            />
+          );
+        }
+        // create post
+        case '/content/drafts/edit': {
+          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
+          return (
+            <Link
+              to={menuItemProps.path as string}
+              onClick={(e) => {
+                if (_status) {
+                  e.preventDefault();
+                  // message.warning('请先创建 Meta Space');
+                }
+              }}
+            >
+              <Text disabled={_status}>{defaultDom}</Text>
+            </Link>
           );
         }
         default: {
@@ -319,7 +314,7 @@ const ReactStartup = (root: any) => {
       },
     );
   }, [setInitialState]);
-  console.log(root.children);
+
   return root.children;
 };
 
