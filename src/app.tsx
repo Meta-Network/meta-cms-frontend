@@ -7,7 +7,7 @@ import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import { fetchPostsStorage } from '@/services/api/meta-cms';
+import { fetchPostCount } from '@/services/api/meta-cms';
 import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
@@ -16,7 +16,7 @@ import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
 import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 import PublishSiteButton from './components/menu/PublishSiteButton';
-import { FetchPostsStorageParamsState, RealTimeNotificationEvent } from './services/constants';
+import { RealTimeNotificationEvent } from './services/constants';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
@@ -98,7 +98,7 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     return undefined;
   };
 
-  const state: GLOBAL.InitialState = {
+  let state: GLOBAL.InitialState = {
     fetchUserInfo,
     currentUser: undefined,
     siteConfig: undefined,
@@ -126,12 +126,9 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     state.siteConfig = siteConfig;
 
     if (siteConfig?.id) {
-      const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
-        page: 1,
-        limit: 1,
-        state: FetchPostsStorageParamsState.Published,
-      });
-      state.publishedCount = publishedCountRequest?.data?.meta?.totalItems ?? 0;
+      // update post count
+      const newPostCount = (await fetchPostCount())?.data ?? {};
+      state = { ...state, ...newPostCount };
     }
   }
 
@@ -291,14 +288,7 @@ const ReactStartup = (root: any) => {
 
     client.on(
       RealTimeNotificationEvent.POST_COUNT_UPDATED,
-      (notification: {
-        data: {
-          allPostCount: number;
-          publishingCount: number;
-          publishedCount: number;
-          publishingAlertFlag: boolean;
-        };
-      }) => {
+      (notification: { data: CMS.PostCount }) => {
         setCounts({
           ...notification.data,
         });

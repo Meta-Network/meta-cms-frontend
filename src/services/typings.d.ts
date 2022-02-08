@@ -260,20 +260,25 @@ declare namespace CMS {
   };
   // 可能会有变动 暂时命名区分
   type PostStorageUpdateData = PostStoragePublishData;
-}
 
-declare namespace GLOBAL {
-  type InitialState = Partial<{
-    currentUser: GLOBAL.CurrentUser;
-    fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
+  type PostCount = {
     allPostCount: number;
     publishingCount: number;
     publishedCount: number;
-    invitationsCount: number;
-    localDraftCount: number;
     publishingAlertFlag: boolean;
-    siteConfig: CMS.SiteConfiguration;
-  }>;
+  };
+}
+
+declare namespace GLOBAL {
+  type InitialState = Partial<
+    {
+      currentUser: GLOBAL.CurrentUser;
+      fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
+      invitationsCount: number;
+      localDraftCount: number;
+      siteConfig: CMS.SiteConfiguration;
+    } & CMS.PostCount
+  >;
 
   type GeneralResponse<T> = {
     statusCode: number;
