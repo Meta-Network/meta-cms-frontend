@@ -286,7 +286,7 @@ const ReactStartup = (root: any) => {
     });
 
     client.on('connect', () => {
-      console.log('connected', client.id);
+      console.log('Socket.io has been connected to the backend successfully. Id:', client.id);
     });
 
     client.on(
