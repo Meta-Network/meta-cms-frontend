@@ -47,6 +47,7 @@ import {
 } from '@/utils/gun';
 import { storeGet } from '@/utils/store';
 import PublishingTip from '@/components/Editor/PublishingTip';
+import type { GatewayType } from '@/services/constants';
 
 const keyUploadAllImages = 'keyUploadAllImages';
 const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
@@ -206,60 +207,64 @@ const Edit: React.FC = () => {
     [initialState],
   );
 
-  const pipelinesPostOrdersFn = useCallback(async () => {
-    setPublishLoading(true);
+  const pipelinesPostOrdersFn = useCallback(
+    async (gatewayType: GatewayType) => {
+      setPublishLoading(true);
 
-    const payload = {
-      title: title,
-      cover: cover,
-      summary: generateSummary(),
-      content: content,
-      license: license,
-      categories: '',
-      tags: tags.join(),
-    };
+      const payload = {
+        title: title,
+        cover: cover,
+        summary: generateSummary(),
+        content: content,
+        license: license,
+        categories: '',
+        tags: tags.join(),
+      };
 
-    const { authorPostDigest, authorPostDigestSign } = pipelinesPostOrdersData({ payload });
-    const result = await pipelinesPostOrders({
-      authorPostDigest,
-      authorPostSign: authorPostDigestSign,
-    });
-
-    setPublishLoading(false);
-
-    if (result.statusCode === 201) {
-      message.success(intl.formatMessage({ id: 'messages.editor.success' }));
-
-      const { id } = history.location.query as Router.PostQuery;
-      await handleUpdate(Number(id), postDataMergedUpdateAt({ post: result.data, draft: null }));
-
-      setSiteNeedToDeploy(true);
-      setVisiblePublishingTip(true);
-    } else if (result.statusCode === 400) {
-      const _message =
-        typeof result.message === 'string' ? result.message : mergedMessage(result.message);
-      message.error(_message);
-    } else if (result.statusCode === 409) {
-      // 'When post state is not pending or pending_edit.'
-      message.error(result.message);
-    } else if (result.statusCode === 500) {
-      message.error(result.message);
-    } else {
-      message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
-    }
-
-    if (!(result.statusCode === 201 || result.statusCode === 200)) {
-      notification.open({
-        message: intl.formatMessage({
-          id: 'messages.editor.notification.title',
-        }),
-        description: intl.formatMessage({
-          id: 'messages.editor.publish.notification.fail',
-        }),
-        duration: null,
+      const { authorPostDigest, authorPostDigestSign } = pipelinesPostOrdersData({ payload });
+      const result = await pipelinesPostOrders({
+        certificateStorageType: gatewayType,
+        authorPostDigest,
+        authorPostSign: authorPostDigestSign,
       });
-    }
-  }, [title, cover, content, tags, license, handleUpdate, setSiteNeedToDeploy, intl]);
+
+      setPublishLoading(false);
+
+      if (result.statusCode === 201) {
+        message.success(intl.formatMessage({ id: 'messages.editor.success' }));
+
+        const { id } = history.location.query as Router.PostQuery;
+        await handleUpdate(Number(id), postDataMergedUpdateAt({ post: result.data, draft: null }));
+
+        setSiteNeedToDeploy(true);
+        setVisiblePublishingTip(true);
+      } else if (result.statusCode === 400) {
+        const _message =
+          typeof result.message === 'string' ? result.message : mergedMessage(result.message);
+        message.error(_message);
+      } else if (result.statusCode === 409) {
+        // 'When post state is not pending or pending_edit.'
+        message.error(result.message);
+      } else if (result.statusCode === 500) {
+        message.error(result.message);
+      } else {
+        message.error(intl.formatMessage({ id: 'messages.editor.fail' }));
+      }
+
+      if (!(result.statusCode === 201 || result.statusCode === 200)) {
+        notification.open({
+          message: intl.formatMessage({
+            id: 'messages.editor.notification.title',
+          }),
+          description: intl.formatMessage({
+            id: 'messages.editor.publish.notification.fail',
+          }),
+          duration: null,
+        });
+      }
+    },
+    [title, cover, content, tags, license, handleUpdate, setSiteNeedToDeploy, intl],
+  );
 
   const checkTitle = useCallback(
     async ({ titleValue, id }: { titleValue: string; id: number }): Promise<boolean> => {
@@ -303,59 +308,62 @@ const Edit: React.FC = () => {
   );
 
   // handle publish
-  const handlePublish = useCallback(async () => {
-    const { id } = history.location.query as Router.PostQuery;
-    if (!id) {
-      message.warning(
-        intl.formatMessage({
-          id: 'messages.editor.tip.id',
-        }),
-      );
-      return;
-    }
+  const handlePublish = useCallback(
+    async (gatewayType: GatewayType) => {
+      const { id } = history.location.query as Router.PostQuery;
+      if (!id) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.tip.id',
+          }),
+        );
+        return;
+      }
 
-    if (!title || !content) {
-      message.warning(
-        intl.formatMessage({
-          id: 'messages.editor.tip.titleOrContent',
-        }),
-      );
-      return;
-    }
+      if (!title || !content) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.tip.titleOrContent',
+          }),
+        );
+        return;
+      }
 
-    // check title
-    if (
-      !(await checkTitle({
-        titleValue: title,
-        id: Number(id),
-      }))
-    ) {
-      message.warning('标题重复，请修改');
-      return;
-    }
+      // check title
+      if (
+        !(await checkTitle({
+          titleValue: title,
+          id: Number(id),
+        }))
+      ) {
+        message.warning('标题重复，请修改');
+        return;
+      }
 
-    // check cover format
-    if (cover && !cover.includes(FLEEK_NAME)) {
-      message.success(
-        intl.formatMessage({
-          id: 'messages.editor.tip.coverFormat',
-        }),
-      );
-      return;
-    }
+      // check cover format
+      if (cover && !cover.includes(FLEEK_NAME)) {
+        message.success(
+          intl.formatMessage({
+            id: 'messages.editor.tip.coverFormat',
+          }),
+        );
+        return;
+      }
 
-    const siteConfig = initialState?.siteConfig;
-    if (!siteConfig) {
-      message.warning(
-        intl.formatMessage({
-          id: 'messages.editor.noDefaultConfig',
-        }),
-      );
-      return;
-    }
+      const siteConfig = initialState?.siteConfig;
+      if (!siteConfig) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.noDefaultConfig',
+          }),
+        );
+        return;
+      }
 
-    pipelinesPostOrdersFn();
-  }, [title, cover, content, pipelinesPostOrdersFn, checkTitle, initialState, intl]);
+      pipelinesPostOrdersFn(gatewayType);
+    },
+    [title, cover, content, pipelinesPostOrdersFn, checkTitle, initialState, intl],
+  );
 
   /**
    * async content to DB

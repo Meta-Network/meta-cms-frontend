@@ -351,7 +351,7 @@ declare namespace CMS {
     submitState: PipelineOrderTaskCommonState;
     publishState: PipelineOrderTaskCommonState;
     serverVerificationId: string;
-    certificateStorageType: string;
+    certificateStorageType: GatewayType;
     certificateId: string;
     certificateState: PipelineOrderTaskCommonState;
     postTaskId: string;

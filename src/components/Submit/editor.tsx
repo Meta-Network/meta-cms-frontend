@@ -19,7 +19,7 @@ import { GatewayType } from '@/services/constants';
 
 interface Props {
   readonly loading: boolean;
-  handlePublish: (gateway: boolean) => void;
+  handlePublish: (value: GatewayType) => void;
   setDropdownVisible: (visible: boolean) => void;
 }
 
@@ -39,7 +39,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
   const onFinish = (values: any) => {
     console.log('Success:', values);
 
-    if (gatewayType && !publicKey) {
+    if (gatewayType === GatewayType.Ipfs && !publicKey) {
       message.warning(intl.formatMessage({ id: 'messages.editor.submit.generateKey' }));
       return;
     }
@@ -49,7 +49,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
       return;
     }
 
-    handlePublish(!!gatewayType);
+    handlePublish(gatewayType);
   };
 
   // get seed and key
@@ -159,6 +159,11 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
                 <span className={styles.itemType}>
                   {intl.formatMessage({ id: 'editor.submit.item.gateway.name' })}
                 </span>
+                {' - '}
+                {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
+              </Checkbox>
+              <Checkbox value="arweave">
+                <span className={styles.itemType}>ARWEAVE</span>
                 {' - '}
                 {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
               </Checkbox>

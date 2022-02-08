@@ -1,12 +1,13 @@
 /* eslint-disable no-await-in-loop */
 import { extendWithErrorHandler } from '@/services/api/base-request';
-import type { FetchPostsStorageParamsState } from '../constants';
+import type { FetchPostsStorageParamsState, GatewayType } from '../constants';
 import type {
   AuthorPostDigestMetadata,
   AuthorPostSignatureMetadata,
 } from '@metaio/meta-signature-util';
 
 type PipelinesOrdersPayload = {
+  certificateStorageType: GatewayType;
   authorPostDigest: AuthorPostDigestMetadata;
   authorPostSign: AuthorPostSignatureMetadata;
 };

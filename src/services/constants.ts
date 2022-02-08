@@ -132,3 +132,8 @@ export enum PipelineOrderTaskCommonState {
   FINISHED = 'finished',
   FAILED = 'failed',
 }
+
+export enum MetadataStorageType {
+  IPFS = 'ipfs',
+  ARWEAVE = 'arweave',
+}

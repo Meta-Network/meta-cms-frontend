@@ -4,15 +4,17 @@ import { Space, Typography } from 'antd';
 import { StopOutlined, WarningFilled, CopyOutlined } from '@ant-design/icons';
 import { ShareIcon } from '../Icon';
 import styles from './index.less';
-import { PipelineOrderTaskCommonState } from '@/services/constants';
+import { GatewayType, PipelineOrderTaskCommonState } from '@/services/constants';
 
 const { Text, Link } = Typography;
 
 interface Props {
   readonly state: PipelineOrderTaskCommonState;
+  readonly certificateId: string;
+  readonly certificateStorageType: GatewayType;
 }
 
-const PostsCertificate: FC<Props> = ({ state }) => {
+const PostsCertificate: FC<Props> = ({ state, certificateId, certificateStorageType }) => {
   // const intl = useIntl();
 
   /**
@@ -28,11 +30,33 @@ const PostsCertificate: FC<Props> = ({ state }) => {
         <Space style={{ color: 'black' }}>
           <StopOutlined />
         </Space>
-      ) : state === PipelineOrderTaskCommonState.PENDING ? (
-        <Space style={{ color: 'gray' }}>
-          <Text style={{ color: 'gray' }}>IPFS 存证中</Text>
-          <CopyOutlined />
-          <ShareIcon className={styles.icon} />
+      ) : state === PipelineOrderTaskCommonState.DOING ? (
+        <Space className={styles.gray}>
+          <Text
+            style={{ color: 'gray' }}
+            copyable={{
+              text: certificateId,
+            }}
+          >
+            {certificateStorageType === GatewayType.Ipfs
+              ? 'IPFS 存证中'
+              : certificateStorageType === GatewayType.Arweave
+              ? 'ARWEAVE 存证中'
+              : ''}
+          </Text>
+          <Link
+            href={
+              certificateStorageType === GatewayType.Ipfs
+                ? `${IPFS_FLEEK}/${certificateId}`
+                : certificateStorageType === GatewayType.Arweave
+                ? `${ARWEAVE_VIEWBLOCK}/tx/${certificateId}`
+                : ''
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ShareIcon className={styles.icon} />
+          </Link>
         </Space>
       ) : state === PipelineOrderTaskCommonState.FINISHED ? (
         <Space style={{ color: 'gray' }}>
