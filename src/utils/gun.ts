@@ -10,8 +10,8 @@ import {
   KEY_META_CMS_GUN_PAIR,
 } from '../../config';
 import { storeGet, storeSet } from './store';
-import { generateSeed, generateKeys } from '@metaio/meta-signature-util';
-import type { KeyPair } from '@metaio/meta-signature-util';
+import { generateSeed, generateKeys } from '@metaio/meta-signature-util-v2';
+import type { KeyPair } from '@metaio/meta-signature-util-v2';
 
 export const signIn = (gun: any): Promise<string> => {
   /**

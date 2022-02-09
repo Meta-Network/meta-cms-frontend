@@ -6,8 +6,8 @@ import {
   authorPublishMetaSpaceRequest,
   authorPostDigest,
   authorPostDigestSign,
-} from '@metaio/meta-signature-util';
-import type { KeyPair, BaseSignatureMetadata } from '@metaio/meta-signature-util';
+} from '@metaio/meta-signature-util-v2';
+import type { KeyPair, BaseSignatureMetadata } from '@metaio/meta-signature-util-v2';
 import { storeGet, storeSet } from './store';
 import {
   KEY_META_CMS_METADATA_SEED,

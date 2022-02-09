@@ -1,7 +1,7 @@
 import type {
   AuthorDigestMetadata,
   AuthorPostSignatureMetadata,
-} from '@metaio/meta-signature-util';
+} from '@metaio/meta-signature-util-v2';
 
 export type Metadatas = {
   id?: number;

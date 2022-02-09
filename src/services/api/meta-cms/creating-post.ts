@@ -3,7 +3,7 @@ import type { FetchPostsStorageParamsState, GatewayType } from '@/services/const
 import type {
   AuthorPostDigestMetadata,
   AuthorPostSignatureMetadata,
-} from '@metaio/meta-signature-util';
+} from '@metaio/meta-signature-util-v2';
 
 type PipelinesOrdersPayload = {
   certificateStorageType: GatewayType;
