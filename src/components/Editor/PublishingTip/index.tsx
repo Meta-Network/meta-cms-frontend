@@ -84,7 +84,7 @@ const PublishingTip: FC<Props> = ({ cover, visiblePublishingTip, setVisiblePubli
           {stepState === PublishingTipStepStateType.Loading ? (
             <Spin className={styles.actionSpin} />
           ) : stepState === PublishingTipStepStateType.Finish ? (
-            <NavLink to="/content/drafts">
+            <NavLink to="/content/posts">
               <button className={styles.btnView}>查看我的作品</button>
             </NavLink>
           ) : null}
