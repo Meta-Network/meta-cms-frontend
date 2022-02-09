@@ -14,6 +14,7 @@ import { storeGet, storeSet } from '@/utils/store';
 import { useIntl } from 'umi';
 import GenerateKey from './generate';
 import GatewayIpfs from './gatewayIpfs';
+import GatewayArewave from './gatewayArewave';
 import Storage from './storage';
 import { GatewayType } from '@/services/constants';
 
@@ -172,6 +173,12 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
         </Form.Item>
         {gatewayType === GatewayType.Ipfs && (
           <GatewayIpfs
+            publicKey={publicKey}
+            setVisibleSignatureGenerate={setVisibleSignatureGenerate}
+          />
+        )}
+        {gatewayType === GatewayType.Arweave && (
+          <GatewayArewave
             publicKey={publicKey}
             setVisibleSignatureGenerate={setVisibleSignatureGenerate}
           />

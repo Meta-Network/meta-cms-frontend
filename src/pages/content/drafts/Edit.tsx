@@ -207,6 +207,9 @@ const Edit: React.FC = () => {
     [initialState],
   );
 
+  /**
+   * 发布文章
+   */
   const pipelinesPostOrdersFn = useCallback(
     async (gatewayType: GatewayType) => {
       setPublishLoading(true);

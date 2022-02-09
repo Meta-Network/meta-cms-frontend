@@ -27,8 +27,6 @@ export default {
   'editor.submit.item.gateway.label': 'Evidence storage services',
   'editor.submit.item.gateway.name': 'IPFS',
   'editor.submit.item.gateway.description': 'Store verifiable metadata',
-  'editor.submit.item.gateway.gatewayPlaceholder': 'Gateway not selected',
-  'editor.submit.item.gateway.setting': 'set up',
   'editor.submit.item.gateway.keyPlaceholder': 'KEY is not set',
   'editor.submit.item.gateway.keyGenerate': 'generate',
   'editor.submit.item.gateway.keyGenerateText': 'Generated from your KEY',
