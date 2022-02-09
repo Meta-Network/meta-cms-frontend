@@ -110,8 +110,8 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     allPostCount: 0,
     publishingCount: 0,
     invitationsCount: 0,
-    localDraftCount: 0,
     publishedCount: 0,
+    localDraftCount: 0,
     publishingAlertFlag: false,
   };
 
