@@ -19,7 +19,7 @@ export default () => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
 
-  const columns: ProColumns<CMS.PipelinesOrdersMineItem>[] = [
+  const columns: ProColumns<CMS.PipelinesOrdersItem>[] = [
     {
       dataIndex: 'cover',
       title: '封面图',
@@ -80,7 +80,7 @@ export default () => {
         </p>
       }
     >
-      <ProTable<CMS.PipelinesOrdersMineItem>
+      <ProTable<CMS.PipelinesOrdersItem>
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {

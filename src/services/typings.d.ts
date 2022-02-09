@@ -343,7 +343,7 @@ declare namespace CMS {
     };
   };
 
-  type PipelinesOrdersMineItem = {
+  type PipelinesOrdersItem = {
     id: string;
     createdAt: Date;
     updatedAt: Date;
@@ -371,7 +371,7 @@ declare namespace CMS {
     };
   };
   type PipelinesOrdersMine = {
-    items: PipelinesOrdersMineItem[];
+    items: PipelinesOrdersItem[];
     meta: {
       totalItems: number;
       itemCount: number;
@@ -576,5 +576,3 @@ declare namespace MATATAKI {
     content: string;
   };
 }
-
-declare namespace ApiCmsV1 {}

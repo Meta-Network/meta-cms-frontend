@@ -7,12 +7,7 @@ import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import {
-  pipelinesPostOrdersMine,
-  pipelinesPostOrdersMinePublishing,
-  pipelinesPostOrdersMinePublished,
-  fetchPostCount,
-} from '@/services/api/meta-cms';
+import { fetchPostCount } from '@/services/api/meta-cms';
 import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
@@ -125,33 +120,6 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     const invitationsCountRequest = await queryInvitations();
     state.invitationsCount =
       invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
-
-    // all posts count
-    const pipelinesPostOrdersMineResult = await pipelinesPostOrdersMine({
-      page: 1,
-      limit: 1,
-    });
-    if (pipelinesPostOrdersMineResult.statusCode === 200) {
-      state.allPostCount = pipelinesPostOrdersMineResult.data.meta.totalItems;
-    }
-
-    // publishing posts count
-    const pipelinesPostOrdersMinePublishingResult = await pipelinesPostOrdersMinePublishing({
-      page: 1,
-      limit: 1,
-    });
-    if (pipelinesPostOrdersMinePublishingResult.statusCode === 200) {
-      state.publishingCount = pipelinesPostOrdersMinePublishingResult.data.meta.totalItems;
-    }
-
-    // published posts count
-    const pipelinesPostOrdersMinePublishedResult = await pipelinesPostOrdersMinePublished({
-      page: 1,
-      limit: 1,
-    });
-    if (pipelinesPostOrdersMinePublishedResult.statusCode === 200) {
-      state.publishedCount = pipelinesPostOrdersMinePublishedResult.data.meta.totalItems;
-    }
 
     // get site config
     const siteConfig = await getDefaultSiteConfigAPI();

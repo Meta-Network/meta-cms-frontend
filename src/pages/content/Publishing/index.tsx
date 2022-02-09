@@ -22,7 +22,7 @@ export default () => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
 
-  const columns: ProColumns<CMS.PipelinesOrdersMineItem>[] = [
+  const columns: ProColumns<CMS.PipelinesOrdersItem>[] = [
     {
       dataIndex: 'cover',
       title: '封面图',
@@ -75,7 +75,7 @@ export default () => {
         </p>
       }
     >
-      <ProTable<CMS.PipelinesOrdersMineItem>
+      <ProTable<CMS.PipelinesOrdersItem>
         locale={{
           emptyText: (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有可以发布的内容啦～" />
