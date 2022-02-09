@@ -110,6 +110,28 @@ export default () => {
         ],
       },
       {
+        name: 'deleteDraft',
+        title: '清空本地缓存',
+        description: '清空本地缓存',
+        icon: <ExclamationCircleOutlined />,
+        actions: [
+          <Popconfirm
+            title={'您确定要清空本地缓存吗？'}
+            onConfirm={clearCache}
+            okText={intl.formatMessage({
+              id: 'component.button.yes',
+            })}
+            cancelText={intl.formatMessage({
+              id: 'component.button.no',
+            })}
+          >
+            <Button type="primary" danger key="deleteDraft-delete" loading={deleteCacheLoading}>
+              清空
+            </Button>
+          </Popconfirm>,
+        ],
+      },
+      {
         name: 'publishSite',
         title: intl.formatMessage({
           id: 'messages.redeployment.button',
@@ -144,28 +166,6 @@ export default () => {
               {intl.formatMessage({ id: 'messages.redeployment.button' })}
             </Button>
           </Dropdown>,
-        ],
-      },
-      {
-        name: 'deleteDraft',
-        title: '清空本地缓存',
-        description: '清空本地缓存',
-        icon: <ExclamationCircleOutlined />,
-        actions: [
-          <Popconfirm
-            title={'您确定要清空本地缓存吗？'}
-            onConfirm={clearCache}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
-          >
-            <Button type="primary" danger key="deleteDraft-delete" loading={deleteCacheLoading}>
-              清空
-            </Button>
-          </Popconfirm>,
         ],
       },
     ],
