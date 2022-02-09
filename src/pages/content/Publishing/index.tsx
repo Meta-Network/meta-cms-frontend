@@ -51,7 +51,13 @@ export default () => {
     {
       dataIndex: 'certificate',
       title: '存证',
-      render: (_, record) => <PostsCertificate state={record.certificateState} />,
+      render: (_, record) => (
+        <PostsCertificate
+          state={record.certificateState}
+          certificateId={record.certificateId}
+          certificateStorageType={record.certificateStorageType}
+        />
+      ),
     },
   ];
 
