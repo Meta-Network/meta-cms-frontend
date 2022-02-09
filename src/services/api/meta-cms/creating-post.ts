@@ -1,5 +1,15 @@
 import request from './request';
-import type { FetchPostsStorageParamsState } from '@/services/constants';
+import type { FetchPostsStorageParamsState, GatewayType } from '@/services/constants';
+import type {
+  AuthorPostDigestMetadata,
+  AuthorPostSignatureMetadata,
+} from '@metaio/meta-signature-util';
+
+type PipelinesOrdersPayload = {
+  certificateStorageType: GatewayType;
+  authorPostDigest: AuthorPostDigestMetadata;
+  authorPostSign: AuthorPostSignatureMetadata;
+};
 
 /**
  *  获取当前用户的用户文章数据 GET /v1/pipelines/post-orders/mine/count
@@ -186,4 +196,63 @@ export async function imageUploadByUrl(url: string) {
     method: 'POST',
     data: { url },
   });
+}
+
+// v1
+/**
+ * pipeline
+ * 拥护请求发布文章
+ * @param payload
+ * @returns
+ */
+export async function pipelinesPostOrders(data: PipelinesOrdersPayload) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersData>>('/v1/pipelines/post-orders', {
+    method: 'POST',
+    data: data,
+  });
+}
+
+/**
+ * pipeline
+ * 全部文章
+ * @param payload
+ * @returns
+ */
+export async function pipelinesPostOrdersMine(params: CMS.Pagination) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersMine>>(
+    '/v1/pipelines/post-orders/mine',
+    {
+      method: 'GET',
+      params: params,
+    },
+  );
+}
+/**
+ * 发布中文章
+ * @param params
+ * @returns
+ */
+export async function pipelinesPostOrdersMinePublishing(params: CMS.Pagination) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersMine>>(
+    '/v1/pipelines/post-orders/mine/publishing',
+    {
+      method: 'GET',
+      params: params,
+    },
+  );
+}
+
+/**
+ * 发布完成文章
+ * @param params
+ * @returns
+ */
+export async function pipelinesPostOrdersMinePublished(params: CMS.Pagination) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesOrdersMine>>(
+    '/v1/pipelines/post-orders/mine/published',
+    {
+      method: 'GET',
+      params: params,
+    },
+  );
 }
