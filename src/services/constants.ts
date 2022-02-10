@@ -125,6 +125,19 @@ export enum PublishingTipStepStateType {
   Finish = 'finish',
 }
 
+export enum PipelineOrderTaskCommonState {
+  NONE = '',
+  PENDING = 'pending',
+  DOING = 'doing',
+  FINISHED = 'finished',
+  FAILED = 'failed',
+}
+
+export enum MetadataStorageType {
+  IPFS = 'ipfs',
+  ARWEAVE = 'arweave',
+}
+
 export enum RealTimeNotificationEvent {
   POST_COUNT_UPDATED = 'post.count.updated',
   SPACE_COUNT_UPDATED = 'space.count.updated',

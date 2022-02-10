@@ -4,13 +4,14 @@ import { Tooltip, Dropdown } from 'antd';
 import styles from './editorHeader.less';
 import { LeftOutlined, DownOutlined } from '@ant-design/icons';
 import Submit from '@/components/Submit/editor';
+import type { GatewayType } from '@/services/constants';
 import { DraftMode } from '@/services/constants';
 
 interface Props {
   readonly draftMode: DraftMode;
   readonly loading: boolean;
   settings: JSX.Element;
-  handlePublish: (gateway: boolean) => void;
+  handlePublish: (gateway: GatewayType) => void;
   // headerCloudDraftUpload: JSX.Element;
   // headerCloudDraftDownload: JSX.Element;
 }

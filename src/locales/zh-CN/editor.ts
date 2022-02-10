@@ -24,8 +24,6 @@ export default {
   'editor.submit.item.gateway.label': '存证服务',
   'editor.submit.item.gateway.name': 'IPFS',
   'editor.submit.item.gateway.description': '存储可验证的元数据',
-  'editor.submit.item.gateway.gatewayPlaceholder': '网关未选定',
-  'editor.submit.item.gateway.setting': '设置',
   'editor.submit.item.gateway.keyPlaceholder': 'KEY 未设置',
   'editor.submit.item.gateway.keyGenerate': '生成',
   'editor.submit.item.gateway.keyGenerateText': '生成自你的 KEY',

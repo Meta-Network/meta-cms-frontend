@@ -8,6 +8,17 @@ export const strSlice = (val: string, len: number) => {
   return val.length >= len ? `${val.slice(0, len - 3)}...` : val;
 };
 
+/**
+ * hash slice
+ * @param val
+ * @param start
+ * @param end
+ * @returns
+ */
+export const hashSlice = (val: string, start: number = 6, end: number = 6) => {
+  return val.slice(0, start) + '......' + val.slice(-end);
+};
+
 export const sleep = (time: number) => new Promise((resolve) => setTimeout(resolve, time));
 
 /**

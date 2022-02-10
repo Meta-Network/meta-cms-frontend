@@ -1,17 +1,11 @@
 import type { FC } from 'react';
 import { useState } from 'react';
-import { Input, Select, Typography } from 'antd';
-import {
-  EyeOutlined,
-  CaretDownOutlined,
-  ArrowRightOutlined,
-  EyeInvisibleOutlined,
-} from '@ant-design/icons';
+import { Input, Typography } from 'antd';
+import { EyeOutlined, ArrowRightOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 import styles from './submit.less';
 
 const { Link } = Typography;
-const { Option } = Select;
 
 interface Props {
   readonly publicKey: string;
@@ -24,31 +18,6 @@ const GatewayIpfs: FC<Props> = ({ publicKey, setVisibleSignatureGenerate }) => {
 
   return (
     <section className={styles.gateway}>
-      <section>
-        <div className={styles.flexAlignItemCenter}>
-          <div className={styles.itemStatus}>
-            <span className={styles.done} />
-          </div>
-          <div className={styles.itemForm}>
-            <Select
-              placeholder={intl.formatMessage({
-                id: 'editor.submit.item.gateway.gatewayPlaceholder',
-              })}
-              bordered={false}
-              showArrow={false}
-              disabled={true}
-              defaultValue="ipfs"
-            >
-              <Option value="ipfs">IPFS - FLEEK</Option>
-            </Select>
-            <CaretDownOutlined />
-          </div>
-          <span className={styles.btn} style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
-            {intl.formatMessage({ id: 'editor.submit.item.gateway.setting' })}
-          </span>
-        </div>
-      </section>
-
       <section className={styles.itemGateway}>
         <div className={styles.flexAlignItemCenter}>
           <div className={styles.itemStatus}>

@@ -3,17 +3,11 @@ import moment from 'moment';
 import {
   generateSeed,
   generateKeys,
-  authorDigest,
-  authorDigestSign,
   authorPublishMetaSpaceRequest,
-} from '@metaio/meta-signature-util';
-import type {
-  KeyPair,
-  PostMetadata,
-  AuthorDigestMetadata,
-  AuthorPostSignatureMetadata,
-  BaseSignatureMetadata,
-} from '@metaio/meta-signature-util';
+  authorPostDigest,
+  authorPostDigestSign,
+} from '@metaio/meta-signature-util-v2';
+import type { KeyPair, BaseSignatureMetadata } from '@metaio/meta-signature-util-v2';
 import { storeGet, storeSet } from './store';
 import {
   KEY_META_CMS_METADATA_SEED,
@@ -23,23 +17,6 @@ import {
 import { uploadToIpfsAPI } from '../helpers';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
-type GenerateMetadataParams = { payload: PostMetadata };
-type UploadMetadataParams = { payload: PostMetadata };
-type GenerateMetadataReturnState =
-  | {
-      digestMetadata: AuthorDigestMetadata;
-      authorSignatureMetadata: AuthorPostSignatureMetadata;
-    }
-  | false;
-type UploadMetadataReturnState =
-  | {
-      digestMetadata: AuthorDigestMetadata;
-      authorSignatureMetadata: AuthorPostSignatureMetadata;
-      digestMetadataIpfs: Storage.Fleek;
-      authorSignatureMetadataIpfs: Storage.Fleek;
-    }
-  | false;
-
 type PublishMetaSpaceRequestState = {
   metadata: BaseSignatureMetadata;
   metadataIpfs: Storage.Fleek;
@@ -119,90 +96,6 @@ export const verifySeedAndKey = (): VerifySeedAndKeyReturnState => {
 };
 
 /**
- * generate metadata
- * @param { payload: PostMetadata }
- * @returns
- */
-export const generateMetadata = ({
-  payload,
-}: GenerateMetadataParams): GenerateMetadataReturnState => {
-  const verifyResult = verifySeedAndKey();
-  if (!verifyResult) {
-    console.error('seed or key does not exist or does not match.');
-    return false;
-  }
-
-  const keys: KeyPair = generateKeys(verifyResult.seed);
-  const digestMetadata: AuthorDigestMetadata = authorDigest.generate(payload);
-  // console.log('digestMetadata', digestMetadata);
-
-  const authorSignatureMetadata: AuthorPostSignatureMetadata = authorDigestSign.generate(
-    keys,
-    META_SPACE_BASE_DOMAIN,
-    digestMetadata.digest,
-  );
-  // console.log('authorSignatureMetadata', authorSignatureMetadata);
-
-  return {
-    digestMetadata,
-    authorSignatureMetadata,
-  };
-};
-
-/**
- * upload metadata
- * @param { payload: PostMetadata }
- * @returns
- */
-export const uploadMetadata = async ({
-  payload,
-}: UploadMetadataParams): Promise<UploadMetadataReturnState | false> => {
-  const generateMetadataResult = generateMetadata({ payload });
-  if (!generateMetadataResult) {
-    return false;
-  }
-  const { digestMetadata, authorSignatureMetadata } = generateMetadataResult;
-
-  // generate json file
-  const digestMetadataBlob = new Blob([JSON.stringify(digestMetadata)], {
-    type: 'application/json',
-  });
-  const digestMetadataForm = new FormData();
-  digestMetadataForm.append(
-    'file',
-    digestMetadataBlob,
-    `metadata-digest-${digestMetadata.ts}.json`,
-  );
-
-  const authorSignatureMetadataBlob = new Blob([JSON.stringify(authorSignatureMetadata)], {
-    type: 'application/json',
-  });
-  const authorSignatureMetadataForm = new FormData();
-  authorSignatureMetadataForm.append(
-    'file',
-    authorSignatureMetadataBlob,
-    `metadata-author-signature-${authorSignatureMetadata.ts}.json`,
-  );
-
-  // upload ipfs
-  const digestMetadataResult = await uploadToIpfsAPI(digestMetadataForm);
-  if (!digestMetadataResult) {
-    return false;
-  }
-  const authorSignatureMetadataResult = await uploadToIpfsAPI(authorSignatureMetadataForm);
-  if (!authorSignatureMetadataResult) {
-    return false;
-  }
-
-  return {
-    digestMetadata: digestMetadata,
-    authorSignatureMetadata: authorSignatureMetadata,
-    digestMetadataIpfs: digestMetadataResult,
-    authorSignatureMetadataIpfs: authorSignatureMetadataResult,
-  };
-};
-
-/**
  * generate Storage Link
  * @param platform
  * @param url
@@ -256,5 +149,41 @@ export const publishMetaSpaceRequest = async ({
   return {
     metadata: data,
     metadataIpfs: dataMetadataResult,
+  };
+};
+
+export const pipelinesPostOrdersData = ({
+  payload,
+}: {
+  payload: {
+    categories: string;
+    content: string;
+    cover: string;
+    license: string;
+    summary: string;
+    tags: string;
+    title: string;
+  };
+}) => {
+  const verifyResult = verifySeedAndKey();
+  if (!verifyResult) {
+    throw new Error('seed or key does not exist or does not match.');
+  }
+
+  const keys: KeyPair = generateKeys(verifyResult.seed);
+
+  const authorPostDigestResult = authorPostDigest.generate(payload);
+  console.log('authorPostDigestResult', authorPostDigestResult);
+
+  const authorPostDigestSignResult = authorPostDigestSign.generate(
+    keys,
+    META_SPACE_BASE_DOMAIN,
+    authorPostDigestResult.digest,
+  );
+  console.log('authorPostDigestSignResult', authorPostDigestSignResult);
+
+  return {
+    authorPostDigest: authorPostDigestResult,
+    authorPostDigestSign: authorPostDigestSignResult,
   };
 };

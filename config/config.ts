@@ -26,6 +26,8 @@ export default defineConfig({
     META_GUN_PEERS: process.env.META_GUN_PEERS!.split(','),
     META_WIKI: process.env.META_WIKI,
     META_WIKI_EDITOR_LEARN: process.env.META_WIKI_EDITOR_LEARN,
+    ARWEAVE_VIEWBLOCK: process.env.ARWEAVE_VIEWBLOCK,
+    IPFS_FLEEK: process.env.IPFS_FLEEK,
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
