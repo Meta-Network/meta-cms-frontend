@@ -23,6 +23,7 @@ export default () => {
     {
       dataIndex: 'cover',
       title: '封面图',
+      width: 130,
       render: (_, record) => <PostsCover src={record.postMetadata.cover} />,
     },
     {
