@@ -84,6 +84,7 @@ export default () => {
       title: intl.formatMessage({
         id: 'posts.drafts.table.cover',
       }),
+      width: 130,
       render: (_, record) => <PostsCover src={record.cover} />,
     },
     {

@@ -2056,10 +2056,10 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@metaio/meta-signature-util@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.npmmirror.com/@metaio/meta-signature-util/download/@metaio/meta-signature-util-0.6.0.tgz"
-  integrity sha512-aRzhFmelZep7J0/QOS4qme27ukSf9sXxNXwS7/weBjAtVbG1coA4G0LAtY7L7jXPOVAK2rCjipnUT9eSi+DGEQ==
+"@metaio/meta-signature-util-v2@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@metaio/meta-signature-util-v2/-/meta-signature-util-v2-2.3.0.tgz#114e792bffd32a281b9d5e98dfde4294ca7e6f2a"
+  integrity sha512-EcZcZFIEWclMDzEgGGcAtcMdUrXLn+BNnwIhrLSdqy4Wa1s0PhCWl++axKEo4W56ZZLigaeghOzYi0vndWtPkA==
   dependencies:
     curve25519-js "^0.0.4"
     niceware "^2.0.2"
@@ -4590,12 +4590,7 @@ camelcase@^6.0.0:
   resolved "https://registry.npmmirror.com/camelcase/download/camelcase-6.2.1.tgz?cache=0&sync_timestamp=1636945184694&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fcamelcase%2Fdownload%2Fcamelcase-6.2.1.tgz#250fd350cfd555d0d2160b1d51510eaf8326e86e"
   integrity sha512-tVI4q5jjFV5CavAU8DXfza/TJcZutVKo/5Foskmsqcm0MsL91moHvwiGNnqaa2o6PF/7yT5ikDRcVcl8Rj6LCA==
 
-caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001125, caniuse-lite@^1.0.30001286:
-  version "1.0.30001309"
-  resolved "https://registry.npmmirror.com/caniuse-lite/-/caniuse-lite-1.0.30001309.tgz"
-  integrity sha512-Pl8vfigmBXXq+/yUz1jUwULeq9xhMJznzdc/xwl4WclDAuebcTHVefpz8lE/bMI+UN7TOkSSe7B7RnZd6+dzjA==
-
-caniuse-lite@^1.0.30001309:
+caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001125, caniuse-lite@^1.0.30001286, caniuse-lite@^1.0.30001309:
   version "1.0.30001309"
   resolved "https://registry.npmmirror.com/caniuse-lite/-/caniuse-lite-1.0.30001309.tgz#e0ee78b9bec0704f67304b00ff3c5c0c768a9f62"
   integrity sha512-Pl8vfigmBXXq+/yUz1jUwULeq9xhMJznzdc/xwl4WclDAuebcTHVefpz8lE/bMI+UN7TOkSSe7B7RnZd6+dzjA==

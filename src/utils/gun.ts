@@ -10,8 +10,16 @@ import {
   KEY_META_CMS_GUN_PAIR,
 } from '../../config';
 import { storeGet, storeSet } from './store';
-import { generateSeed, generateKeys } from '@metaio/meta-signature-util';
-import type { KeyPair } from '@metaio/meta-signature-util';
+import { generateSeed, generateKeys } from '@metaio/meta-signature-util-v2';
+import type { KeyPair } from '@metaio/meta-signature-util-v2';
+
+/**
+ * 用到 Gun.js 的地方
+ * 1. 全局初始化
+ * 2. 编辑文章使用
+ * 3. 草稿列表使用
+ * 4. 删除草稿页面使用
+ */
 
 export const signIn = (gun: any): Promise<string> => {
   /**

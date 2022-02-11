@@ -30,3 +30,5 @@ declare const META_NETWORK_DATA_VIEWER_URL: string;
 declare const META_GUN_PEERS: string[];
 declare const META_WIKI: string;
 declare const META_WIKI_EDITOR_LEARN: string;
+declare const ARWEAVE_VIEWBLOCK: string;
+declare const IPFS_FLEEK: string;

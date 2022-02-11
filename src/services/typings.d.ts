@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./constants.ts" />
+
 declare namespace CMS {
   type SourceStatusResponse = {
     id: number;
@@ -260,6 +263,134 @@ declare namespace CMS {
   };
   // 可能会有变动 暂时命名区分
   type PostStorageUpdateData = PostStoragePublishData;
+
+  // V1 pipeline
+  type PipelinesOrdersData = {
+    postOrder: {
+      id: string;
+      userId: 34;
+      serverVerificationId: string;
+      postMetadata: {
+        id: string;
+        title: string;
+        cover: string;
+        summary: string;
+        categories: string;
+        tags: string;
+        license: string;
+        authorPublicKey: string;
+        digest: string;
+        createdAt: Date;
+      };
+      createdAt: Date;
+      updatedAt: Date;
+      submitState: 'pending';
+      publishState: 'pending';
+      certificateStorageType: '';
+      certificateId: '';
+      certificateState: '';
+      postTaskId: '';
+      publishSiteOrderId: 0;
+      publishSiteTaskId: '';
+    };
+    serverVerification: {
+      '@context': 'https://metanetwork.online/ns/cms';
+      '@type': 'server-verification-sign';
+      '@version': '2.0.0';
+      signatureAlgorithm: 'curve25519';
+      publicKey: string;
+      nonce: string;
+      claim: string;
+      signature: string;
+      ts: number;
+      reference: [
+        {
+          refer: string;
+          rel: 'content';
+          body: {
+            '@context': 'https: //metanetwork.online/ns/cms';
+            '@type': 'author-post-digest';
+            '@version': '1.1.0';
+            algorithm: 'sha256';
+            categories: string;
+            content: string;
+            cover: string;
+            license: string;
+            summary: string;
+            tags: string;
+            title: string;
+            digest: string;
+            ts: number;
+          };
+        },
+        {
+          refer: string;
+          rel: 'request';
+          body: {
+            '@context': 'https://metanetwork.online/ns/cms';
+            '@type': 'author-digest-sign';
+            '@version': '1.0.0';
+            signatureAlgorithm: 'curve25519';
+            publicKey: string;
+            digest: string;
+            nonce: string;
+            claim: string;
+            signature: string;
+            ts: number;
+          };
+        },
+      ];
+    };
+  };
+
+  type PipelinesOrdersItem = {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: number;
+    submitState: PipelineOrderTaskCommonState;
+    publishState: PipelineOrderTaskCommonState;
+    serverVerificationId: string;
+    certificateStorageType: GatewayType;
+    certificateId: string;
+    certificateState: PipelineOrderTaskCommonState;
+    postTaskId: string;
+    publishSiteOrderId: number;
+    publishSiteTaskId: string;
+    postMetadata: {
+      id: string;
+      createdAt: Date;
+      title: string;
+      cover: string;
+      summary: string;
+      categories: string;
+      tags: string;
+      license: string;
+      authorPublicKey: string;
+      digest: string;
+    };
+  };
+  type PipelinesOrdersMine = {
+    items: PipelinesOrdersItem[];
+    meta: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+    links: {
+      first: string;
+      previous: string;
+      next: string;
+      last: string;
+    };
+  };
+
+  type Pagination = {
+    page: number;
+    limit: number;
+  };
 
   type PostCount = {
     allPostCount: number;

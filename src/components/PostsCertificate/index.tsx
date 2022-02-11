@@ -1,46 +1,97 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 import { Space, Typography } from 'antd';
 // import { useIntl } from 'umi';
-import { StopOutlined, WarningFilled, CopyOutlined } from '@ant-design/icons';
+import { StopOutlined, WarningFilled } from '@ant-design/icons';
 import { ShareIcon } from '../Icon';
 import styles from './index.less';
+import { GatewayType } from '@/services/constants';
+import { PipelineOrderTaskCommonState } from '@/services/constants';
+import { hashSlice } from '@/utils';
 
 const { Text, Link } = Typography;
 
-interface Props {}
+interface Props {
+  readonly state: PipelineOrderTaskCommonState;
+  readonly certificateId: string;
+  readonly certificateStorageType: GatewayType;
+}
 
-const PostsCertificate: FC<Props> = ({}) => {
+const PostsCertificate: FC<Props> = ({ state, certificateId, certificateStorageType }) => {
   // const intl = useIntl();
 
   /**
    * 无
-   * IPFS 存证中
-   * IPFS HASH
+   * IPFS 存证中 | ARWEAVE 存证中
+   * IPFS | ARWEAVE HASH
    * 存证失败
    */
 
+  // 存证链接
+  const certificateLink = useMemo(() => {
+    return certificateStorageType === GatewayType.Ipfs
+      ? `${IPFS_FLEEK}/${certificateId}`
+      : certificateStorageType === GatewayType.Arweave
+      ? `${ARWEAVE_VIEWBLOCK}/tx/${certificateId}`
+      : '';
+  }, [certificateId, certificateStorageType]);
+
+  // 存证类型文字
+  const certificateStorageTypeText = useMemo(() => {
+    return certificateStorageType === GatewayType.Ipfs
+      ? 'IPFS 存证中'
+      : certificateStorageType === GatewayType.Arweave
+      ? 'ARWEAVE 存证中'
+      : '';
+  }, [certificateStorageType]);
+
   return (
     <>
-      <Space style={{ color: 'black' }}>
-        <StopOutlined />
-      </Space>
-      <Space style={{ color: 'gray' }}>
-        <Text style={{ color: 'gray' }}>IPFS 存证中</Text>
-        <CopyOutlined />
-        <ShareIcon className={styles.icon} />
-      </Space>
-
-      <Space style={{ color: 'red' }}>
-        <WarningFilled />
-        <Text style={{ color: 'red' }}>存证失败</Text>
-      </Space>
-      <Space style={{ color: 'gray' }}>
-        <Link underline style={{ color: 'gray' }}>
-          xxxxxxxxxx
-        </Link>
-        <CopyOutlined />
-        <ShareIcon className={styles.icon} />
-      </Space>
+      {state === PipelineOrderTaskCommonState.NONE ? (
+        <Space style={{ color: 'black' }}>
+          <StopOutlined />
+        </Space>
+      ) : state === PipelineOrderTaskCommonState.DOING ? (
+        <Space className={styles.gray}>
+          <Text
+            style={{ color: 'gray' }}
+            copyable={{
+              text: certificateId,
+            }}
+          >
+            {certificateStorageTypeText}
+          </Text>
+          <Link href={certificateLink} target="_blank" rel="noopener noreferrer">
+            <ShareIcon className={styles.icon} />
+          </Link>
+        </Space>
+      ) : state === PipelineOrderTaskCommonState.FINISHED ? (
+        <Space style={{ color: 'gray' }}>
+          <Text
+            copyable={{
+              text: certificateId,
+            }}
+          >
+            <Link
+              underline
+              style={{ color: 'gray' }}
+              href={certificateLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {hashSlice(certificateId)}
+            </Link>
+          </Text>
+          <Link href={certificateLink} target="_blank" rel="noopener noreferrer">
+            <ShareIcon className={styles.icon} />
+          </Link>
+        </Space>
+      ) : state === PipelineOrderTaskCommonState.FAILED ? (
+        <Space style={{ color: 'red' }}>
+          <WarningFilled />
+          <Text style={{ color: 'red' }}>存证失败</Text>
+        </Space>
+      ) : null}
     </>
   );
 };

@@ -13,13 +13,13 @@ import { KEY_META_CMS_GATEWAY_CHECKED, STORAGE_PLATFORM } from '../../../config/
 import { storeGet, storeSet } from '@/utils/store';
 import { useIntl } from 'umi';
 import GenerateKey from './generate';
-import GatewayIpfs from './gatewayIpfs';
+import GatewayArewave from './gatewayArewave';
 import Storage from './storage';
 import { GatewayType } from '@/services/constants';
 
 interface Props {
   readonly loading: boolean;
-  handlePublish: (gateway: boolean) => void;
+  handlePublish: (value: GatewayType) => void;
   setDropdownVisible: (visible: boolean) => void;
 }
 
@@ -39,7 +39,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
   const onFinish = (values: any) => {
     console.log('Success:', values);
 
-    if (gatewayType && !publicKey) {
+    if (gatewayType === GatewayType.Ipfs && !publicKey) {
       message.warning(intl.formatMessage({ id: 'messages.editor.submit.generateKey' }));
       return;
     }
@@ -49,7 +49,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
       return;
     }
 
-    handlePublish(!!gatewayType);
+    handlePublish(gatewayType);
   };
 
   // get seed and key
@@ -155,18 +155,16 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
         >
           <Checkbox.Group onChange={(val: any) => gatewayTypeChange(val)} value={[gatewayType]}>
             <Space direction="vertical">
-              <Checkbox value="ipfs">
-                <span className={styles.itemType}>
-                  {intl.formatMessage({ id: 'editor.submit.item.gateway.name' })}
-                </span>
+              <Checkbox value="arweave">
+                <span className={styles.itemType}>ARWEAVE</span>
                 {' - '}
                 {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
               </Checkbox>
             </Space>
           </Checkbox.Group>
         </Form.Item>
-        {gatewayType === GatewayType.Ipfs && (
-          <GatewayIpfs
+        {gatewayType === GatewayType.Arweave && (
+          <GatewayArewave
             publicKey={publicKey}
             setVisibleSignatureGenerate={setVisibleSignatureGenerate}
           />
