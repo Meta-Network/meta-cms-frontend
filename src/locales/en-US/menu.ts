@@ -12,7 +12,7 @@ export default {
   'menu.manage.account': 'Account',
   'menu.manage.source': 'Content source',
   'menu.manage.siteSetting': 'Information',
-  'menu.manage.storeSetting': 'Storage',
+  'menu.manage.storageSetting': 'Storage',
   'menu.manage.domainSetting': 'Domain',
   'menu.localDraft': 'Local draft',
   'menu.invitation': 'Invitation code',

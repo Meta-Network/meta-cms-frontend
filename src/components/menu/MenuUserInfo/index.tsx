@@ -20,7 +20,7 @@ export default () => {
     (event: MenuInfo) => {
       const { key } = event;
       if (key === 'logout') {
-        setInitialState((s) => ({
+        setInitialState((s: any) => ({
           ...s,
           currentUser: undefined,
         }));

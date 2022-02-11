@@ -41,10 +41,13 @@ export default () => {
       if (initialState?.currentUser?.id) {
         const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
 
-        setInitialState((s) => ({
-          ...s,
-          localDraftCount: localDraftCount,
-        }));
+        setInitialState(
+          (s) =>
+            ({
+              ...s,
+              localDraftCount: localDraftCount,
+            } as GLOBAL.InitialState),
+        );
       }
 
       message.success(

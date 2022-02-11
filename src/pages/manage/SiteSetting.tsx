@@ -16,7 +16,7 @@ export default () => {
   const intl = useIntl();
   const [defaultSiteConfig, setDefaultSiteConfig] = useState<CMS.SiteConfiguration>();
   const [faviconUrl, setFaviconUrl] = useState<string>('');
-  const { setSiteNeedToDeploy } = useModel('storage');
+  const { setSiteNeedToDeploy } = useModel('localStorageHooks');
 
   const handleFinishing = async (values: GLOBAL.SiteSetting) => {
     if (faviconUrl) {

@@ -1,20 +1,20 @@
-import { getUsernameOfStore } from '@/services/api/global';
+import { getUsernameOfStorage } from '@/services/api/global';
 import { useModel, useIntl, FormattedMessage } from 'umi';
 import { useEffect, useState } from 'react';
 import { Card, List, Avatar, message } from 'antd';
-import PlatformModal from '@/components/StorePicker/PlatformModal';
+import PlatformModal from '@/components/StoragePicker/PlatformModal';
 import styles from './index.less';
 
 export default () => {
   const intl = useIntl();
-  const { storeSetting, setStoreSetting } = useModel('storage');
+  const { storageSetting, setStorageSetting } = useModel('localStorageHooks');
   const visibleState = useState(false);
   const [, setModalVisible] = visibleState;
 
-  const confirmedState = useState<string>(storeSetting?.storage ?? '');
-  const [storeConfirmed, setStoreConfirmed] = confirmedState;
+  const confirmedState = useState<string>(storageSetting?.storage ?? '');
+  const [storageConfirmed, setStorageConfirmed] = confirmedState;
 
-  const [selectedStoreName, setSelectedStoreName] = useState('');
+  const [selectedStorageName, setSelectedStorageName] = useState('');
 
   const storage = [
     {
@@ -31,23 +31,26 @@ export default () => {
 
   useEffect(() => {
     const validating = async () => {
-      if (storeConfirmed) {
-        if (storeSetting?.storage && storeSetting?.username) return;
+      if (storageConfirmed) {
+        if (storageSetting?.storage && storageSetting?.username) return;
 
-        switch (storeConfirmed) {
+        switch (storageConfirmed) {
           case 'GitHub': {
             let username: string;
             try {
-              username = await getUsernameOfStore('GitHub');
+              username = await getUsernameOfStorage('GitHub');
             } catch {
               throw new Error(intl.formatMessage({ id: 'guide.storage.noAuthToken' }));
             }
             if (!username) {
               throw new Error(intl.formatMessage({ id: 'guide.storage.canNotGetUsername' }));
             }
-            setStoreSetting({ storage: storeConfirmed, username });
+            setStorageSetting((prev) => ({ ...prev, ...{ storage: storageConfirmed, username } }));
             message.success(
-              intl.formatMessage({ id: 'guide.storage.setStorageAs' }, { storage: storeConfirmed }),
+              intl.formatMessage(
+                { id: 'guide.storage.setStorageAs' },
+                { storage: storageConfirmed },
+              ),
             );
             break;
           }
@@ -59,8 +62,8 @@ export default () => {
       }
     };
     validating().catch((error) => {
-      setStoreConfirmed('');
-      setStoreSetting({ storage: '', username: '' });
+      setStorageConfirmed('');
+      setStorageSetting((prev) => ({ ...prev, ...{ storage: '', username: '' } }));
       message
         .error(
           intl.formatMessage(
@@ -71,10 +74,10 @@ export default () => {
         .then();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setStoreConfirmed, setStoreSetting, storeConfirmed]);
+  }, [setStorageConfirmed, setStorageSetting, storageConfirmed]);
 
-  const handleSelectStore = async (name: GLOBAL.StoreProvider) => {
-    setSelectedStoreName(name);
+  const handleSelectStorage = async (name: GLOBAL.StorageProvider) => {
+    setSelectedStorageName(name);
     setModalVisible(true);
   };
 
@@ -90,7 +93,7 @@ export default () => {
         renderItem={(item) => (
           <List.Item key={item.name}>
             <Card
-              onClick={() => handleSelectStore(item.name as GLOBAL.StoreProvider)}
+              onClick={() => handleSelectStorage(item.name as GLOBAL.StorageProvider)}
               hoverable
               bordered
               className={styles.card}
@@ -107,8 +110,8 @@ export default () => {
       <p>
         <FormattedMessage id="guide.storage.currentStorage" />
         <strong>
-          {storeConfirmed && storeSetting?.username
-            ? `${storeConfirmed} (${storeSetting.username})`
+          {storageConfirmed && storageSetting?.username
+            ? `${storageConfirmed} (${storageSetting.username})`
             : intl.formatMessage({ id: 'guide.storage.unselected' })}
         </strong>
       </p>
@@ -116,7 +119,7 @@ export default () => {
       <PlatformModal
         visibleState={visibleState}
         confirmedState={confirmedState}
-        name={selectedStoreName as GLOBAL.StoreProvider}
+        name={selectedStorageName as GLOBAL.StorageProvider}
       />
     </div>
   );
