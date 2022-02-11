@@ -13,20 +13,20 @@ const PostsSubmit: FC<Props> = ({ state }) => {
   // const intl = useIntl();
 
   /**
-   * 正在提交
-   * 等待提交
-   * 提交失败
-   * 已提交
+   * PENDING 等待提交
+   * DOING 正在提交
+   * FINISHED 已提交
+   * FAILED 提交失败
    */
 
   return (
     <>
-      {state === PipelineOrderTaskCommonState.DOING ? (
+      {state === PipelineOrderTaskCommonState.PENDING ? (
         <Space style={{ color: 'gray' }}>
           <ClockCircleOutlined />
           <Text style={{ color: 'gray' }}>等待提交</Text>
         </Space>
-      ) : state === PipelineOrderTaskCommonState.PENDING ? (
+      ) : state === PipelineOrderTaskCommonState.DOING ? (
         <Space style={{ color: 'gray' }}>
           <ClockCircleOutlined />
           <Text style={{ color: 'gray' }}>正在提交</Text>

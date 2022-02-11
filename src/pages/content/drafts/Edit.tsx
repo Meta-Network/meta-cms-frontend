@@ -269,6 +269,9 @@ const Edit: React.FC = () => {
     [title, cover, content, tags, license, handleUpdate, setSiteNeedToDeploy, intl],
   );
 
+  /**
+   * 校验标题
+   */
   const checkTitle = useCallback(
     async ({ titleValue, id }: { titleValue: string; id: number }): Promise<boolean> => {
       /**

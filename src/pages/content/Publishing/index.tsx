@@ -1,11 +1,14 @@
 import { useIntl } from 'umi';
-import { useRef } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 // import FormattedDescription from '@/components/FormattedDescription';
-import { Typography, Button, Checkbox, Empty } from 'antd';
+import { Typography, Button, Empty, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
-import { pipelinesPostOrdersMinePublishing } from '@/services/api/meta-cms';
+import {
+  pipelinesPostOrdersMinePublishing,
+  pipelinesSiteOrdersPublish,
+} from '@/services/api/meta-cms';
 import PostsCover from '@/components/PostsCover';
 import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
@@ -14,18 +17,16 @@ import PostsCertificate from '@/components/PostsCertificate';
 
 const { Link } = Typography;
 
-function onChange(e: any) {
-  console.log(`checked = ${e.target.checked}`);
-}
-
 export default () => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
+  const [siteOrdersPublishState, setSiteOrdersPublishState] = useState<boolean>(false);
 
   const columns: ProColumns<CMS.PipelinesOrdersItem>[] = [
     {
       dataIndex: 'cover',
       title: '封面图',
+      width: 130,
       render: (_, record) => <PostsCover src={record.postMetadata.cover} />,
     },
     {
@@ -41,7 +42,9 @@ export default () => {
     {
       dataIndex: 'publish',
       title: 'Publish 状态',
-      render: (_, record) => <PostsPublish state={record.publishState} />,
+      render: (_, record) => (
+        <PostsPublish state={record.publishState} publishSiteOrderId={record.publishSiteOrderId} />
+      ),
     },
     {
       dataIndex: 'date',
@@ -60,6 +63,17 @@ export default () => {
       ),
     },
   ];
+
+  const siteOrdersPublish = useCallback(async () => {
+    setSiteOrdersPublishState(true);
+    const siteOrdersPublishResult = await pipelinesSiteOrdersPublish();
+    setSiteOrdersPublishState(false);
+    if (siteOrdersPublishResult.statusCode === 201) {
+      message.info('成功');
+    } else {
+      message.error('失败');
+    }
+  }, []);
 
   return (
     <PageContainer
@@ -107,16 +121,15 @@ export default () => {
         options={false}
         size="middle"
         toolBarRender={() => [
-          <Checkbox key="actionCheckbox" onChange={onChange}>
-            全部提交后自动发布
-          </Checkbox>,
-          <Button key="button">立即开始发布 #1</Button>,
-          <Button key="button" disabled>
-            等待发布 #1
+          <Button key="button" loading={siteOrdersPublishState} onClick={() => siteOrdersPublish()}>
+            立即开始发布
           </Button>,
-          <Button key="button" disabled>
-            正在发布 #1
-          </Button>,
+          // <Button key="button" disabled>
+          //   等待发布 #1
+          // </Button>,
+          // <Button key="button" disabled>
+          //   正在发布 #1
+          // </Button>,
         ]}
       />
     </PageContainer>
