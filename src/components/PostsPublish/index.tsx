@@ -10,26 +10,27 @@ const { Text } = Typography;
 
 interface Props {
   readonly state: PipelineOrderTaskCommonState;
+  readonly publishSiteOrderId: number;
 }
 
-const PostsPublish: FC<Props> = ({ state }) => {
+const PostsPublish: FC<Props> = ({ state, publishSiteOrderId }) => {
   // const intl = useIntl();
 
   /**
-   * 发布中
-   * 等待发布
-   * 发布失败
-   * 已发布
+   * PENDING 等待发布
+   * DOING 发布中
+   * FINISHED 已发布
+   * FAILED 发布失败
    */
 
   return (
     <>
-      {state === PipelineOrderTaskCommonState.DOING ? (
+      {state === PipelineOrderTaskCommonState.PENDING ? (
         <Space style={{ color: 'gray' }}>
           <PublishIcon className={styles.icon} />
           <Text style={{ color: 'gray' }}>等待发布</Text>
         </Space>
-      ) : state === PipelineOrderTaskCommonState.PENDING ? (
+      ) : state === PipelineOrderTaskCommonState.DOING ? (
         <Space style={{ color: 'gray' }}>
           <PublishIcon className={styles.icon} />
           <Text style={{ color: 'gray' }}>发布中</Text>
@@ -38,7 +39,7 @@ const PostsPublish: FC<Props> = ({ state }) => {
         <Space style={{ color: 'green' }}>
           <PublishIcon className={styles.icon} />
           <Text style={{ color: 'green' }}>
-            已发布 <span>#1</span>
+            已发布 {publishSiteOrderId && <span>#{publishSiteOrderId}</span>}
           </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.FAILED ? (

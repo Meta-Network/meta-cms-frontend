@@ -38,7 +38,9 @@ export default () => {
     {
       dataIndex: 'publish',
       title: 'Publish 状态',
-      render: (_, record) => <PostsPublish state={record.publishState} />,
+      render: (_, record) => (
+        <PostsPublish state={record.publishState} publishSiteOrderId={record.publishSiteOrderId} />
+      ),
     },
     {
       dataIndex: 'date',
