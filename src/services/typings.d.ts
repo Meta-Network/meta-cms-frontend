@@ -68,8 +68,8 @@ declare namespace CMS {
     timezone: string;
     templateId: number;
     domain: string;
-    storageType: string;
-    storageProviderId: number;
+    storeType: string;
+    storeProviderId: number;
     cicdType: string;
     cicdProviderId: number;
     publisherType: string;

@@ -19,7 +19,7 @@ export default () => {
     getDefaultSiteConfig().then((config) => {
       form.setFieldsValue({
         domain: config?.data?.domain,
-        platform: platformsAliases[config?.data?.storageType],
+        platform: platformsAliases[config?.data?.storeType],
       });
     });
   }, [form]);
