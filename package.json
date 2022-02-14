@@ -79,6 +79,7 @@
     "react-spring": "^9.4.1",
     "socket.io-client": "^4.4.1",
     "store": "^2.0.12",
+    "swr": "^1.2.1",
     "umi": "^3.5.20",
     "umi-serve": "^1.9.10",
     "vditor": "3.8.10"

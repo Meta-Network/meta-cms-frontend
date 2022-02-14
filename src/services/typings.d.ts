@@ -398,6 +398,29 @@ declare namespace CMS {
     publishedCount: number;
     publishingAlertFlag: boolean;
   };
+
+  type PipelinesSiteOrdersPublishQueue = {
+    pending: {
+      id: number;
+      createdAt: Date;
+      updatedAt: Date;
+      userId: number;
+      siteConfigId: number;
+      serverVerificationId: string;
+      publishSiteTaskId: string;
+      state: PipelineOrderTaskCommonState;
+    };
+    doing: {
+      id: number;
+      createdAt: Date;
+      updatedAt: Date;
+      userId: number;
+      siteConfigId: number;
+      serverVerificationId: string;
+      publishSiteTaskId: string;
+      state: PipelineOrderTaskCommonState;
+    };
+  };
 }
 
 declare namespace GLOBAL {

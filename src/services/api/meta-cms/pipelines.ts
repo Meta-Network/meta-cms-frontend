@@ -75,11 +75,29 @@ export async function pipelinesPostOrdersMinePublished(params: CMS.Pagination) {
 }
 
 /**
+ * 用户请求重新发布失败文章
+ * @param id
+ * @returns
+ */
+export async function pipelinesPostOrdersRetryById(id: string) {
+  return request<GLOBAL.GeneralResponse<void>>(`/v1/pipelines/post-orders/${id}/retry`, {
+    method: 'POST',
+  });
+}
+
+/**
  * Site Orders Publish
  * @returns
  */
 export async function pipelinesSiteOrdersPublish() {
   return request<GLOBAL.GeneralResponse<void>>('/v1/pipelines/site-orders/publish', {
     method: 'POST',
+  });
+}
+
+export const pipelinesSiteOrdersPublishQueueUrl = '/v1/pipelines/site-orders/mine/publish-in-queue';
+export async function pipelinesSiteOrdersPublishQueue(url = pipelinesSiteOrdersPublishQueueUrl) {
+  return request<GLOBAL.GeneralResponse<CMS.PipelinesSiteOrdersPublishQueue>>(url, {
+    method: 'GET',
   });
 }

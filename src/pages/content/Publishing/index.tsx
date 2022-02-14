@@ -3,7 +3,7 @@ import { useRef, useCallback, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 // import FormattedDescription from '@/components/FormattedDescription';
-import { Typography, Button, Empty, message } from 'antd';
+import { Typography, Empty, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import {
   pipelinesPostOrdersMinePublishing,
@@ -14,6 +14,7 @@ import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
 import PostsDate from '@/components/PostsDate';
 import PostsCertificate from '@/components/PostsCertificate';
+import PublishQueue from './components/publishQueue';
 
 const { Link } = Typography;
 
@@ -121,15 +122,11 @@ export default () => {
         options={false}
         size="middle"
         toolBarRender={() => [
-          <Button key="button" loading={siteOrdersPublishState} onClick={() => siteOrdersPublish()}>
-            立即开始发布
-          </Button>,
-          // <Button key="button" disabled>
-          //   等待发布 #1
-          // </Button>,
-          // <Button key="button" disabled>
-          //   正在发布 #1
-          // </Button>,
+          <PublishQueue
+            key="publishQueue"
+            siteOrdersPublishState={siteOrdersPublishState}
+            siteOrdersPublish={siteOrdersPublish}
+          />,
         ]}
       />
     </PageContainer>
