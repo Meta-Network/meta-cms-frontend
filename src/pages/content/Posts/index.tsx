@@ -107,6 +107,7 @@ export default () => {
       }
     >
       <ProTable<CMS.PipelinesOrdersItem>
+        polling={3000}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {

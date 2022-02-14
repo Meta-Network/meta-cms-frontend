@@ -68,6 +68,11 @@ export default () => {
   const siteOrdersPublish = useCallback(async () => {
     setSiteOrdersPublishState(true);
     const siteOrdersPublishResult = await pipelinesSiteOrdersPublish();
+
+    if (actionRef?.current) {
+      actionRef.current.reload();
+    }
+
     setSiteOrdersPublishState(false);
     if (siteOrdersPublishResult.statusCode === 201) {
       message.info('成功');
@@ -96,6 +101,7 @@ export default () => {
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有可以发布的内容啦～" />
           ),
         }}
+        polling={3000}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {
