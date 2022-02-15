@@ -29,7 +29,7 @@ export default (): any => {
 
   useEffect(() => {
     isDomainForbidden(domainSetting || '').then((isForbidden) => {
-      setDomainSettingValidation(Boolean(domainSetting?.match(/\w{3,16}/) && !isForbidden));
+      setDomainSettingValidation(!isForbidden);
     });
   }, [domainSetting]);
 

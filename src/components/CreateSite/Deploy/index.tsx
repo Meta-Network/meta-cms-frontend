@@ -89,7 +89,7 @@ export default () => {
       language: validatedSiteSettings.language,
       timezone: validatedSiteSettings.timezone,
       templateId: 1,
-      metaSpacePrefix: domainSetting as string,
+      metaSpacePrefix: domainSetting,
       // domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
     });
 

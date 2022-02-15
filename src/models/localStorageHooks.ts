@@ -1,36 +1,53 @@
 import { useModel } from 'umi';
-import { useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default () => {
   const username = useModel('@@initialState').initialState?.currentUser?.username as string;
 
-  const [domainSetting, setDomainSetting] = useState<string | null>();
-  const [storageSetting, setStorageSetting] = useState<Partial<GLOBAL.StorageSetting>>();
-  const [siteSetting, setSiteSetting] = useState<GLOBAL.SiteSetting>();
-  const [siteNeedToDeploy, setSiteNeedToDeploy] = useState<boolean>();
+  const [domainSetting, setDomainSetting] = useState<string>('');
+  const [storageSetting, setStorageSetting] = useState<Partial<GLOBAL.StorageSetting>>({});
+  const [siteSetting, setSiteSetting] = useState<GLOBAL.SiteSetting>({} as GLOBAL.SiteSetting);
+  const [siteNeedToDeploy, setSiteNeedToDeploy] = useState<boolean>(false);
+
+  const getUsersEntity = (key: string) => {
+    let entity;
+    try {
+      entity = JSON.parse(window.localStorage.getItem(key) || '{}');
+    } catch {
+      entity = {};
+    }
+    return entity instanceof Object ? entity : {};
+  };
 
   const localStorageByUser = useMemo(() => {
-    const getAndParse = (key: string) => JSON.parse(window.localStorage.getItem(key) || '{}');
     return {
       set: (key: string, value: any) => {
         if (username && value !== undefined) {
-          const entity = getAndParse(key);
+          const entity = getUsersEntity(key);
           entity[username] = value;
           window.localStorage.setItem(key, JSON.stringify(entity));
         }
       },
-      get: (key: string) => getAndParse(key)[username],
+      get: (key: string) => getUsersEntity(key)[username],
     };
   }, [username]);
+
+  const setIfHasValue = useCallback(
+    (setFn: React.Dispatch<React.SetStateAction<any>>, key: string, defaultVal: any) => {
+      setFn(localStorageByUser.get(key) ?? defaultVal);
+    },
+    [localStorageByUser],
+  );
 
   // if the username has changed, update the states
   // in this way to create a two-way binding logic between localStorage and states
   useEffect(() => {
-    setDomainSetting(localStorageByUser.get('domainSetting'));
-    setStorageSetting(localStorageByUser.get('storageSetting'));
-    setSiteSetting(localStorageByUser.get('siteSetting'));
-    setSiteNeedToDeploy(localStorageByUser.get('siteNeedToDeploy'));
-  }, [localStorageByUser]);
+    setIfHasValue(setDomainSetting, 'domainSetting', '');
+    setIfHasValue(setStorageSetting, 'storageSetting', {});
+    setIfHasValue(setSiteSetting, 'siteSetting', {});
+    setIfHasValue(setSiteNeedToDeploy, 'siteNeedToDeploy', false);
+  }, [localStorageByUser, setIfHasValue]);
 
   useEffect(() => {
     localStorageByUser.set('domainSetting', domainSetting);
