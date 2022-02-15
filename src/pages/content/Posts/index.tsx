@@ -12,6 +12,7 @@ import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
 import PostsCertificate from '@/components/PostsCertificate';
 import PostsDate from '@/components/PostsDate';
+import { postPolling } from '../../../../config';
 
 const { Link } = Typography;
 
@@ -26,7 +27,7 @@ export default () => {
     const postOrdersRetryResult = await pipelinesPostOrdersRetryById(id);
     setPostOrdersRetryLoading('');
 
-    if (postOrdersRetryResult.statusCode === 200) {
+    if (postOrdersRetryResult.statusCode === 201) {
       message.success('success');
     } else if (postOrdersRetryResult.statusCode === 409) {
       message.warning(postOrdersRetryResult.message);
@@ -107,7 +108,7 @@ export default () => {
       }
     >
       <ProTable<CMS.PipelinesOrdersItem>
-        polling={3000}
+        polling={postPolling}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {

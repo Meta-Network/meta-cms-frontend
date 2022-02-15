@@ -15,6 +15,7 @@ import PostsPublish from '@/components/PostsPublish';
 import PostsDate from '@/components/PostsDate';
 import PostsCertificate from '@/components/PostsCertificate';
 import PublishQueue from './components/publishQueue';
+import { postPolling } from '../../../../config';
 
 const { Link } = Typography;
 
@@ -101,7 +102,7 @@ export default () => {
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有可以发布的内容啦～" />
           ),
         }}
-        polling={3000}
+        polling={postPolling}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {

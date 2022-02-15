@@ -6,6 +6,7 @@ import {
   pipelinesSiteOrdersPublishQueue,
   pipelinesSiteOrdersPublishQueueUrl,
 } from '@/services/api/meta-cms';
+import { postPolling } from '../../../../../config';
 
 interface Props {
   readonly siteOrdersPublishState: boolean;
@@ -20,7 +21,7 @@ const PublishQueue: React.FC<Props> = ({ siteOrdersPublishState, siteOrdersPubli
     pipelinesSiteOrdersPublishQueueUrl,
     pipelinesSiteOrdersPublishQueue,
     {
-      refreshInterval: 3000,
+      refreshInterval: postPolling,
     },
   );
   if (error) return null;

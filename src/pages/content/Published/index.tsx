@@ -11,6 +11,7 @@ import PostsPublish from '@/components/PostsPublish';
 import PostsCertificate from '@/components/PostsCertificate';
 import PostsDate from '@/components/PostsDate';
 import { pipelinesPostOrdersMinePublished } from '@/services/api/meta-cms';
+import { postPolling } from '../../../../config';
 
 const { Link } = Typography;
 
@@ -75,6 +76,7 @@ export default () => {
       }
     >
       <ProTable<CMS.PipelinesOrdersItem>
+        polling={postPolling}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {
