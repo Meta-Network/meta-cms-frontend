@@ -70,10 +70,6 @@ export default () => {
     setSiteOrdersPublishState(true);
     const siteOrdersPublishResult = await pipelinesSiteOrdersPublish();
 
-    if (actionRef?.current) {
-      actionRef.current.reload();
-    }
-
     setSiteOrdersPublishState(false);
     if (siteOrdersPublishResult.statusCode === 201) {
       message.info('成功');
