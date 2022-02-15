@@ -12,10 +12,13 @@ export default function useUser() {
   const refreshUserInfo = useCallback(async () => {
     const currentUserResult = await queryCurrentUser();
     if (currentUserResult.statusCode === 200) {
-      await setInitialState((s) => ({
-        ...s,
-        currentUser: currentUserResult.data,
-      }));
+      await setInitialState(
+        (s) =>
+          ({
+            ...s,
+            currentUser: currentUserResult.data,
+          } as GLOBAL.InitialState),
+      );
     }
   }, [setInitialState]);
 

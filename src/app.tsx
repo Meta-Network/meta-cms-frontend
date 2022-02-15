@@ -1,3 +1,4 @@
+import { userHasSite } from '@/utils';
 import { useModel } from '@@/plugin-model/useModel';
 import { isMobile } from 'is-mobile';
 import React, { useEffect } from 'react';
@@ -41,7 +42,7 @@ function CustomSiderMenu({
           <DownOutlined className="menu-extra-icons" />
         </Card>
       </Dropdown>
-      {initialState?.siteConfig?.domain && (
+      {initialState?.siteConfig && userHasSite(initialState) && (
         <a href={`https://${initialState.siteConfig.domain}`} target="__blank">
           <Card
             className={
@@ -79,7 +80,7 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<GLOBAL.InitialState> {
   // don't log in if this page is a result
   if (history.location.pathname.startsWith('/result')) {
-    return {};
+    return {} as GLOBAL.InitialState;
   }
 
   if (isMobile()) {
@@ -122,10 +123,9 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
       invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
 
     // get site config
-    const siteConfig = await getDefaultSiteConfigAPI();
-    state.siteConfig = siteConfig;
+    state.siteConfig = await getDefaultSiteConfigAPI();
 
-    if (siteConfig?.id) {
+    if (userHasSite(state)) {
       // update post count
       const newPostCount = (await fetchPostCount())?.data ?? {};
       state = { ...state, ...newPostCount };
@@ -137,7 +137,13 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 // @ts-ignore
-export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+export const layout: RunTimeLayoutConfig = ({
+  initialState,
+  setInitialState,
+}: {
+  initialState: GLOBAL.InitialState;
+  setInitialState: (state: any) => GLOBAL.InitialState;
+}) => {
   return {
     disableContentMargin: false,
     siderWidth: 300,
@@ -149,8 +155,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       return menuData.map((menuDataItem) => {
         switch (menuDataItem.path as string) {
           case '/create': {
-            const hasSite = initialState?.siteConfig?.domain;
-            if (hasSite) {
+            if (userHasSite(initialState)) {
               return null;
             } else {
               return menuDataItem;
@@ -168,7 +173,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.localDraftCount || 0}
+              count={initialState?.localDraftCount}
             />
           );
         }
@@ -177,7 +182,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.allPostCount || 0}
+              count={initialState?.allPostCount}
               onAlert={initialState?.publishingAlertFlag}
             />
           );
@@ -187,7 +192,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.publishingCount || 0}
+              count={initialState?.publishingCount}
             />
           );
         }
@@ -196,7 +201,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.publishedCount || 0}
+              count={initialState?.publishedCount}
             />
           );
         }
@@ -206,13 +211,14 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.invitationsCount || 0}
+              count={initialState?.invitationsCount}
             />
           );
         }
         // create post
         case '/content/drafts/edit': {
-          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
+          const _status = !userHasSite(initialState);
+
           return (
             <Link
               to={menuItemProps.path as string}
@@ -243,7 +249,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       if (initialState?.currentUser?.id) {
         const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
 
-        setInitialState((s) => ({
+        setInitialState((s: GLOBAL.InitialState) => ({
           ...s,
           localDraftCount: localDraftCount,
         }));
@@ -271,10 +277,13 @@ const ReactStartup = (root: any) => {
 
   useEffect(() => {
     const setCounts = (count: Partial<Record<keyof GLOBAL.InitialState, any>>) => {
-      return setInitialState((prevData) => ({
-        ...prevData,
-        ...count,
-      }));
+      setInitialState(
+        (prevData: GLOBAL.InitialState | undefined) =>
+          ({
+            ...prevData,
+            ...count,
+          } as GLOBAL.InitialState),
+      ).then(); // ignore void return value
     };
 
     // connect to Meta CMS backend with socket.io

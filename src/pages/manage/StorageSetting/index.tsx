@@ -1,4 +1,4 @@
-import { getUsernameOfStore } from '@/services/api/global';
+import { getUsernameOfStorage } from '@/services/api/global';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { useIntl } from 'umi';
@@ -8,8 +8,8 @@ import styles from './index.less';
 
 export default () => {
   const intl = useIntl();
-  const storeNames: string[] = useMemo(() => ['GitHub'], []);
-  const [stores, setStores] = useState<
+  const storageNames: string[] = useMemo(() => ['GitHub'], []);
+  const [storages, setStorages] = useState<
     {
       name: string;
       description: string;
@@ -39,30 +39,32 @@ export default () => {
   };
 
   const getActionsAndTitle = useMemo(
-    () => (store: typeof storeNames[number], username: string) => {
+    () => (storage: typeof storageNames[number], username: string) => {
       if (username !== '') {
         return {
           title: [
-            store,
-            <Tag className="status" color="blue">
+            storage,
+            <Tag key="alreadyBoundStatus" className="status" color="blue">
               {intl.formatMessage({ id: 'component.status.alreadyBound' })}
             </Tag>,
             `(${username})`,
           ],
           actions: [
-            <Button disabled>{intl.formatMessage({ id: 'component.button.unbind' })}</Button>,
+            <Button key="unbindButton" disabled>
+              {intl.formatMessage({ id: 'component.button.unbind' })}
+            </Button>,
           ],
         };
       }
       return {
         title: [
-          store,
-          <Tag className="status" color="red">
+          storage,
+          <Tag key="notBindStatus" className="status" color="red">
             {intl.formatMessage({ id: 'component.status.notBound' })}
           </Tag>,
         ],
         actions: [
-          <Button disabled onClick={() => bindRequest(store)} type="primary">
+          <Button key="bindButton" disabled onClick={() => bindRequest(storage)} type="primary">
             {intl.formatMessage({ id: 'component.button.bind' })}
           </Button>,
         ],
@@ -72,48 +74,47 @@ export default () => {
   );
 
   useEffect(() => {
-    storeNames.forEach((name) => {
-      console.log(stores);
-      getUsernameOfStore(name)
+    storageNames.forEach((name) => {
+      getUsernameOfStorage(name)
         .then((username) => {
           const { actions, title } = getActionsAndTitle(name, username);
-          setStores((previous) => {
-            const store = previous.find((e) => e.name === name);
-            if (!store) {
+          setStorages((previous) => {
+            const storage = previous.find((e) => e.name === name);
+            if (!storage) {
               return previous;
             }
             const copy = previous.slice();
             const index = previous.findIndex((e) => e.name === name);
-            store.actions = actions;
-            store.title = title;
+            storage.actions = actions;
+            storage.title = title;
 
-            copy[index] = store;
+            copy[index] = storage;
             return copy;
           });
         })
         .catch(() => {
           const { actions, title } = getActionsAndTitle(name, '');
-          setStores((previous) => {
-            const store = previous.find((e) => e.name === name);
-            if (!store) {
+          setStorages((previous) => {
+            const storage = previous.find((e) => e.name === name);
+            if (!storage) {
               return previous;
             }
             const copy = previous.slice();
             const index = previous.findIndex((e) => e.name === name);
-            store.actions = actions;
-            store.title = title;
+            storage.actions = actions;
+            storage.title = title;
 
-            copy[index] = store;
+            copy[index] = storage;
             return copy;
           });
         });
     });
-  }, [getActionsAndTitle, storeNames]);
+  }, [getActionsAndTitle, storageNames]);
 
   return (
     <PageContainer
-      title={intl.formatMessage({ id: 'messages.storeSetting.title' })}
-      content={<p>{intl.formatMessage({ id: 'messages.storeSetting.description' })}</p>}
+      title={intl.formatMessage({ id: 'messages.storageSetting.title' })}
+      content={<p>{intl.formatMessage({ id: 'messages.storageSetting.description' })}</p>}
       breadcrumb={{}}
     >
       <GridContent>
@@ -122,17 +123,17 @@ export default () => {
             <List
               itemLayout="horizontal"
               rowKey={(record) => record.name}
-              dataSource={stores}
-              renderItem={(store) => {
-                if (store.title.length) {
+              dataSource={storages}
+              renderItem={(storage) => {
+                if (storage.title.length) {
                   return (
-                    // <List.Item actions={store.actions}>
+                    // <List.Item actions={storage.actions}>
                     // TODO: no actions are supported now
                     <List.Item>
                       <List.Item.Meta
-                        avatar={store.avatar}
-                        title={store.title}
-                        description={store.description}
+                        avatar={storage.avatar}
+                        title={storage.title}
+                        description={storage.description}
                       />
                     </List.Item>
                   );

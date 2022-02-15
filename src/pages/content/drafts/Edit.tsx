@@ -71,7 +71,7 @@ const Edit: React.FC = () => {
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
-  const { setSiteNeedToDeploy } = useModel('storage');
+  const { setSiteNeedToDeploy } = useModel('localStorageHooks');
   const { initialState } = useModel('@@initialState');
 
   const postTempDataMergedUserId = useCallback(

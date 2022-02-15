@@ -414,15 +414,13 @@ declare namespace CMS {
 }
 
 declare namespace GLOBAL {
-  type InitialState = Partial<
-    {
-      currentUser: GLOBAL.CurrentUser;
-      fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
-      invitationsCount: number;
-      localDraftCount: number;
-      siteConfig: CMS.SiteConfiguration;
-    } & CMS.PostCount
-  >;
+  type InitialState = {
+    currentUser: GLOBAL.CurrentUser | undefined;
+    siteConfig: CMS.SiteConfiguration | undefined;
+    fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
+    invitationsCount: number;
+    localDraftCount: number;
+  } & CMS.PostCount;
 
   type GeneralResponse<T> = {
     statusCode: number;
@@ -508,11 +506,11 @@ declare namespace GLOBAL {
     state: 'info' | 'error' | 'success' | 'null';
   };
 
-  type StoreSetting = {
+  type StorageSetting = {
     storage: string;
     username: string;
     repos?: {
-      storeRepo: string;
+      storageRepo: string;
       publishRepo: string;
     };
   };
@@ -527,7 +525,7 @@ declare namespace GLOBAL {
     matataki: SourcePlatformStatusProperties;
   };
 
-  type StoreProvider = 'GitHub' | 'Gitee';
+  type StorageProvider = 'GitHub' | 'Gitee';
 
   type InvitationsValidateProps = {
     invitation: string;

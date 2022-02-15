@@ -1,3 +1,4 @@
+import { userHasSite } from '@/utils';
 import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
 import { Button, message, notification, Dropdown } from 'antd';
@@ -11,7 +12,7 @@ export default () => {
   const { initialState } = useModel('@@initialState');
   const [publishButtonDisplay, setPublishButtonDisplay] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
-  const { siteNeedToDeploy, setSiteNeedToDeploy } = useModel('storage');
+  const { siteNeedToDeploy, setSiteNeedToDeploy } = useModel('localStorageHooks');
 
   const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
 
@@ -50,7 +51,7 @@ export default () => {
         };
 
         if (gateway) {
-          if (!initialState?.siteConfig?.domain) {
+          if (!userHasSite(initialState)) {
             message.error(intl.formatMessage({ id: 'messages.redeployment.noSiteConfig' }));
             done();
             setPublishLoading(false);

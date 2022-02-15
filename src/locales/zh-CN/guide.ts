@@ -87,5 +87,5 @@ export default {
   'guide.repo.description':
     '请在下方输入 Meta Space 存储仓库和发布仓库的名称（仅用于创建，不影响使用）',
   'guide.repo.publish': '发布仓库（公开）',
-  'guide.repo.store': '存储仓库（私密）',
+  'guide.repo.storage': '存储仓库（私密）',
 };

@@ -10,7 +10,7 @@ export default ({
   visibleState,
   confirmedState,
 }: {
-  name: GLOBAL.StoreProvider;
+  name: GLOBAL.StorageProvider;
   visibleState: any;
   confirmedState: any;
 }) => {
@@ -21,7 +21,7 @@ export default ({
   const handleRequest = async () => {
     const request = await requestSocialAuth(
       name.toLowerCase(),
-      `${window.location.origin}/result/store-setting-success?platform=${name}`,
+      `${window.location.origin}/result/storage-setting-success?platform=${name}`,
     );
     window.open(request.data, '_blank');
   };

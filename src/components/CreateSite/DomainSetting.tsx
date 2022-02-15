@@ -7,7 +7,7 @@ import { isDomainForbidden } from '@/services/api/meta-cms';
 export default () => {
   const intl = useIntl();
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const { domainSetting, setDomainSetting } = useModel('storage');
+  const { domainSetting, setDomainSetting } = useModel('localStorageHooks');
 
   const updateDomainSettings = async (values: { domain: string }) => {
     const { domain } = values;

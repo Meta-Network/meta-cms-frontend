@@ -28,3 +28,8 @@ export const sleep = (time: number) => new Promise((resolve) => setTimeout(resol
  */
 export const mergedMessage = (messages: string[]): string =>
   messages.reduce((a: string, b: string) => a + (a && '、') + b, '');
+
+export const userHasSite = (initialState: GLOBAL.InitialState | undefined) =>
+  initialState?.siteConfig &&
+  initialState.siteConfig.status !== 'CONFIGURED' &&
+  initialState.siteConfig.status !== 'DEPLOY_FAILED';

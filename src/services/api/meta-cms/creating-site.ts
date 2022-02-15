@@ -61,7 +61,22 @@ export async function newSiteStorageSetting(
   });
 }
 
-/** 提交新的存储配置 POST /storage/{platform} */
+/** 更新现有的存储配置 PATCH /storage/{platform} */
+export async function updateSiteStorageSetting(
+  configId: number,
+  platform: string,
+  body: CMS.SiteStorageSettingRequest,
+) {
+  return request<GLOBAL.GeneralResponse<any>>(`/storage/${platform}`, {
+    params: {
+      configId,
+    },
+    method: 'PATCH',
+    data: body,
+  });
+}
+
+/** 提交新的发布配置 POST /publisher/{platform} */
 export async function newSitePublishSetting(
   configId: number,
   platform: string,
@@ -76,7 +91,30 @@ export async function newSitePublishSetting(
   });
 }
 
-/** 提交新的存储配置 POST /tasks/deploy-publish */
+/** 更新现有的发布配置 PATCH /publisher/{platform} */
+export async function updateSitePublishSetting(
+  configId: number,
+  platform: string,
+  body: CMS.SitePublishSettingRequest,
+) {
+  return request<GLOBAL.GeneralResponse<any>>(`/publisher/${platform}`, {
+    params: {
+      configId,
+    },
+    method: 'PATCH',
+    data: body,
+  });
+}
+
+/** 部署新站点 POST /v1/pipelines/site-orders/deploy */
+export async function deploySite(data: { siteConfigId: number }) {
+  return request<GLOBAL.GeneralResponse<any>>('/v1/pipelines/site-orders/deploy', {
+    data,
+    method: 'POST',
+  });
+}
+
+/** 部署并发布站点[旧的API] POST /tasks/deploy-publish */
 export async function deployAndPublishSite(data: {
   configId: number;
   authorPublishMetaSpaceRequestMetadataStorageType: string;

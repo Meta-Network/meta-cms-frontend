@@ -89,9 +89,9 @@
         icon: 'setting',
       },
       {
-        path: '/manage/store-setting',
-        name: 'storeSetting',
-        component: './manage/StoreSetting',
+        path: '/manage/storage-setting',
+        name: 'storageSetting',
+        component: './manage/StorageSetting',
       },
       {
         path: '/manage/domain-setting',
@@ -118,10 +118,10 @@
     component: './Settings',
   },
   {
-    path: '/result/store-setting-success',
+    path: '/result/storage-setting-success',
     hideInMenu: true,
     layout: false,
-    component: './result/StoreSettingSuccess',
+    component: './result/StorageSettingSuccess',
   },
   {
     path: '/result/mobile',
