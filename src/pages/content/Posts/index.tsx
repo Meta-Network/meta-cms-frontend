@@ -1,12 +1,12 @@
 import { useIntl } from 'umi';
-import { useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 // import FormattedDescription from '@/components/FormattedDescription';
-import { Typography, Button } from 'antd';
+import { Typography, Button, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import { PipelineOrderTaskCommonState } from '@/services/constants';
-import { pipelinesPostOrdersMine } from '@/services/api/meta-cms';
+import { pipelinesPostOrdersMine, pipelinesPostOrdersRetryById } from '@/services/api/meta-cms';
 import PostsCover from '@/components/PostsCover';
 import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
@@ -18,6 +18,24 @@ const { Link } = Typography;
 export default () => {
   const intl = useIntl();
   const actionRef = useRef<ActionType>();
+  const [postOrdersRetryLoading, setPostOrdersRetryLoading] = useState<string>();
+
+  // post orders retry
+  const postOrdersRetry = useCallback(async (id: string) => {
+    setPostOrdersRetryLoading(id);
+    const postOrdersRetryResult = await pipelinesPostOrdersRetryById(id);
+    setPostOrdersRetryLoading('');
+
+    if (postOrdersRetryResult.statusCode === 200) {
+      message.success('success');
+    } else if (postOrdersRetryResult.statusCode === 409) {
+      message.warning(postOrdersRetryResult.message);
+    } else if (postOrdersRetryResult.statusCode === 404) {
+      message.warning(postOrdersRetryResult.message);
+    } else {
+      message.error('fail');
+    }
+  }, []);
 
   const columns: ProColumns<CMS.PipelinesOrdersItem>[] = [
     {
@@ -64,7 +82,12 @@ export default () => {
       title: '操作',
       render: (_, record) =>
         record.publishState === PipelineOrderTaskCommonState.FAILED ? (
-          <Button>{intl.formatMessage({ id: 'posts.action.button' })}</Button>
+          <Button
+            loading={postOrdersRetryLoading === record.id}
+            onClick={() => postOrdersRetry(record.id)}
+          >
+            {intl.formatMessage({ id: 'posts.action.button' })}
+          </Button>
         ) : null,
     },
   ];
@@ -84,6 +107,7 @@ export default () => {
       }
     >
       <ProTable<CMS.PipelinesOrdersItem>
+        polling={3000}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {

@@ -3,7 +3,7 @@ import { useRef, useCallback, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 // import FormattedDescription from '@/components/FormattedDescription';
-import { Typography, Button, Empty, message } from 'antd';
+import { Typography, Empty, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import {
   pipelinesPostOrdersMinePublishing,
@@ -14,6 +14,7 @@ import PostsSubmit from '@/components/PostsSubmit';
 import PostsPublish from '@/components/PostsPublish';
 import PostsDate from '@/components/PostsDate';
 import PostsCertificate from '@/components/PostsCertificate';
+import PublishQueue from './components/publishQueue';
 
 const { Link } = Typography;
 
@@ -67,6 +68,11 @@ export default () => {
   const siteOrdersPublish = useCallback(async () => {
     setSiteOrdersPublishState(true);
     const siteOrdersPublishResult = await pipelinesSiteOrdersPublish();
+
+    if (actionRef?.current) {
+      actionRef.current.reload();
+    }
+
     setSiteOrdersPublishState(false);
     if (siteOrdersPublishResult.statusCode === 201) {
       message.info('成功');
@@ -95,6 +101,7 @@ export default () => {
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有可以发布的内容啦～" />
           ),
         }}
+        polling={3000}
         columns={columns}
         actionRef={actionRef}
         request={async ({ pageSize, current }) => {
@@ -121,15 +128,11 @@ export default () => {
         options={false}
         size="middle"
         toolBarRender={() => [
-          <Button key="button" loading={siteOrdersPublishState} onClick={() => siteOrdersPublish()}>
-            立即开始发布
-          </Button>,
-          // <Button key="button" disabled>
-          //   等待发布 #1
-          // </Button>,
-          // <Button key="button" disabled>
-          //   正在发布 #1
-          // </Button>,
+          <PublishQueue
+            key="publishQueue"
+            siteOrdersPublishState={siteOrdersPublishState}
+            siteOrdersPublish={siteOrdersPublish}
+          />,
         ]}
       />
     </PageContainer>
