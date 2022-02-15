@@ -2,8 +2,8 @@ export default {
   'messages.table.noCoverExists': 'No cover image',
   'messages.domain.enterPrefixDomain':
     'Set a personalized domain name (web address visited by others)',
-  'messages.publish.currentStore': 'The currently selected storage service',
-  'messages.publish.noStoreSelected': 'No storage service selected',
+  'messages.publish.currentStorage': 'The currently selected storage service',
+  'messages.publish.noStorageSelected': 'No storage service selected',
   'messages.publish.success': 'Publish success',
   'messages.publish.waiting': 'Not publish',
   'messages.publish.publishing': 'Publishing',
@@ -12,7 +12,7 @@ export default {
   'messages.deployment.readyToStart': 'Ready to start...',
   'messages.deployment.validateSuccess': 'Information verification succeeded',
   'messages.deployment.validateFailed':
-    'Information verification failed, please check the following configuration',
+    'Information verification failed, please check the configuration',
   'messages.deployment.deploying': 'Publishing your Meta Space...',
   'messages.deployment.saveConfigSuccess': 'Successfully save Meta Space information settings',
   'messages.deployment.submitInfoSuccess': 'Submit Meta Space information successfully',
@@ -20,9 +20,9 @@ export default {
   'messages.deployment.submitConfigSuccess': 'Submit the Meta Space configuration successfully',
   'messages.deployment.submitConfigFailed':
     'Submit Meta Space configuration failed, reason: {reason}',
-  'messages.deployment.submitStoreSuccess':
+  'messages.deployment.submitStorageSuccess':
     'Submit the storage repository configuration successfully',
-  'messages.deployment.submitStoreFailed':
+  'messages.deployment.submitStorageFailed':
     'Failed to submit storage repository configuration, reason: {reason}',
   'messages.deployment.submitPublishSuccess': 'Submit the publish configuration successfully',
   'messages.deployment.submitPublishFailed':
@@ -40,20 +40,20 @@ export default {
   'messages.deployment.taskFailed.title': 'Publish failed',
   'messages.deployment.taskFinished.description':
     'Your Meta Space creation is complete and a new invitation code has been issued',
-  'messages.store.setRepoName':
-    'The submitted storage repository is named {storeRepo}, publish repository is {publishRepo}',
+  'messages.storage.setRepoName':
+    'The submitted storage repository is named {storageRepo}, publish repository is {publishRepo}',
   'messages.deployment.taskFailed.description':
     'Meta Space publish failed, please retry or contact us',
-  'messages.store.noRepoTokenReSelect':
+  'messages.storage.noRepoTokenReSelect':
     'Authorization failed, please rebind the storage repository service',
-  'messages.store.noRepoTokenFirstSelect':
+  'messages.storage.noRepoTokenFirstSelect':
     'Name verification failed, please bind storage service first',
-  'messages.store.repoNameCanNotBeEmpty': 'Please set the name of the storage repository',
-  'messages.store.repoNameAlreadyExists':
+  'messages.storage.repoNameCanNotBeEmpty': 'Please set the name of the storage repository',
+  'messages.storage.repoNameAlreadyExists':
     'The storage repository already exists, please set a new name',
-  'messages.store.form.repoName': 'Please set the name of the storage repository',
-  'messages.store.form.repoNameAvailable': 'This name is available!',
-  'messages.store.form.sameRepoName':
+  'messages.storage.form.repoName': 'Please set the name of the storage repository',
+  'messages.storage.form.repoNameAvailable': 'This name is available!',
+  'messages.storage.form.sameRepoName':
     'The names of the repositories should not be the same, please set a new name',
   'messages.invitation.title': 'Invitation code management',
   'messages.invitation.description':
@@ -86,12 +86,12 @@ export default {
   'messages.site.submitSuccess': 'Data submission completed',
   'messages.site.title': 'Meta Space information settings',
   'messages.site.description': 'Set your Meta Space information here',
-  'messages.storeSetting.bind': 'Bind',
-  'messages.storeSetting.alreadyBound': 'Bound',
-  'messages.storeSetting.notBound': 'Unbound',
-  'messages.storeSetting.unbind': 'Unbinding',
-  'messages.storeSetting.title': 'Storage repository configuration',
-  'messages.storeSetting.description': 'You can configure your Meta Space storage source here',
+  'messages.storageSetting.bind': 'Bind',
+  'messages.storageSetting.alreadyBound': 'Bound',
+  'messages.storageSetting.notBound': 'Unbound',
+  'messages.storageSetting.unbind': 'Unbinding',
+  'messages.storageSetting.title': 'Storage repository configuration',
+  'messages.storageSetting.description': 'You can configure your Meta Space storage source here',
   'messages.published.table.cover': 'Cover image',
   'messages.published.table.title': 'Title',
   'messages.published.table.category': 'Category',

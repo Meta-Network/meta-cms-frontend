@@ -34,7 +34,7 @@ export default () => {
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [editCurrentId, setEditCurrentId] = useState<number>(0);
   const { getLockedConfigState, setLockedConfig } = useModel('global');
-  const { setSiteNeedToDeploy } = useModel('storage');
+  const { setSiteNeedToDeploy } = useModel('localStorageHooks');
   const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
 
   getDefaultSiteConfig().then((response) => {

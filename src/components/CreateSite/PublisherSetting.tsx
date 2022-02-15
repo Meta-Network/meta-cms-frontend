@@ -3,14 +3,14 @@ import { useModel, FormattedMessage } from 'umi';
 import FormattedDescription from '../FormattedDescription';
 
 export default () => {
-  const { storeSetting } = useModel('storage');
+  const { storageSetting } = useModel('localStorageHooks');
 
-  const SelectedStore = () => {
+  const SelectedStorage = () => {
     return (
       <>
-        <FormattedMessage id="messages.publish.currentStore" />:{' '}
+        <FormattedMessage id="messages.publish.currentStorage" />:{' '}
         <strong>
-          {storeSetting.storage || <FormattedMessage id="messages.publish.noStoreSelected" />}
+          {storageSetting?.storage || <FormattedMessage id="messages.publish.noStorageSelected" />}
         </strong>
       </>
     );
@@ -24,7 +24,7 @@ export default () => {
       description={
         <>
           <FormattedDescription id="guide.publish.content" />
-          <SelectedStore />
+          <SelectedStorage />
         </>
       }
     />

@@ -11,7 +11,7 @@ const { Paragraph } = Typography;
 export default () => {
   const intl = useIntl();
   // @ts-ignore
-  const { themeSetting, setThemeSetting } = useModel('storage');
+  const { themeSetting, setThemeSetting } = useModel('localStorageHooks');
   const [themes, setThemes] = useState<CMS.ThemeTemplatesResponse[]>([]);
 
   useEffect(() => {
@@ -35,7 +35,6 @@ export default () => {
   return (
     <div className={styles.cardList}>
       <List
-        rowKey="name"
         grid={{
           column: 4,
           gutter: 16,

@@ -12,7 +12,7 @@ export default {
   'menu.manage.account': '账号',
   'menu.manage.source': '内容源',
   'menu.manage.siteSetting': '信息',
-  'menu.manage.storeSetting': '存储',
+  'menu.manage.storageSetting': '存储',
   'menu.manage.domainSetting': '域名',
   'menu.invitation': '邀请码',
   'menu.user.profile': '个人中心',

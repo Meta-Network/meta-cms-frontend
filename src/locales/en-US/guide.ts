@@ -71,7 +71,7 @@ export default {
   'guide.storage.setStorageAs': 'Successfully selected storage as {storage}',
   'guide.storage.unknownStorage': 'Unknown storage repository',
   'guide.storage.selectStorageFailed': 'Storage repository selection failed. Reason: {reason}',
-  'guide.repo.store': 'Storage repository(private)',
+  'guide.repo.storage': 'Storage repository(private)',
   'guide.repo.publish': 'Publish repository(public)',
   'guide.storage.unselected': 'Not selected',
 };
