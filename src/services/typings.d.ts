@@ -399,28 +399,18 @@ declare namespace CMS {
     publishingAlertFlag: boolean;
   };
 
-  type PipelinesSiteOrdersPublishQueue = {
-    pending: {
-      id: number;
-      createdAt: Date;
-      updatedAt: Date;
-      userId: number;
-      siteConfigId: number;
-      serverVerificationId: string;
-      publishSiteTaskId: string;
-      state: PipelineOrderTaskCommonState;
-    };
-    doing: {
-      id: number;
-      createdAt: Date;
-      updatedAt: Date;
-      userId: number;
-      siteConfigId: number;
-      serverVerificationId: string;
-      publishSiteTaskId: string;
-      state: PipelineOrderTaskCommonState;
-    };
+  type PipelinesSiteOrder = {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: number;
+    siteConfigId: number;
+    serverVerificationId: string;
+    publishSiteTaskId: string;
+    state: PipelineOrderTaskCommonState;
   };
+
+  type PipelinesSiteOrdersPublishQueue = Record<'pending' | 'doing', PipelinesSiteOrder>;
 }
 
 declare namespace GLOBAL {
