@@ -157,18 +157,6 @@ export default {
   'messages.domain.form.edit': 'Modify the deployment platform',
   'messages.domain.form.content': 'Domain name settings',
   'messages.domain.form.placeholder': 'Domain name of your Meta Space',
-  'messages.redeployment.taskStart': 'Start publishing Meta Space, please wait...',
-  'messages.redeployment.taskSuccess.title': 'mission completed',
-  'messages.redeployment.taskSuccess.description': 'Meta Space has been republished successfully',
-  'messages.redeployment.taskFailed.title': 'Task failed',
-  'messages.redeployment.taskFailed.description':
-    'Meta Space failed to publish, please try again or report to the development team',
-  'messages.redeployment.noSiteConfig': 'You have not created a Meta Space',
-  'messages.redeployment.button': 'Publish my Meta Space',
-  'messages.redeployment.description':
-    'To see the new updates of posts and site configration in my Meta Space',
-  'messages.redeployment.uploadIPFS.fail': 'IPFS upload failed',
-  'messages.redeployment.noKey': 'No KEY',
   'messages.copy.success': 'Copied to clipboard',
   'messages.editor.noDefaultConfig': 'Get the default configuration failed',
   'messages.editor.success': 'Publish successful',

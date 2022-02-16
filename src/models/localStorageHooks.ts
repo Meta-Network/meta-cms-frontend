@@ -7,7 +7,6 @@ export default () => {
   const [domainSetting, setDomainSetting] = useState<string | null>();
   const [storageSetting, setStorageSetting] = useState<Partial<GLOBAL.StorageSetting>>();
   const [siteSetting, setSiteSetting] = useState<GLOBAL.SiteSetting>();
-  const [siteNeedToDeploy, setSiteNeedToDeploy] = useState<boolean>();
 
   const localStorageByUser = useMemo(() => {
     const getAndParse = (key: string) => JSON.parse(window.localStorage.getItem(key) || '{}');
@@ -29,7 +28,6 @@ export default () => {
     setDomainSetting(localStorageByUser.get('domainSetting'));
     setStorageSetting(localStorageByUser.get('storageSetting'));
     setSiteSetting(localStorageByUser.get('siteSetting'));
-    setSiteNeedToDeploy(localStorageByUser.get('siteNeedToDeploy'));
   }, [localStorageByUser]);
 
   useEffect(() => {
@@ -44,18 +42,12 @@ export default () => {
     localStorageByUser.set('siteSetting', siteSetting);
   }, [localStorageByUser, siteSetting]);
 
-  useEffect(() => {
-    localStorageByUser.set('siteNeedToDeploy', siteNeedToDeploy);
-  }, [localStorageByUser, siteNeedToDeploy]);
-
   return {
     domainSetting,
     storageSetting,
     siteSetting,
-    siteNeedToDeploy,
     setDomainSetting,
     setStorageSetting,
     setSiteSetting,
-    setSiteNeedToDeploy,
   };
 };
