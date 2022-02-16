@@ -1,5 +1,5 @@
 import SiteSettingFormItems from '@/components/SiteSettingFormItems';
-import { useIntl, useModel } from 'umi';
+import { useIntl } from 'umi';
 import { Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
@@ -16,7 +16,6 @@ export default () => {
   const intl = useIntl();
   const [defaultSiteConfig, setDefaultSiteConfig] = useState<CMS.SiteConfiguration>();
   const [faviconUrl, setFaviconUrl] = useState<string>('');
-  const { setSiteNeedToDeploy } = useModel('localStorageHooks');
 
   const handleFinishing = async (values: GLOBAL.SiteSetting) => {
     if (faviconUrl) {
@@ -42,7 +41,6 @@ export default () => {
       await Promise.all([siteConfigRequest, siteInfoRequest]);
       done();
       message.success(intl.formatMessage({ id: 'messages.site.submitSuccess' }));
-      setSiteNeedToDeploy(true);
     }
   };
 

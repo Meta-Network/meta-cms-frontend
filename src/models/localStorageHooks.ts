@@ -8,7 +8,6 @@ export default () => {
   const [domainSetting, setDomainSetting] = useState<string>('');
   const [storageSetting, setStorageSetting] = useState<Partial<GLOBAL.StorageSetting>>({});
   const [siteSetting, setSiteSetting] = useState<GLOBAL.SiteSetting>({} as GLOBAL.SiteSetting);
-  const [siteNeedToDeploy, setSiteNeedToDeploy] = useState<boolean>(false);
 
   const getUsersEntity = (key: string) => {
     let entity;
@@ -46,7 +45,6 @@ export default () => {
     setIfHasValue(setDomainSetting, 'domainSetting', '');
     setIfHasValue(setStorageSetting, 'storageSetting', {});
     setIfHasValue(setSiteSetting, 'siteSetting', {});
-    setIfHasValue(setSiteNeedToDeploy, 'siteNeedToDeploy', false);
   }, [localStorageByUser, setIfHasValue]);
 
   useEffect(() => {
@@ -61,18 +59,12 @@ export default () => {
     localStorageByUser.set('siteSetting', siteSetting);
   }, [localStorageByUser, siteSetting]);
 
-  useEffect(() => {
-    localStorageByUser.set('siteNeedToDeploy', siteNeedToDeploy);
-  }, [localStorageByUser, siteNeedToDeploy]);
-
   return {
     domainSetting,
     storageSetting,
     siteSetting,
-    siteNeedToDeploy,
     setDomainSetting,
     setStorageSetting,
     setSiteSetting,
-    setSiteNeedToDeploy,
   };
 };

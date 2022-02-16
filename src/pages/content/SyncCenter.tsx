@@ -34,7 +34,6 @@ export default () => {
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [editCurrentId, setEditCurrentId] = useState<number>(0);
   const { getLockedConfigState, setLockedConfig } = useModel('global');
-  const { setSiteNeedToDeploy } = useModel('localStorageHooks');
   const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
 
   getDefaultSiteConfig().then((response) => {
@@ -69,7 +68,6 @@ export default () => {
     setLockedConfig(siteConfigId, false);
     done();
     message.success(intl.formatMessage({ id: 'messages.syncCenter.publishMultiPostsSuccess' }));
-    setSiteNeedToDeploy(true);
     if (ref.current?.reset) {
       await ref.current?.reset();
     }
@@ -236,16 +234,17 @@ export default () => {
       valueType: 'option',
       render: (_, record) => [
         <Button
+          ghost
+          key="option-edit"
+          type="primary"
           onClick={() => transferDraft(record)}
           loading={editCurrentId === record.id}
           disabled={editCurrentId !== 0 && editCurrentId !== record.id}
-          ghost
-          type="primary"
         >
           {intl.formatMessage({ id: 'component.button.edit' })}
         </Button>,
         <Button
-          key="option-ignore"
+          key="option-discard"
           onClick={() => ignoreSinglePost(record)}
           // loading={postsLoadings[index] === LoadingStates.Discarding}
           // disabled={postsLoadings[index] === LoadingStates.Publishing}

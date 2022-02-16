@@ -42,3 +42,10 @@ export const rules = {
     max: 200,
   },
 };
+
+/**
+ * 文章列表轮询时间
+ * 全部文章 发布中 已发布
+ * 发布中交互按钮状态查询
+ */
+export const postPolling = 3000;
