@@ -13,12 +13,13 @@ import { KEY_META_CMS_GATEWAY_CHECKED, STORAGE_PLATFORM } from '../../../config/
 import { storeGet, storeSet } from '@/utils/store';
 import { useIntl } from 'umi';
 import GenerateKey from './generate';
-import GatewayArewave from './gatewayArewave';
+import Seed from './seed';
 import Storage from './storage';
 import { GatewayType } from '@/services/constants';
 
 interface Props {
   readonly loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   handlePublish: (value: GatewayType) => void;
   setDropdownVisible: (visible: boolean) => void;
 }
@@ -27,7 +28,7 @@ const onFinishFailed = (errorInfo: any) => {
   console.log('Failed:', errorInfo);
 };
 
-const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
+const Submit: FC<Props> = ({ loading, setLoading, handlePublish, setDropdownVisible }) => {
   const intl = useIntl();
 
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
@@ -36,16 +37,25 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
   const [storagePrivateSetting, setStoragePrivateSetting] = useState<CMS.StoragePlatformSetting>();
   const [gatewayType, setGatewayType] = useState<GatewayType>(GatewayType.Default);
 
-  const onFinish = (values: any) => {
-    console.log('Success:', values);
+  // 提交
+  const onFinish = () => {
+    // 仅仅提交一次
+    if (loading) return;
 
-    if (gatewayType === GatewayType.Ipfs && !publicKey) {
+    setLoading(true);
+    // console.log('Success:', values);
+
+    // 没有 seed or key，seed and key not match
+    if (!publicKey) {
       message.warning(intl.formatMessage({ id: 'messages.editor.submit.generateKey' }));
+      setLoading(false);
       return;
     }
 
+    // 没有 storage
     if (!storagePublicSetting && !storagePrivateSetting) {
       message.warning(intl.formatMessage({ id: 'messages.editor.submit.bindStorage' }));
+      setLoading(false);
       return;
     }
 
@@ -90,6 +100,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
     }
   }, []);
 
+  // 处理存证类型改变
   const gatewayTypeChange = useCallback(
     (checkedValue: (GatewayType.Ipfs | GatewayType.Arweave)[]) => {
       // console.log('checkedValue', checkedValue);
@@ -163,12 +174,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
             </Space>
           </Checkbox.Group>
         </Form.Item>
-        {gatewayType === GatewayType.Arweave && (
-          <GatewayArewave
-            publicKey={publicKey}
-            setVisibleSignatureGenerate={setVisibleSignatureGenerate}
-          />
-        )}
+        <Seed publicKey={publicKey} setVisibleSignatureGenerate={setVisibleSignatureGenerate} />
 
         <Form.Item className={styles.footer}>
           <Space>

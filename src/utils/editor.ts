@@ -7,7 +7,12 @@ import {
   authorPostDigest,
   authorPostDigestSign,
 } from '@metaio/meta-signature-util-v2';
-import type { KeyPair, BaseSignatureMetadata } from '@metaio/meta-signature-util-v2';
+import type {
+  KeyPair,
+  BaseSignatureMetadata,
+  AuthorPostDigestMetadata,
+  AuthorPostSignatureMetadata,
+} from '@metaio/meta-signature-util-v2';
 import { storeGet, storeSet } from './store';
 import {
   KEY_META_CMS_METADATA_SEED,
@@ -152,6 +157,11 @@ export const publishMetaSpaceRequest = async ({
   };
 };
 
+/**
+ * generate pipelinesPostOrdersData
+ * @param payload
+ * @returns
+ */
 export const pipelinesPostOrdersData = ({
   payload,
 }: {
@@ -164,7 +174,10 @@ export const pipelinesPostOrdersData = ({
     tags: string;
     title: string;
   };
-}) => {
+}): {
+  authorPostDigest: AuthorPostDigestMetadata;
+  authorPostDigestSign: AuthorPostSignatureMetadata;
+} => {
   const verifyResult = verifySeedAndKey();
   if (!verifyResult) {
     throw new Error('seed or key does not exist or does not match.');
@@ -173,14 +186,14 @@ export const pipelinesPostOrdersData = ({
   const keys: KeyPair = generateKeys(verifyResult.seed);
 
   const authorPostDigestResult = authorPostDigest.generate(payload);
-  console.log('authorPostDigestResult', authorPostDigestResult);
+  // console.log('authorPostDigestResult', authorPostDigestResult);
 
   const authorPostDigestSignResult = authorPostDigestSign.generate(
     keys,
     META_SPACE_BASE_DOMAIN,
     authorPostDigestResult.digest,
   );
-  console.log('authorPostDigestSignResult', authorPostDigestSignResult);
+  // console.log('authorPostDigestSignResult', authorPostDigestSignResult);
 
   return {
     authorPostDigest: authorPostDigestResult,

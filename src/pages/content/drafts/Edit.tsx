@@ -48,6 +48,10 @@ import {
 import { storeGet } from '@/utils/store';
 import PublishingTip from '@/components/Editor/PublishingTip';
 import type { GatewayType } from '@/services/constants';
+import type {
+  AuthorPostDigestMetadata,
+  AuthorPostSignatureMetadata,
+} from '@metaio/meta-signature-util-v2';
 
 const keyUploadAllImages = 'keyUploadAllImages';
 const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
@@ -224,7 +228,24 @@ const Edit: React.FC = () => {
         tags: tags.join(),
       };
 
-      const { authorPostDigest, authorPostDigestSign } = pipelinesPostOrdersData({ payload });
+      // 校验 seed key，可能不匹配
+      let pipelinesPostOrdersDataResult;
+      try {
+        pipelinesPostOrdersDataResult = pipelinesPostOrdersData({ payload }) as {
+          authorPostDigest: AuthorPostDigestMetadata;
+          authorPostDigestSign: AuthorPostSignatureMetadata;
+        };
+      } catch (e: any) {
+        console.error('pipelinesPostOrders', e);
+        message.error(e.message);
+      }
+
+      if (!pipelinesPostOrdersDataResult) {
+        setPublishLoading(false);
+        return;
+      }
+
+      const { authorPostDigest, authorPostDigestSign } = pipelinesPostOrdersDataResult;
       const result = await pipelinesPostOrders({
         certificateStorageType: gatewayType,
         authorPostDigest,
@@ -313,9 +334,11 @@ const Edit: React.FC = () => {
     [initialState],
   );
 
-  // handle publish
+  // 处理提交
   const handlePublish = useCallback(
     async (gatewayType: GatewayType) => {
+      setPublishLoading(true);
+
       const { id } = history.location.query as Router.PostQuery;
       if (!id) {
         message.warning(
@@ -323,6 +346,7 @@ const Edit: React.FC = () => {
             id: 'messages.editor.tip.id',
           }),
         );
+        setPublishLoading(false);
         return;
       }
 
@@ -332,17 +356,19 @@ const Edit: React.FC = () => {
             id: 'messages.editor.tip.titleOrContent',
           }),
         );
+        setPublishLoading(false);
         return;
       }
 
       // check title
-      if (
-        !(await checkTitle({
-          titleValue: title,
-          id: Number(id),
-        }))
-      ) {
+      const checkTitleResult = await checkTitle({
+        titleValue: title,
+        id: Number(id),
+      });
+
+      if (!checkTitleResult) {
         message.warning('标题重复，请修改');
+        setPublishLoading(false);
         return;
       }
 
@@ -353,6 +379,7 @@ const Edit: React.FC = () => {
             id: 'messages.editor.tip.coverFormat',
           }),
         );
+        setPublishLoading(false);
         return;
       }
 
@@ -363,6 +390,7 @@ const Edit: React.FC = () => {
             id: 'messages.editor.noDefaultConfig',
           }),
         );
+        setPublishLoading(false);
         return;
       }
 
@@ -671,6 +699,7 @@ const Edit: React.FC = () => {
           </Settings>
         }
         loading={publishLoading}
+        setLoading={setPublishLoading}
         handlePublish={handlePublish}
       />
       <section className={styles.edit}>

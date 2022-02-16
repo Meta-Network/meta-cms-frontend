@@ -10,6 +10,7 @@ import { DraftMode } from '@/services/constants';
 interface Props {
   readonly draftMode: DraftMode;
   readonly loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   settings: JSX.Element;
   handlePublish: (gateway: GatewayType) => void;
   // headerCloudDraftUpload: JSX.Element;
@@ -18,6 +19,7 @@ interface Props {
 
 const EditorHeader: React.FC<Props> = ({
   loading,
+  setLoading,
   draftMode,
   handlePublish,
   // headerCloudDraftUpload,
@@ -81,6 +83,7 @@ const EditorHeader: React.FC<Props> = ({
               overlay={
                 <Submit
                   loading={loading}
+                  setLoading={setLoading}
                   handlePublish={handlePublish}
                   setDropdownVisible={setDropdownVisible}
                 />
