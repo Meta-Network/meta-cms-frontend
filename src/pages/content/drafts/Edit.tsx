@@ -385,7 +385,7 @@ const Edit: React.FC = () => {
       }
 
       // 封面长度判断
-      if (cover && cover.length > editorRules.cover.max) {
+      if (cover.length < editorRules.cover.min || cover.length > editorRules.cover.max) {
         message.warning('封面链接过长');
         setPublishLoading(false);
         return;
