@@ -148,10 +148,10 @@ const Submit: FC<Props> = ({ loading, setLoading, handlePublish, setDropdownVisi
         >
           <Radio value="githubStorage" checked={!!STORAGE_PLATFORM}>
             <span className={styles.itemType}>
-              {intl.formatMessage({ id: 'editor.submit.item.repo.private.name' })}
+              {intl.formatMessage({ id: 'editor.submit.item.repo.name' })}
             </span>
             {' - '}
-            {intl.formatMessage({ id: 'editor.submit.item.repo.private.description' })}
+            {intl.formatMessage({ id: 'editor.submit.item.repo.description' })}
           </Radio>
         </Form.Item>
         <Storage
@@ -167,7 +167,9 @@ const Submit: FC<Props> = ({ loading, setLoading, handlePublish, setDropdownVisi
           <Checkbox.Group onChange={(val: any) => gatewayTypeChange(val)} value={[gatewayType]}>
             <Space direction="vertical">
               <Checkbox value="arweave">
-                <span className={styles.itemType}>ARWEAVE</span>
+                <span className={styles.itemType}>
+                  {intl.formatMessage({ id: 'editor.submit.item.gateway.arweave.name' })}
+                </span>
                 {' - '}
                 {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
               </Checkbox>
