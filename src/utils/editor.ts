@@ -18,6 +18,7 @@ import {
   KEY_META_CMS_METADATA_SEED,
   KEY_META_CMS_METADATA_PUBLIC_KEYS,
   GITHUB_URL,
+  editorRules,
 } from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
 
@@ -38,7 +39,9 @@ export const generateSummary = (): string => {
     if (htmlContent) {
       const div = document.createElement('div');
       div.innerHTML = htmlContent;
-      return div.innerText.length >= 100 ? `${div.innerText.slice(0, 97)}...` : div.innerText;
+      return div.innerText.length >= editorRules.summary.max
+        ? `${div.innerText.slice(0, editorRules.summary.max - 3)}...`
+        : div.innerText;
     }
     return '';
   } catch (e) {

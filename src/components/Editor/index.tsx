@@ -8,6 +8,7 @@ import { useIntl } from 'umi';
 import { message } from 'antd';
 import { useMount } from 'ahooks';
 import type { EventEmitter } from 'ahooks/lib/useEventEmitter';
+import { editorRules } from '../../../config';
 
 interface Props {
   focus$: EventEmitter<string>;
@@ -107,7 +108,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ focus$ }) {
       },
       counter: {
         enable: true,
-        type: 'text',
+        max: editorRules.content.max,
       },
       hint: {
         emojiPath: 'https://cdn.jsdelivr.net/npm/vditor@1.8.3/dist/images/emoji',
