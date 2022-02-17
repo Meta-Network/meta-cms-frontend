@@ -49,3 +49,36 @@ export const rules = {
  * 发布中交互按钮状态查询
  */
 export const postPolling = 3000;
+
+// 编辑器相关规则
+export const editorRules = {
+  title: {
+    min: 1,
+    max: 60,
+  },
+  content: {
+    min: 3,
+    max: 10000,
+  },
+  summary: {
+    min: 3,
+    max: 100,
+  },
+  tags: {
+    min: 0,
+    max: 200,
+    maxNumber: 10,
+  },
+  categories: {
+    min: 0,
+    max: 200,
+  },
+  license: {
+    min: 0,
+    max: 50,
+  },
+  cover: {
+    min: 0,
+    max: 256,
+  },
+};

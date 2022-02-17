@@ -7,12 +7,18 @@ import {
   authorPostDigest,
   authorPostDigestSign,
 } from '@metaio/meta-signature-util-v2';
-import type { KeyPair, BaseSignatureMetadata } from '@metaio/meta-signature-util-v2';
+import type {
+  KeyPair,
+  BaseSignatureMetadata,
+  AuthorPostDigestMetadata,
+  AuthorPostSignatureMetadata,
+} from '@metaio/meta-signature-util-v2';
 import { storeGet, storeSet } from './store';
 import {
   KEY_META_CMS_METADATA_SEED,
   KEY_META_CMS_METADATA_PUBLIC_KEYS,
   GITHUB_URL,
+  editorRules,
 } from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
 
@@ -33,7 +39,9 @@ export const generateSummary = (): string => {
     if (htmlContent) {
       const div = document.createElement('div');
       div.innerHTML = htmlContent;
-      return div.innerText.length >= 100 ? `${div.innerText.slice(0, 97)}...` : div.innerText;
+      return div.innerText.length >= editorRules.summary.max
+        ? `${div.innerText.slice(0, editorRules.summary.max - 3)}...`
+        : div.innerText;
     }
     return '';
   } catch (e) {
@@ -152,6 +160,11 @@ export const publishMetaSpaceRequest = async ({
   };
 };
 
+/**
+ * generate pipelinesPostOrdersData
+ * @param payload
+ * @returns
+ */
 export const pipelinesPostOrdersData = ({
   payload,
 }: {
@@ -164,7 +177,10 @@ export const pipelinesPostOrdersData = ({
     tags: string;
     title: string;
   };
-}) => {
+}): {
+  authorPostDigest: AuthorPostDigestMetadata;
+  authorPostDigestSign: AuthorPostSignatureMetadata;
+} => {
   const verifyResult = verifySeedAndKey();
   if (!verifyResult) {
     throw new Error('seed or key does not exist or does not match.');
@@ -173,14 +189,14 @@ export const pipelinesPostOrdersData = ({
   const keys: KeyPair = generateKeys(verifyResult.seed);
 
   const authorPostDigestResult = authorPostDigest.generate(payload);
-  console.log('authorPostDigestResult', authorPostDigestResult);
+  // console.log('authorPostDigestResult', authorPostDigestResult);
 
   const authorPostDigestSignResult = authorPostDigestSign.generate(
     keys,
     META_SPACE_BASE_DOMAIN,
     authorPostDigestResult.digest,
   );
-  console.log('authorPostDigestSignResult', authorPostDigestSignResult);
+  // console.log('authorPostDigestSignResult', authorPostDigestSignResult);
 
   return {
     authorPostDigest: authorPostDigestResult,

@@ -7,12 +7,13 @@ import { getDefaultSiteConfigAPI } from '@/helpers';
 import { spaceTagsAPI } from '@/services/api/space';
 import { storeGet, storeSet } from '@/utils/store';
 import { uniqBy } from 'lodash';
+import { editorRules } from '../../../config';
 
 const { Option } = Select;
 const KEY_META_CMS_HISTORY_TAGS = 'metaCmsHistoryTags';
 const HISTORY_TAGS_MAX = 10;
 const SPACE_TAGS_MAX = 20;
-const SELECT_TAGS_MAX = 10;
+const SELECT_TAGS_MAX = editorRules.tags.maxNumber;
 
 interface Props {
   readonly tags: string[];
