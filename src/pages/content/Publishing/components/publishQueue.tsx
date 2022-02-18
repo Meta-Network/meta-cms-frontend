@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
-// import { useIntl } from 'umi';
+import { useIntl } from 'umi';
 import useSWR, { useSWRConfig } from 'swr';
 import {
   pipelinesSiteOrdersPublishQueue,
@@ -14,8 +14,8 @@ interface Props {
 }
 
 const PublishQueue: React.FC<Props> = ({ siteOrdersPublishState, siteOrdersPublish }) => {
+  const intl = useIntl();
   const { mutate } = useSWRConfig();
-  // const intl = useIntl();
 
   const { data, error } = useSWR(
     pipelinesSiteOrdersPublishQueueUrl,
@@ -38,15 +38,15 @@ const PublishQueue: React.FC<Props> = ({ siteOrdersPublishState, siteOrdersPubli
     <>
       {data.data.pending ? (
         <Button key="button" disabled>
-          等待发布 #{data.data.pending.id}
+          {intl.formatMessage({ id: 'posts.publishing.queue.pending' })} #{data.data.pending.id}
         </Button>
       ) : data.data.doing ? (
         <Button key="button" disabled>
-          正在发布 #{data.data.doing.id}
+          {intl.formatMessage({ id: 'posts.publishing.queue.doing' })} #{data.data.doing.id}
         </Button>
       ) : (
         <Button key="button" loading={siteOrdersPublishState} onClick={() => siteOrdersPublishFn()}>
-          立即开始发布
+          {intl.formatMessage({ id: 'posts.publishing.queue.default' })}
         </Button>
       )}
     </>
