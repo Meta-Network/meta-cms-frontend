@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import { Space, Typography } from 'antd';
-// import { useIntl } from 'umi';
+import { useIntl } from 'umi';
 import { StopOutlined, WarningFilled } from '@ant-design/icons';
 import { ShareIcon } from '../Icon';
 import styles from './index.less';
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const PostsCertificate: FC<Props> = ({ state, certificateId, certificateStorageType }) => {
-  // const intl = useIntl();
+  const intl = useIntl();
 
   /**
    * 无
@@ -39,11 +39,11 @@ const PostsCertificate: FC<Props> = ({ state, certificateId, certificateStorageT
   // 存证类型文字
   const certificateStorageTypeText = useMemo(() => {
     return certificateStorageType === GatewayType.Ipfs
-      ? 'IPFS 存证中'
+      ? `IPFS ${intl.formatMessage({ id: 'posts.table.certificate.doing' })}`
       : certificateStorageType === GatewayType.Arweave
-      ? 'ARWEAVE 存证中'
+      ? `ARWEAVE ${intl.formatMessage({ id: 'posts.table.certificate.doing' })}`
       : '';
-  }, [certificateStorageType]);
+  }, [certificateStorageType, intl]);
 
   return (
     <>
@@ -89,7 +89,9 @@ const PostsCertificate: FC<Props> = ({ state, certificateId, certificateStorageT
       ) : state === PipelineOrderTaskCommonState.FAILED ? (
         <Space style={{ color: 'red' }}>
           <WarningFilled />
-          <Text style={{ color: 'red' }}>存证失败</Text>
+          <Text style={{ color: 'red' }}>
+            {intl.formatMessage({ id: 'posts.table.certificate.failed' })}
+          </Text>
         </Space>
       ) : null}
     </>

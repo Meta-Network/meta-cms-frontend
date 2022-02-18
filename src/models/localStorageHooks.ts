@@ -19,7 +19,11 @@ export default () => {
           window.localStorage.setItem(key, JSON.stringify(entity));
         }
       },
-      get: (key: string) => getAndParse(key)[username],
+      get: (key: string) => {
+        if (getAndParse(key)) {
+          return getAndParse(key)[username];
+        }
+      },
     };
   }, [username]);
 

@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { Space, Typography } from 'antd';
-// import { useIntl } from 'umi';
+import { useIntl } from 'umi';
 import { ClockCircleOutlined, WarningFilled, CheckCircleFilled } from '@ant-design/icons';
 import { PipelineOrderTaskCommonState } from '@/services/constants';
 const { Text } = Typography;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const PostsSubmit: FC<Props> = ({ state }) => {
-  // const intl = useIntl();
+  const intl = useIntl();
 
   /**
    * PENDING 等待提交
@@ -24,22 +24,30 @@ const PostsSubmit: FC<Props> = ({ state }) => {
       {state === PipelineOrderTaskCommonState.PENDING ? (
         <Space style={{ color: 'gray' }}>
           <ClockCircleOutlined />
-          <Text style={{ color: 'gray' }}>等待提交</Text>
+          <Text style={{ color: 'gray' }}>
+            {intl.formatMessage({ id: 'posts.table.submitState.pending' })}
+          </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.DOING ? (
         <Space style={{ color: 'gray' }}>
           <ClockCircleOutlined />
-          <Text style={{ color: 'gray' }}>正在提交</Text>
+          <Text style={{ color: 'gray' }}>
+            {intl.formatMessage({ id: 'posts.table.submitState.doing' })}
+          </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.FINISHED ? (
         <Space style={{ color: 'green' }}>
           <CheckCircleFilled />
-          <Text style={{ color: 'green' }}>已提交</Text>
+          <Text style={{ color: 'green' }}>
+            {intl.formatMessage({ id: 'posts.table.submitState.finished' })}
+          </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.FAILED ? (
         <Space style={{ color: 'red' }}>
           <WarningFilled />
-          <Text style={{ color: 'red' }}>提交失败</Text>
+          <Text style={{ color: 'red' }}>
+            {intl.formatMessage({ id: 'posts.table.submitState.failed' })}
+          </Text>
         </Space>
       ) : null}
     </>

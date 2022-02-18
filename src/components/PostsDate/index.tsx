@@ -7,12 +7,6 @@ interface Props {
   readonly time: Date | string;
 }
 
-const PostsDate: FC<Props> = ({ time }) => {
-  return (
-    <>
-      <Text>{moment(time).format('YYYY-MM-DD HH:mm')}</Text>
-    </>
-  );
-};
+const PostsDate: FC<Props> = ({ time }) => <Text>{moment(time).format('YYYY-MM-DD HH:mm')}</Text>;
 
 export default PostsDate;
