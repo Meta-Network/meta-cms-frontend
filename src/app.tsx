@@ -16,7 +16,6 @@ import MenuUserInfo from './components/menu/MenuUserInfo';
 import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
 import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
-import PublishSiteButton from './components/menu/PublishSiteButton';
 import { RealTimeNotificationEvent } from './services/constants';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
@@ -63,8 +62,6 @@ function CustomSiderMenu({
           </Card>
         </a>
       )}
-      {/* Button to redeploy the Meta Space */}
-      {PublishSiteButton().node}
     </div>
   );
 }

@@ -76,7 +76,6 @@ const Edit: React.FC = () => {
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
-  const { setSiteNeedToDeploy } = useModel('localStorageHooks');
   const { initialState } = useModel('@@initialState');
 
   const postTempDataMergedUserId = useCallback(
@@ -261,7 +260,6 @@ const Edit: React.FC = () => {
         const { id } = history.location.query as Router.PostQuery;
         await handleUpdate(Number(id), postDataMergedUpdateAt({ post: result.data, draft: null }));
 
-        setSiteNeedToDeploy(true);
         setVisiblePublishingTip(true);
       } else if (result.statusCode === 400) {
         const _message =
@@ -288,7 +286,7 @@ const Edit: React.FC = () => {
         });
       }
     },
-    [title, cover, content, tags, license, handleUpdate, setSiteNeedToDeploy, intl],
+    [title, cover, content, tags, license, handleUpdate, intl],
   );
 
   /**

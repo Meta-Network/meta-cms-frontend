@@ -114,18 +114,6 @@ export async function deploySite(data: { siteConfigId: number }) {
   });
 }
 
-/** 部署并发布站点[旧的API] POST /tasks/deploy-publish */
-export async function deployAndPublishSite(data: {
-  configId: number;
-  authorPublishMetaSpaceRequestMetadataStorageType: string;
-  authorPublishMetaSpaceRequestMetadataRefer: string;
-}) {
-  return request<GLOBAL.GeneralResponse<any>>('/tasks/deploy-publish', {
-    method: 'POST',
-    data: data,
-  });
-}
-
 /** 进行特定平台的文章同步 POST /post/sync/{platform} */
 export async function syncPostsByPlatform(platform: string) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/sync/${platform}`, {
