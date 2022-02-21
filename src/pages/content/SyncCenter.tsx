@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import {
   ignorePendingPost,
   getDefaultSiteConfig,
@@ -10,7 +9,7 @@ import {
 import { useIntl, useModel, history } from 'umi';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Image, Button, Space, Tag, message, Modal, notification } from 'antd';
+import { Button, Space, Tag, message, Modal, notification, Typography } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useCallback, useRef } from 'react';
 import syncPostsRequest from '../../utils/sync-posts-request';
@@ -18,13 +17,15 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist, PostTempData } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
 import { imageUploadByUrlAPI } from '@/helpers';
-import styles from './SyncCenter.less';
 import { fetchIpfs } from '@/services/api/global';
 import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
 import { useMount } from 'ahooks';
 import { queryCurrentUser } from '@/services/api/meta-ucenter';
+import PostsCover from '@/components/PostsCover';
+import PostsDate from '@/components/PostsDate';
 
 const { confirm } = Modal;
+const { Link } = Typography;
 
 type PostInfo = CMS.ExistsPostsResponse['items'][number];
 
@@ -42,7 +43,7 @@ export default () => {
     }
   });
 
-  const ref = useRef<ActionType>();
+  const actionRef = useRef<ActionType>();
 
   const publishMultiplePosts = async (selectedKeys: number[]) => {
     if (siteConfigId === null) {
@@ -68,24 +69,23 @@ export default () => {
     setLockedConfig(siteConfigId, false);
     done();
     message.success(intl.formatMessage({ id: 'messages.syncCenter.publishMultiPostsSuccess' }));
-    if (ref.current?.reset) {
-      await ref.current?.reset();
+    if (actionRef.current?.reset) {
+      await actionRef.current?.reset();
     }
   };
 
+  // handle delete
   const ignoreSinglePost = async (record: PostInfo) => {
     const done = message.loading(intl.formatMessage({ id: 'messages.syncCenter.discardPost' }), 0);
     await ignorePendingPost(record.id);
     done();
     message.success(intl.formatMessage({ id: 'messages.syncCenter.discardPostSuccess' }));
-    if (ref.current?.reset) {
-      await ref.current?.reset();
+    if (actionRef.current?.reset) {
+      await actionRef.current?.reset();
     }
   };
 
-  /**
-   * transfer draft
-   */
+  // transfer draft
   const transferDraft = useCallback(
     async (post: CMS.Post) => {
       if (!currentUser?.id) {
@@ -178,121 +178,101 @@ export default () => {
   const columns: ProColumns<PostInfo>[] = [
     {
       dataIndex: 'cover',
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.cover' }),
-      search: false,
+      title: intl.formatMessage({ id: 'posts.table.cover' }),
+      width: 130,
       render: (_, record) => (
-        <Space>
-          {record.cover ? (
-            <Image width={100} src={record.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI)} />
-          ) : (
-            intl.formatMessage({ id: 'messages.table.noCoverExists' })
-          )}
-        </Space>
+        <PostsCover src={record.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI)} />
       ),
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.title' }),
       dataIndex: 'title',
-      width: 200,
-      copyable: true,
+      title: intl.formatMessage({ id: 'posts.table.title' }),
       ellipsis: true,
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.platform' }),
       dataIndex: 'platform',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.platform' }),
       width: 100,
-      filters: true,
-      onFilter: true,
       render: (_, record) => (
-        <Space>
+        <>
           {record.platform && (
             <Tag color="blue" key={`source-platform-${record.id}`}>
               {record.platform}
             </Tag>
           )}
-        </Space>
+        </>
       ),
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.createTime' }),
-      key: 'showTime',
       dataIndex: 'createdAt',
-      valueType: 'date',
-      sorter: true,
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.createTime' }),
+      render: (_, record) => <PostsDate time={record.createdAt} />,
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
-      key: 'showTime',
       dataIndex: 'updatedAt',
-      valueType: 'date',
-      sorter: true,
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
+      render: (_, record) => <PostsDate time={record.updatedAt} />,
     },
     {
+      dataIndex: 'action',
       title: intl.formatMessage({ id: 'messages.syncCenter.table.actions' }),
-      key: 'option',
-      width: 290,
-      valueType: 'option',
-      render: (_, record) => [
-        <Button
-          ghost
-          key="option-edit"
-          type="primary"
-          onClick={() => transferDraft(record)}
-          loading={editCurrentId === record.id}
-          disabled={editCurrentId !== 0 && editCurrentId !== record.id}
-        >
-          {intl.formatMessage({ id: 'component.button.edit' })}
-        </Button>,
-        <Button
-          key="option-discard"
-          onClick={() => ignoreSinglePost(record)}
-          // loading={postsLoadings[index] === LoadingStates.Discarding}
-          // disabled={postsLoadings[index] === LoadingStates.Publishing}
-          danger
-        >
-          {intl.formatMessage({ id: 'component.button.discard' })}
-        </Button>,
-      ],
+      width: 180,
+      render: (_, record) => (
+        <Space>
+          <Button
+            ghost
+            key="option-edit"
+            type="primary"
+            onClick={() => transferDraft(record)}
+            loading={editCurrentId === record.id}
+            disabled={editCurrentId !== 0 && editCurrentId !== record.id}
+          >
+            {intl.formatMessage({ id: 'component.button.edit' })}
+          </Button>
+          <Button
+            key="option-discard"
+            onClick={() => ignoreSinglePost(record)}
+            // loading={postsLoadings[index] === LoadingStates.Discarding}
+            // disabled={postsLoadings[index] === LoadingStates.Publishing}
+            danger
+          >
+            {intl.formatMessage({ id: 'component.button.discard' })}
+          </Button>
+        </Space>
+      ),
     },
   ];
 
+  // handle sync
+  const handleSync = useCallback(async () => {
+    setSyncLoading(true);
+    const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
+    await syncPostsRequest((await getSourceStatus()).data);
+    done();
+    message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
+    setSyncLoading(false);
+    if (actionRef.current?.reset) {
+      actionRef.current.reset();
+    }
+  }, [intl]);
+
   return (
     <PageContainer
+      className="custom-container"
       breadcrumb={{}}
       title={intl.formatMessage({ id: 'messages.syncCenter.title' })}
-      content={[
-        <div key="header-description" style={{ paddingTop: '11px', marginBottom: '4px' }}>
-          <p>{intl.formatMessage({ id: 'messages.syncCenter.description' })}</p>
-        </div>,
-        <div key="header-actions" className={styles.syncButtons}>
-          <Button
-            key="sync-button"
-            loading={syncLoading}
-            onClick={async () => {
-              setSyncLoading(true);
-              const done = message.loading(
-                intl.formatMessage({ id: 'messages.source.syncing' }),
-                0,
-              );
-              await syncPostsRequest((await getSourceStatus()).data);
-              done();
-              message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
-              setSyncLoading(false);
-              if (ref.current?.reset) {
-                ref.current.reset();
-              }
-            }}
-            style={{ marginRight: 10 }}
-          >
-            {intl.formatMessage({ id: 'component.button.syncNow' })}
-          </Button>
-        </div>,
-      ]}
+      content={
+        <p>
+          {intl.formatMessage({ id: 'messages.syncCenter.description' })}{' '}
+          <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
+            {intl.formatMessage({ id: 'posts.intro.learnMore' })}
+          </Link>
+        </p>
+      }
     >
       <ProTable<PostInfo>
-        actionRef={ref}
         columns={columns}
-        rowSelection={{}}
+        actionRef={actionRef}
         tableAlertOptionRender={({ selectedRowKeys }) => {
           return (
             <Space size={16}>
@@ -325,21 +305,18 @@ export default () => {
           };
         }}
         rowKey={(record) => record.id}
-        form={{
-          // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-          syncToUrl: (values, type) => {
-            if (type === 'get') {
-              return {
-                ...values,
-                created_at: [values.startTime, values.endTime],
-              };
-            }
-            return values;
-          },
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: false,
         }}
-        dateFormatter="string"
         search={false}
         options={false}
+        size="middle"
+        toolBarRender={() => [
+          <Button key="sync-button" loading={syncLoading} onClick={() => handleSync}>
+            {intl.formatMessage({ id: 'component.button.syncNow' })}
+          </Button>,
+        ]}
       />
     </PageContainer>
   );
