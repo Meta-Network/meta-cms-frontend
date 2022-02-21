@@ -35,6 +35,7 @@ import {
   KEY_GUN_ROOT,
   KEY_GUN_ROOT_DRAFT,
   KEY_META_CMS_GUN_PAIR,
+  editorRules,
 } from '../../../../config';
 import { DraftMode, FetchPostsStorageParamsState } from '@/services/constants';
 import Gun from 'gun';
@@ -48,6 +49,10 @@ import {
 import { storeGet } from '@/utils/store';
 import PublishingTip from '@/components/Editor/PublishingTip';
 import type { GatewayType } from '@/services/constants';
+import type {
+  AuthorPostDigestMetadata,
+  AuthorPostSignatureMetadata,
+} from '@metaio/meta-signature-util-v2';
 
 const keyUploadAllImages = 'keyUploadAllImages';
 const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
@@ -223,7 +228,24 @@ const Edit: React.FC = () => {
         tags: tags.join(),
       };
 
-      const { authorPostDigest, authorPostDigestSign } = pipelinesPostOrdersData({ payload });
+      // 校验 seed key，可能不匹配
+      let pipelinesPostOrdersDataResult;
+      try {
+        pipelinesPostOrdersDataResult = pipelinesPostOrdersData({ payload }) as {
+          authorPostDigest: AuthorPostDigestMetadata;
+          authorPostDigestSign: AuthorPostSignatureMetadata;
+        };
+      } catch (e: any) {
+        console.error('pipelinesPostOrders', e);
+        message.error(e.message);
+      }
+
+      if (!pipelinesPostOrdersDataResult) {
+        setPublishLoading(false);
+        return;
+      }
+
+      const { authorPostDigest, authorPostDigestSign } = pipelinesPostOrdersDataResult;
       const result = await pipelinesPostOrders({
         certificateStorageType: gatewayType,
         authorPostDigest,
@@ -311,9 +333,11 @@ const Edit: React.FC = () => {
     [initialState],
   );
 
-  // handle publish
+  // 处理提交
   const handlePublish = useCallback(
     async (gatewayType: GatewayType) => {
+      setPublishLoading(true);
+
       const { id } = history.location.query as Router.PostQuery;
       if (!id) {
         message.warning(
@@ -321,39 +345,62 @@ const Edit: React.FC = () => {
             id: 'messages.editor.tip.id',
           }),
         );
+        setPublishLoading(false);
         return;
       }
 
+      // 标题内容不能为空
       if (!title || !content) {
         message.warning(
           intl.formatMessage({
             id: 'messages.editor.tip.titleOrContent',
           }),
         );
+        setPublishLoading(false);
         return;
       }
 
-      // check title
-      if (
-        !(await checkTitle({
-          titleValue: title,
-          id: Number(id),
-        }))
-      ) {
-        message.warning('标题重复，请修改');
+      // title 长度判断
+      if (title.length < editorRules.title.min || title.length > editorRules.title.max) {
+        message.warning(`标题长度为 ${editorRules.title.min}-${editorRules.title.max}`);
+        setPublishLoading(false);
         return;
       }
 
-      // check cover format
+      // content 长度判断
+      if (content.length < editorRules.content.min || content.length > editorRules.content.max) {
+        message.warning(`内容长度为 ${editorRules.content.min}-${editorRules.content.max}`);
+        setPublishLoading(false);
+        return;
+      }
+
+      // summary 长度判断
+      const summary = generateSummary();
+      if (summary.length < editorRules.summary.min || summary.length > editorRules.summary.max) {
+        message.warning(`摘要长度为 ${editorRules.summary.min}-${editorRules.summary.max}`);
+        setPublishLoading(false);
+        return;
+      }
+
+      // 封面长度判断
+      if (cover.length < editorRules.cover.min || cover.length > editorRules.cover.max) {
+        message.warning('封面链接过长');
+        setPublishLoading(false);
+        return;
+      }
+
+      // 封面格式判断
       if (cover && !cover.includes(FLEEK_NAME)) {
-        message.success(
+        message.warning(
           intl.formatMessage({
             id: 'messages.editor.tip.coverFormat',
           }),
         );
+        setPublishLoading(false);
         return;
       }
 
+      // site config 判断
       const siteConfig = initialState?.siteConfig;
       if (!siteConfig) {
         message.warning(
@@ -361,12 +408,49 @@ const Edit: React.FC = () => {
             id: 'messages.editor.noDefaultConfig',
           }),
         );
+        setPublishLoading(false);
+        return;
+      }
+
+      // tags 长度 个数 判断
+      if (tags.length > editorRules.tags.maxNumber) {
+        message.warning(`最多 ${editorRules.tags.maxNumber} 个标签`);
+        setPublishLoading(false);
+        return;
+      }
+
+      const tagsStr = tags.join();
+      if (tagsStr.length < editorRules.tags.min || tagsStr.length > editorRules.tags.max) {
+        message.warning(`标签总长度为 ${editorRules.tags.min}-${editorRules.tags.max}`);
+        setPublishLoading(false);
+        return;
+      }
+
+      // categories 长度判断
+      // 暂无
+
+      // license 长度判断
+      if (license.length < editorRules.license.min || license.length > editorRules.license.max) {
+        message.warning(`协议长度为 ${editorRules.license.min}-${editorRules.license.max}`);
+        setPublishLoading(false);
+        return;
+      }
+
+      // check title
+      const checkTitleResult = await checkTitle({
+        titleValue: title,
+        id: Number(id),
+      });
+
+      if (!checkTitleResult) {
+        message.warning('标题重复，请修改');
+        setPublishLoading(false);
         return;
       }
 
       pipelinesPostOrdersFn(gatewayType);
     },
-    [title, cover, content, pipelinesPostOrdersFn, checkTitle, initialState, intl],
+    [title, cover, content, pipelinesPostOrdersFn, checkTitle, initialState, license, tags, intl],
   );
 
   /**
@@ -487,6 +571,7 @@ const Edit: React.FC = () => {
   const handleAsyncContentToDB = useCallback(async () => {
     if ((window as any)?.vditor) {
       const value = (window as any).vditor.getValue();
+
       await asyncContentToDB(value);
       await handleImageUploadToIpfs();
     }
@@ -669,6 +754,7 @@ const Edit: React.FC = () => {
           </Settings>
         }
         loading={publishLoading}
+        setLoading={setPublishLoading}
         handlePublish={handlePublish}
       />
       <section className={styles.edit}>
@@ -679,7 +765,7 @@ const Edit: React.FC = () => {
             id: 'editor.title',
           })}
           className={styles.title}
-          maxLength={100}
+          maxLength={editorRules.title.max}
           value={title}
           onChange={(e) => handleChangeTitle(e.target.value)}
         />

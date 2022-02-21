@@ -82,7 +82,7 @@
     "swr": "^1.2.1",
     "umi": "^3.5.20",
     "umi-serve": "^1.9.10",
-    "vditor": "3.8.10"
+    "vditor": "3.8.11"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^2.1.5",
