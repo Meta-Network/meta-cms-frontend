@@ -1,9 +1,7 @@
 import { useIntl, useModel } from 'umi';
-import Publish from '@/components/Submit/editor';
 import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useCallback, useMemo, useState } from 'react';
-import PublishSiteButton from '@/components/menu/PublishSiteButton';
-import { Button, Popconfirm, message, List, Dropdown } from 'antd';
+import { Button, Popconfirm, message, List } from 'antd';
 import {
   dbPostsDeleteAll,
   dbMetadatasDeleteAll,
@@ -18,12 +16,8 @@ export default () => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
 
-  const [publishLoading, setPublishLoading] = useState<boolean>(false);
-  const [dropdownVisible, setDropdownVisible] = useState<boolean>(false);
   const [deleteDraftLoading, setDeleteDraftLoading] = useState<boolean>(false);
   const [deleteCacheLoading, setDeleteCacheLoading] = useState<boolean>(false);
-
-  const publishSiteRequest = PublishSiteButton().func;
 
   /**
    * handle delete all local draft
@@ -90,6 +84,7 @@ export default () => {
         icon: <DeleteOutlined />,
         actions: [
           <Popconfirm
+            key="deleteDraft-confirm"
             title={intl.formatMessage({
               id: 'setting.deleteLocalDraft.all.tip',
             })}
@@ -110,12 +105,13 @@ export default () => {
         ],
       },
       {
-        name: 'deleteDraft',
+        name: 'clearCache',
         title: '清空本地缓存',
         description: '清空本地缓存',
         icon: <ExclamationCircleOutlined />,
         actions: [
           <Popconfirm
+            key="clearCache-confirm"
             title={'您确定要清空本地缓存吗？'}
             onConfirm={clearCache}
             okText={intl.formatMessage({
@@ -125,60 +121,14 @@ export default () => {
               id: 'component.button.no',
             })}
           >
-            <Button type="primary" danger key="deleteDraft-delete" loading={deleteCacheLoading}>
+            <Button type="primary" danger key="clearCache-clear" loading={deleteCacheLoading}>
               清空
             </Button>
           </Popconfirm>,
         ],
       },
-      {
-        name: 'publishSite',
-        title: intl.formatMessage({
-          id: 'messages.redeployment.button',
-        }),
-        description: intl.formatMessage({
-          id: 'messages.redeployment.description',
-        }),
-        icon: null,
-        actions: [
-          <Dropdown
-            overlay={
-              <Publish
-                loading={publishLoading}
-                setDropdownVisible={setDropdownVisible}
-                handlePublish={(gateway) => {
-                  setPublishLoading(true);
-                  publishSiteRequest(gateway).then(() => setPublishLoading(false));
-                }}
-              />
-            }
-            trigger={['click']}
-            placement="topCenter"
-            visible={dropdownVisible}
-            onVisibleChange={(visible: boolean) => setDropdownVisible(visible)}
-          >
-            <Button
-              key="publish-button"
-              loading={publishLoading}
-              className={styles.publishButton}
-              type="primary"
-            >
-              {intl.formatMessage({ id: 'messages.redeployment.button' })}
-            </Button>
-          </Dropdown>,
-        ],
-      },
     ],
-    [
-      dropdownVisible,
-      handleDeleteAllLocalDraft,
-      clearCache,
-      intl,
-      publishLoading,
-      publishSiteRequest,
-      deleteDraftLoading,
-      deleteCacheLoading,
-    ],
+    [handleDeleteAllLocalDraft, clearCache, intl, deleteDraftLoading, deleteCacheLoading],
   );
 
   return (

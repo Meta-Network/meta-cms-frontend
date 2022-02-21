@@ -10,8 +10,7 @@ export default () => {
   const { domainSetting, setDomainSetting } = useModel('localStorageHooks');
 
   const updateDomainSettings = async (values: { domain: string }) => {
-    const { domain } = values;
-    setDomainSetting(domain);
+    setDomainSetting(values.domain);
     message.success(intl.formatMessage({ id: 'messages.domain.updated' }));
   };
 
