@@ -7,12 +7,11 @@ import {
 import { useIntl, useModel, history } from 'umi';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Space, Tag, message, Modal, Typography, Popconfirm } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Space, Tag, message, Typography, Popconfirm } from 'antd';
 import { useState, useCallback, useRef } from 'react';
 import syncPostsRequest from '../../utils/sync-posts-request';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist, PostTempData } from '@/db/db';
+import { dbPostsAdd, dbPostsWhereExistByTitle, PostTempData } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { fetchIpfs } from '@/services/api/global';
@@ -20,7 +19,6 @@ import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
 import PostsCover from '@/components/PostsCover';
 import PostsDate from '@/components/PostsDate';
 
-const { confirm } = Modal;
 const { Link } = Typography;
 
 type PostInfo = CMS.ExistsPostsResponse['items'][number];
@@ -61,49 +59,53 @@ export default () => {
         return;
       }
 
+      // 1. 检查草稿标题是否同名
+      // - 同名 标题增加一个后缀(时间戳)，获取内容保存到草稿
+      // - 不同名 获取内容保存到草稿
+      // 2. 获取封面
+      // 3. 获取内容
+
       setEditCurrentId(post.id);
 
-      // check save as draft
-      const isExist = await dbPostsWhereExist(post.id);
-      if (isExist) {
-        setEditCurrentId(0);
-
-        const currentDraft = await dbPostsWhereByID(post.id);
-        const _url = currentDraft
-          ? `/content/drafts/edit?id=${currentDraft.id}`
-          : '/content/drafts';
-        confirm({
-          icon: <ExclamationCircleOutlined />,
-          content: intl.formatMessage({ id: 'messages.syncCenter.draftSavedTips' }),
-          async onOk() {
-            history.push(_url);
-          },
-          onCancel() {},
-        });
-        return;
-      }
+      const isExist = await dbPostsWhereExistByTitle({
+        title: post.title,
+        userId: initialState.currentUser.id,
+      });
+      // console.log('isExist', isExist);
 
       const _post = cloneDeep(post);
 
-      // image transfer ipfs
+      // image transfer IPFS
       if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
+        const done = message.loading('封面转存中', 0);
+
         const result = await imageUploadByUrlAPI(
           _post.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI),
         );
+
+        done();
         if (result) {
           message.success(intl.formatMessage({ id: 'messages.syncCenter.coverSavedSuccess' }));
           _post.cover = result.publicUrl;
+        } else {
+          message.error('封面转存失败');
         }
       }
 
       try {
+        const done = message.loading('获取内容中', 0);
+
         let postResult = await fetchIpfs(_post.source);
         if (!postResult.content && postResult.iv && postResult.encryptedData) {
           postResult = await decryptMatatakiPost(postResult.iv, postResult.encryptedData);
         }
 
-        if (!postResult.content) {
-          message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
+        done();
+
+        if (postResult.content) {
+          message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentSuccess' }));
+        } else {
+          message.error(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
           return;
         }
 
@@ -111,10 +113,9 @@ export default () => {
         const resultID = await dbPostsAdd(
           assign(PostTempData(), {
             cover: _post.cover,
-            title: _post.title,
+            title: isExist ? `${_post.title} ${Date.now()}` : _post.title,
             summary: _post.summary || '',
             content: postResult.content,
-            post: _post,
             tags: _post.tags || [],
             license: '',
             userId: initialState.currentUser.id,

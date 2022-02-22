@@ -145,13 +145,24 @@ export const dbPostsWhereByID = async (id: number): Promise<PostType.Posts | und
   return result.find((post) => post.post && Number(post.post.id) === id);
 };
 
+export const dbPostsWhereExistByTitle = async ({
+  title,
+  userId,
+}: {
+  title: string;
+  userId: number;
+}): Promise<boolean> => {
+  const result = await db.posts.filter((i) => !i.delete && i.userId === userId).toArray();
+  return result.some((post) => post.title === title);
+};
+
 /**
- * dbPostsWhereExistByTitle
+ * dbPostsWhereExistByTitleAndId
  * @param title
  * @param userId
  * @returns
  */
-export const dbPostsWhereExistByTitle = async ({
+export const dbPostsWhereExistByTitleAndId = async ({
   title,
   id,
   userId,

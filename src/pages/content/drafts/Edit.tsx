@@ -11,7 +11,7 @@ import {
   dbPostsAdd,
   dbPostsGet,
   PostTempData,
-  dbPostsWhereExistByTitle,
+  dbPostsWhereExistByTitleAndId,
 } from '@/db/db';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { assign, cloneDeep, uniq } from 'lodash';
@@ -303,7 +303,7 @@ const Edit: React.FC = () => {
         return false;
       }
 
-      const isLocalExist = await dbPostsWhereExistByTitle({
+      const isLocalExist = await dbPostsWhereExistByTitleAndId({
         title: titleValue,
         id,
         userId: initialState.currentUser!.id,
