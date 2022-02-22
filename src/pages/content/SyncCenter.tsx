@@ -212,9 +212,7 @@ export default () => {
     const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
 
     const sourceStatusResult = await getSourceStatus();
-    if (sourceStatusResult.statusCode === 200) {
-      //
-    } else {
+    if (sourceStatusResult.statusCode !== 200) {
       done();
       setSyncLoading(false);
       message.success(intl.formatMessage({ id: 'messages.source.syncFailed' }));
