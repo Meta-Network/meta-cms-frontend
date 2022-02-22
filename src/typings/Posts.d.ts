@@ -15,11 +15,12 @@ declare namespace PostType {
     status: 'pending' | 'publish';
     timestamp: number;
     delete: boolean;
-    post: (CMS.Post & { stateId: number; stateIdData: FetchPostsStorageState }) | null;
-    draft: CMS.Draft | null;
+    post: CMS.PipelinesOrdersData | null;
+    draft: null;
     tags: string[];
     license: string;
     userId: number;
+    sourceData: CMS.Post | null;
     createdAt: string;
     updatedAt: string;
   };

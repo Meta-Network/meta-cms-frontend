@@ -118,6 +118,7 @@ export default () => {
             content: postResult.content,
             tags: _post.tags || [],
             license: '',
+            sourceData: _post,
             userId: initialState.currentUser.id,
           }),
         );

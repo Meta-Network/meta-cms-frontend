@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback, useEffect } from 'react';
+import React, { Fragment, useState, useCallback, useEffect, useMemo } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { Input, message, notification } from 'antd';
 import Editor from '@/components/Editor';
@@ -37,7 +37,7 @@ import {
   KEY_META_CMS_GUN_PAIR,
   editorRules,
 } from '../../../../config';
-import { DraftMode, FetchPostsStorageParamsState } from '@/services/constants';
+import { DraftMode, FetchPostsStorageParamsState, SyncPlatform } from '@/services/constants';
 import Gun from 'gun';
 import {
   fetchGunDraftsAndUpdateLocal,
@@ -77,6 +77,15 @@ const Edit: React.FC = () => {
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   const { initialState } = useModel('@@initialState');
+
+  // 原文链接
+  const settingsOriginalLinkHash = useMemo(() => {
+    if (postData.sourceData?.platform === SyncPlatform.MATATAKI) {
+      return postData.sourceData.source;
+    } else {
+      return '';
+    }
+  }, [postData]);
 
   const postTempDataMergedUserId = useCallback(
     () => assign(PostTempData(), { userId: initialState?.currentUser?.id }),
@@ -743,7 +752,7 @@ const Edit: React.FC = () => {
           <Settings>
             <Fragment>
               <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
-              <SettingsOriginalLink hash={postData.post?.source || postData.draft?.source || ''} />
+              <SettingsOriginalLink hash={settingsOriginalLinkHash} />
               <SettingsCopyrightNotice
                 license={license}
                 handleChangeLicense={handleChangeLicense}

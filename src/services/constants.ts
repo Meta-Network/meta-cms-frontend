@@ -65,3 +65,7 @@ export enum RealTimeNotificationEvent {
   INVITATION_COUNT_UPDATED = 'invitation.count.updated',
   POST_PUBLISHING_STATE_UPDATED = 'post.publishing.state.updated',
 }
+
+export enum SyncPlatform {
+  MATATAKI = 'matataki',
+}
