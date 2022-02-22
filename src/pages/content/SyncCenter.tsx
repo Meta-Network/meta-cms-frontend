@@ -92,15 +92,12 @@ export default () => {
         }
       }
 
+      const done = message.loading('获取内容中', 0);
       try {
-        const done = message.loading('获取内容中', 0);
-
         let postResult = await fetchIpfs(_post.source);
         if (!postResult.content && postResult.iv && postResult.encryptedData) {
           postResult = await decryptMatatakiPost(postResult.iv, postResult.encryptedData);
         }
-
-        done();
 
         if (postResult.content) {
           message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentSuccess' }));
@@ -129,6 +126,7 @@ export default () => {
         message.success(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
       } finally {
         setEditCurrentId(0);
+        done();
       }
     },
     [intl, initialState?.currentUser],
