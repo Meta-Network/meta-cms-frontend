@@ -1,15 +1,13 @@
 import {
   ignorePendingPost,
-  getDefaultSiteConfig,
   fetchPostSync,
   getSourceStatus,
-  publishPosts,
   decryptMatatakiPost,
 } from '@/services/api/meta-cms';
 import { useIntl, useModel, history } from 'umi';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Space, Tag, message, Modal, notification, Typography } from 'antd';
+import { Button, Space, Tag, message, Modal, Typography, Popconfirm } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useCallback, useRef } from 'react';
 import syncPostsRequest from '../../utils/sync-posts-request';
@@ -19,8 +17,6 @@ import { assign, cloneDeep } from 'lodash';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { fetchIpfs } from '@/services/api/global';
 import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
-import { useMount } from 'ahooks';
-import { queryCurrentUser } from '@/services/api/meta-ucenter';
 import PostsCover from '@/components/PostsCover';
 import PostsDate from '@/components/PostsDate';
 
@@ -31,64 +27,37 @@ type PostInfo = CMS.ExistsPostsResponse['items'][number];
 
 export default () => {
   const intl = useIntl();
-  const [siteConfigId, setSiteConfigId] = useState<number | null>(null);
+  const { initialState } = useModel('@@initialState');
+
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [editCurrentId, setEditCurrentId] = useState<number>(0);
-  const { getLockedConfigState, setLockedConfig } = useModel('global');
-  const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
-
-  getDefaultSiteConfig().then((response) => {
-    if (response.data) {
-      setSiteConfigId(response.data.id);
-    }
-  });
+  const [deleteCurrentId, setDeleteEditCurrentId] = useState<number>(0);
 
   const actionRef = useRef<ActionType>();
 
-  const publishMultiplePosts = async (selectedKeys: number[]) => {
-    if (siteConfigId === null) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.description' }),
-      });
-      return;
-    }
-    if (getLockedConfigState(siteConfigId)) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.description' }),
-      });
-      return;
-    }
-    setLockedConfig(siteConfigId, true);
-    const done = message.loading(
-      intl.formatMessage({ id: 'messages.syncCenter.publishMultiPosts' }),
-      0,
-    );
-    await publishPosts(selectedKeys, [siteConfigId]);
-    setLockedConfig(siteConfigId, false);
-    done();
-    message.success(intl.formatMessage({ id: 'messages.syncCenter.publishMultiPostsSuccess' }));
-    if (actionRef.current?.reset) {
-      await actionRef.current?.reset();
-    }
-  };
-
   // handle delete
   const ignoreSinglePost = async (record: PostInfo) => {
+    setDeleteEditCurrentId(record.id);
     const done = message.loading(intl.formatMessage({ id: 'messages.syncCenter.discardPost' }), 0);
-    await ignorePendingPost(record.id);
+    const ignorePostResult = await ignorePendingPost(record.id);
+
+    setDeleteEditCurrentId(0);
     done();
-    message.success(intl.formatMessage({ id: 'messages.syncCenter.discardPostSuccess' }));
-    if (actionRef.current?.reset) {
-      await actionRef.current?.reset();
+
+    if (ignorePostResult.statusCode === 201) {
+      message.success(intl.formatMessage({ id: 'messages.syncCenter.discardPostSuccess' }));
+      if (actionRef.current?.reset) {
+        await actionRef.current?.reset();
+      }
+    } else {
+      message.error('移除此文章失败');
     }
   };
 
   // transfer draft
-  const transferDraft = useCallback(
+  const handleEditPost = useCallback(
     async (post: CMS.Post) => {
-      if (!currentUser?.id) {
+      if (!initialState?.currentUser?.id) {
         return;
       }
 
@@ -148,7 +117,7 @@ export default () => {
             post: _post,
             tags: _post.tags || [],
             license: '',
-            userId: currentUser?.id,
+            userId: initialState.currentUser.id,
           }),
         );
 
@@ -160,20 +129,8 @@ export default () => {
         setEditCurrentId(0);
       }
     },
-    [intl, currentUser],
+    [intl, initialState?.currentUser],
   );
-
-  /** fetch current user */
-  const fetchCurrentUser = useCallback(async () => {
-    const result = await queryCurrentUser();
-    if (result.statusCode === 200) {
-      setCurrentUser(result.data);
-    }
-  }, []);
-
-  useMount(() => {
-    fetchCurrentUser();
-  });
 
   const columns: ProColumns<PostInfo>[] = [
     {
@@ -223,21 +180,27 @@ export default () => {
             ghost
             key="option-edit"
             type="primary"
-            onClick={() => transferDraft(record)}
+            onClick={() => handleEditPost(record)}
             loading={editCurrentId === record.id}
             disabled={editCurrentId !== 0 && editCurrentId !== record.id}
           >
             {intl.formatMessage({ id: 'component.button.edit' })}
           </Button>
-          <Button
-            key="option-discard"
-            onClick={() => ignoreSinglePost(record)}
-            // loading={postsLoadings[index] === LoadingStates.Discarding}
-            // disabled={postsLoadings[index] === LoadingStates.Publishing}
-            danger
+
+          <Popconfirm
+            placement="top"
+            title={'您确定要删除此文章吗？'}
+            onConfirm={() => ignoreSinglePost(record)}
           >
-            {intl.formatMessage({ id: 'component.button.discard' })}
-          </Button>
+            <Button
+              key="option-discard"
+              danger
+              loading={deleteCurrentId === record.id}
+              disabled={deleteCurrentId !== 0 && deleteCurrentId !== record.id}
+            >
+              {intl.formatMessage({ id: 'component.button.discard' })}
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -247,10 +210,23 @@ export default () => {
   const handleSync = useCallback(async () => {
     setSyncLoading(true);
     const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
-    await syncPostsRequest((await getSourceStatus()).data);
+
+    const sourceStatusResult = await getSourceStatus();
+    if (sourceStatusResult.statusCode === 200) {
+      //
+    } else {
+      done();
+      setSyncLoading(false);
+      message.success(intl.formatMessage({ id: 'messages.source.syncFailed' }));
+      return;
+    }
+
+    // TODO: api http code 400
+    await syncPostsRequest(sourceStatusResult.data);
     done();
-    message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
     setSyncLoading(false);
+    message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
+
     if (actionRef.current?.reset) {
       actionRef.current.reset();
     }
@@ -273,36 +249,22 @@ export default () => {
       <ProTable<PostInfo>
         columns={columns}
         actionRef={actionRef}
-        tableAlertOptionRender={({ selectedRowKeys }) => {
-          return (
-            <Space size={16}>
-              <Button onClick={() => publishMultiplePosts(selectedRowKeys as number[])}>
-                {intl.formatMessage({ id: 'messages.syncCenter.button.publishMultiPosts' })}
-              </Button>
-              <Button danger>
-                {intl.formatMessage({ id: 'messages.syncCenter.button.discardMultiPosts' })}
-              </Button>
-            </Space>
-          );
-        }}
         request={async ({ pageSize, current }) => {
-          // TODO: 分页
           const params = {
             page: current ?? 1,
             limit: pageSize ?? 10,
             state: 'pending' as CMS.PostState,
           };
-          const request = await fetchPostSync(params);
-          // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
-          // 如果需要转化参数可以在这里进行修改
-          return {
-            data: request.data.items,
-            // success 请返回 true，
-            // 不然 table 会停止解析数据，即使有数据
-            success: true,
-            // 不传会使用 data 的长度，如果是分页一定要传
-            total: request.data.meta.totalItems,
-          };
+          const result = await fetchPostSync(params);
+          if (result.statusCode === 200) {
+            return {
+              data: result.data.items,
+              success: true,
+              total: result.data.meta.totalItems,
+            };
+          } else {
+            return { success: false };
+          }
         }}
         rowKey={(record) => record.id}
         pagination={{
@@ -313,7 +275,7 @@ export default () => {
         options={false}
         size="middle"
         toolBarRender={() => [
-          <Button key="sync-button" loading={syncLoading} onClick={() => handleSync}>
+          <Button key="sync-button" loading={syncLoading} onClick={() => handleSync()}>
             {intl.formatMessage({ id: 'component.button.syncNow' })}
           </Button>,
         ]}
