@@ -154,7 +154,6 @@ export default {
   'messages.editor.verify.tag.number': '最多 { maxNumber } 个标签',
   'messages.editor.verify.license.length': '协议长度为 { min }-{ max }',
   'messages.editor.verify.title.repeat': '标题重复，请修改',
-
   'messages.editor.upload.image.type': '您只能上传 {type} 文件！',
   'messages.editor.upload.image.size': '图片必须小于 {size}MB！',
   'messages.editor.upload.image.token.not': '令牌获取失败',

@@ -178,7 +178,6 @@ export default {
   'messages.editor.verify.tag.number': '最多 { maxNumber } 个标签',
   'messages.editor.verify.license.length': '协议长度为 { min }-{ max }',
   'messages.editor.verify.title.repeat': '标题重复，请修改',
-
   'messages.editor.upload.image.type': 'You can only upload {type} files!',
   'messages.editor.upload.image.size': 'The image must be smaller than {size}MB!',
   'messages.editor.upload.image.token.not': 'Token acquisition failed',
