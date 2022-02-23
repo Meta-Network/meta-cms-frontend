@@ -71,9 +71,9 @@ export default () => {
 
     setSiteOrdersPublishState(false);
     if (siteOrdersPublishResult.statusCode === 201) {
-      message.info('成功');
+      message.success(intl.formatMessage({ id: 'messages.success' }));
     } else {
-      message.error('失败');
+      message.error(intl.formatMessage({ id: 'messages.fail' }));
     }
   }, []);
 
@@ -94,7 +94,10 @@ export default () => {
       <ProTable<CMS.PipelinesOrdersItem>
         locale={{
           emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有可以发布的内容啦～" />
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={intl.formatMessage({ id: 'posts.publishing.empty' })}
+            />
           ),
         }}
         polling={postPolling}

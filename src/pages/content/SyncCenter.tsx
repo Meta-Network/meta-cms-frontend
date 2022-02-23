@@ -48,7 +48,7 @@ export default () => {
         await actionRef.current?.reset();
       }
     } else {
-      message.error('移除此文章失败');
+      message.error(intl.formatMessage({ id: 'messages.syncCenter.discardPostFail' }));
     }
   };
 
@@ -77,7 +77,10 @@ export default () => {
 
       // image transfer IPFS
       if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
-        const done = message.loading('封面转存中', 0);
+        const done = message.loading(
+          intl.formatMessage({ id: 'messages.syncCenter.coverSavedLoading' }),
+          0,
+        );
 
         const result = await imageUploadByUrlAPI(
           _post.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI),
@@ -88,11 +91,14 @@ export default () => {
           message.success(intl.formatMessage({ id: 'messages.syncCenter.coverSavedSuccess' }));
           _post.cover = result.publicUrl;
         } else {
-          message.error('封面转存失败');
+          message.error(intl.formatMessage({ id: 'messages.syncCenter.coverSavedFail' }));
         }
       }
 
-      const done = message.loading('获取内容中', 0);
+      const done = message.loading(
+        intl.formatMessage({ id: 'messages.syncCenter.getContentLoading' }),
+        0,
+      );
       try {
         let postResult = await fetchIpfs(_post.source);
         if (!postResult.content && postResult.iv && postResult.encryptedData) {
@@ -121,9 +127,11 @@ export default () => {
         );
 
         history.push(`/content/drafts/edit?id=${resultID}`);
+
+        message.success(intl.formatMessage({ id: 'messages.syncCenter.savedSuccess' }));
       } catch (e) {
         console.error(e);
-        message.success(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
+        message.error(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
       } finally {
         setEditCurrentId(0);
         done();
@@ -189,7 +197,9 @@ export default () => {
 
           <Popconfirm
             placement="top"
-            title={'您确定要删除此文章吗？'}
+            title={intl.formatMessage({
+              id: 'messages.syncCenter.table.actions.deletePopconfirmTitle',
+            })}
             onConfirm={() => ignoreSinglePost(record)}
           >
             <Button
@@ -219,7 +229,6 @@ export default () => {
       return;
     }
 
-    // TODO: api http code 400
     await syncPostsRequest(sourceStatusResult.data);
     done();
     setSyncLoading(false);
@@ -234,10 +243,10 @@ export default () => {
     <PageContainer
       className="custom-container"
       breadcrumb={{}}
-      title={intl.formatMessage({ id: 'messages.syncCenter.title' })}
+      title={intl.formatMessage({ id: 'posts.syncCenter.title' })}
       content={
         <p>
-          {intl.formatMessage({ id: 'messages.syncCenter.description' })}{' '}
+          {intl.formatMessage({ id: 'posts.syncCenter.intro' })}{' '}
           <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
             {intl.formatMessage({ id: 'posts.intro.learnMore' })}
           </Link>

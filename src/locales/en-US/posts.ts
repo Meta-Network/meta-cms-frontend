@@ -27,10 +27,13 @@ export default {
   'posts.publishing.queue.default': '立即开始发布',
   'posts.publishing.queue.pending': '等待发布',
   'posts.publishing.queue.doing': '正在发布',
+  'posts.publishing.empty': '没有可以发布的内容啦～',
   'posts.published.title': '已发布',
   'posts.published.intro': '检查和管理已经发布到 Meta Space 的作品',
   'posts.draft.title': '草稿',
   'posts.draft.intro': '检查和管理已经创建的草稿',
+  'posts.syncCenter.title': 'Sync center',
+  'posts.syncCenter.intro': 'Synchronize and manage articles obtained from data sources here',
 
   'posts.drafts.table.createdAt': 'Created At',
   'posts.drafts.table.updatedAt': 'Updated At',

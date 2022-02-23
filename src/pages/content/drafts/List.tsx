@@ -144,12 +144,6 @@ export default () => {
               handleDelete(Number(record.id), record?.key);
             }}
             onCancel={(e) => e?.stopPropagation()}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
           >
             <Button danger onClick={(e) => e.stopPropagation()}>
               {intl.formatMessage({
