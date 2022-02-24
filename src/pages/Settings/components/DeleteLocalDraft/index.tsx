@@ -70,31 +70,32 @@ export default () => {
     // LocalStorage Cookies SessionStorage 因为里面存了一些别的数据，暂时不清理
 
     setDeleteCacheLoading(false);
-    message.success('成功');
-  }, []);
+
+    message.success(
+      intl.formatMessage({
+        id: 'messages.success',
+      }),
+    );
+  }, [intl]);
 
   const list = useMemo(
     () => [
       {
         name: 'deleteDraft',
-        title: '删除本地草稿',
+        title: intl.formatMessage({
+          id: 'setting.deleteLocalDraft.title',
+        }),
         description: intl.formatMessage({
-          id: 'setting.deleteLocalDraft.all',
+          id: 'setting.deleteLocalDraft.description',
         }),
         icon: <DeleteOutlined />,
         actions: [
           <Popconfirm
             key="deleteDraft-confirm"
             title={intl.formatMessage({
-              id: 'setting.deleteLocalDraft.all.tip',
+              id: 'setting.deleteLocalDraft.popconfirmTitle',
             })}
             onConfirm={handleDeleteAllLocalDraft}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
           >
             <Button type="primary" danger key="deleteDraft-delete" loading={deleteDraftLoading}>
               {intl.formatMessage({
@@ -106,23 +107,25 @@ export default () => {
       },
       {
         name: 'clearCache',
-        title: '清空本地缓存',
-        description: '清空本地缓存',
+        title: intl.formatMessage({
+          id: 'setting.deleteLocalCache.title',
+        }),
+        description: intl.formatMessage({
+          id: 'setting.deleteLocalCache.description',
+        }),
         icon: <ExclamationCircleOutlined />,
         actions: [
           <Popconfirm
             key="clearCache-confirm"
-            title={'您确定要清空本地缓存吗？'}
+            title={intl.formatMessage({
+              id: 'setting.deleteLocalCache.popconfirmTitle',
+            })}
             onConfirm={clearCache}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
           >
             <Button type="primary" danger key="clearCache-clear" loading={deleteCacheLoading}>
-              清空
+              {intl.formatMessage({
+                id: 'component.button.delete',
+              })}
             </Button>
           </Popconfirm>,
         ],

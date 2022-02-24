@@ -7,8 +7,8 @@ export default () => {
     <Result
       className={styles.antResult}
       icon={'🚧'}
-      title={<FormattedMessage id="手机端正在施工中" />}
-      subTitle={<FormattedMessage id="敬请使用电脑端体验本页面" />}
+      title={<FormattedMessage id="result.mobile.title" />}
+      subTitle={<FormattedMessage id="result.mobile.description" />}
     />
   );
 };

@@ -8,6 +8,7 @@ import component from './en-US/component';
 import timezones from './en-US/timezones';
 import login from './en-US/login';
 import manage from './en-US/manage';
+import result from './en-US/result';
 
 export default {
   ...menu,
@@ -20,4 +21,5 @@ export default {
   ...timezones,
   ...login,
   ...manage,
+  ...result,
 };
