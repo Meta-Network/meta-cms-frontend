@@ -34,7 +34,6 @@ export default {
   'posts.draft.intro': '检查和管理已经创建的草稿',
   'posts.syncCenter.title': 'Sync center',
   'posts.syncCenter.intro': 'Synchronize and manage articles obtained from data sources here',
-
   'posts.drafts.table.createdAt': 'Created At',
   'posts.drafts.table.updatedAt': 'Updated At',
   'posts.drafts.table.action': 'Action',
