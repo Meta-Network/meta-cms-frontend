@@ -61,7 +61,6 @@ export default {
     '在取得原作者或权利人同意后，对作品进行改编、翻译再创作的，视同原创。',
   'editor.license.originalStatement.content.nine':
     'Meta Space 鼓励用户发布原创文章，勾选本原创声明的文章会展示原创标识。但本原创声明仅是您对文章内容原创性的单方承诺，并不表示 Meta Network 或 Meta Space 认可了文章的原创性。',
-
   'editor.license.creativeCommons': 'Creative Commons 授权许可协议',
   'editor.license.creativeCommons.tip': 'Creative Commons 授权许可协议',
   'editor.license.creativeCommons.share': '请问您允许作品被别人转载、节选、混编、二次创作吗？',
@@ -74,4 +73,14 @@ export default {
     '他人再混合、转换或者基于本作品进行创作，必须基于与原先许可协议相同的许可协议分发作品。',
   'editor.license.creativeCommons.businessAllowed': '允许商业性使用',
   'editor.license.creativeCommons.terms': '则授权条款为：',
+  'editor.publishingTip.cover.loading': 'Loading...',
+  'editor.publishingTip.cover.finish': 'Successful',
+  'editor.publishingTip.content.loadingTextOne': '感谢您的创作和信任！',
+  'editor.publishingTip.content.loadingTextTwo': '正在将您的文章添加到发布队列中，请勿关闭此页面',
+  'editor.publishingTip.content.finishTextOne': '您的文章已经在发布队列中了～',
+  'editor.publishingTip.content.finishTextTwo': '这需要花费一些时间和 Web3 交互，请耐心等候',
+  'editor.publishingTip.content.finishButtonView': '查看我的作品',
+  'editor.publishingTip.content.help.description': '技术说明：',
+  'editor.publishingTip.content.help.descriptionLink':
+    '您的文章是如何去平台发布到 Meta Space 中的？',
 };

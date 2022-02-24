@@ -29,6 +29,7 @@ export default defineConfig({
     ARWEAVE_VIEWBLOCK: process.env.ARWEAVE_VIEWBLOCK,
     IPFS_FLEEK: process.env.IPFS_FLEEK,
     MATATAKI_DEVELOPER: process.env.MATATAKI_DEVELOPER,
+    META_FEEDBACK: process.env.META_FEEDBACK,
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout

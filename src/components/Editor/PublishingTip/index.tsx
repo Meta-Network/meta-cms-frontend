@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
 import { Modal, Spin, Typography, Image } from 'antd';
-import { NavLink } from 'umi';
+import { NavLink, useIntl } from 'umi';
 import styles from './index.less';
 import { PublishingTipStepStateType } from '@/services/constants';
 import { FinishIcon } from '@/components/Icon';
@@ -15,6 +15,8 @@ interface Props {
 }
 
 const PublishingTip: FC<Props> = ({ cover, visiblePublishingTip, setVisiblePublishingTip }) => {
+  const intl = useIntl();
+
   const [stepState, setStepState] = useState<PublishingTipStepStateType>(
     PublishingTipStepStateType.Loading,
   );
@@ -58,11 +60,20 @@ const PublishingTip: FC<Props> = ({ cover, visiblePublishingTip, setVisiblePubli
         )}
         <section className={styles.coverLoading}>
           {stepState === PublishingTipStepStateType.Loading ? (
-            <Spin className={styles.coverLoadingSpin} tip="Loading..." />
+            <Spin
+              className={styles.coverLoadingSpin}
+              tip={intl.formatMessage({
+                id: 'editor.publishingTip.cover.loading',
+              })}
+            />
           ) : stepState === PublishingTipStepStateType.Finish ? (
             <section className={styles.coverState}>
               <FinishIcon />
-              <p className={styles.coverStateText}>Successful</p>
+              <p className={styles.coverStateText}>
+                {intl.formatMessage({
+                  id: 'editor.publishingTip.cover.finish',
+                })}
+              </p>
             </section>
           ) : null}
         </section>
@@ -70,13 +81,29 @@ const PublishingTip: FC<Props> = ({ cover, visiblePublishingTip, setVisiblePubli
       <section className={styles.content}>
         {stepState === PublishingTipStepStateType.Loading ? (
           <>
-            <p className={styles.title}>感谢您的创作和信任！</p>
-            <p className={styles.title}>正在将您的文章添加到发布队列中，请勿关闭此页面</p>
+            <p className={styles.title}>
+              {intl.formatMessage({
+                id: 'editor.publishingTip.content.loadingTextOne',
+              })}
+            </p>
+            <p className={styles.title}>
+              {intl.formatMessage({
+                id: 'editor.publishingTip.content.loadingTextTwo',
+              })}
+            </p>
           </>
         ) : stepState === PublishingTipStepStateType.Finish ? (
           <>
-            <p className={styles.title}>您的文章已经在发布队列中了～</p>
-            <p className={styles.title}>这需要花费一些时间和 Web3 交互，请耐心等候</p>
+            <p className={styles.title}>
+              {intl.formatMessage({
+                id: 'editor.publishingTip.content.finishTextOne',
+              })}
+            </p>
+            <p className={styles.title}>
+              {intl.formatMessage({
+                id: 'editor.publishingTip.content.finishTextTwo',
+              })}
+            </p>
           </>
         ) : null}
 
@@ -85,13 +112,23 @@ const PublishingTip: FC<Props> = ({ cover, visiblePublishingTip, setVisiblePubli
             <Spin className={styles.actionSpin} />
           ) : stepState === PublishingTipStepStateType.Finish ? (
             <NavLink to="/content/posts">
-              <button className={styles.btnView}>查看我的作品</button>
+              <button className={styles.btnView}>
+                {intl.formatMessage({
+                  id: 'editor.publishingTip.content.finishButtonView',
+                })}
+              </button>
             </NavLink>
           ) : null}
         </section>
-        <p className={styles.description}>技术说明：</p>
+        <p className={styles.description}>
+          {intl.formatMessage({
+            id: 'editor.publishingTip.content.help.description',
+          })}
+        </p>
         <Link underline href={META_WIKI} target="_blank" className={styles.descriptionLink}>
-          您的文章是如何去平台发布到 Meta Space 中的？
+          {intl.formatMessage({
+            id: 'editor.publishingTip.content.help.descriptionLink',
+          })}
         </Link>
       </section>
     </Modal>

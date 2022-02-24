@@ -27,4 +27,5 @@ export default {
   'menu.moreInfo.home': 'Home',
   'menu.post.create': 'Create',
   'menu.settings': 'Settings',
+  'menu.feedback.feedback': 'Feedback',
 };

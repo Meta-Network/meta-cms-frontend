@@ -175,6 +175,10 @@ export default {
   'messages.dashboard.publishing': '正在发布中...',
   'messages.dashboard.submitted': '已提交',
   'messages.dashboard.settings': '设置项',
+  'messages.dashboard.siteSettingStatus.item.modifyPersonalInformation': '修改了个人信息',
+  'messages.dashboard.siteSettingStatus.item.modifyTemplateInformation':
+    '修改了 Meta Space 模板信息',
+
   'messages.invitation.inviteMessage':
     'Hi，Meta Network原住民正在邀请您来做邻居，快去 https://home.metanetwork.online，通过您的邀请码来入驻吧！',
   'messages.editor.notification.title': '通知',

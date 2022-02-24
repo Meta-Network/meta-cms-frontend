@@ -83,4 +83,14 @@ export default {
     'Anyone who remixes, converts, or creates based on this work must distribute the work based on the same license agreement as the original license agreement.',
   'editor.license.creativeCommons.businessAllowed': 'Commercial use allowed',
   'editor.license.creativeCommons.terms': 'The authorization terms are:',
+  'editor.publishingTip.cover.loading': 'Loading...',
+  'editor.publishingTip.cover.finish': 'Successful',
+  'editor.publishingTip.content.loadingTextOne': '感谢您的创作和信任！',
+  'editor.publishingTip.content.loadingTextTwo': '正在将您的文章添加到发布队列中，请勿关闭此页面',
+  'editor.publishingTip.content.finishTextOne': '您的文章已经在发布队列中了～',
+  'editor.publishingTip.content.finishTextTwo': '这需要花费一些时间和 Web3 交互，请耐心等候',
+  'editor.publishingTip.content.finishButtonView': '查看我的作品',
+  'editor.publishingTip.content.help.description': '技术说明：',
+  'editor.publishingTip.content.help.descriptionLink':
+    '您的文章是如何去平台发布到 Meta Space 中的？',
 };

@@ -1,9 +1,16 @@
-// import { useIntl } from 'umi';
+import { useIntl } from 'umi';
 import { List } from 'antd';
 
 export default () => {
-  // const intl = useIntl();
-  const data = ['修改了个人信息', '修改了 Meta Space 模板信息'];
+  const intl = useIntl();
+  const data = [
+    intl.formatMessage({
+      id: 'messages.dashboard.siteSettingStatus.item.modifyPersonalInformation',
+    }),
+    intl.formatMessage({
+      id: 'messages.dashboard.siteSettingStatus.item.modifyTemplateInformation',
+    }),
+  ];
 
   return (
     <List
