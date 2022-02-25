@@ -85,12 +85,14 @@ export default {
   'editor.license.creativeCommons.terms': 'The authorization terms are:',
   'editor.publishingTip.cover.loading': 'Loading...',
   'editor.publishingTip.cover.finish': 'Successful',
-  'editor.publishingTip.content.loadingTextOne': '感谢您的创作和信任！',
-  'editor.publishingTip.content.loadingTextTwo': '正在将您的文章添加到发布队列中，请勿关闭此页面',
-  'editor.publishingTip.content.finishTextOne': '您的文章已经在发布队列中了～',
-  'editor.publishingTip.content.finishTextTwo': '这需要花费一些时间和 Web3 交互，请耐心等候',
-  'editor.publishingTip.content.finishButtonView': '查看我的作品',
-  'editor.publishingTip.content.help.description': '技术说明：',
+  'editor.publishingTip.content.loadingTextOne': 'Thanks for your creation and trust',
+  'editor.publishingTip.content.loadingTextTwo':
+    'Your article is adding to the publishing queue, please do not close this page',
+  'editor.publishingTip.content.finishTextOne': 'Your article is now in the publishing queue ~',
+  'editor.publishingTip.content.finishTextTwo':
+    'This will take some time to interact with Web3, so please be patient!',
+  'editor.publishingTip.content.finishButtonView': 'View my posts',
+  'editor.publishingTip.content.help.description': 'Technical Description.',
   'editor.publishingTip.content.help.descriptionLink':
-    '您的文章是如何去平台发布到 Meta Space 中的？',
+    'How does your article published in Meta Space?',
 };
