@@ -83,4 +83,16 @@ export default {
     'Anyone who remixes, converts, or creates based on this work must distribute the work based on the same license agreement as the original license agreement.',
   'editor.license.creativeCommons.businessAllowed': 'Commercial use allowed',
   'editor.license.creativeCommons.terms': 'The authorization terms are:',
+  'editor.publishingTip.cover.loading': 'Loading...',
+  'editor.publishingTip.cover.finish': 'Successful',
+  'editor.publishingTip.content.loadingTextOne': 'Thanks for your creation and trust',
+  'editor.publishingTip.content.loadingTextTwo':
+    'Your article is adding to the publishing queue, please do not close this page',
+  'editor.publishingTip.content.finishTextOne': 'Your article is now in the publishing queue ~',
+  'editor.publishingTip.content.finishTextTwo':
+    'This will take some time to interact with Web3, so please be patient!',
+  'editor.publishingTip.content.finishButtonView': 'View my posts',
+  'editor.publishingTip.content.help.description': 'Technical Description.',
+  'editor.publishingTip.content.help.descriptionLink':
+    'How does your article published in Meta Space?',
 };

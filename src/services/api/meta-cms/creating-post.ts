@@ -128,14 +128,6 @@ export async function publishPost(data: CMS.LocalDraft) {
   });
 }
 
-/** 发布若干篇待同步待文章 POST /post/publish */
-export async function publishPosts(postIds: number[], configIds: number[]) {
-  return request<GLOBAL.GeneralResponse<any>>(`/post/publish`, {
-    method: 'POST',
-    data: { postIds, configIds },
-  });
-}
-
 /** 取消发布一篇待同步待文章 POST /post/{postId}/ignore */
 export async function ignorePendingPost(postId: number) {
   return request<GLOBAL.GeneralResponse<any>>(`/post/sync/${postId}/ignore`, {

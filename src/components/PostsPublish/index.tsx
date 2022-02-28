@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { Space, Typography } from 'antd';
-// import { useIntl } from 'umi';
+import { useIntl } from 'umi';
 import { WarningFilled } from '@ant-design/icons';
 import { PublishIcon } from '../Icon';
 import styles from './index.less';
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const PostsPublish: FC<Props> = ({ state, publishSiteOrderId }) => {
-  // const intl = useIntl();
+  const intl = useIntl();
 
   /**
    * PENDING 等待发布
@@ -28,24 +28,31 @@ const PostsPublish: FC<Props> = ({ state, publishSiteOrderId }) => {
       {state === PipelineOrderTaskCommonState.PENDING ? (
         <Space style={{ color: 'gray' }}>
           <PublishIcon className={styles.icon} />
-          <Text style={{ color: 'gray' }}>等待发布</Text>
+          <Text style={{ color: 'gray' }}>
+            {intl.formatMessage({ id: 'posts.table.publishState.pending' })}
+          </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.DOING ? (
         <Space style={{ color: 'gray' }}>
           <PublishIcon className={styles.icon} />
-          <Text style={{ color: 'gray' }}>发布中</Text>
+          <Text style={{ color: 'gray' }}>
+            {intl.formatMessage({ id: 'posts.table.publishState.doing' })}
+          </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.FINISHED ? (
         <Space style={{ color: 'green' }}>
           <PublishIcon className={styles.icon} />
           <Text style={{ color: 'green' }}>
-            已发布 {publishSiteOrderId && <span>#{publishSiteOrderId}</span>}
+            {intl.formatMessage({ id: 'posts.table.publishState.finished' })}{' '}
+            {publishSiteOrderId && <span>#{publishSiteOrderId}</span>}
           </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.FAILED ? (
         <Space style={{ color: 'red' }}>
           <WarningFilled />
-          <Text style={{ color: 'red' }}>发布失败</Text>
+          <Text style={{ color: 'red' }}>
+            {intl.formatMessage({ id: 'posts.table.publishState.failed' })}
+          </Text>
         </Space>
       ) : null}
     </>

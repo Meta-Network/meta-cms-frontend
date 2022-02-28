@@ -1,10 +1,11 @@
 import type { FC } from 'react';
 import { Tag } from 'antd';
+import { useIntl } from 'umi';
 
-interface Props {}
+const PostsStorage: FC = () => {
+  const intl = useIntl();
 
-const PostsStorage: FC<Props> = () => {
-  return <Tag>本地存储</Tag>;
+  return <Tag>{intl.formatMessage({ id: 'posts.table.status.localStorage' })}</Tag>;
 };
 
 export default PostsStorage;

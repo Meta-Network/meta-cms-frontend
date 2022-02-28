@@ -1,140 +1,114 @@
-/* eslint-disable no-underscore-dangle */
 import {
   ignorePendingPost,
-  getDefaultSiteConfig,
   fetchPostSync,
   getSourceStatus,
-  publishPosts,
   decryptMatatakiPost,
 } from '@/services/api/meta-cms';
 import { useIntl, useModel, history } from 'umi';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Image, Button, Space, Tag, message, Modal, notification } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Space, Tag, message, Typography, Popconfirm } from 'antd';
 import { useState, useCallback, useRef } from 'react';
 import syncPostsRequest from '../../utils/sync-posts-request';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { dbPostsAdd, dbPostsWhereByID, dbPostsWhereExist, PostTempData } from '@/db/db';
+import { dbPostsAdd, dbPostsWhereExistByTitle, PostTempData } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
 import { imageUploadByUrlAPI } from '@/helpers';
-import styles from './SyncCenter.less';
 import { fetchIpfs } from '@/services/api/global';
 import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
-import { useMount } from 'ahooks';
-import { queryCurrentUser } from '@/services/api/meta-ucenter';
+import PostsCover from '@/components/PostsCover';
+import PostsDate from '@/components/PostsDate';
 
-const { confirm } = Modal;
+const { Link } = Typography;
 
 type PostInfo = CMS.ExistsPostsResponse['items'][number];
 
 export default () => {
   const intl = useIntl();
-  const [siteConfigId, setSiteConfigId] = useState<number | null>(null);
+  const { initialState } = useModel('@@initialState');
+
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [editCurrentId, setEditCurrentId] = useState<number>(0);
-  const { getLockedConfigState, setLockedConfig } = useModel('global');
-  const [currentUser, setCurrentUser] = useState<GLOBAL.CurrentUser | undefined>();
+  const [deleteCurrentId, setDeleteEditCurrentId] = useState<number>(0);
 
-  getDefaultSiteConfig().then((response) => {
-    if (response.data) {
-      setSiteConfigId(response.data.id);
-    }
-  });
+  const actionRef = useRef<ActionType>();
 
-  const ref = useRef<ActionType>();
-
-  const publishMultiplePosts = async (selectedKeys: number[]) => {
-    if (siteConfigId === null) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.description' }),
-      });
-      return;
-    }
-    if (getLockedConfigState(siteConfigId)) {
-      notification.error({
-        message: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.title' }),
-        description: intl.formatMessage({ id: 'messages.syncCenter.taskInProgress.description' }),
-      });
-      return;
-    }
-    setLockedConfig(siteConfigId, true);
-    const done = message.loading(
-      intl.formatMessage({ id: 'messages.syncCenter.publishMultiPosts' }),
-      0,
-    );
-    await publishPosts(selectedKeys, [siteConfigId]);
-    setLockedConfig(siteConfigId, false);
-    done();
-    message.success(intl.formatMessage({ id: 'messages.syncCenter.publishMultiPostsSuccess' }));
-    if (ref.current?.reset) {
-      await ref.current?.reset();
-    }
-  };
-
+  // handle delete
   const ignoreSinglePost = async (record: PostInfo) => {
+    setDeleteEditCurrentId(record.id);
     const done = message.loading(intl.formatMessage({ id: 'messages.syncCenter.discardPost' }), 0);
-    await ignorePendingPost(record.id);
+    const ignorePostResult = await ignorePendingPost(record.id);
+
+    setDeleteEditCurrentId(0);
     done();
-    message.success(intl.formatMessage({ id: 'messages.syncCenter.discardPostSuccess' }));
-    if (ref.current?.reset) {
-      await ref.current?.reset();
+
+    if (ignorePostResult.statusCode === 201) {
+      message.success(intl.formatMessage({ id: 'messages.syncCenter.discardPostSuccess' }));
+      if (actionRef.current?.reset) {
+        await actionRef.current?.reset();
+      }
+    } else {
+      message.error(intl.formatMessage({ id: 'messages.syncCenter.discardPostFail' }));
     }
   };
 
-  /**
-   * transfer draft
-   */
-  const transferDraft = useCallback(
+  // transfer draft
+  const handleEditPost = useCallback(
     async (post: CMS.Post) => {
-      if (!currentUser?.id) {
+      if (!initialState?.currentUser?.id) {
         return;
       }
+
+      // 1. 检查草稿标题是否同名
+      // - 同名 标题增加一个后缀(时间戳)，获取内容保存到草稿
+      // - 不同名 获取内容保存到草稿
+      // 2. 获取封面
+      // 3. 获取内容
 
       setEditCurrentId(post.id);
 
-      // check save as draft
-      const isExist = await dbPostsWhereExist(post.id);
-      if (isExist) {
-        setEditCurrentId(0);
-
-        const currentDraft = await dbPostsWhereByID(post.id);
-        const _url = currentDraft
-          ? `/content/drafts/edit?id=${currentDraft.id}`
-          : '/content/drafts';
-        confirm({
-          icon: <ExclamationCircleOutlined />,
-          content: intl.formatMessage({ id: 'messages.syncCenter.draftSavedTips' }),
-          async onOk() {
-            history.push(_url);
-          },
-          onCancel() {},
-        });
-        return;
-      }
+      const isExist = await dbPostsWhereExistByTitle({
+        title: post.title,
+        userId: initialState.currentUser.id,
+      });
+      // console.log('isExist', isExist);
 
       const _post = cloneDeep(post);
 
-      // image transfer ipfs
+      // image transfer IPFS
       if (_post.cover && !_post.cover.includes(FLEEK_NAME)) {
+        const done = message.loading(
+          intl.formatMessage({ id: 'messages.syncCenter.coverSavedLoading' }),
+          0,
+        );
+
         const result = await imageUploadByUrlAPI(
           _post.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI),
         );
+
+        done();
         if (result) {
           message.success(intl.formatMessage({ id: 'messages.syncCenter.coverSavedSuccess' }));
           _post.cover = result.publicUrl;
+        } else {
+          message.error(intl.formatMessage({ id: 'messages.syncCenter.coverSavedFail' }));
         }
       }
 
+      const done = message.loading(
+        intl.formatMessage({ id: 'messages.syncCenter.getContentLoading' }),
+        0,
+      );
       try {
         let postResult = await fetchIpfs(_post.source);
         if (!postResult.content && postResult.iv && postResult.encryptedData) {
           postResult = await decryptMatatakiPost(postResult.iv, postResult.encryptedData);
         }
 
-        if (!postResult.content) {
-          message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
+        if (postResult.content) {
+          message.success(intl.formatMessage({ id: 'messages.syncCenter.getContentSuccess' }));
+        } else {
+          message.error(intl.formatMessage({ id: 'messages.syncCenter.getContentFail' }));
           return;
         }
 
@@ -142,204 +116,176 @@ export default () => {
         const resultID = await dbPostsAdd(
           assign(PostTempData(), {
             cover: _post.cover,
-            title: _post.title,
+            title: isExist ? `${_post.title} ${Date.now()}` : _post.title,
             summary: _post.summary || '',
             content: postResult.content,
-            post: _post,
             tags: _post.tags || [],
             license: '',
-            userId: currentUser?.id,
+            sourceData: _post,
+            userId: initialState.currentUser.id,
           }),
         );
 
         history.push(`/content/drafts/edit?id=${resultID}`);
+
+        message.success(intl.formatMessage({ id: 'messages.syncCenter.savedSuccess' }));
       } catch (e) {
         console.error(e);
-        message.success(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
+        message.error(intl.formatMessage({ id: 'messages.syncCenter.savedFail' }));
       } finally {
         setEditCurrentId(0);
+        done();
       }
     },
-    [intl, currentUser],
+    [intl, initialState?.currentUser],
   );
-
-  /** fetch current user */
-  const fetchCurrentUser = useCallback(async () => {
-    const result = await queryCurrentUser();
-    if (result.statusCode === 200) {
-      setCurrentUser(result.data);
-    }
-  }, []);
-
-  useMount(() => {
-    fetchCurrentUser();
-  });
 
   const columns: ProColumns<PostInfo>[] = [
     {
       dataIndex: 'cover',
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.cover' }),
-      search: false,
+      title: intl.formatMessage({ id: 'posts.table.cover' }),
+      width: 130,
       render: (_, record) => (
-        <Space>
-          {record.cover ? (
-            <Image width={100} src={record.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI)} />
-          ) : (
-            intl.formatMessage({ id: 'messages.table.noCoverExists' })
-          )}
-        </Space>
+        <PostsCover src={record.cover.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI)} />
       ),
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.title' }),
       dataIndex: 'title',
-      width: 200,
-      copyable: true,
+      title: intl.formatMessage({ id: 'posts.table.title' }),
       ellipsis: true,
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.platform' }),
       dataIndex: 'platform',
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.platform' }),
       width: 100,
-      filters: true,
-      onFilter: true,
       render: (_, record) => (
-        <Space>
+        <>
           {record.platform && (
             <Tag color="blue" key={`source-platform-${record.id}`}>
               {record.platform}
             </Tag>
           )}
-        </Space>
+        </>
       ),
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.createTime' }),
-      key: 'showTime',
       dataIndex: 'createdAt',
-      valueType: 'date',
-      sorter: true,
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.createTime' }),
+      render: (_, record) => <PostsDate time={record.createdAt} />,
     },
     {
-      title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
-      key: 'showTime',
       dataIndex: 'updatedAt',
-      valueType: 'date',
-      sorter: true,
+      title: intl.formatMessage({ id: 'messages.syncCenter.table.updateTime' }),
+      render: (_, record) => <PostsDate time={record.updatedAt} />,
     },
     {
+      dataIndex: 'action',
       title: intl.formatMessage({ id: 'messages.syncCenter.table.actions' }),
-      key: 'option',
-      width: 290,
-      valueType: 'option',
-      render: (_, record) => [
-        <Button
-          ghost
-          key="option-edit"
-          type="primary"
-          onClick={() => transferDraft(record)}
-          loading={editCurrentId === record.id}
-          disabled={editCurrentId !== 0 && editCurrentId !== record.id}
-        >
-          {intl.formatMessage({ id: 'component.button.edit' })}
-        </Button>,
-        <Button
-          key="option-discard"
-          onClick={() => ignoreSinglePost(record)}
-          // loading={postsLoadings[index] === LoadingStates.Discarding}
-          // disabled={postsLoadings[index] === LoadingStates.Publishing}
-          danger
-        >
-          {intl.formatMessage({ id: 'component.button.discard' })}
-        </Button>,
-      ],
+      width: 180,
+      render: (_, record) => (
+        <Space>
+          <Button
+            ghost
+            key="option-edit"
+            type="primary"
+            onClick={() => handleEditPost(record)}
+            loading={editCurrentId === record.id}
+            disabled={editCurrentId !== 0 && editCurrentId !== record.id}
+          >
+            {intl.formatMessage({ id: 'component.button.edit' })}
+          </Button>
+
+          <Popconfirm
+            placement="top"
+            title={intl.formatMessage({
+              id: 'messages.syncCenter.table.actions.deletePopconfirmTitle',
+            })}
+            onConfirm={() => ignoreSinglePost(record)}
+          >
+            <Button
+              key="option-discard"
+              danger
+              loading={deleteCurrentId === record.id}
+              disabled={deleteCurrentId !== 0 && deleteCurrentId !== record.id}
+            >
+              {intl.formatMessage({ id: 'component.button.discard' })}
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
+  // handle sync
+  const handleSync = useCallback(async () => {
+    setSyncLoading(true);
+    const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
+
+    const sourceStatusResult = await getSourceStatus();
+    if (sourceStatusResult.statusCode !== 200) {
+      done();
+      setSyncLoading(false);
+      message.success(intl.formatMessage({ id: 'messages.source.syncFailed' }));
+      return;
+    }
+
+    await syncPostsRequest(sourceStatusResult.data);
+    done();
+    setSyncLoading(false);
+    message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
+
+    if (actionRef.current?.reset) {
+      actionRef.current.reset();
+    }
+  }, [intl]);
+
   return (
     <PageContainer
+      className="custom-container"
       breadcrumb={{}}
-      title={intl.formatMessage({ id: 'messages.syncCenter.title' })}
-      content={[
-        <div key="header-description" style={{ paddingTop: '11px', marginBottom: '4px' }}>
-          <p>{intl.formatMessage({ id: 'messages.syncCenter.description' })}</p>
-        </div>,
-        <div key="header-actions" className={styles.syncButtons}>
-          <Button
-            key="sync-button"
-            loading={syncLoading}
-            onClick={async () => {
-              setSyncLoading(true);
-              const done = message.loading(
-                intl.formatMessage({ id: 'messages.source.syncing' }),
-                0,
-              );
-              await syncPostsRequest((await getSourceStatus()).data);
-              done();
-              message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
-              setSyncLoading(false);
-              if (ref.current?.reset) {
-                ref.current.reset();
-              }
-            }}
-            style={{ marginRight: 10 }}
-          >
-            {intl.formatMessage({ id: 'component.button.syncNow' })}
-          </Button>
-        </div>,
-      ]}
+      title={intl.formatMessage({ id: 'posts.syncCenter.title' })}
+      content={
+        <p>
+          {intl.formatMessage({ id: 'posts.syncCenter.intro' })}{' '}
+          <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
+            {intl.formatMessage({ id: 'posts.intro.learnMore' })}
+          </Link>
+        </p>
+      }
     >
       <ProTable<PostInfo>
-        actionRef={ref}
         columns={columns}
-        rowSelection={{}}
-        tableAlertOptionRender={({ selectedRowKeys }) => {
-          return (
-            <Space size={16}>
-              <Button onClick={() => publishMultiplePosts(selectedRowKeys as number[])}>
-                {intl.formatMessage({ id: 'messages.syncCenter.button.publishMultiPosts' })}
-              </Button>
-              <Button danger>
-                {intl.formatMessage({ id: 'messages.syncCenter.button.discardMultiPosts' })}
-              </Button>
-            </Space>
-          );
-        }}
+        actionRef={actionRef}
         request={async ({ pageSize, current }) => {
-          // TODO: 分页
           const params = {
             page: current ?? 1,
             limit: pageSize ?? 10,
             state: 'pending' as CMS.PostState,
           };
-          const request = await fetchPostSync(params);
-          // 这里需要返回一个 Promise,在返回之前你可以进行数据转化
-          // 如果需要转化参数可以在这里进行修改
-          return {
-            data: request.data.items,
-            // success 请返回 true，
-            // 不然 table 会停止解析数据，即使有数据
-            success: true,
-            // 不传会使用 data 的长度，如果是分页一定要传
-            total: request.data.meta.totalItems,
-          };
+          const result = await fetchPostSync(params);
+          if (result.statusCode === 200) {
+            return {
+              data: result.data.items,
+              success: true,
+              total: result.data.meta.totalItems,
+            };
+          } else {
+            return { success: false };
+          }
         }}
         rowKey={(record) => record.id}
-        form={{
-          // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-          syncToUrl: (values, type) => {
-            if (type === 'get') {
-              return {
-                ...values,
-                created_at: [values.startTime, values.endTime],
-              };
-            }
-            return values;
-          },
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: false,
         }}
-        dateFormatter="string"
         search={false}
         options={false}
+        size="middle"
+        toolBarRender={() => [
+          <Button key="sync-button" loading={syncLoading} onClick={() => handleSync()}>
+            {intl.formatMessage({ id: 'component.button.syncNow' })}
+          </Button>,
+        ]}
       />
     </PageContainer>
   );

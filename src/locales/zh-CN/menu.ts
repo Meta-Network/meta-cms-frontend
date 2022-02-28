@@ -26,4 +26,5 @@ export default {
   'menu.moreInfo.home': '首页',
   'menu.post.create': '创作',
   'menu.settings': '设置',
+  'menu.feedback.feedback': '反馈',
 };

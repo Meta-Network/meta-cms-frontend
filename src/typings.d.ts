@@ -32,3 +32,5 @@ declare const META_WIKI: string;
 declare const META_WIKI_EDITOR_LEARN: string;
 declare const ARWEAVE_VIEWBLOCK: string;
 declare const IPFS_FLEEK: string;
+declare const MATATAKI_DEVELOPER: string;
+declare const META_FEEDBACK: string;

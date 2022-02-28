@@ -9,10 +9,10 @@ export class StoreDB extends Dexie {
   metadatas!: Table<Metadatas, number>;
   constructor() {
     super('StoreDB');
-    this.version(12)
+    this.version(14)
       .stores({
         posts:
-          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, userId ,createdAt, updatedAt',
+          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, userId, sourceData ,createdAt, updatedAt',
         metadatas: '++id, postId, metadata, delete, createdAt, updatedAt',
       })
       .upgrade((tx: Transaction | any) => {
@@ -33,6 +33,7 @@ export class StoreDB extends Dexie {
           post.tags = post.tags || [];
           post.license = post.license || License;
           post.userId = post.userId || 0;
+          post.sourceData = post.sourceData || null;
           post.createdAt = post.createdAt || time;
           post.updatedAt = post.updatedAt || time;
         });
@@ -128,30 +129,24 @@ export const dbDraftsAllCount = async (userId: number): Promise<number> => {
   return await db.posts.filter((i) => !i.delete && i.userId === userId && i.post == null).count();
 };
 
-/**
- * db posts where exist by id
- * @param id
- * @returns
- */
-export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
-  // 草稿删除了 允许重新编辑
-  const result = await db.posts.filter((i) => !i.delete).toArray();
-  return result.some((post) => post.post && Number(post.post.id) === id);
-};
-
-export const dbPostsWhereByID = async (id: number): Promise<PostType.Posts | undefined> => {
-  // 草稿删除了 允许重新编辑
-  const result = await db.posts.filter((i) => !i.delete).toArray();
-  return result.find((post) => post.post && Number(post.post.id) === id);
+export const dbPostsWhereExistByTitle = async ({
+  title,
+  userId,
+}: {
+  title: string;
+  userId: number;
+}): Promise<boolean> => {
+  const result = await db.posts.filter((i) => !i.delete && i.userId === userId).toArray();
+  return result.some((post) => post.title === title);
 };
 
 /**
- * dbPostsWhereExistByTitle
+ * dbPostsWhereExistByTitleAndId
  * @param title
  * @param userId
  * @returns
  */
-export const dbPostsWhereExistByTitle = async ({
+export const dbPostsWhereExistByTitleAndId = async ({
   title,
   id,
   userId,
@@ -180,6 +175,7 @@ export const PostTempData = (): PostType.Posts => ({
   tags: [],
   license: License,
   userId: 0,
+  sourceData: null,
   createdAt: moment().toISOString(),
   updatedAt: moment().toISOString(),
 });

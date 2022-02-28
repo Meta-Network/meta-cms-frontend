@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback, useEffect } from 'react';
+import React, { Fragment, useState, useCallback, useEffect, useMemo } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { Input, message, notification } from 'antd';
 import Editor from '@/components/Editor';
@@ -11,7 +11,7 @@ import {
   dbPostsAdd,
   dbPostsGet,
   PostTempData,
-  dbPostsWhereExistByTitle,
+  dbPostsWhereExistByTitleAndId,
 } from '@/db/db';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { assign, cloneDeep, uniq } from 'lodash';
@@ -37,7 +37,7 @@ import {
   KEY_META_CMS_GUN_PAIR,
   editorRules,
 } from '../../../../config';
-import { DraftMode, FetchPostsStorageParamsState } from '@/services/constants';
+import { DraftMode, FetchPostsStorageParamsState, SyncPlatform } from '@/services/constants';
 import Gun from 'gun';
 import {
   fetchGunDraftsAndUpdateLocal,
@@ -77,6 +77,15 @@ const Edit: React.FC = () => {
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   const { initialState } = useModel('@@initialState');
+
+  // 原文链接
+  const settingsOriginalLinkHash = useMemo(() => {
+    if (postData.sourceData?.platform === SyncPlatform.MATATAKI) {
+      return postData.sourceData.source;
+    } else {
+      return '';
+    }
+  }, [postData]);
 
   const postTempDataMergedUserId = useCallback(
     () => assign(PostTempData(), { userId: initialState?.currentUser?.id }),
@@ -303,7 +312,7 @@ const Edit: React.FC = () => {
         return false;
       }
 
-      const isLocalExist = await dbPostsWhereExistByTitle({
+      const isLocalExist = await dbPostsWhereExistByTitleAndId({
         title: titleValue,
         id,
         userId: initialState.currentUser!.id,
@@ -362,14 +371,34 @@ const Edit: React.FC = () => {
 
       // title 长度判断
       if (title.length < editorRules.title.min || title.length > editorRules.title.max) {
-        message.warning(`标题长度为 ${editorRules.title.min}-${editorRules.title.max}`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.title.length',
+            },
+            {
+              min: editorRules.title.min,
+              max: editorRules.title.max,
+            },
+          ),
+        );
         setPublishLoading(false);
         return;
       }
 
       // content 长度判断
       if (content.length < editorRules.content.min || content.length > editorRules.content.max) {
-        message.warning(`内容长度为 ${editorRules.content.min}-${editorRules.content.max}`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.content.length',
+            },
+            {
+              min: editorRules.content.min,
+              max: editorRules.content.max,
+            },
+          ),
+        );
         setPublishLoading(false);
         return;
       }
@@ -377,14 +406,34 @@ const Edit: React.FC = () => {
       // summary 长度判断
       const summary = generateSummary();
       if (summary.length < editorRules.summary.min || summary.length > editorRules.summary.max) {
-        message.warning(`摘要长度为 ${editorRules.summary.min}-${editorRules.summary.max}`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.summary.length',
+            },
+            {
+              min: editorRules.summary.min,
+              max: editorRules.summary.max,
+            },
+          ),
+        );
         setPublishLoading(false);
         return;
       }
 
       // 封面长度判断
       if (cover.length < editorRules.cover.min || cover.length > editorRules.cover.max) {
-        message.warning('封面链接过长');
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.cover.length',
+            },
+            {
+              min: editorRules.cover.min,
+              max: editorRules.cover.max,
+            },
+          ),
+        );
         setPublishLoading(false);
         return;
       }
@@ -414,14 +463,35 @@ const Edit: React.FC = () => {
 
       // tags 长度 个数 判断
       if (tags.length > editorRules.tags.maxNumber) {
-        message.warning(`最多 ${editorRules.tags.maxNumber} 个标签`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.tag.number',
+            },
+            {
+              maxNumber: editorRules.tags.maxNumber,
+            },
+          ),
+        );
+
         setPublishLoading(false);
         return;
       }
 
       const tagsStr = tags.join();
       if (tagsStr.length < editorRules.tags.min || tagsStr.length > editorRules.tags.max) {
-        message.warning(`标签总长度为 ${editorRules.tags.min}-${editorRules.tags.max}`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.tag.length',
+            },
+            {
+              min: editorRules.tags.min,
+              max: editorRules.tags.max,
+            },
+          ),
+        );
+
         setPublishLoading(false);
         return;
       }
@@ -431,7 +501,18 @@ const Edit: React.FC = () => {
 
       // license 长度判断
       if (license.length < editorRules.license.min || license.length > editorRules.license.max) {
-        message.warning(`协议长度为 ${editorRules.license.min}-${editorRules.license.max}`);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.license.length',
+            },
+            {
+              min: editorRules.license.min,
+              max: editorRules.license.max,
+            },
+          ),
+        );
+
         setPublishLoading(false);
         return;
       }
@@ -443,7 +524,12 @@ const Edit: React.FC = () => {
       });
 
       if (!checkTitleResult) {
-        message.warning('标题重复，请修改');
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.verify.title.repeat',
+          }),
+        );
+
         setPublishLoading(false);
         return;
       }
@@ -743,7 +829,7 @@ const Edit: React.FC = () => {
           <Settings>
             <Fragment>
               <SettingsTags tags={tags} handleChangeTags={handleChangeTags} />
-              <SettingsOriginalLink hash={postData.post?.source || postData.draft?.source || ''} />
+              <SettingsOriginalLink hash={settingsOriginalLinkHash} />
               <SettingsCopyrightNotice
                 license={license}
                 handleChangeLicense={handleChangeLicense}

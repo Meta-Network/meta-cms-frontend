@@ -76,7 +76,7 @@ export default () => {
       bind: (
         <Button
           onClick={() => {
-            window.location.href = 'https://developer.matataki.io/app/44ba10e59e954bf4/oauth';
+            window.location.href = MATATAKI_DEVELOPER;
           }}
           type="primary"
         >

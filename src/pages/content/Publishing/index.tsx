@@ -2,7 +2,6 @@ import { useIntl } from 'umi';
 import { useRef, useCallback, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-// import FormattedDescription from '@/components/FormattedDescription';
 import { Typography, Empty, message } from 'antd';
 import ProTable from '@ant-design/pro-table';
 import {
@@ -27,35 +26,35 @@ export default () => {
   const columns: ProColumns<CMS.PipelinesOrdersItem>[] = [
     {
       dataIndex: 'cover',
-      title: '封面图',
+      title: intl.formatMessage({ id: 'posts.table.cover' }),
       width: 130,
       render: (_, record) => <PostsCover src={record.postMetadata.cover} />,
     },
     {
       dataIndex: ['postMetadata', 'title'],
-      title: intl.formatMessage({ id: 'messages.published.table.title' }),
+      title: intl.formatMessage({ id: 'posts.table.title' }),
       ellipsis: true,
     },
     {
       dataIndex: 'submit',
-      title: 'Submit 状态',
+      title: intl.formatMessage({ id: 'posts.table.submitState' }),
       render: (_, record) => <PostsSubmit state={record.submitState} />,
     },
     {
       dataIndex: 'publish',
-      title: 'Publish 状态',
+      title: intl.formatMessage({ id: 'posts.table.publishState' }),
       render: (_, record) => (
         <PostsPublish state={record.publishState} publishSiteOrderId={record.publishSiteOrderId} />
       ),
     },
     {
       dataIndex: 'date',
-      title: '请求日期',
+      title: intl.formatMessage({ id: 'posts.table.date' }),
       render: (_, record) => <PostsDate time={record.postMetadata.createdAt} />,
     },
     {
       dataIndex: 'certificate',
-      title: '存证',
+      title: intl.formatMessage({ id: 'posts.table.certificate' }),
       render: (_, record) => (
         <PostsCertificate
           state={record.certificateState}
@@ -72,9 +71,9 @@ export default () => {
 
     setSiteOrdersPublishState(false);
     if (siteOrdersPublishResult.statusCode === 201) {
-      message.info('成功');
+      message.success(intl.formatMessage({ id: 'messages.success' }));
     } else {
-      message.error('失败');
+      message.error(intl.formatMessage({ id: 'messages.fail' }));
     }
   }, []);
 
@@ -82,12 +81,12 @@ export default () => {
     <PageContainer
       className="custom-container"
       breadcrumb={{}}
-      title={'发布中'}
+      title={intl.formatMessage({ id: 'posts.publishing.title' })}
       content={
         <p>
-          检查和管理正在发布到 Meta Space 的作品{' '}
+          {intl.formatMessage({ id: 'posts.publishing.intro' })}{' '}
           <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
-            了解更多
+            {intl.formatMessage({ id: 'posts.intro.learnMore' })}
           </Link>
         </p>
       }
@@ -95,7 +94,10 @@ export default () => {
       <ProTable<CMS.PipelinesOrdersItem>
         locale={{
           emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="没有可以发布的内容啦～" />
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={intl.formatMessage({ id: 'posts.publishing.empty' })}
+            />
           ),
         }}
         polling={postPolling}

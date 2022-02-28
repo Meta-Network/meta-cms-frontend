@@ -82,14 +82,14 @@ export default () => {
     {
       dataIndex: 'cover',
       title: intl.formatMessage({
-        id: 'posts.drafts.table.cover',
+        id: 'posts.table.cover',
       }),
       width: 130,
       render: (_, record) => <PostsCover src={record.cover} />,
     },
     {
       dataIndex: 'title',
-      title: intl.formatMessage({ id: 'posts.drafts.table.title' }),
+      title: intl.formatMessage({ id: 'posts.table.title' }),
       ellipsis: true,
     },
     {
@@ -108,16 +108,12 @@ export default () => {
     },
     {
       dataIndex: 'status',
-      title: intl.formatMessage({
-        id: 'posts.drafts.table.status',
-      }),
+      title: intl.formatMessage({ id: 'posts.table.status' }),
       width: 100,
       render: () => <PostsStorage />,
     },
     {
-      title: intl.formatMessage({
-        id: 'posts.drafts.table.action',
-      }),
+      title: intl.formatMessage({ id: 'posts.drafts.table.action' }),
       dataIndex: 'status',
       key: 'status',
       width: 180,
@@ -148,12 +144,6 @@ export default () => {
               handleDelete(Number(record.id), record?.key);
             }}
             onCancel={(e) => e?.stopPropagation()}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
           >
             <Button danger onClick={(e) => e.stopPropagation()}>
               {intl.formatMessage({
@@ -174,10 +164,12 @@ export default () => {
     <PageContainer
       className="custom-container"
       breadcrumb={{}}
-      title={'草稿'}
+      title={intl.formatMessage({
+        id: 'posts.draft.title',
+      })}
       content={
         <p>
-          检查和管理已经创建的草稿{' '}
+          {intl.formatMessage({ id: 'posts.draft.intro' })}{' '}
           <Link underline href={META_WIKI} target="_blank" rel="noopener noreferrer">
             {intl.formatMessage({
               id: 'posts.intro.learnMore',

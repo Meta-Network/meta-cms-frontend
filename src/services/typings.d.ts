@@ -144,7 +144,7 @@ declare namespace CMS {
     titleInStorage: string;
     cover: string;
     summary: string;
-    platform: string;
+    platform: SyncPlatform;
     source: string;
     state: 'drafted' | 'pending';
     category: string;
