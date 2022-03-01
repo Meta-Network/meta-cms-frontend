@@ -143,7 +143,6 @@ export default {
   'messages.editor.saveToDraftFail': '转存草稿失败',
   'messages.editor.draftUpdateFail': '草稿更新失败',
   'messages.editor.tip.id': '请先编辑文章',
-  'messages.editor.tip.titleOrContent': '文章或内容不能为空',
   'messages.editor.tip.coverFormat': '封面链接格式不正确，请重新上传！',
   'messages.editor.tip.postExists': '文章已发布，再次发布会覆盖文章的信息',
   'messages.editor.verify.title.empty': '标题不能为空',
