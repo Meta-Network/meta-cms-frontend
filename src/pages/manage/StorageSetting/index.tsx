@@ -1,5 +1,6 @@
 import { getUsernameOfStorage } from '@/services/api/global';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
+import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { useIntl } from 'umi';
 import { Fragment, useEffect, useMemo, useState } from 'react';
@@ -12,15 +13,15 @@ export default () => {
   const [storages, setStorages] = useState<
     {
       name: string;
-      description: string;
-      actions: any[];
-      title: any;
-      avatar: any;
+      description: JSX.Element;
+      actions: JSX.Element[];
+      title: (string | JSX.Element)[];
+      avatar: JSX.Element;
     }[]
   >([
     {
       name: 'GitHub',
-      description: intl.formatMessage({ id: 'guide.storage.githubDescription' }),
+      description: <FormattedMessage id="guide.storage.githubDescription" />,
       actions: [],
       title: [],
       avatar: (
@@ -45,13 +46,13 @@ export default () => {
           title: [
             storage,
             <Tag key="alreadyBoundStatus" className="status" color="blue">
-              {intl.formatMessage({ id: 'component.status.alreadyBound' })}
+              <FormattedMessage id="component.status.alreadyBound" />
             </Tag>,
             `(${username})`,
           ],
           actions: [
             <Button key="unbindButton" disabled>
-              {intl.formatMessage({ id: 'component.button.unbind' })}
+              <FormattedMessage id="component.button.unbind" />
             </Button>,
           ],
         };
@@ -60,17 +61,17 @@ export default () => {
         title: [
           storage,
           <Tag key="notBindStatus" className="status" color="red">
-            {intl.formatMessage({ id: 'component.status.notBound' })}
+            <FormattedMessage id="component.status.notBound" />
           </Tag>,
         ],
         actions: [
           <Button key="bindButton" disabled onClick={() => bindRequest(storage)} type="primary">
-            {intl.formatMessage({ id: 'component.button.bind' })}
+            <FormattedMessage id="component.button.bind" />
           </Button>,
         ],
       };
     },
-    [intl],
+    [],
   );
 
   useEffect(() => {
