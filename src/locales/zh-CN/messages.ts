@@ -151,6 +151,7 @@ export default {
   'messages.editor.verify.summary.length': '摘要长度为 { min }-{ max }',
   'messages.editor.verify.cover.length': '封面长度为 { min }-{ max }',
   'messages.editor.verify.tag.length': '标签总长度为 { min }-{ max }',
+  'messages.editor.verify.tag.singleLength': '标签单个长度最长为 { max }',
   'messages.editor.verify.tag.number': '最多 { maxNumber } 个标签',
   'messages.editor.verify.license.length': '协议长度为 { min }-{ max }',
   'messages.editor.verify.title.repeat': '标题重复，请修改',

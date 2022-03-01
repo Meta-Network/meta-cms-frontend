@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useIntl } from 'umi';
-import { Select } from 'antd';
+import { message, Select } from 'antd';
 import styles from './settings.less';
 import { useMount } from 'ahooks';
 import { getDefaultSiteConfigAPI } from '@/helpers';
@@ -109,6 +109,22 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
    */
   const handleSelectChangeTags = useCallback(
     (val: string[]) => {
+      // 判断新添加的 tag 长度
+      if (val.length && val[val.length - 1].length > editorRules.tags.singleLength) {
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.tag.singleLength',
+            },
+            {
+              max: editorRules.tags.singleLength,
+            },
+          ),
+        );
+        return;
+      }
+
+      // 判断总个数
       if (val.length > SELECT_TAGS_MAX) {
         return;
       }
@@ -120,7 +136,7 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
         mergedHistoryTags(currentTag);
       }
     },
-    [tags, handleChangeTags, mergedHistoryTags],
+    [tags, handleChangeTags, mergedHistoryTags, intl],
   );
 
   useMount(() => {

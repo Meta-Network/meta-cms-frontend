@@ -176,6 +176,7 @@ export default {
   'messages.editor.verify.summary.length': 'Description length limit is { min }-{ max }',
   'messages.editor.verify.cover.length': 'Cover url length limit is { min }-{ max }',
   'messages.editor.verify.tag.length': 'Tags length limit is { min }-{ max }',
+  'messages.editor.verify.tag.singleLength': '标签单个长度最长为 { max }',
   'messages.editor.verify.tag.number': 'Up to { maxNumber } tags',
   'messages.editor.verify.license.length': 'Protocol length limit is { min }-{ max }',
   'messages.editor.verify.title.repeat': 'Title is repeated, please change',

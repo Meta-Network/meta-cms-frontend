@@ -478,6 +478,24 @@ const Edit: React.FC = () => {
         return;
       }
 
+      // tag 单个个数长度判断
+      const tagsFilter = tags.filter((i) => i.length > editorRules.tags.singleLength);
+      if (tagsFilter.length) {
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.tag.singleLength',
+            },
+            {
+              max: editorRules.tags.singleLength,
+            },
+          ),
+        );
+
+        setPublishLoading(false);
+        return;
+      }
+
       const tagsStr = tags.join();
       if (tagsStr.length < editorRules.tags.min || tagsStr.length > editorRules.tags.max) {
         message.warning(
