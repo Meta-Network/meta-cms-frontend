@@ -66,12 +66,15 @@ export const editorRules = {
   },
   tags: {
     min: 0,
-    max: 200,
+    max: 509,
     maxNumber: 10,
+    singleLength: 50,
   },
   categories: {
     min: 0,
-    max: 200,
+    max: 203,
+    maxNumber: 4,
+    singleLength: 50,
   },
   license: {
     min: 0,
