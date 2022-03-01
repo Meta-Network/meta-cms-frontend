@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCountDown } from 'ahooks';
 import type { FormInstance } from 'antd';
+import { Button } from 'antd';
 import { message } from 'antd';
 import { trim } from 'lodash';
 import { useIntl } from 'umi';
@@ -13,6 +14,7 @@ interface Props {
 
 const EmailCode: React.FC<Props> = ({ form }) => {
   const intl = useIntl();
+  const [emailCodeFlag, setEmailCodeFlag] = useState<boolean>(false);
 
   const onEnd = () => {
     console.log('onEnd of the time');
@@ -25,10 +27,19 @@ const EmailCode: React.FC<Props> = ({ form }) => {
    */
   const sendEmailCode = async () => {
     const { email } = await form.getFieldsValue();
+
+    // 空邮箱
     if (!trim(email)) {
       message.warning({ content: intl.formatMessage({ id: 'messages.login.enterEmail' }) });
       return;
     }
+
+    // 防止重复点击
+    if (emailCodeFlag) {
+      return;
+    }
+    setEmailCodeFlag(true);
+
     try {
       const res = await emailGetVerificationCode({
         key: trim(email),
@@ -57,22 +68,26 @@ const EmailCode: React.FC<Props> = ({ form }) => {
         message.warning({ content: intl.formatMessage({ id: 'messages.login.sendFailed' }) });
         console.error(e);
       }
+    } finally {
+      setEmailCodeFlag(false);
     }
   };
 
   return (
-    <>
-      <button
-        className={`${styles.buttonCode} ${count !== 0 ? 'g-red' : ''}`}
-        type="button"
+    <div className={styles.buttonCode}>
+      <Button
+        className={`${count !== 0 ? 'g-red' : ''}`}
+        type="text"
         disabled={count !== 0}
         onClick={sendEmailCode}
+        loading={emailCodeFlag}
+        shape="round"
       >
         {count === 0
           ? intl.formatMessage({ id: 'component.button.send' })
           : `${Math.round(count / 1000)}s`}
-      </button>
-    </>
+      </Button>
+    </div>
   );
 };
 
