@@ -14,7 +14,7 @@ import {
   dbPostsWhereExistByTitleAndId,
 } from '@/db/db';
 import { imageUploadByUrlAPI } from '@/helpers';
-import { assign, cloneDeep, uniq } from 'lodash';
+import { assign, cloneDeep, trim, uniq } from 'lodash';
 // import type Vditor from 'vditor';
 import { generateSummary, postDataMergedUpdateAt, pipelinesPostOrdersData } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
@@ -228,10 +228,10 @@ const Edit: React.FC = () => {
       setPublishLoading(true);
 
       const payload = {
-        title: title,
+        title: trim(title),
         cover: cover,
         summary: generateSummary(),
-        content: content,
+        content: trim(content),
         license: license,
         categories: '',
         tags: tags.join(),
@@ -358,11 +358,25 @@ const Edit: React.FC = () => {
         return;
       }
 
-      // 标题内容不能为空
-      if (!title || !content) {
+      // 标题不能为空
+      const _title = trim(title);
+      const _content = trim(content);
+
+      if (!_title) {
         message.warning(
           intl.formatMessage({
-            id: 'messages.editor.tip.titleOrContent',
+            id: 'messages.editor.verify.title.empty',
+          }),
+        );
+        setPublishLoading(false);
+        return;
+      }
+
+      // 内容不能为空
+      if (!_content) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.verify.content.empty',
           }),
         );
         setPublishLoading(false);
@@ -370,7 +384,7 @@ const Edit: React.FC = () => {
       }
 
       // title 长度判断
-      if (title.length < editorRules.title.min || title.length > editorRules.title.max) {
+      if (_title.length < editorRules.title.min || _title.length > editorRules.title.max) {
         message.warning(
           intl.formatMessage(
             {
@@ -387,7 +401,7 @@ const Edit: React.FC = () => {
       }
 
       // content 长度判断
-      if (content.length < editorRules.content.min || content.length > editorRules.content.max) {
+      if (_content.length < editorRules.content.min || _content.length > editorRules.content.max) {
         message.warning(
           intl.formatMessage(
             {
@@ -470,6 +484,24 @@ const Edit: React.FC = () => {
             },
             {
               maxNumber: editorRules.tags.maxNumber,
+            },
+          ),
+        );
+
+        setPublishLoading(false);
+        return;
+      }
+
+      // tag 单个个数长度判断
+      const tagsFilter = tags.filter((i) => i.length > editorRules.tags.singleLength);
+      if (tagsFilter.length) {
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.tag.singleLength',
+            },
+            {
+              max: editorRules.tags.singleLength,
             },
           ),
         );
