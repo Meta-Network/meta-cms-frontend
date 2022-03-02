@@ -551,7 +551,7 @@ const Edit: React.FC = () => {
 
       // check title
       const checkTitleResult = await checkTitle({
-        titleValue: title,
+        titleValue: trim(title),
         id: Number(id),
       });
 
