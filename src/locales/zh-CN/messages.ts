@@ -67,6 +67,7 @@ export default {
   'messages.profile.updateUserInfoWait': '更新用户信息中...请稍候',
   'messages.site.submittingInfo': '正在提交数据，请等待完成…',
   'messages.site.submitSuccess': '数据提交完成',
+  'messages.site.submitFailed': '数据提交失败，原因：{reason}',
   'messages.site.title': ' Meta Space 信息设置',
   'messages.site.description': '在此设定您的 Meta Space 信息',
   'messages.storageSetting.bind': '绑定',

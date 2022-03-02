@@ -1,4 +1,6 @@
 import request from './request';
+import { sleep } from '@/utils';
+import { getDefaultSiteConfig } from '@/services/api/meta-cms/information-and-validation';
 
 /** 获取主题模板 GET /theme/template */
 export async function getThemeTemplates(type: 'HEXO' | 'ALL') {
@@ -112,6 +114,21 @@ export async function deploySite(data: { siteConfigId: number }) {
     data,
     method: 'POST',
   });
+}
+
+/** 轮询等待站点发布结束 */
+export async function waitUntilSitePublished(): Promise<void> {
+  let status = (await getDefaultSiteConfig()).data.status;
+
+  while (!['PUBLISHED', 'DEPLOY_FAILED', 'PUBLISH_FAILED'].includes(status)) {
+    // await polling for every 5 seconds, because it takes so long to complete
+    await sleep(5000);
+    status = (await getDefaultSiteConfig()).data.status;
+  }
+
+  if (status.endsWith('FAILED')) {
+    throw new Error(status);
+  }
 }
 
 /** 进行特定平台的文章同步 POST /post/sync/{platform} */

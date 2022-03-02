@@ -23,7 +23,7 @@ export default () => {
         size="small"
         rowKey="id"
         loading={loading}
-        dataSource={list}
+        dataSource={list.sort((a, b) => a.invitee_user_id - b.invitee_user_id)}
         renderItem={(item) => {
           return (
             <List.Item style={{ justifyContent: 'flex-start' }} className={styles.lessMargin}>

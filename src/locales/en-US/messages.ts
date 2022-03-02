@@ -84,6 +84,7 @@ export default {
   'messages.profile.updateUserInfoWait': 'Updating user information...please wait',
   'messages.site.submittingInfo': 'Submitting data, please wait for completion...',
   'messages.site.submitSuccess': 'Data submission completed',
+  'messages.site.submitFailed': 'Data submission failed, reason: {reason}',
   'messages.site.title': 'Meta Space information settings',
   'messages.site.description': 'Set your Meta Space information here',
   'messages.storageSetting.bind': 'Bind',
