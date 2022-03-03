@@ -1,5 +1,6 @@
 import { assign, isEmpty } from 'lodash';
 import moment from 'moment';
+import request from 'umi-request';
 import {
   generateSeed,
   generateKeys,
@@ -202,4 +203,22 @@ export const pipelinesPostOrdersData = ({
     authorPostDigest: authorPostDigestResult,
     authorPostDigestSign: authorPostDigestSignResult,
   };
+};
+
+/**
+ * 是否有效图片
+ * @param src
+ * @returns
+ */
+export const isValidImage = async (src: string) => {
+  try {
+    const response = await request.get(src, {
+      responseType: 'blob',
+    });
+
+    return !!response;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };

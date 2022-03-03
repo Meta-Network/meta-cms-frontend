@@ -16,7 +16,12 @@ import {
 import { imageUploadByUrlAPI } from '@/helpers';
 import { assign, cloneDeep, trim, uniq } from 'lodash';
 // import type Vditor from 'vditor';
-import { generateSummary, postDataMergedUpdateAt, pipelinesPostOrdersData } from '@/utils/editor';
+import {
+  generateSummary,
+  postDataMergedUpdateAt,
+  pipelinesPostOrdersData,
+  isValidImage,
+} from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
 // import HeaderCloudDraftUpload from '@/components/Editor/headerCloudDraftUpload';
@@ -645,19 +650,32 @@ const Edit: React.FC = () => {
         duration: null,
       });
 
+      // 保存失败的图片地址
+      const saveFailAddress = (src: string) => {
+        const _list = cloneDeep(contentImagesSrc);
+        _list.push(src);
+        setContentImagesSrc(uniq(_list));
+      };
+
       for (let i = 0; i < imgListFilter.length; i++) {
         const ele = imgListFilter[i];
 
-        const result = await imageUploadByUrlAPI(ele.src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI));
+        const src = ele.src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI);
+
+        // 无效图片跳过处理
+        const isValidImageResult = await isValidImage(src);
+        if (!isValidImageResult) {
+          saveFailAddress(ele.src);
+          continue;
+        }
+
+        const result = await imageUploadByUrlAPI(src);
         if (result) {
           // _vditor.tip('上传成功', 2000);
           ele.src = result.publicUrl;
           ele.alt = result.key;
         } else {
-          // 保存失败的图片地址
-          const _list = cloneDeep(contentImagesSrc);
-          _list.push(ele.src);
-          setContentImagesSrc(uniq(_list));
+          saveFailAddress(ele.src);
         }
       }
 
