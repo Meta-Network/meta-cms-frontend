@@ -44,7 +44,7 @@ const PostsPublish: FC<Props> = ({ state, publishSiteOrderId }) => {
           <PublishIcon className={styles.icon} />
           <Text style={{ color: 'green' }}>
             {intl.formatMessage({ id: 'posts.table.publishState.finished' })}{' '}
-            {publishSiteOrderId && <span>#{publishSiteOrderId}</span>}
+            {publishSiteOrderId >= 0 ? <span>#{publishSiteOrderId}</span> : null}
           </Text>
         </Space>
       ) : state === PipelineOrderTaskCommonState.FAILED ? (
