@@ -1,9 +1,8 @@
-import { userHasSite } from '@/utils';
-import { useModel } from '@@/plugin-model/useModel';
 import { isMobile } from 'is-mobile';
-import React, { useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { history, Link } from 'umi';
+import { userHasSite } from '@/utils';
+import React, { useEffect } from 'react';
+import { useModel, history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
@@ -31,7 +30,12 @@ function CustomSiderMenu({
 }) {
   return (
     <div className="menu-extra-cards">
-      <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click']}>
+      <Dropdown
+        overlayStyle={{ position: 'fixed' }}
+        overlay={<MenuUserInfo />}
+        placement="bottomCenter"
+        trigger={['click']}
+      >
         <Card className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card'}>
           <Card.Meta
             className="menu-user-card-meta"
@@ -245,8 +249,7 @@ export const layout: RunTimeLayoutConfig = ({
        */
       if (initialState?.currentUser?.id) {
         const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
-
-        setInitialState((s: GLOBAL.InitialState) => ({
+        await setInitialState((s: GLOBAL.InitialState) => ({
           ...s,
           localDraftCount: localDraftCount,
         }));

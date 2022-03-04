@@ -8,6 +8,7 @@ import {
   updateSiteInfoSetting,
   updateSitePublishSetting,
   updateSiteStorageSetting,
+  waitUntilSitePublished,
 } from '@/services/api/meta-cms';
 import { useIntl, useModel } from 'umi';
 import { useEffect, useState } from 'react';
@@ -24,6 +25,14 @@ export default () => {
 
   const intl = useIntl();
   const [ableToStart, setAbleToStart] = useState<boolean>(true);
+
+  const ifSubmittingFailed = (response: GLOBAL.GeneralResponse<any>, messageId: string) => {
+    if (response.message !== 'Ok') {
+      throw new Error(
+        intl.formatMessage({ id: messageId }, { reason: response.message.toString() }),
+      );
+    }
+  };
 
   // set default message
   useEffect(() => {
@@ -79,10 +88,7 @@ export default () => {
       favicon: new URL(validatedSiteSettings.favicon).href,
     });
 
-    if (infoSetting.message !== 'Ok') {
-      throw new Error(intl.formatMessage({ id: 'messages.deployment.submitInfoFailed' }));
-    }
-
+    ifSubmittingFailed(infoSetting, 'messages.deployment.submitInfoFailed');
     processingMessage.success(intl.formatMessage({ id: 'messages.deployment.submitInfoSuccess' }));
 
     const configSetting = await createOrUpdateSiteConfig(infoSetting.data.id, {
@@ -93,22 +99,14 @@ export default () => {
       // domain: `${domainSetting}.${META_SPACE_BASE_DOMAIN}`,
     });
 
-    if (configSetting.message !== 'Ok') {
-      throw new Error(
-        intl.formatMessage(
-          { id: 'messages.deployment.submitConfigFailed' },
-          { reason: configSetting.message },
-        ),
-      );
-    }
-
+    ifSubmittingFailed(configSetting, 'messages.deployment.submitConfigFailed');
     processingMessage.success(
       intl.formatMessage({ id: 'messages.deployment.submitConfigSuccess' }),
     );
     const configId = configSetting.data.id;
 
     const validatedStorageSettings = storageSetting as GLOBAL.StorageSetting;
-    const newStorageSetting = await createOrUpdateSiteStorage(
+    const storageSettingResponse = await createOrUpdateSiteStorage(
       configId,
       validatedStorageSettings.storage.toLowerCase(),
       {
@@ -120,20 +118,12 @@ export default () => {
       },
     );
 
-    if (newStorageSetting.message !== 'Ok') {
-      throw new Error(
-        intl.formatMessage(
-          { id: 'messages.deployment.submitStorageFailed' },
-          { reason: newStorageSetting.message },
-        ),
-      );
-    }
-
+    ifSubmittingFailed(storageSettingResponse, 'messages.deployment.submitStorageFailed');
     processingMessage.success(
       intl.formatMessage({ id: 'messages.deployment.submitStorageSuccess' }),
     );
 
-    const publishSetting = await createOrUpdateSitePublish(
+    const publishSettingResponse = await createOrUpdateSitePublish(
       configId,
       storageSetting!.storage!.toLowerCase(),
       {
@@ -146,17 +136,11 @@ export default () => {
       },
     );
 
-    if (publishSetting.message !== 'Ok') {
-      throw new Error(
-        intl.formatMessage(
-          { id: 'messages.deployment.submitPublishFailed' },
-          { reason: publishSetting.message },
-        ),
-      );
-    }
+    ifSubmittingFailed(publishSettingResponse, 'messages.deployment.submitPublishFailed');
     processingMessage.success(
       intl.formatMessage({ id: 'messages.deployment.submitPublishSuccess' }),
     );
+
     processingMessage.info(intl.formatMessage({ id: 'messages.deployment.awaitDeploying' }));
     processingMessage.info(
       intl.formatMessage({ id: 'messages.deployment.pleaseWaitDeployingForMinutes' }),
@@ -171,9 +155,8 @@ export default () => {
 
     // ignore errors accord when deployed, to set the loading indicator as done
     try {
-      deployAndPublish = await deploySite({
-        siteConfigId: configId,
-      });
+      deployAndPublish = await deploySite({ siteConfigId: configId });
+      await waitUntilSitePublished();
     } catch (error) {
       deployAndPublish = error as Error;
     }
@@ -196,6 +179,7 @@ export default () => {
         ),
       );
     }
+
     processingMessage.success(
       intl.formatMessage({ id: 'messages.deployment.deployAndPublishSuccess' }),
     );
@@ -220,15 +204,13 @@ export default () => {
       await validate();
       const { configId } = await submit();
       await deploy(configId);
-    } catch (error) {
-      let errMessage: any = (error as Error).message;
-      if (typeof errMessage !== 'string') {
-        // deal with the error object
-        errMessage = errMessage.message;
-      }
-      processingMessage.error(errMessage);
+    } catch (error: any) {
+      processingMessage.error(error.message);
       processingMessage.info(intl.formatMessage({ id: 'messages.deployment.readyToStart' }));
       setAbleToStart(true);
+    } finally {
+      // refresh the initialState
+      refresh().then();
     }
   };
   return (
