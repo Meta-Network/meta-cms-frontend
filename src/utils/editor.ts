@@ -222,3 +222,56 @@ export const isValidImage = async (src: string) => {
     return false;
   }
 };
+
+/**
+ * 获取过滤后的 HTML 然后转成 Markdown
+ * @returns
+ */
+export const renderFilteredContent = () => {
+  // TODO: modify
+  try {
+    const htmlContent = (window as any).vditor!.getHTML();
+    if (htmlContent) {
+      return (window as any).vditor!.html2md(htmlContent);
+    }
+    return '';
+  } catch (e) {
+    console.error(e);
+    return '';
+  }
+};
+
+/**
+ *
+ * @returns
+ */
+export const getPreviewImageLink = (existList: string[]) => {
+  try {
+    const htmlContent = (window as any).vditor!.getHTML();
+    if (htmlContent) {
+      const DIV = document.createElement('div');
+      DIV.innerHTML = htmlContent;
+
+      const imgList: HTMLImageElement[] = [
+        ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
+      ];
+
+      /**
+       * 1. 有 src
+       * 2. src 不为 fleek (已上传)
+       * 3. 图片不存在
+       */
+      const list = imgList.filter(
+        (i) => i.src && !i.src.includes(FLEEK_NAME) && !existList.includes(i.src),
+      );
+
+      const listMap = list.map((i) => i.src);
+
+      return [...new Set(listMap)];
+    }
+    return [];
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};

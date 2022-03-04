@@ -5,11 +5,10 @@ import { Button, Popconfirm, message, List } from 'antd';
 import {
   dbPostsDeleteAll,
   dbMetadatasDeleteAll,
-  dbPostsDelete,
   dbMetadatasDelete,
   dbPostsDeleteCurrent,
+  dbPostsAll,
 } from '@/db/db';
-import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
 import styles from './index.less';
 
 export default () => {
@@ -29,27 +28,19 @@ export default () => {
 
     setDeleteDraftLoading(true);
 
-    // 删除用户的文章
-    const gunDraftsResult = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
+    // 删除当前用户的文章
+    const draftsResult = (await dbPostsAll(initialState.currentUser.id)) || [];
 
-    for (let i = 0; i < gunDraftsResult.length; i++) {
-      const ele = gunDraftsResult[i];
-      console.log('ele', ele);
-
-      if (ele.userId !== initialState.currentUser.id) {
-        continue;
-      }
+    // 删除当前用户文章的 metadata 数据
+    for (let i = 0; i < draftsResult.length; i++) {
+      const ele = draftsResult[i];
 
       if (ele.id) {
-        await dbPostsDelete(ele.id);
         await dbMetadatasDelete(ele.id);
-      }
-      if (ele.key) {
-        await deleteDraft({ userId: initialState.currentUser.id, key: ele.key });
       }
     }
 
-    // 删除当前用户的所有草稿（清理 delete 为 true 的本地草稿）
+    // 删除当前用户的所有草稿数据
     await dbPostsDeleteCurrent(initialState.currentUser.id);
 
     setDeleteDraftLoading(false);

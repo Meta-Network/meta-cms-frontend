@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { Fragment, useState, useCallback, useMemo } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { Input, message, notification } from 'antd';
 import Editor from '@/components/Editor';
@@ -15,12 +15,13 @@ import {
 } from '@/db/db';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { assign, cloneDeep, trim, uniq } from 'lodash';
-// import type Vditor from 'vditor';
 import {
   generateSummary,
   postDataMergedUpdateAt,
   pipelinesPostOrdersData,
   isValidImage,
+  renderFilteredContent,
+  getPreviewImageLink,
 } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
@@ -33,25 +34,8 @@ import SettingsCopyrightNotice from '@/components/Editor/settingsCopyrightNotice
 import SettingsTips from '@/components/Editor/settingsTips';
 import { fetchPostsStorage, pipelinesPostOrders } from '@/services/api/meta-cms';
 import { mergedMessage } from '@/utils';
-import moment from 'moment';
-import {
-  OSS_MATATAKI,
-  OSS_MATATAKI_FEUSE,
-  KEY_GUN_ROOT,
-  KEY_GUN_ROOT_DRAFT,
-  KEY_META_CMS_GUN_PAIR,
-  editorRules,
-} from '../../../../config';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE, editorRules } from '../../../../config';
 import { DraftMode, FetchPostsStorageParamsState, SyncPlatform } from '@/services/constants';
-import Gun from 'gun';
-import {
-  fetchGunDraftsAndUpdateLocal,
-  syncNewDraft,
-  syncDraft,
-  fetchGunDrafts,
-  signIn,
-} from '@/utils/gun';
-import { storeGet } from '@/utils/store';
 import PublishingTip from '@/components/Editor/PublishingTip';
 import type { GatewayType } from '@/services/constants';
 import type {
@@ -59,7 +43,6 @@ import type {
   AuthorPostSignatureMetadata,
 } from '@metaio/meta-signature-util-v2';
 
-const keyUploadAllImages = 'keyUploadAllImages';
 const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
 
 const Edit: React.FC = () => {
@@ -71,12 +54,10 @@ const Edit: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [license, setLicense] = useState<string>('');
   const [draftMode, setDraftMode] = useState<DraftMode>(DraftMode.Default);
+  // 保存失败的图片地址
   const [contentImagesSrc, setContentImagesSrc] = useState<string[]>([]);
   const focus$ = useEventEmitter<string>();
   const [visiblePublishingTip, setVisiblePublishingTip] = useState<boolean>(false);
-
-  // vditor
-  // const [vditor, setVditor] = useState<Vditor>();
   // 处理图片上传开关
   const [flagImageUploadToIpfs, setFlagImageUploadToIpfs] = useState<boolean>(false);
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
@@ -97,133 +78,17 @@ const Edit: React.FC = () => {
     [initialState],
   );
 
-  // watch current draft
-  const watchCurrentDraft = useCallback(
-    async (id: number) => {
-      if (!initialState?.currentUser?.id) {
-        return;
-      }
-      const draft = await dbPostsGet(id);
-
-      if (!draft) {
-        return;
-      }
-
-      const { currentUser } = initialState;
-      const userScope = `user_${currentUser.id}`;
-      const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
-
-      // 获取所有草稿找到 key
-      const gunAllDrafts = await fetchGunDrafts({
-        gunDraft: _gun,
-        scope: userScope,
-        userId: currentUser.id,
-      });
-
-      const draftFind: any = gunAllDrafts.find(
-        (i) => String(i.timestamp) === String(draft.timestamp) && i.userId === currentUser.id,
-      );
-
-      const updateDraftFn = async (data: string) => {
-        const pair = JSON.parse(storeGet(KEY_META_CMS_GUN_PAIR) || '""');
-        if (!pair) {
-          return;
-        }
-
-        // 解密
-        const msg = await Gun.SEA.verify(data, pair.pub);
-        const gunDraft = (await Gun.SEA.decrypt(msg, pair)) as PostType.Posts;
-
-        // 如果文章变动
-        if (
-          moment(draft.updatedAt).isBefore(gunDraft.updatedAt) &&
-          draft.userId === gunDraft.userId
-        ) {
-          // 监测到更新，立即本地更新
-          const _data = assign(draft, gunDraft);
-          const updateData: any = cloneDeep(_data);
-          delete updateData.key;
-
-          await dbPostsUpdate(updateData.id!, updateData);
-        }
-      };
-
-      if (draftFind && draftFind?.key) {
-        _gun
-          .get(userScope)
-          .get(draftFind.key)
-          .on((data: any) => {
-            if (data) {
-              updateDraftFn(data);
-            }
-          });
-      }
-    },
-    [initialState],
-  );
-
   // handle history url state
-  const handleHistoryState = useCallback(
-    (id: string) => {
-      window.history.replaceState({}, '', `?id=${id}`);
-      history.location.query!.id = id;
-
-      if (initialState?.currentUser?.id) {
-        // 同步新草稿
-        syncNewDraft({
-          id: Number(id),
-          userId: initialState.currentUser.id!,
-        });
-      }
-    },
-    [initialState],
-  );
+  const handleHistoryState = useCallback((id: string) => {
+    window.history.replaceState({}, '', `?id=${id}`);
+    history.location.query!.id = id;
+  }, []);
 
   // 处理更新
-  const handleUpdate = useCallback(
-    async (id: number, data: any) => {
-      // local update
-      await dbPostsUpdate(id, data);
-
-      // gun.js update
-      // 更新到 gun.js
-      if (!initialState?.currentUser?.id) {
-        return;
-      }
-
-      const { currentUser } = initialState;
-      const draft = await dbPostsGet(id);
-
-      const userScope = `user_${currentUser.id}`;
-      const _gun = (window as any).gun.user().get(KEY_GUN_ROOT).get(KEY_GUN_ROOT_DRAFT);
-
-      const gunAllDrafts = await fetchGunDrafts({
-        gunDraft: _gun,
-        scope: userScope,
-        userId: currentUser.id,
-      });
-
-      const draftFind: any = gunAllDrafts.find(
-        (i) => String(i.timestamp) === String(draft?.timestamp) && i.userId === currentUser.id,
-      );
-
-      // 更新草稿
-      if (draftFind && draftFind?.key) {
-        syncDraft({
-          userId: currentUser.id,
-          key: draftFind?.key,
-          data: draft,
-        });
-      } else {
-        // 如果文章在 gun 被删了
-        syncNewDraft({
-          id: id,
-          userId: currentUser.id,
-        });
-      }
-    },
-    [initialState],
-  );
+  const handleUpdate = useCallback(async (id: number, data: any) => {
+    // local update
+    await dbPostsUpdate(id, data);
+  }, []);
 
   /**
    * 发布文章
@@ -236,11 +101,13 @@ const Edit: React.FC = () => {
         title: trim(title),
         cover: cover,
         summary: generateSummary(),
-        content: trim(content),
+        content: trim(renderFilteredContent()),
         license: license,
         categories: '',
         tags: tags.join(),
       };
+
+      console.log('payload', payload);
 
       // 校验 seed key，可能不匹配
       let pipelinesPostOrdersDataResult;
@@ -300,7 +167,7 @@ const Edit: React.FC = () => {
         });
       }
     },
-    [title, cover, content, tags, license, handleUpdate, intl],
+    [title, cover, tags, license, handleUpdate, intl],
   );
 
   /**
@@ -365,6 +232,7 @@ const Edit: React.FC = () => {
 
       // 标题不能为空
       const _title = trim(title);
+      // 过滤后的内容长度判断
       const _content = trim(content);
 
       if (!_title) {
@@ -584,11 +452,12 @@ const Edit: React.FC = () => {
       setContent(val);
       setDraftMode(DraftMode.Saving);
 
-      const { id } = history.location.query as Router.PostQuery;
       const data = postDataMergedUpdateAt({
         content: val,
         summary: generateSummary(),
       });
+
+      const { id } = history.location.query as Router.PostQuery;
       if (id) {
         await handleUpdate(Number(id), data);
       } else {
@@ -606,6 +475,13 @@ const Edit: React.FC = () => {
    * TODO: 如果图片失败下次跳过执行
    */
   const handleImageUploadToIpfs = useCallback(async () => {
+    console.log('handleImageUploadToIpfs');
+
+    /**
+     * 1. 获取所有图片地址
+     * 2. 上传前校验一次是否有效(处理前 oss 地址替换)
+     */
+
     if (flagImageUploadToIpfs) return;
     setFlagImageUploadToIpfs(true);
 
@@ -615,97 +491,74 @@ const Edit: React.FC = () => {
       return;
     }
 
-    const contentHTML = _vditor.getHTML();
-    const DIV = document.createElement('div');
-    DIV.innerHTML = contentHTML;
+    const contentImagesSrcDeep = cloneDeep(contentImagesSrc);
+    console.log('contentImagesSrcDeep start', contentImagesSrcDeep);
 
-    const imgList: HTMLImageElement[] = [
-      ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
-    ];
+    const imgListFilter = getPreviewImageLink(contentImagesSrcDeep);
+    console.log('imgListFilter', imgListFilter);
 
-    const imgListFilter = imgList.filter((i) => {
-      const reg = new RegExp('[a-zA-z]+://[^s]*');
-
-      const result = i.outerHTML.match('src=".*?"');
-      const _src = result ? result[0].slice(5, -1) : '';
-      // console.log('_src', _src);
-
-      return (
-        i.src && !i.src.includes(FLEEK_NAME) && reg.test(_src) && !contentImagesSrc.includes(_src)
-      );
-    });
-    // console.log('imgListFilter', imgListFilter);
-
-    if (imgListFilter.length > 0) {
-      _vditor.disabled();
-
-      notification.open({
-        key: keyUploadAllImages,
-        message: intl.formatMessage({
-          id: 'messages.editor.notification.title',
-        }),
-        description: intl.formatMessage({
-          id: 'messages.editor.uploadAllImages.notification',
-        }),
-        duration: null,
-      });
-
-      // 保存失败的图片地址
-      const saveFailAddress = (src: string) => {
-        const _list = cloneDeep(contentImagesSrc);
-        _list.push(src);
-        setContentImagesSrc(uniq(_list));
-      };
-
-      for (let i = 0; i < imgListFilter.length; i++) {
-        const ele = imgListFilter[i];
-
-        const src = ele.src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI);
-
-        // 无效图片跳过处理
-        const isValidImageResult = await isValidImage(src);
-        if (!isValidImageResult) {
-          saveFailAddress(ele.src);
-          continue;
-        }
-
-        const result = await imageUploadByUrlAPI(src);
-        if (result) {
-          // _vditor.tip('上传成功', 2000);
-          ele.src = result.publicUrl;
-          ele.alt = result.key;
-        } else {
-          saveFailAddress(ele.src);
-        }
-      }
-
-      notification.close(keyUploadAllImages);
-
-      message.destroy(keyUploadAllImagesMessage);
-      message.success({
-        key: keyUploadAllImagesMessage,
-        content: intl.formatMessage({
-          id: 'messages.editor.uploadAllImages.success',
-        }),
-      });
-
-      // console.log('imgList', imgList);
-
-      const mdValue = _vditor.html2md(DIV.innerHTML);
-
-      _vditor.setValue(mdValue);
-
-      await asyncContentToDB(mdValue);
-
-      _vditor.enable();
+    if (!imgListFilter.length) {
+      setFlagImageUploadToIpfs(false);
+      return;
     }
 
+    _vditor.disabled();
+
+    const done = message.loading(
+      intl.formatMessage({ id: 'messages.editor.uploadAllImages.notification' }),
+      0,
+    );
+
+    let contentDeep = _vditor.getValue();
+
+    for (let i = 0; i < imgListFilter.length; i++) {
+      const src = imgListFilter[i];
+      const uploadSrc = src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI);
+
+      // 无效图片跳过处理
+      const isValidImageResult = await isValidImage(uploadSrc);
+      if (!isValidImageResult) {
+        contentImagesSrcDeep.push(src);
+        continue;
+      }
+
+      const result = await imageUploadByUrlAPI(uploadSrc);
+      if (result) {
+        contentDeep = contentDeep.replaceAll(src, result.publicUrl);
+      } else {
+        contentImagesSrcDeep.push(src);
+      }
+    }
+
+    done();
+
+    message.destroy(keyUploadAllImagesMessage);
+    message.success({
+      key: keyUploadAllImagesMessage,
+      content: intl.formatMessage({
+        id: 'messages.editor.uploadAllImages.success',
+      }),
+    });
+
+    console.log('contentImagesSrcDeep end', uniq(contentImagesSrcDeep));
+    setContentImagesSrc(uniq(contentImagesSrcDeep));
+
+    _vditor.setValue(contentDeep);
+    await asyncContentToDB(contentDeep);
+
+    console.log('contentDeep', contentDeep);
+
+    _vditor.enable();
+
     setFlagImageUploadToIpfs(false);
-  }, [flagImageUploadToIpfs, asyncContentToDB, intl, contentImagesSrc]);
+  }, [flagImageUploadToIpfs, intl, contentImagesSrc, asyncContentToDB]);
 
   // handle async content to db
   const handleAsyncContentToDB = useCallback(async () => {
+    console.log('handleAsyncContentToDB');
     if ((window as any)?.vditor) {
+      console.log('handleAsyncContentToDB start');
+
       const value = (window as any).vditor.getValue();
 
       await asyncContentToDB(value);
@@ -833,38 +686,22 @@ const Edit: React.FC = () => {
           if ((window as any).vditor) {
             (window as any).vditor!.setValue(resultPost.content);
             // handle all image
-            handleImageUploadToIpfs();
+            // handleImageUploadToIpfs();
           }
-        }, 1000);
+        }, 3000);
       }
     }
   }, [handleImageUploadToIpfs]);
 
   useMount(() => {
-    if (initialState?.currentUser) {
-      fetchGunDraftsAndUpdateLocal(initialState.currentUser).then(() => {
-        fetchDBContent();
-      });
-
-      // 初始化监听
-      const { id } = history.location.query as Router.PostQuery;
-      if (id) {
-        // 有草稿的监听
-        signIn((window as any).gun).then(() => {
-          watchCurrentDraft(Number(id));
-        });
-      }
-    }
+    fetchDBContent();
+    (window as any).handleImageUploadToIpfs = handleImageUploadToIpfs;
   });
 
-  useEffect(() => {
-    // 30s handle all image
-    const timer = setInterval(handleImageUploadToIpfs, 1000 * 30);
-    return () => clearInterval(timer);
-  }, [handleImageUploadToIpfs]);
-
+  // 编辑器内容改变
   focus$.useSubscription((val: string) => {
     if (val === 'editor-input') {
+      console.log('editor-input');
       handleAsyncContentToDB();
     }
   });
