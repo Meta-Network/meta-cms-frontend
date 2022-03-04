@@ -37,6 +37,7 @@ export default {
   'messages.storage.noRepoTokenFirstSelect': ' 名称校验失败，请先绑定存储服务',
   'messages.storage.repoNameCanNotBeEmpty': '请设定存储仓库的名称',
   'messages.storage.repoNameAlreadyExists': '该存储仓库已存在，请设定一个新的名称',
+  'messages.storage.repoNameInvalid': "仓库名称应该仅由字母，数字，'_', '-' 和 '.' 组成",
   'messages.storage.form.repoName': '请设定存储仓库的名称',
   'messages.storage.form.repoNameAvailable': '可以使用该名称！',
   'messages.storage.form.sameRepoName': '仓库名称不可以重复，请重新设定名称',

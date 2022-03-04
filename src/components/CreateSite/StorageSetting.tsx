@@ -6,6 +6,7 @@ import { getGithubReposName } from '@/services/api/global';
 import StoragePicker from '@/components/StoragePicker';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
+import { siteStorageRepoRules } from '../../../config';
 import FormattedDescription from '../FormattedDescription';
 import type { StoreValue } from 'antd/es/form/interface';
 import type { RuleObject } from 'antd/lib/form';
@@ -33,26 +34,21 @@ export default () => {
 
   const validator = useCallback(
     (setState: Dispatch<SetStateAction<boolean>>) => (_: RuleObject, value: StoreValue) => {
+      let error;
       if (!userRepos) {
-        setState(false);
-        return Promise.reject(
-          new Error(intl.formatMessage({ id: 'messages.storage.noRepoTokenFirstSelect' })),
-        );
+        error = new Error(intl.formatMessage({ id: 'messages.storage.noRepoTokenFirstSelect' }));
+      } else if (value.match(/^[A-Za-z0-9_.-]+$/) === null) {
+        error = new Error(intl.formatMessage({ id: 'messages.storage.repoNameInvalid' }));
+      } else if (userRepos?.includes(value.toLowerCase())) {
+        error = new Error(intl.formatMessage({ id: 'messages.storage.repoNameAlreadyExists' }));
       }
-      if (!value) {
+      if (!error) {
+        setState(true);
+        return Promise.resolve();
+      } else {
         setState(false);
-        return Promise.reject(
-          new Error(intl.formatMessage({ id: 'messages.storage.repoNameCanNotBeEmpty' })),
-        );
+        return Promise.reject(error);
       }
-      if (userRepos?.includes(value.toLowerCase())) {
-        setState(false);
-        return Promise.reject(
-          new Error(intl.formatMessage({ id: 'messages.storage.repoNameAlreadyExists' })),
-        );
-      }
-      setState(true);
-      return Promise.resolve();
     },
     [userRepos],
   );
@@ -96,6 +92,7 @@ export default () => {
           }
           rules={[
             {
+              ...siteStorageRepoRules,
               validator: validator(setStorageRepoIsValid),
             },
           ]}

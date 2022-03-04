@@ -12,10 +12,6 @@ export default () => {
   const { siteSetting, setSiteSetting } = useModel('localStorageHooks');
 
   const faviconUrl = META_SPACE_DEFAULT_FAVICON_URL;
-  // const [faviconUrl, setFaviconUrl] = useState<string>(
-  //   siteSetting.favicon || META_SPACE_DEFAULT_FAVICON_URL,
-  // );
-
   const author = initialState?.currentUser?.nickname || '';
 
   let defaultLanguage = getLocale().split('-')[0];
@@ -26,7 +22,7 @@ export default () => {
     language: defaultLanguage,
     timezone: momentTimezone.tz.guess(),
     favicon: META_SPACE_DEFAULT_FAVICON_URL,
-    ...siteSetting,
+    ...(siteSetting as Partial<GLOBAL.SiteSetting>),
   };
 
   const handleFinishing = async (values: GLOBAL.SiteSetting) => {
