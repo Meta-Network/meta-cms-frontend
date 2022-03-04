@@ -242,17 +242,18 @@ export const renderFilteredContent = () => {
 };
 
 /**
- *
+ * 获取预览区域所有图片地址
  * @returns
  */
 export const getPreviewImageLink = (existList: string[]) => {
+  // TODO: modify
   try {
     const htmlContent = (window as any).vditor!.getHTML();
     if (htmlContent) {
       const DIV = document.createElement('div');
       DIV.innerHTML = htmlContent;
 
-      const imgList: HTMLImageElement[] = [
+      const imageLinkList: HTMLImageElement[] = [
         ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
       ];
 
@@ -261,13 +262,17 @@ export const getPreviewImageLink = (existList: string[]) => {
        * 2. src 不为 fleek (已上传)
        * 3. 图片不存在
        */
-      const list = imgList.filter(
+
+      // 过滤
+      const list = imageLinkList.filter(
         (i) => i.src && !i.src.includes(FLEEK_NAME) && !existList.includes(i.src),
       );
 
-      const listMap = list.map((i) => i.src);
+      // 清理格式
+      const listFormat = list.map((i) => i.src);
 
-      return [...new Set(listMap)];
+      // 去重
+      return [...new Set(listFormat)];
     }
     return [];
   } catch (e) {

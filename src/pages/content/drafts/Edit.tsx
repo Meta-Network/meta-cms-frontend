@@ -472,14 +472,14 @@ const Edit: React.FC = () => {
 
   /**
    * handle image upload to IPFS
-   * TODO: 如果图片失败下次跳过执行
    */
   const handleImageUploadToIpfs = useCallback(async () => {
-    console.log('handleImageUploadToIpfs');
-
     /**
      * 1. 获取所有图片地址
      * 2. 上传前校验一次是否有效(处理前 oss 地址替换)
+     * 3. 上传图片到 IPFS
+     * 4. 存在替换 src 地址
+     * 5. 不存在保持错误地址
      */
 
     if (flagImageUploadToIpfs) return;
@@ -492,12 +492,9 @@ const Edit: React.FC = () => {
     }
 
     const contentImagesSrcDeep = cloneDeep(contentImagesSrc);
-    console.log('contentImagesSrcDeep start', contentImagesSrcDeep);
+    const previewImageLinkList = getPreviewImageLink(contentImagesSrcDeep);
 
-    const imgListFilter = getPreviewImageLink(contentImagesSrcDeep);
-    console.log('imgListFilter', imgListFilter);
-
-    if (!imgListFilter.length) {
+    if (!previewImageLinkList.length) {
       setFlagImageUploadToIpfs(false);
       return;
     }
@@ -511,8 +508,9 @@ const Edit: React.FC = () => {
 
     let contentDeep = _vditor.getValue();
 
-    for (let i = 0; i < imgListFilter.length; i++) {
-      const src = imgListFilter[i];
+    for (let i = 0; i < previewImageLinkList.length; i++) {
+      const src = previewImageLinkList[i];
+      // mttk oss 替换
       const uploadSrc = src.replace(OSS_MATATAKI_FEUSE, OSS_MATATAKI);
 
       // 无效图片跳过处理
@@ -522,6 +520,7 @@ const Edit: React.FC = () => {
         continue;
       }
 
+      // 上传图片
       const result = await imageUploadByUrlAPI(uploadSrc);
       if (result) {
         contentDeep = contentDeep.replaceAll(src, result.publicUrl);
@@ -540,13 +539,10 @@ const Edit: React.FC = () => {
       }),
     });
 
-    console.log('contentImagesSrcDeep end', uniq(contentImagesSrcDeep));
     setContentImagesSrc(uniq(contentImagesSrcDeep));
 
     _vditor.setValue(contentDeep);
     await asyncContentToDB(contentDeep);
-
-    console.log('contentDeep', contentDeep);
 
     _vditor.enable();
 
@@ -555,10 +551,7 @@ const Edit: React.FC = () => {
 
   // handle async content to db
   const handleAsyncContentToDB = useCallback(async () => {
-    console.log('handleAsyncContentToDB');
     if ((window as any)?.vditor) {
-      console.log('handleAsyncContentToDB start');
-
       const value = (window as any).vditor.getValue();
 
       await asyncContentToDB(value);
@@ -686,7 +679,7 @@ const Edit: React.FC = () => {
           if ((window as any).vditor) {
             (window as any).vditor!.setValue(resultPost.content);
             // handle all image
-            // handleImageUploadToIpfs();
+            handleImageUploadToIpfs();
           }
         }, 3000);
       }
