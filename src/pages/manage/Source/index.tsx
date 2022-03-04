@@ -27,7 +27,7 @@ export default () => {
   const getUsername = useCallback(
     (platform: keyof GLOBAL.SourcePlatformStatus) => {
       if (sourceStatus[platform].username) {
-        return `(${sourceStatus[platform].username}`;
+        return `(${sourceStatus[platform].username})`;
       }
       return '';
     },

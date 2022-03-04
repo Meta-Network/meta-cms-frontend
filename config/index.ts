@@ -85,3 +85,36 @@ export const editorRules = {
     max: 256,
   },
 };
+
+export const siteStorageRepoRules = {
+  min: 1,
+  max: 100,
+};
+
+export const siteInfoRules = {
+  title: {
+    min: 1,
+    max: 50,
+  },
+  subtitle: {
+    min: 1,
+    max: 80,
+  },
+  author: {
+    min: 1,
+    max: 50,
+  },
+  description: {
+    min: 1,
+    max: 200,
+  },
+  keywords: {
+    min: 1,
+    max: 6,
+    type: 'array',
+    defaultField: {
+      min: 1,
+      max: 60,
+    },
+  },
+};

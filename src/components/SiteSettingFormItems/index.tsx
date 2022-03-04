@@ -1,4 +1,5 @@
 import { useIntl } from 'umi';
+import { siteInfoRules } from '../../../config';
 import { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
 export default () => {
@@ -74,28 +75,48 @@ export default () => {
         name="title"
         label={intl.formatMessage({ id: 'guide.config.form.title' })}
         placeholder={intl.formatMessage({ id: 'guide.config.form.titlePlaceholder' })}
-        rules={[{ required: true }]}
+        rules={[
+          {
+            required: true,
+            ...siteInfoRules.title,
+          },
+        ]}
       />
       <ProFormText
         width="md"
         name="subtitle"
         label={intl.formatMessage({ id: 'guide.config.form.subtitle' })}
         placeholder={intl.formatMessage({ id: 'guide.config.form.subtitlePlaceholder' })}
-        rules={[{ required: true }]}
+        rules={[
+          {
+            required: true,
+            ...siteInfoRules.subtitle,
+          },
+        ]}
       />
       <ProFormText
         width="md"
         name="author"
         label={intl.formatMessage({ id: 'guide.config.form.author' })}
         placeholder={intl.formatMessage({ id: 'guide.config.form.authorPlaceholder' })}
-        rules={[{ required: true }]}
+        rules={[
+          {
+            required: true,
+            ...siteInfoRules.author,
+          },
+        ]}
       />
       <ProFormTextArea
         width="md"
         name="description"
         label={intl.formatMessage({ id: 'guide.config.form.description' })}
         placeholder={intl.formatMessage({ id: 'guide.config.form.descriptionPlaceholder' })}
-        rules={[{ required: true }]}
+        rules={[
+          {
+            required: true,
+            ...siteInfoRules.description,
+          },
+        ]}
       />
       <ProFormSelect
         mode="tags"
@@ -106,7 +127,13 @@ export default () => {
         }}
         label={intl.formatMessage({ id: 'guide.config.form.keywords' })}
         extra={intl.formatMessage({ id: 'guide.config.form.keywordsExtra' })}
-        rules={[{ required: true }]}
+        rules={[
+          {
+            required: true,
+            ...siteInfoRules.keywords,
+            type: 'array',
+          },
+        ]}
       />
       <ProFormSelect
         width="md"
@@ -115,7 +142,6 @@ export default () => {
         rules={[
           {
             required: true,
-            message: intl.formatMessage({ id: 'guide.config.form.languagePleaseEnter' }),
           },
         ]}
         valueEnum={{
@@ -132,7 +158,6 @@ export default () => {
         rules={[
           {
             required: true,
-            message: intl.formatMessage({ id: 'guide.config.form.timezonePleaseEnter' }),
           },
         ]}
         valueEnum={timezones}
