@@ -232,7 +232,7 @@ const Edit: React.FC = () => {
 
       // 标题不能为空
       const _title = trim(title);
-      // 过滤后的内容长度判断
+      // 内容不能为空
       const _content = trim(content);
 
       if (!_title) {
@@ -250,6 +250,18 @@ const Edit: React.FC = () => {
         message.warning(
           intl.formatMessage({
             id: 'messages.editor.verify.content.empty',
+          }),
+        );
+        setPublishLoading(false);
+        return;
+      }
+
+      // 过滤后的内容不能为空
+      const _contentXssFilter = trim(renderFilteredContent());
+      if (!_contentXssFilter) {
+        message.warning(
+          intl.formatMessage({
+            id: 'messages.editor.verify.content.filterEmpty',
           }),
         );
         setPublishLoading(false);
@@ -688,13 +700,12 @@ const Edit: React.FC = () => {
 
   useMount(() => {
     fetchDBContent();
-    (window as any).handleImageUploadToIpfs = handleImageUploadToIpfs;
   });
 
   // 编辑器内容改变
   focus$.useSubscription((val: string) => {
     if (val === 'editor-input') {
-      console.log('editor-input');
+      // console.log('editor-input');
       handleAsyncContentToDB();
     }
   });

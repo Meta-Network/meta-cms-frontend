@@ -36,6 +36,7 @@ type PublishMetaSpaceRequestState = {
  */
 export const generateSummary = (): string => {
   // TODO: modify
+  // 需要过滤 \n
   try {
     const htmlContent = (window as any).vditor!.getHTML();
     if (htmlContent) {
