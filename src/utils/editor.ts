@@ -22,6 +22,7 @@ import {
   editorRules,
 } from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
+import { isValidUrl } from '.';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
 type PublishMetaSpaceRequestState = {
@@ -260,13 +261,30 @@ export const getPreviewImageLink = (existList: string[]) => {
       /**
        * 1. 有 src
        * 2. src 不为 fleek (已上传)
-       * 3. 图片不存在
+       *    图片不存在（会在编辑器方法里面处理）
+       * 4. 图片没有处理过
+       * 4. 空 空地址会使用当前 url 需要屏蔽
+       * 5. 非法 url
+       *
+       * TODO：如果写了 xxx.png 链接为 location.origin+location.pathname + xxx.png, 还没想好怎么判断
+       * 因为会有可能使用当前域名下图片的情况，而去手写 url 的情况少 一般都是复制粘贴
        */
 
       // 过滤
-      const list = imageLinkList.filter(
-        (i) => i.src && !i.src.includes(FLEEK_NAME) && !existList.includes(i.src),
-      );
+      const urlReg = new RegExp('[a-zA-z]+://[^s]*');
+
+      const list = imageLinkList.filter((i) => {
+        // console.log('i', i.src);
+
+        return (
+          i.src &&
+          isValidUrl(i.src) &&
+          urlReg.test(i.src) &&
+          !i.src.includes(FLEEK_NAME) &&
+          !existList.includes(i.src) &&
+          i.src !== window.location.href
+        );
+      });
 
       // 清理格式
       const listFormat = list.map((i) => i.src);
