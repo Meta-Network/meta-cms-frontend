@@ -23,6 +23,7 @@ import {
 } from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
 import { isValidUrl } from '.';
+import { xssSummary } from './xss';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
 type PublishMetaSpaceRequestState = {
@@ -36,15 +37,13 @@ type PublishMetaSpaceRequestState = {
  */
 export const generateSummary = (): string => {
   // TODO: modify
-  // 需要过滤 \n
   try {
     const htmlContent = (window as any).vditor!.getHTML();
     if (htmlContent) {
-      const div = document.createElement('div');
-      div.innerHTML = htmlContent;
-      return div.innerText.length >= editorRules.summary.max
-        ? `${div.innerText.slice(0, editorRules.summary.max - 3)}...`
-        : div.innerText;
+      const summery = xssSummary(htmlContent);
+      return summery.length >= editorRules.summary.max
+        ? `${summery.slice(0, editorRules.summary.max - 3)}...`
+        : summery;
     }
     return '';
   } catch (e) {
