@@ -57,11 +57,11 @@ export const editorRules = {
     max: 60,
   },
   content: {
-    min: 3,
+    min: 1,
     max: 10000,
   },
   summary: {
-    min: 3,
+    min: 1,
     max: 100,
   },
   tags: {

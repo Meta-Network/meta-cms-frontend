@@ -22,6 +22,8 @@ import {
   editorRules,
 } from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
+import { isValidUrl } from '.';
+import { xssSummary } from './xss';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
 type PublishMetaSpaceRequestState = {
@@ -35,14 +37,14 @@ type PublishMetaSpaceRequestState = {
  */
 export const generateSummary = (): string => {
   // TODO: modify
+  // 没有删掉 \n
   try {
     const htmlContent = (window as any).vditor!.getHTML();
     if (htmlContent) {
-      const div = document.createElement('div');
-      div.innerHTML = htmlContent;
-      return div.innerText.length >= editorRules.summary.max
-        ? `${div.innerText.slice(0, editorRules.summary.max - 3)}...`
-        : div.innerText;
+      const summery = xssSummary(htmlContent);
+      return summery.length >= editorRules.summary.max
+        ? `${summery.slice(0, editorRules.summary.max - 3)}...`
+        : summery;
     }
     return '';
   } catch (e) {
@@ -220,5 +222,80 @@ export const isValidImage = async (src: string) => {
   } catch (error) {
     console.error(error);
     return false;
+  }
+};
+
+/**
+ * 获取过滤后的 HTML 然后转成 Markdown
+ * @returns
+ */
+export const renderFilteredContent = () => {
+  // TODO: modify
+  try {
+    const htmlContent = (window as any).vditor!.getHTML();
+    if (htmlContent) {
+      return (window as any).vditor!.html2md(htmlContent);
+    }
+    return '';
+  } catch (e) {
+    console.error(e);
+    return '';
+  }
+};
+
+/**
+ * 获取预览区域所有图片地址
+ * @returns
+ */
+export const getPreviewImageLink = (existList: string[]) => {
+  // TODO: modify
+  try {
+    const htmlContent = (window as any).vditor!.getHTML();
+    if (htmlContent) {
+      const DIV = document.createElement('div');
+      DIV.innerHTML = htmlContent;
+
+      const imageLinkList: HTMLImageElement[] = [
+        ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
+      ];
+
+      /**
+       * 1. 有 src
+       * 2. src 不为 fleek (已上传)
+       *    图片不存在（会在编辑器方法里面处理）
+       * 4. 图片没有处理过
+       * 4. 空 空地址会使用当前 url 需要屏蔽
+       * 5. 非法 url
+       *
+       * TODO：如果写了 xxx.png 链接为 location.origin+location.pathname + xxx.png, 还没想好怎么判断
+       * 因为会有可能使用当前域名下图片的情况，而去手写 url 的情况少 一般都是复制粘贴
+       */
+
+      // 过滤
+      const urlReg = new RegExp('[a-zA-z]+://[^s]*');
+
+      const list = imageLinkList.filter((i) => {
+        // console.log('i', i.src);
+
+        return (
+          i.src &&
+          isValidUrl(i.src) &&
+          urlReg.test(i.src) &&
+          !i.src.includes(FLEEK_NAME) &&
+          !existList.includes(i.src) &&
+          i.src !== window.location.href
+        );
+      });
+
+      // 清理格式
+      const listFormat = list.map((i) => i.src);
+
+      // 去重
+      return [...new Set(listFormat)];
+    }
+    return [];
+  } catch (e) {
+    console.error(e);
+    return [];
   }
 };

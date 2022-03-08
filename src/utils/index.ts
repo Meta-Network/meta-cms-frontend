@@ -33,3 +33,17 @@ export const userHasSite = (initialState: GLOBAL.InitialState | undefined) =>
   initialState?.siteConfig &&
   initialState.siteConfig.status !== 'CONFIGURED' &&
   initialState.siteConfig.status !== 'DEPLOY_FAILED';
+
+/**
+ * 有效 url
+ * @param url
+ * @returns
+ */
+export const isValidUrl = (url: string) => {
+  try {
+    return !!new URL(url);
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};

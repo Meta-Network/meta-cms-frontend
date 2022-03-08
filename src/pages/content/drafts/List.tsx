@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { history, useIntl, useModel } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Space, Popconfirm, message, Typography } from 'antd';
-import { dbPostsUpdate, dbMetadatasUpdateByPostId, dbDraftsAllCount } from '@/db/db';
-import { fetchGunDraftsAndUpdateLocal, deleteDraft } from '@/utils/gun';
+import { dbPostsUpdate, dbMetadatasUpdateByPostId, dbDraftsAllCount, dbPostsAll } from '@/db/db';
 import moment from 'moment';
 import ProTable from '@ant-design/pro-table';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -20,16 +19,9 @@ export default () => {
 
   /** handle delete */
   const handleDelete = useCallback(
-    async (id: number, key?: string) => {
+    async (id: number) => {
       await dbPostsUpdate(id, { delete: true });
       await dbMetadatasUpdateByPostId(id, { delete: true });
-
-      if (key) {
-        deleteDraft({
-          userId: initialState!.currentUser!.id,
-          key: key,
-        });
-      }
 
       // 刷新
       await actionRef.current!.reload();
@@ -63,16 +55,14 @@ export default () => {
   const fetchPosts = useCallback(async () => {
     if (initialState?.currentUser) {
       // 获取草稿
-      const response = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
+      const response = (await dbPostsAll(initialState?.currentUser.id)) || [];
 
       // 过滤 排序
-      const responseSort = response
-        .filter((item) => {
-          return item.post == null;
-        })
-        .sort((a, b) => Number(moment(a.updatedAt).isBefore(b.updatedAt)));
+      const sortFn = (a: PostType.Posts, b: PostType.Posts) =>
+        Number(moment(a.updatedAt).isBefore(b.updatedAt));
+      const filterFn = (item: PostType.Posts) => item.post == null;
 
-      return responseSort;
+      return response.filter(filterFn).sort(sortFn);
     } else {
       return [];
     }
@@ -140,8 +130,7 @@ export default () => {
               id: 'posts.table.action.delete.confirm',
             })}
             onConfirm={() => {
-              // console.log(record);
-              handleDelete(Number(record.id), record?.key);
+              handleDelete(Number(record.id));
             }}
             onCancel={(e) => e?.stopPropagation()}
           >
