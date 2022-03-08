@@ -10,6 +10,7 @@ import { siteStorageRepoRules } from '../../../config';
 import FormattedDescription from '../FormattedDescription';
 import type { StoreValue } from 'antd/es/form/interface';
 import type { RuleObject } from 'antd/lib/form';
+import { inRange } from 'lodash';
 
 export default () => {
   const intl = useIntl();
@@ -35,7 +36,18 @@ export default () => {
   const validator = useCallback(
     (setState: Dispatch<SetStateAction<boolean>>) => (_: RuleObject, value: StoreValue) => {
       let error;
-      if (!userRepos) {
+      // include the max
+      if (!inRange(value.length, siteStorageRepoRules.min, siteStorageRepoRules.max + 1)) {
+        error = new Error(
+          intl.formatMessage(
+            { id: 'messages.storage.repoNameLengthInvalid' },
+            {
+              min: siteStorageRepoRules.min,
+              max: siteStorageRepoRules.max,
+            },
+          ),
+        );
+      } else if (!userRepos) {
         error = new Error(intl.formatMessage({ id: 'messages.storage.noRepoTokenFirstSelect' }));
       } else if (value.match(/^[A-Za-z0-9_.-]+$/) === null) {
         error = new Error(intl.formatMessage({ id: 'messages.storage.repoNameInvalid' }));
@@ -92,7 +104,6 @@ export default () => {
           }
           rules={[
             {
-              ...siteStorageRepoRules,
               validator: validator(setStorageRepoIsValid),
             },
           ]}
