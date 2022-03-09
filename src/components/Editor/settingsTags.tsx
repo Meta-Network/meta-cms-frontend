@@ -1,9 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { useIntl } from 'umi';
+import { useIntl, useModel } from 'umi';
 import { message, Select } from 'antd';
 import styles from './settings.less';
 import { useMount } from 'ahooks';
-import { getDefaultSiteConfigAPI } from '@/helpers';
 import { spaceTagsAPI } from '@/services/api/space';
 import { storeGet, storeSet } from '@/utils/store';
 import { uniqBy } from 'lodash';
@@ -40,6 +39,7 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
   const intl = useIntl();
   const [spaceTags, setSpaceTags] = useState<Space.Tags[]>([]);
   const [historyTags, setHistoryTags] = useState<string[]>([]);
+  const { initialState } = useModel('@@initialState');
 
   // tags list
   const tagsList = useMemo(() => {
@@ -62,17 +62,15 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
    * fetch space tags
    */
   const fetchTags = useCallback(async () => {
-    const resultDefaultSiteConfig = await getDefaultSiteConfigAPI();
-    if (!resultDefaultSiteConfig) {
+    if (!initialState?.siteConfig) {
       return;
     }
 
-    const resulSpaceTags = await spaceTagsAPI(resultDefaultSiteConfig.domain);
-
-    if (resulSpaceTags) {
-      setSpaceTags(resulSpaceTags);
-    }
-  }, []);
+    const resulSpaceTags = await spaceTagsAPI(
+      `${initialState.siteConfig?.metaSpacePrefix}.${META_SPACE_BASE_DOMAIN}`,
+    );
+    setSpaceTags(resulSpaceTags);
+  }, [initialState]);
 
   /**
    * fetch history tags

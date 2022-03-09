@@ -22,7 +22,7 @@ import {
   editorRules,
 } from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
-import { isValidUrl } from '.';
+import { isValidUrl, sleep } from '.';
 import { xssSummary } from './xss';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
@@ -32,14 +32,29 @@ type PublishMetaSpaceRequestState = {
 };
 
 /**
+ * 校验 vditor 是否存在
+ * @returns
+ */
+export const hasVditor = async (time = 300): Promise<boolean> => {
+  while (!(window.vditor && window.vditor.hasOwnProperty('vditor'))) {
+    await sleep(time);
+    console.log('sleep %s vditor', time);
+  }
+
+  console.log('hash vditor');
+  return window.vditor.hasOwnProperty('vditor');
+};
+
+/**
  * generate summary
  * @returns
  */
-export const generateSummary = (): string => {
-  // TODO: modify
-  // 没有删掉 \n
+export const generateSummary = async (): Promise<string> => {
+  await hasVditor();
+
+  // TODO: 没有删掉 \n
   try {
-    const htmlContent = (window as any).vditor!.getHTML();
+    const htmlContent = window.vditor.getHTML();
     if (htmlContent) {
       const summery = xssSummary(htmlContent);
       return summery.length >= editorRules.summary.max
@@ -229,12 +244,13 @@ export const isValidImage = async (src: string) => {
  * 获取过滤后的 HTML 然后转成 Markdown
  * @returns
  */
-export const renderFilteredContent = () => {
-  // TODO: modify
+export const renderFilteredContent = async (): Promise<string> => {
+  await hasVditor();
+
   try {
-    const htmlContent = (window as any).vditor!.getHTML();
+    const htmlContent = window.vditor.getHTML();
     if (htmlContent) {
-      return (window as any).vditor!.html2md(htmlContent);
+      return window.vditor.html2md(htmlContent);
     }
     return '';
   } catch (e) {
@@ -247,10 +263,11 @@ export const renderFilteredContent = () => {
  * 获取预览区域所有图片地址
  * @returns
  */
-export const getPreviewImageLink = (existList: string[]) => {
-  // TODO: modify
+export const getPreviewImageLink = async (existList: string[]): Promise<string[]> => {
+  await hasVditor();
+
   try {
-    const htmlContent = (window as any).vditor!.getHTML();
+    const htmlContent = window.vditor.getHTML();
     if (htmlContent) {
       const DIV = document.createElement('div');
       DIV.innerHTML = htmlContent;

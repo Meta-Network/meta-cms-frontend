@@ -45,9 +45,6 @@ const Editor: React.FC<Props> = React.memo(function Editor({ focus$ }) {
       cache: {
         enable: false,
       },
-      after() {
-        // vditor.setValue('');
-      },
       // _lutePath: `http://192.168.0.107:9090/lute.min.js?${new Date().getTime()}`,
       // _lutePath: 'src/js/lute/lute.min.js',
       // cdn: 'http://localhost:9000',
@@ -230,10 +227,13 @@ const Editor: React.FC<Props> = React.memo(function Editor({ focus$ }) {
       input() {
         focus$.emit('editor-input');
       },
-    });
+      after() {
+        // vditor.setValue('');
+        // console.log('edit after');
 
-    // TODO: need modify
-    (window as any).vditor = vditor;
+        window.vditor = vditor;
+      },
+    });
   }, [focus$, intl]);
 
   useMount(() => {

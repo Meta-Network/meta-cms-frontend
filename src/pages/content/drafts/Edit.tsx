@@ -22,6 +22,7 @@ import {
   isValidImage,
   renderFilteredContent,
   getPreviewImageLink,
+  hasVditor,
 } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
@@ -97,11 +98,14 @@ const Edit: React.FC = () => {
     async (gatewayType: GatewayType) => {
       setPublishLoading(true);
 
+      const filterContent = await renderFilteredContent();
+      const summary = await generateSummary();
+
       const payload = {
         title: trim(title),
         cover: cover,
-        summary: generateSummary(),
-        content: trim(renderFilteredContent()),
+        summary: summary,
+        content: trim(filterContent),
         license: license,
         categories: '',
         tags: tags.join(),
@@ -257,7 +261,7 @@ const Edit: React.FC = () => {
       }
 
       // 过滤后的内容不能为空
-      const _contentXssFilter = trim(renderFilteredContent());
+      const _contentXssFilter = trim(await renderFilteredContent());
       if (!_contentXssFilter) {
         message.warning(
           intl.formatMessage({
@@ -303,7 +307,7 @@ const Edit: React.FC = () => {
       }
 
       // summary 长度判断
-      const summary = generateSummary();
+      const summary = await generateSummary();
       if (summary.length < editorRules.summary.min || summary.length > editorRules.summary.max) {
         message.warning(
           intl.formatMessage(
@@ -466,7 +470,7 @@ const Edit: React.FC = () => {
 
       const data = postDataMergedUpdateAt({
         content: val,
-        summary: generateSummary(),
+        summary: await generateSummary(),
       });
 
       const { id } = history.location.query as Router.PostQuery;
@@ -497,28 +501,24 @@ const Edit: React.FC = () => {
     if (flagImageUploadToIpfs) return;
     setFlagImageUploadToIpfs(true);
 
-    const _vditor = (window as any).vditor;
-    if (!_vditor) {
-      setFlagImageUploadToIpfs(false);
-      return;
-    }
+    await hasVditor();
 
     const contentImagesSrcDeep = cloneDeep(contentImagesSrc);
-    const previewImageLinkList = getPreviewImageLink(contentImagesSrcDeep);
+    const previewImageLinkList = await getPreviewImageLink(contentImagesSrcDeep);
 
     if (!previewImageLinkList.length) {
       setFlagImageUploadToIpfs(false);
       return;
     }
 
-    _vditor.disabled();
+    window.vditor.disabled();
 
     const done = message.loading(
       intl.formatMessage({ id: 'messages.editor.uploadAllImages.notification' }),
       0,
     );
 
-    let contentDeep = _vditor.getValue();
+    let contentDeep = window.vditor.getValue();
 
     for (let i = 0; i < previewImageLinkList.length; i++) {
       const src = previewImageLinkList[i];
@@ -553,22 +553,22 @@ const Edit: React.FC = () => {
 
     setContentImagesSrc(uniq(contentImagesSrcDeep));
 
-    _vditor.setValue(contentDeep);
+    window.vditor.setValue(contentDeep);
     await asyncContentToDB(contentDeep);
 
-    _vditor.enable();
+    window.vditor.enable();
 
     setFlagImageUploadToIpfs(false);
   }, [flagImageUploadToIpfs, intl, contentImagesSrc, asyncContentToDB]);
 
   // handle async content to db
   const handleAsyncContentToDB = useCallback(async () => {
-    if ((window as any)?.vditor) {
-      const value = (window as any).vditor.getValue();
+    await hasVditor();
 
-      await asyncContentToDB(value);
-      await handleImageUploadToIpfs();
-    }
+    const value = window.vditor.getValue();
+
+    await asyncContentToDB(value);
+    await handleImageUploadToIpfs();
   }, [asyncContentToDB, handleImageUploadToIpfs]);
 
   /**
@@ -686,14 +686,12 @@ const Edit: React.FC = () => {
         setTags(resultPost.tags);
         setLicense(resultPost.license);
 
-        // TODO：need modify
-        setTimeout(() => {
-          if ((window as any).vditor) {
-            (window as any).vditor!.setValue(resultPost.content);
-            // handle all image
-            handleImageUploadToIpfs();
-          }
-        }, 3000);
+        await hasVditor();
+
+        window.vditor.setValue(resultPost.content);
+
+        // handle all image
+        handleImageUploadToIpfs();
       }
     }
   }, [handleImageUploadToIpfs]);
