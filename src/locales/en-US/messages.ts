@@ -51,6 +51,8 @@ export default {
   'messages.storage.repoNameCanNotBeEmpty': 'Please set the name of the storage repository',
   'messages.storage.repoNameAlreadyExists':
     'The storage repository already exists, please set a new name',
+  'messages.storage.repoNameLengthInvalid':
+    'The length of storage repository name should be { min }-{ max }',
   'messages.storage.repoNameInvalid':
     "Repository name can contain only letters, digits, '_', '-' and '.'",
   'messages.storage.form.repoName': 'Please set the name of the storage repository',
