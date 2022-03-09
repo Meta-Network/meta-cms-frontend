@@ -24,6 +24,7 @@ import {
 import { uploadToIpfsAPI } from '../helpers';
 import { isValidUrl, sleep } from '.';
 import { xssSummary } from './xss';
+import { urlReg } from './reg';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
 type PublishMetaSpaceRequestState = {
@@ -43,6 +44,16 @@ export const hasVditor = async (time = 300): Promise<boolean> => {
 
   console.log('hash vditor');
   return window.vditor.hasOwnProperty('vditor');
+};
+
+/**
+ * parse Image Src
+ * @param outerHTML
+ * @returns
+ */
+export const parseImageSrc = (outerHTML: string) => {
+  const outerHTMLSrcResult = outerHTML.match('src=".*?"');
+  return outerHTMLSrcResult ? outerHTMLSrcResult[0].slice(5, -1) : '';
 };
 
 /**
@@ -277,42 +288,93 @@ export const getPreviewImageLink = async (existList: string[]): Promise<string[]
       ];
 
       /**
-       * 1. 有 src
-       * 2. src 不为 fleek (已上传)
-       *    图片不存在（会在编辑器方法里面处理）
-       * 4. 图片没有处理过
-       * 4. 空 空地址会使用当前 url 需要屏蔽
-       * 5. 非法 url
+       * 过滤条件
        *
-       * TODO：如果写了 xxx.png 链接为 location.origin+location.pathname + xxx.png, 还没想好怎么判断
-       * 因为会有可能使用当前域名下图片的情况，而去手写 url 的情况少 一般都是复制粘贴
+       * 1. 有 src
+       * 2. 非法 url 和 url 正则检查
+       * 3. src 不为 fleek (已上传)
+       *      图片不存在（会在编辑器方法里面处理）
+       * 4. 图片没有处理过
+       * 5. 空 空地址会使用当前 url 需要屏蔽（现在使用 outerHTML，会直接为空过滤掉）
        */
 
       // 过滤
-      const urlReg = new RegExp('[a-zA-z]+://[^s]*');
+      const list = imageLinkList.reduce(
+        (previousValue: string[], currentValue: HTMLImageElement) => {
+          const outerHTMLSrc = parseImageSrc(currentValue.outerHTML);
 
-      const list = imageLinkList.filter((i) => {
-        // console.log('i', i.src);
+          // console.log('outerHTMLSrc', outerHTMLSrc, outerHTMLSrc.length);
 
-        return (
-          i.src &&
-          isValidUrl(i.src) &&
-          urlReg.test(i.src) &&
-          !i.src.includes(FLEEK_NAME) &&
-          !existList.includes(i.src) &&
-          i.src !== window.location.href
-        );
-      });
+          if (
+            outerHTMLSrc &&
+            isValidUrl(outerHTMLSrc) &&
+            urlReg.test(outerHTMLSrc) &&
+            !outerHTMLSrc.includes(FLEEK_NAME) &&
+            !existList.includes(outerHTMLSrc) &&
+            outerHTMLSrc !== window.location.href
+          ) {
+            previousValue.push(outerHTMLSrc);
+          }
+
+          return previousValue;
+        },
+        [],
+      );
 
       // 清理格式
-      const listFormat = list.map((i) => i.src);
+      // console.log('list', list);
 
       // 去重
-      return [...new Set(listFormat)];
+      return [...new Set(list)];
     }
     return [];
   } catch (e) {
     console.error(e);
     return [];
   }
+};
+
+/**
+ * 检查所有图片链接是否有效
+ * @returns
+ */
+export const checkAllImageLink = async (): Promise<string[]> => {
+  await hasVditor();
+
+  const htmlContent = window.vditor.getHTML();
+  if (htmlContent) {
+    const DIV = document.createElement('div');
+    DIV.innerHTML = htmlContent;
+
+    const imageLinkList: HTMLImageElement[] = [
+      ...(DIV.querySelectorAll('img') as NodeListOf<HTMLImageElement>),
+    ];
+
+    const list = imageLinkList.reduce((previousValue: string[], currentValue: HTMLImageElement) => {
+      const outerHTMLSrc = parseImageSrc(currentValue.outerHTML);
+
+      if (!outerHTMLSrc || !isValidUrl(outerHTMLSrc) || !urlReg.test(outerHTMLSrc)) {
+        previousValue.push(outerHTMLSrc);
+      }
+
+      return previousValue;
+    }, []);
+
+    // console.log('list', list);
+
+    return list;
+  }
+
+  return [];
+};
+
+/**
+ * 转换无效链接为消息提示
+ * @param list
+ * @returns
+ */
+export const convertInvalidUrlMessage = (list: string[]): string => {
+  return list.reduce((previousValue, currentValue) => {
+    return previousValue + `【"${currentValue}"】`;
+  }, '');
 };

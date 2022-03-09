@@ -152,6 +152,7 @@ export default {
   'messages.editor.verify.title.length': '标题长度为 { min }-{ max }',
   'messages.editor.verify.content.empty': '内容不能为空',
   'messages.editor.verify.content.filterEmpty': '内容过滤后不能为空',
+  'messages.editor.verify.content.invalidUrl': '无效图片链接 { message }，请修改。',
   'messages.editor.verify.content.length': '内容长度为 { min }-{ max }',
   'messages.editor.verify.summary.length': '摘要长度为 { min }-{ max }',
   'messages.editor.verify.cover.length': '封面长度为 { min }-{ max }',

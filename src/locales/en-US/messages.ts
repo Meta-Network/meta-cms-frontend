@@ -179,6 +179,7 @@ export default {
   'messages.editor.verify.title.length': 'Title length limit is { min }-{ max }',
   'messages.editor.verify.content.empty': 'Content cannot be empty',
   'messages.editor.verify.content.filterEmpty': 'Content cannot be empty after filtering',
+  'messages.editor.verify.content.invalidUrl': 'Invalid image link { message }, please edit.',
   'messages.editor.verify.content.length': 'Content length limit is { min }-{ max }',
   'messages.editor.verify.summary.length': 'Description length limit is { min }-{ max }',
   'messages.editor.verify.cover.length': 'Cover url length limit is { min }-{ max }',
