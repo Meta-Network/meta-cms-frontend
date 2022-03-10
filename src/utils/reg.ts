@@ -1,4 +1,4 @@
 /**
  * url RegExp
  */
-export const urlReg = new RegExp('[a-zA-z]+://[^s]*');
+export const urlReg = new RegExp('[a-zA-z]+://[^s]+');
