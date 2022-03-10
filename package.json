@@ -1,6 +1,6 @@
 {
   "name": "meta-space-console",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Platform to generates and maintains Meta Space written in Ant Design Pro",
   "scripts": {
