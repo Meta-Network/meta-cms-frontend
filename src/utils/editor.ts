@@ -353,7 +353,10 @@ export const checkAllImageLink = async (): Promise<string[]> => {
     const list = imageLinkList.reduce((previousValue: string[], currentValue: HTMLImageElement) => {
       const outerHTMLSrc = parseImageSrc(currentValue.outerHTML);
 
-      if (!outerHTMLSrc || !isValidUrl(outerHTMLSrc) || !urlReg.test(outerHTMLSrc)) {
+      // 不存在 Src
+      // 正则检测 URL
+      // 有效 URL
+      if (!outerHTMLSrc || !urlReg.test(outerHTMLSrc) || !isValidUrl(outerHTMLSrc)) {
         previousValue.push(outerHTMLSrc);
       }
 
