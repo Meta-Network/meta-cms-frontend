@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Upload, message, notification } from 'antd';
+import { Upload, message } from 'antd';
 import { PlusOutlined, DeleteOutlined, FileImageOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 import styles from './uploadImage.less';
@@ -82,15 +82,12 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
             return false;
           }
 
-          notification.open({
-            key: keyUploadAvatar,
-            className: 'custom-notification',
-            message: intl.formatMessage({
-              id: 'messages.editor.upload.image.notification.title',
-            }),
-            description: intl.formatMessage({
+          message.loading({
+            content: intl.formatMessage({
               id: 'messages.editor.upload.image.notification.description',
             }),
+            key: keyUploadAvatar,
+            duration: 0,
           });
         }
 
@@ -101,25 +98,32 @@ const UploadImage: React.FC<Props> = ({ cover, asyncCoverToDB }) => {
           console.log(info.file, info.fileList);
         }
         if (info.file.status === 'done') {
-          console.log('info', info);
+          // console.log('info', info);
+          message.destroy(keyUploadAvatar);
+
           if (info.file.response.statusCode === 201) {
-            message.info({
+            message.success({
               content: intl.formatMessage({
                 id: 'messages.editor.upload.image.success',
               }),
             });
             asyncCoverToDB(info.file.response.data.publicUrl);
+          } else {
+            message.error({
+              content: intl.formatMessage({
+                id: 'messages.editor.upload.image.fail',
+              }),
+            });
           }
-          notification.close(keyUploadAvatar);
           // (`${info.file.name} file uploaded successfully`);
         } else if (info.file.status === 'error') {
           // (`${info.file.name} file upload failed.`);
-          message.info({
+          message.destroy(keyUploadAvatar);
+          message.error({
             content: intl.formatMessage({
               id: 'messages.editor.upload.image.fail',
             }),
           });
-          notification.close(keyUploadAvatar);
         }
       },
     }),

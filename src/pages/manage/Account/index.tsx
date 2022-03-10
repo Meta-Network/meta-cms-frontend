@@ -40,7 +40,13 @@ export default () => {
 
   const DisplayUserPublicKey = () => {
     if (!userPublicKey) {
-      return <Button onClick={generateKeys}>生成非金融Keys</Button>;
+      return (
+        <Button onClick={generateKeys}>
+          {intl.formatMessage({
+            id: 'manage.account.item.sign.content.button.generateKeys',
+          })}
+        </Button>
+      );
     }
     return (
       <>
@@ -51,10 +57,16 @@ export default () => {
           >
             {userPublicKey.slice(0, 6)}****{userPublicKey.slice(-4)}
           </Paragraph>
-          <Button onClick={generateKeys}>重新生成</Button>
+          <Button onClick={generateKeys}>
+            {intl.formatMessage({
+              id: 'manage.account.item.sign.content.button.regenerate',
+            })}
+          </Button>
           <Tooltip
             placement="bottomLeft"
-            title="若发现非金融签名的私钥可能存在泄漏，可以通过重新生成来保护个人权益"
+            title={intl.formatMessage({
+              id: 'manage.account.item.sign.content.button.regenerateTooltipTitle',
+            })}
           >
             <QuestionCircleOutlined style={{ paddingLeft: 10, fontSize: 20 }} />
           </Tooltip>
@@ -72,30 +84,30 @@ export default () => {
   }[] = [
     {
       name: 'email',
-      title: '邮箱账号',
+      title: intl.formatMessage({ id: 'manage.account.item.email.title' }),
       icon: <MailOutlined />,
-      description: '用于登入时的验证',
+      description: intl.formatMessage({ id: 'manage.account.item.email.description' }),
       content: <Paragraph>{userEmail}</Paragraph>,
     },
     {
       name: 'wallet',
-      title: '钱包金融Key',
+      title: intl.formatMessage({ id: 'manage.account.item.wallet.description' }),
       icon: <WalletOutlined />,
-      description: '用于进行金融活动验证\n若要使用此功能，需先开启您的浏览器钱包',
+      description: intl.formatMessage({ id: 'manage.account.item.wallet.description' }),
       content: <></>,
     },
     {
       name: 'biometrics',
-      title: '生物认证Key',
+      title: intl.formatMessage({ id: 'manage.account.item.biometrics.description' }),
       icon: <ScanOutlined />,
-      description: '用于辅助登入和非金融场景以外的行为验证\n若要使用该功能，须您的设备支持',
+      description: intl.formatMessage({ id: 'manage.account.item.biometrics.description' }),
       content: <></>,
     },
     {
       name: 'sign',
-      title: '非金融Key',
+      title: intl.formatMessage({ id: 'manage.account.item.sign.description' }),
       icon: <KeyOutlined />,
-      description: '用于对非金融场景以外的行为验证',
+      description: intl.formatMessage({ id: 'manage.account.item.sign.description' }),
       content: <DisplayUserPublicKey />,
     },
   ];
@@ -103,8 +115,8 @@ export default () => {
   return (
     <PageContainer
       breadcrumb={{}}
-      title={intl.formatMessage({ id: '账号' })}
-      content={<FormattedDescription id="用来管理与您 Meta Space 相关联的账号和签名" />}
+      title={intl.formatMessage({ id: 'manage.account.title' })}
+      content={<FormattedDescription id="manage.account.description" />}
     >
       <List
         size="large"

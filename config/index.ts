@@ -20,6 +20,101 @@ export const OSS_MATATAKI_FEUSE = 'https://ssimg.frontenduse.top';
 export const OSS_MATATAKI = 'https://smartsignature-img.oss-cn-hongkong.aliyuncs.com';
 
 // Gun Config
-export const GUN_PEERS = ['https://gun-manhattan.herokuapp.com/gun'];
 export const KEY_GUN_ROOT = 'meta.io_v7';
 export const KEY_GUN_ROOT_DRAFT = 'cms_draft';
+export const STORAGE_PLATFORM = 'github';
+
+export const KEY_IS_LOGIN = 'META_CMS_IS_LOGIN';
+
+// rules
+export const rules = {
+  usernameReg: '^[a-z0-9-]{3,15}$',
+  username: {
+    min: 3,
+    max: 15,
+  },
+  nickname: {
+    min: 1,
+    max: 32,
+  },
+  bio: {
+    min: 1,
+    max: 200,
+  },
+};
+
+/**
+ * 文章列表轮询时间
+ * 全部文章 发布中 已发布
+ * 发布中交互按钮状态查询
+ */
+export const postPolling = 3000;
+
+// 编辑器相关规则
+export const editorRules = {
+  title: {
+    min: 1,
+    max: 60,
+  },
+  content: {
+    min: 1,
+    max: 10000,
+  },
+  summary: {
+    min: 1,
+    max: 100,
+  },
+  tags: {
+    min: 0,
+    max: 509,
+    maxNumber: 10,
+    singleLength: 50,
+  },
+  categories: {
+    min: 0,
+    max: 203,
+    maxNumber: 4,
+    singleLength: 50,
+  },
+  license: {
+    min: 0,
+    max: 50,
+  },
+  cover: {
+    min: 0,
+    max: 256,
+  },
+};
+
+export const siteStorageRepoRules = {
+  min: 1,
+  max: 100,
+};
+
+export const siteInfoRules = {
+  title: {
+    min: 1,
+    max: 50,
+  },
+  subtitle: {
+    min: 1,
+    max: 80,
+  },
+  author: {
+    min: 1,
+    max: 50,
+  },
+  description: {
+    min: 1,
+    max: 200,
+  },
+  keywords: {
+    min: 1,
+    max: 6,
+    type: 'array',
+    defaultField: {
+      min: 1,
+      max: 60,
+    },
+  },
+};

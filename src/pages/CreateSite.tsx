@@ -1,3 +1,4 @@
+import { userHasSite } from '@/utils';
 import ProCard from '@ant-design/pro-card';
 import { Affix, Steps, Card } from 'antd';
 import { useIntl, FormattedMessage, useModel, Redirect } from 'umi';
@@ -7,7 +8,7 @@ import { useEffect, useMemo } from 'react';
 import Deploy from '@/components/CreateSite/Deploy';
 import AnchoredTitle from '@/components/AnchoredTitle';
 import SiteSetting from '@/components/CreateSite/SiteSetting';
-import StoreSetting from '@/components/CreateSite/StoreSetting';
+import StorageSetting from '@/components/CreateSite/StorageSetting';
 import DomainSetting from '@/components/CreateSite/DomainSetting';
 import FormattedDescription from '@/components/FormattedDescription';
 import styles from './CreateSite.less';
@@ -16,48 +17,39 @@ const { Step } = Steps;
 
 const CreateSite = () => {
   const intl = useIntl();
+  const { currentStep, setCurrentStep, stepsStatus } = useModel('deploySiteStepStatus');
 
-  const steps = useMemo<{ title: string; component: JSX.Element; description?: JSX.Element }[]>(
+  const steps = useMemo<
+    { title: string; setting: string; component: JSX.Element; description?: JSX.Element }[]
+  >(
     () => [
       {
         title: intl.formatMessage({ id: 'guide.domain.title' }),
+        setting: 'domainSetting',
         description: <FormattedDescription id="guide.domain.description" />,
         component: <DomainSetting />,
       },
-      // {
-      //   title: intl.formatMessage({ id: 'guide.theme.title' }),
-      //   description: <FormattedDescription id="guide.theme.description" />,
-      //   component: <ThemeSetting />,
-      // },
       {
         title: intl.formatMessage({ id: 'guide.config.title' }),
+        setting: 'siteSetting',
         description: <FormattedDescription id="guide.config.description" />,
         component: <SiteSetting />,
       },
       {
         title: intl.formatMessage({ id: 'guide.storage.title' }),
+        setting: 'storageSetting',
         description: <FormattedDescription id="guide.storage.description" />,
-        component: <StoreSetting />,
+        component: <StorageSetting />,
       },
-      // {
-      //   title: intl.formatMessage({ id: 'guide.publish.title' }),
-      //   description: <FormattedDescription id="guide.publish.description" />,
-      //   component: <PublisherSetting />,
-      // },
-      // {
-      //   title: intl.formatMessage({ id: 'guide.cdn.title' }),
-      //   description: <FormattedDescription id="guide.cdn.description" />,
-      //   component: <CDNSetting />,
-      // },
       {
         title: intl.formatMessage({ id: 'guide.deploy.title' }),
+        setting: 'deploySetting',
         description: <FormattedDescription id="guide.deploy.description" />,
         component: <Deploy />,
       },
     ],
     [intl],
   );
-  const { current, setCurrent, stepStatus } = useModel('steps');
 
   useEffect(() => {
     const titlePositioningOffset = () => {
@@ -71,9 +63,9 @@ const CreateSite = () => {
       const closest = positions.reduce((prev, curr) =>
         Math.abs(curr - currentPosition) < Math.abs(prev - currentPosition) ? curr : prev,
       );
-
       if (Math.abs(currentPosition - closest) < 60) {
-        setCurrent(positions.findIndex((e) => e === closest));
+        const index = positions.findIndex((e) => e === closest);
+        setCurrentStep(steps[index].setting);
       }
     };
     window.addEventListener('scroll', titlePositioningOffset);
@@ -81,7 +73,7 @@ const CreateSite = () => {
     return () => {
       window.removeEventListener('scroll', titlePositioningOffset);
     };
-  }, [steps, setCurrent]);
+  }, [steps, setCurrentStep]);
 
   return (
     <PageContainer
@@ -94,11 +86,15 @@ const CreateSite = () => {
       <div className={styles.main}>
         <Affix offsetTop={40}>
           <Card className={styles.steps}>
-            <Steps size="small" direction="vertical" current={current}>
-              {steps.map((step, index) => (
+            <Steps
+              size="small"
+              direction="vertical"
+              current={steps.findIndex((e) => e.setting === currentStep)}
+            >
+              {steps.map((step) => (
                 <Step
-                  icon={stepStatus[index] === 'error' && <ExclamationCircleOutlined />}
-                  status={stepStatus[index]}
+                  icon={stepsStatus[step.setting] === 'error' && <ExclamationCircleOutlined />}
+                  status={stepsStatus[step.setting] as any}
                   key={step.title}
                   title={
                     <a style={{ color: 'rgba(0, 0, 0, 0.85)' }} href={`#${step.title}`}>
@@ -139,14 +135,9 @@ const CreateSite = () => {
   );
 };
 
-const CheckPermission = () => {
+const CreateSiteIfAvailable = () => {
   const { initialState } = useModel('@@initialState');
-  const hasSite = initialState?.siteConfig?.domain;
-  if (hasSite) {
-    return <Redirect to="/" />;
-  } else {
-    return <CreateSite />;
-  }
+  return userHasSite(initialState) ? <Redirect to="/" /> : <CreateSite />;
 };
 
-export default CheckPermission;
+export default CreateSiteIfAvailable;

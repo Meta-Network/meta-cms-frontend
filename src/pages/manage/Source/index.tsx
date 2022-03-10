@@ -1,5 +1,5 @@
 import { useIntl } from 'umi';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, List, message, Spin, Tag } from 'antd';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { getSourceStatus } from '@/services/api/meta-cms';
@@ -23,6 +23,16 @@ export default () => {
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [unbindLoading, setUnbindLoading] = useState<boolean>(false);
   const [sourceStatus, setSourceStatus] = useState<GLOBAL.SourcePlatformStatus>(status);
+
+  const getUsername = useCallback(
+    (platform: keyof GLOBAL.SourcePlatformStatus) => {
+      if (sourceStatus[platform].username) {
+        return `(${sourceStatus[platform].username})`;
+      }
+      return '';
+    },
+    [sourceStatus],
+  );
 
   const getStatus = (platform: GLOBAL.SourcePlatformStatusProperties) =>
     platform.active ? (
@@ -76,7 +86,7 @@ export default () => {
       bind: (
         <Button
           onClick={() => {
-            window.location.href = 'https://developer.matataki.io/app/44ba10e59e954bf4/oauth';
+            window.location.href = MATATAKI_DEVELOPER;
           }}
           type="primary"
         >
@@ -103,6 +113,7 @@ export default () => {
             setSourceStatus((source: GLOBAL.SourcePlatformStatus) => {
               const copy = { ...source };
               copy.matataki.active = false;
+              copy.matataki.username = '';
               return copy;
             });
           }}
@@ -123,11 +134,7 @@ export default () => {
   const sourcePlatformsInformation = [
     {
       // Matataki [tag] (username)
-      title: [
-        'Matataki',
-        getStatus(sourceStatus.matataki),
-        sourceStatus.matataki.username ? `(${sourceStatus.matataki.username})` : '',
-      ],
+      title: ['Matataki', getStatus(sourceStatus.matataki), getUsername('matataki')],
       description: intl.formatMessage({ id: 'messages.source.matatakiDescription' }),
       actions: getActions(sourceStatus.matataki),
       avatar: <img className="icon" src="/icons/custom/matataki.png" alt="matataki icon" />,

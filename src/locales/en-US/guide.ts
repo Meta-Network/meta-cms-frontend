@@ -55,13 +55,10 @@ export default {
   'guide.config.form.keywordsExtra':
     'It will be easier for others to find your Meta Space if they enter these keywords in the search engine',
   'guide.config.form.language': 'Language',
-  'guide.config.form.languagePleaseEnter': 'Please select your Meta Space language',
   'guide.config.form.timezone': 'Time zone',
-  'guide.config.form.timezonePleaseEnter': 'Please select your Meta Space time zone',
   'guide.config.form.favicon': 'Website icon',
   'guide.config.form.faviconExtra':
     'You can upload a picture in .ico  format and display it on the tab',
-  'guide.config.form.faviconPleaseEnter': 'Please upload an icon for Meta Space',
   'guide.config.form.uploadFavicon': 'Upload Meta Space icon',
   'guide.storage.githubDescription':
     "The world's largest code storage website with open source community",
@@ -71,7 +68,7 @@ export default {
   'guide.storage.setStorageAs': 'Successfully selected storage as {storage}',
   'guide.storage.unknownStorage': 'Unknown storage repository',
   'guide.storage.selectStorageFailed': 'Storage repository selection failed. Reason: {reason}',
-  'guide.repo.store': 'Storage repository(private)',
+  'guide.repo.storage': 'Storage repository(private)',
   'guide.repo.publish': 'Publish repository(public)',
   'guide.storage.unselected': 'Not selected',
 };

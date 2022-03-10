@@ -21,14 +21,13 @@ export default {
   'editor.submit.tip':
     'Submit directly to the storage warehouse without going through the platform',
   'editor.submit.item.repo.label': 'Storage repository',
-  'editor.submit.item.repo.private.name': 'Github private repo',
-  'editor.submit.item.repo.private.description': 'Store unpublished content',
+  'editor.submit.item.repo.name': 'Github',
+  'editor.submit.item.repo.description': 'Store published content',
   'editor.submit.item.repo.noBuild': 'Not yet bound',
   'editor.submit.item.gateway.label': 'Evidence storage services',
-  'editor.submit.item.gateway.name': 'IPFS',
+  'editor.submit.item.gateway.arweave.name': 'ARWEAVE',
+  'editor.submit.item.gateway.ipfs.name': 'IPFS',
   'editor.submit.item.gateway.description': 'Store verifiable metadata',
-  'editor.submit.item.gateway.gatewayPlaceholder': 'Gateway not selected',
-  'editor.submit.item.gateway.setting': 'set up',
   'editor.submit.item.gateway.keyPlaceholder': 'KEY is not set',
   'editor.submit.item.gateway.keyGenerate': 'generate',
   'editor.submit.item.gateway.keyGenerateText': 'Generated from your KEY',
@@ -41,8 +40,6 @@ export default {
     '(Stored in the browser, the user generates an encrypted signature)',
   'editor.publish.title': 'Ready to publish to Meta Space ?',
   'editor.publish.item.repo.label': 'Main storage',
-  'editor.publish.item.repo.public.name': 'Github public repo',
-  'editor.publish.item.repo.public.description': 'Store published content',
   'editor.publish.item.gateway.label': 'Backup storage',
   'editor.publish.item.gateway.description': 'Store all and cannot be deleted',
   'editor.tips.content':
@@ -76,7 +73,7 @@ export default {
   'editor.license.creativeCommons.tip': 'Creative Commons license agreement',
   'editor.license.creativeCommons.share':
     'Do you allow your work to be reprinted, excerpted, mixed, or re-created by others?',
-  'editor.license.creativeCommons.allow': 'allow',
+  'editor.license.creativeCommons.allow': 'Allow',
   'editor.license.creativeCommons.nd': 'Not allowed',
   'editor.license.creativeCommons.nd.tip':
     'Others can no longer mix, convert, or create based on the work, and cannot distribute the modified work',
@@ -86,4 +83,16 @@ export default {
     'Anyone who remixes, converts, or creates based on this work must distribute the work based on the same license agreement as the original license agreement.',
   'editor.license.creativeCommons.businessAllowed': 'Commercial use allowed',
   'editor.license.creativeCommons.terms': 'The authorization terms are:',
+  'editor.publishingTip.cover.loading': 'Loading...',
+  'editor.publishingTip.cover.finish': 'Successful',
+  'editor.publishingTip.content.loadingTextOne': 'Thanks for your creation and trust',
+  'editor.publishingTip.content.loadingTextTwo':
+    'Your article is adding to the publishing queue, please do not close this page',
+  'editor.publishingTip.content.finishTextOne': 'Your article is now in the publishing queue ~',
+  'editor.publishingTip.content.finishTextTwo':
+    'This will take some time to interact with Web3, so please be patient!',
+  'editor.publishingTip.content.finishButtonView': 'View my posts',
+  'editor.publishingTip.content.help.description': 'Technical Description.',
+  'editor.publishingTip.content.help.descriptionLink':
+    'How does your article published in Meta Space?',
 };

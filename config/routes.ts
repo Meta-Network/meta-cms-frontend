@@ -46,14 +46,24 @@
         component: './content/drafts/List',
       },
       {
+        path: '/content/posts',
+        name: 'allPosts',
+        component: './content/Posts/index',
+      },
+      {
+        path: '/content/publishing',
+        name: 'allPosts.publishing',
+        component: './content/Publishing/index',
+      },
+      {
+        path: '/content/published',
+        name: 'allPosts.published',
+        component: './content/Published/index',
+      },
+      {
         path: '/content/sync-center',
         name: 'syncCenter',
         component: './content/SyncCenter',
-      },
-      {
-        path: '/content/published-posts',
-        name: 'publishedPosts',
-        component: './content/PublishedPosts',
       },
       {
         path: '/content/drafts/edit',
@@ -79,9 +89,9 @@
         icon: 'setting',
       },
       {
-        path: '/manage/store-setting',
-        name: 'storeSetting',
-        component: './manage/StoreSetting',
+        path: '/manage/storage-setting',
+        name: 'storageSetting',
+        component: './manage/StorageSetting',
       },
       {
         path: '/manage/domain-setting',
@@ -108,9 +118,10 @@
     component: './Settings',
   },
   {
-    path: '/result/store-setting-success',
+    path: '/result/storage-setting-success',
     hideInMenu: true,
-    component: './result/StoreSettingSuccess',
+    layout: false,
+    component: './result/StorageSettingSuccess',
   },
   {
     path: '/result/mobile',

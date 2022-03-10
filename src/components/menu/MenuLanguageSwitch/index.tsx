@@ -21,7 +21,7 @@ const menu = (
       <Menu.Item
         key={language.value}
         onClick={() => {
-          setLocale(language.value, true);
+          setLocale(language.value, false);
         }}
       >
         {<Typography.Text>{language.title}</Typography.Text>}
@@ -42,6 +42,7 @@ export default () => {
     >
       <Dropdown
         overlay={menu}
+        trigger={[]}
         placement="topLeft"
         visible={visible}
         onVisibleChange={(isVisible) => setVisible(isVisible)}

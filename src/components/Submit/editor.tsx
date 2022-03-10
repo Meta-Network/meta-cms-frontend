@@ -1,75 +1,68 @@
 import type { FC } from 'react';
-import { Fragment, useCallback, useState, useEffect } from 'react';
-import {
-  Card,
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Radio,
-  Select,
-  Space,
-  message,
-  Typography,
-} from 'antd';
-import {
-  EyeOutlined,
-  CaretDownOutlined,
-  ArrowRightOutlined,
-  EyeInvisibleOutlined,
-} from '@ant-design/icons';
+import { useCallback, useState, useEffect } from 'react';
+import { Card, Form, Button, Checkbox, Radio, Space, message } from 'antd';
 import styles from './submit.less';
-import { generateStorageLink, verifySeedAndKey } from '@/utils/editor';
-import { getDefaultSiteConfigAPI, getStorageSettingAPI } from '@/helpers/index';
+import { verifySeedAndKey } from '@/utils/editor';
+import {
+  getDefaultSiteConfigAPI,
+  getPublisherSettingAPI,
+  getStorageSettingAPI,
+} from '@/helpers/index';
 import { useMount } from 'ahooks';
-import { KEY_META_CMS_GATEWAY_CHECKED } from '../../../config/index';
+import { KEY_META_CMS_GATEWAY_CHECKED, STORAGE_PLATFORM } from '../../../config/index';
 import { storeGet, storeSet } from '@/utils/store';
 import { useIntl } from 'umi';
 import GenerateKey from './generate';
+import Seed from './seed';
+import Storage from './storage';
+import { GatewayType } from '@/services/constants';
 
 interface Props {
   readonly loading: boolean;
-  handlePublish: (gateway: boolean) => void;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  handlePublish: (value: GatewayType) => void;
   setDropdownVisible: (visible: boolean) => void;
 }
 
-const { Text, Link } = Typography;
-const { Option } = Select;
-const STORAGE_PLATFORM = 'github';
+const onFinishFailed = (errorInfo: any) => {
+  console.log('Failed:', errorInfo);
+};
 
-const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
+const Submit: FC<Props> = ({ loading, setLoading, handlePublish, setDropdownVisible }) => {
   const intl = useIntl();
 
   const [visibleSignatureGenerate, setVisibleSignatureGenerate] = useState<boolean>(false);
-  const [visibleSignature, setVisibleSignature] = useState<boolean>(false);
   const [publicKey, setPublicKey] = useState<string>('');
-  // const [gatewayLoading, setGatewayLoading] = useState<boolean>(true);
-  const [gatewayChecked, setGatewayChecked] = useState<boolean>(false);
-  const [storageSetting, setStorageSetting] = useState<CMS.StoragePlatformSetting>();
+  const [storagePublicSetting, setStoragePublicSetting] = useState<CMS.StoragePlatformSetting>();
+  const [storagePrivateSetting, setStoragePrivateSetting] = useState<CMS.StoragePlatformSetting>();
+  const [gatewayType, setGatewayType] = useState<GatewayType>(GatewayType.Default);
 
-  const onFinish = (values: any) => {
-    console.log('Success:', values);
+  // 提交
+  const onFinish = () => {
+    // 仅仅提交一次
+    if (loading) return;
 
-    if (gatewayChecked && !publicKey) {
+    setLoading(true);
+    // console.log('Success:', values);
+
+    // 没有 seed or key，seed and key not match
+    if (!publicKey) {
       message.warning(intl.formatMessage({ id: 'messages.editor.submit.generateKey' }));
+      setLoading(false);
       return;
     }
 
-    if (!storageSetting) {
+    // 没有 storage
+    if (!storagePublicSetting && !storagePrivateSetting) {
       message.warning(intl.formatMessage({ id: 'messages.editor.submit.bindStorage' }));
+      setLoading(false);
       return;
     }
 
-    handlePublish(gatewayChecked);
+    handlePublish(gatewayType);
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-  };
-
-  /**
-   * get seed and key
-   */
+  // get seed and key
   const getSeedAndKey = useCallback(() => {
     const result = verifySeedAndKey();
     if (result) {
@@ -80,50 +73,48 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
   }, [setPublicKey]);
 
   /**
-   * handle Gateway Change Checked
-   */
-  const handleGatewayChangeChecked = useCallback((val: boolean) => {
-    setGatewayChecked(val);
-    storeSet(KEY_META_CMS_GATEWAY_CHECKED, JSON.stringify(val));
-  }, []);
-
-  /**
-   * handle set gateway
-   */
-  // const handleSetGateway = useCallback(async () => {
-  // setGatewayLoading(true);
-  // // const result = await something()
-  // await sleep(2000);
-  // const result = true;
-  // if (result) {
-  //   message.success('设置成功');
-  // } else {
-  //   message.error('设置失败');
-  // }
-  // setGatewayLoading(false);
-  // }, []);
-
-  /**
    * fetch Storage Setting
+   * public private
    */
   const fetchStorageSetting = useCallback(async () => {
     const defaultSiteConfigResult = await getDefaultSiteConfigAPI();
     if (!defaultSiteConfigResult) {
       return;
     }
-    const storageResult = await getStorageSettingAPI(defaultSiteConfigResult.id, STORAGE_PLATFORM);
-    if (storageResult) {
-      setStorageSetting(storageResult);
+
+    const storagePublicResult = await getPublisherSettingAPI(
+      defaultSiteConfigResult.id,
+      STORAGE_PLATFORM,
+    );
+
+    const storagePrivateResult = await getStorageSettingAPI(
+      defaultSiteConfigResult.id,
+      STORAGE_PLATFORM,
+    );
+
+    if (storagePublicResult) {
+      setStoragePublicSetting(storagePublicResult);
+    }
+    if (storagePrivateResult) {
+      setStoragePrivateSetting(storagePrivateResult);
     }
   }, []);
 
-  /**
-   * get Gateway Checked
-   */
-  const getGatewayChecked = useCallback(async () => {
-    const gatewayCheckedResult = JSON.parse(storeGet(KEY_META_CMS_GATEWAY_CHECKED) || 'false');
-    setGatewayChecked(gatewayCheckedResult);
-  }, []);
+  // 处理存证类型改变
+  const gatewayTypeChange = useCallback(
+    (checkedValue: (GatewayType.Ipfs | GatewayType.Arweave)[]) => {
+      // console.log('checkedValue', checkedValue);
+
+      let val = GatewayType.Default;
+      if (checkedValue.length) {
+        val = checkedValue[checkedValue.length - 1];
+      }
+
+      setGatewayType(val);
+      storeSet(KEY_META_CMS_GATEWAY_CHECKED, val);
+    },
+    [],
+  );
 
   useEffect(() => {
     getSeedAndKey();
@@ -131,152 +122,61 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
 
   useMount(() => {
     fetchStorageSetting();
-    getGatewayChecked();
+    // get Gateway Checked
+    setGatewayType(storeGet(KEY_META_CMS_GATEWAY_CHECKED) || GatewayType.Default);
   });
 
   return (
     <Card
       title={intl.formatMessage({ id: 'editor.submit.title' })}
       bodyStyle={{ padding: 0 }}
-      style={{ width: 340 }}
+      style={{ width: 360 }}
     >
       <Form
-        name="basic"
+        name="SubmitEditor"
         initialValues={{ remember: true }}
         layout={'vertical'}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
+        {/* 存储仓库 */}
         <Form.Item
-          name="github"
           label={intl.formatMessage({ id: 'editor.submit.item.repo.label' })}
           className={styles.item}
+          style={{ marginTop: 20 }}
         >
-          <Radio value="githubPublic" checked={!!STORAGE_PLATFORM}>
+          <Radio value="githubStorage" checked={!!STORAGE_PLATFORM}>
             <span className={styles.itemType}>
-              {intl.formatMessage({ id: 'editor.submit.item.repo.private.name' })}
-            </span>{' '}
-            - {intl.formatMessage({ id: 'editor.submit.item.repo.private.description' })}
+              {intl.formatMessage({ id: 'editor.submit.item.repo.name' })}
+            </span>
+            {' - '}
+            {intl.formatMessage({ id: 'editor.submit.item.repo.description' })}
           </Radio>
-          <div className={styles.itemRepo}>
-            <div className={styles.itemStatus}>
-              <span className={storageSetting ? styles.done : styles.undone} />
-            </div>
-            {storageSetting ? (
-              <Link
-                href={generateStorageLink(
-                  STORAGE_PLATFORM,
-                  `${storageSetting.userName}/${storageSetting.repoName}`,
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.itemRepoName}
-              >
-                {`${storageSetting.userName} - ${storageSetting.repoName}`}
-              </Link>
-            ) : (
-              <Text>{intl.formatMessage({ id: 'editor.submit.item.repo.noBuild' })}</Text>
-            )}
-          </div>
         </Form.Item>
-
+        <Storage
+          storagePublicSetting={storagePublicSetting}
+          storagePrivateSetting={storagePrivateSetting}
+        />
+        {/* 存证服务 */}
         <Form.Item
-          name="ipfs"
           label={intl.formatMessage({ id: 'editor.submit.item.gateway.label' })}
           className={styles.item}
+          style={{ marginTop: 20 }}
         >
-          <Checkbox
-            value="ipfs"
-            style={{ lineHeight: '32px' }}
-            checked={gatewayChecked}
-            onChange={(e) => handleGatewayChangeChecked(e.target.checked)}
-          >
-            <span className={styles.itemType}>
-              {intl.formatMessage({ id: 'editor.submit.item.gateway.name' })}
-            </span>{' '}
-            - {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
-          </Checkbox>
+          <Checkbox.Group onChange={(val: any) => gatewayTypeChange(val)} value={[gatewayType]}>
+            <Space direction="vertical">
+              <Checkbox value="arweave">
+                <span className={styles.itemType}>
+                  {intl.formatMessage({ id: 'editor.submit.item.gateway.arweave.name' })}
+                </span>
+                {' - '}
+                {intl.formatMessage({ id: 'editor.submit.item.gateway.description' })}
+              </Checkbox>
+            </Space>
+          </Checkbox.Group>
         </Form.Item>
-
-        {gatewayChecked && (
-          <Fragment>
-            <Form.Item name="select-multiple" label="" className={styles.item}>
-              <div className={styles.flexAlignItemCenter}>
-                <div className={styles.itemStatus}>
-                  <span className={styles.done} />
-                </div>
-                <div className={styles.itemForm}>
-                  <Select
-                    placeholder={intl.formatMessage({
-                      id: 'editor.submit.item.gateway.gatewayPlaceholder',
-                    })}
-                    bordered={false}
-                    showArrow={false}
-                    disabled={true}
-                    defaultValue="ipfs"
-                  >
-                    <Option value="ipfs">IPFS - FLEEK</Option>
-                  </Select>
-                  <CaretDownOutlined />
-                </div>
-                <span className={styles.btn} style={{ color: 'rgba(0, 0, 0, 0.25)' }}>
-                  {intl.formatMessage({ id: 'editor.submit.item.gateway.setting' })}
-                </span>
-              </div>
-            </Form.Item>
-
-            <Form.Item name="publicKey" label="" className={styles.item}>
-              <div className={styles.flexAlignItemCenter}>
-                <div className={styles.itemStatus}>
-                  {publicKey ? (
-                    <span className={styles.done} />
-                  ) : (
-                    <span className={styles.undone} />
-                  )}
-                </div>
-                <div className={styles.itemForm}>
-                  <Input
-                    placeholder={intl.formatMessage({
-                      id: 'editor.submit.item.gateway.keyPlaceholder',
-                    })}
-                    className={styles.input}
-                    value={publicKey}
-                    disabled={true}
-                  />
-                  {visibleSignature ? (
-                    <EyeOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
-                  ) : (
-                    <EyeInvisibleOutlined onClick={() => setVisibleSignature(!visibleSignature)} />
-                  )}
-                </div>
-                <span className={styles.btn} onClick={() => setVisibleSignatureGenerate(true)}>
-                  {intl.formatMessage({
-                    id: 'editor.submit.item.gateway.keyGenerate',
-                  })}
-                </span>
-              </div>
-            </Form.Item>
-            {visibleSignature && (
-              <div className={styles.key}>
-                <div className={styles.keyVal}>
-                  {publicKey ||
-                    intl.formatMessage({
-                      id: 'editor.submit.item.gateway.noKey',
-                    })}
-                </div>
-                <div className={styles.keyGenerate}>
-                  {intl.formatMessage({
-                    id: 'editor.submit.item.gateway.keyGenerateText',
-                  })}{' '}
-                  <Link onClick={() => window.open('/manage/account')}>
-                    <ArrowRightOutlined />
-                  </Link>
-                </div>
-              </div>
-            )}
-          </Fragment>
-        )}
+        <Seed publicKey={publicKey} setVisibleSignatureGenerate={setVisibleSignatureGenerate} />
 
         <Form.Item className={styles.footer}>
           <Space>
@@ -287,7 +187,7 @@ const Submit: FC<Props> = ({ loading, handlePublish, setDropdownVisible }) => {
             </Button>
             <Button type="primary" htmlType="submit" loading={loading}>
               {intl.formatMessage({
-                id: 'component.button.submit',
+                id: 'component.button.startPublishing',
               })}
             </Button>
           </Space>

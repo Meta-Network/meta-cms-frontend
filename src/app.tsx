@@ -1,24 +1,25 @@
 import { isMobile } from 'is-mobile';
-import { history, Link } from 'umi';
+import { io } from 'socket.io-client';
+import { userHasSite } from '@/utils';
+import React, { useEffect } from 'react';
+import { useModel, history, Link } from 'umi';
 import type { RunTimeLayoutConfig } from 'umi';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Typography, Avatar, Card, Dropdown } from 'antd';
 import { DownOutlined, ExportOutlined } from '@ant-design/icons';
-import { fetchPostsStorage } from '@/services/api/meta-cms';
-import { dbPostsAllCount } from './db/db';
+import { fetchPostCount } from '@/services/api/meta-cms';
+import { dbDraftsAllCount } from './db/db';
 import { getDefaultSiteConfigAPI } from '@/helpers';
 import MenuMoreInfo from './components/menu/MenuMoreInfo';
 import MenuUserInfo from './components/menu/MenuUserInfo';
 import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
 import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
-import PublishSiteButton from './components/menu/PublishSiteButton';
-import { FetchPostsStorageParamsState } from './services/constants';
+import { RealTimeNotificationEvent } from './services/constants';
 import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
-let userTokenCache: GLOBAL.GeneralResponse<GLOBAL.CurrentUser> | null = null;
 
 function CustomSiderMenu({
   initialState,
@@ -29,7 +30,12 @@ function CustomSiderMenu({
 }) {
   return (
     <div className="menu-extra-cards">
-      <Dropdown overlay={<MenuUserInfo />} placement="bottomCenter" trigger={['click']}>
+      <Dropdown
+        overlayStyle={{ position: 'fixed' }}
+        overlay={<MenuUserInfo />}
+        placement="bottomCenter"
+        trigger={['click']}
+      >
         <Card className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card'}>
           <Card.Meta
             className="menu-user-card-meta"
@@ -39,10 +45,12 @@ function CustomSiderMenu({
           <DownOutlined className="menu-extra-icons" />
         </Card>
       </Dropdown>
-      {initialState?.siteConfig?.domain && (
+      {initialState?.siteConfig && userHasSite(initialState) && (
         <a href={`https://${initialState.siteConfig.domain}`} target="__blank">
           <Card
-            className={menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card my-site-link'}
+            className={
+              menuItemProps.collapsed ? 'menu-card-collapsed' : 'menu-card default-site-link'
+            }
           >
             <Card.Meta
               className="menu-site-card-meta"
@@ -54,12 +62,10 @@ function CustomSiderMenu({
                 </Text>
               }
             />
-            <ExportOutlined className="my-site-link-icon menu-extra-icons" />
+            <ExportOutlined className="default-site-link-icon menu-extra-icons" />
           </Card>
         </a>
       )}
-      {/* Button to redeploy the Meta Space */}
-      <PublishSiteButton />
     </div>
   );
 }
@@ -73,55 +79,58 @@ export const initialStateConfig = {
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<GLOBAL.InitialState> {
+  // don't log in if this page is a result
+  if (history.location.pathname.startsWith('/result')) {
+    return {} as GLOBAL.InitialState;
+  }
+
+  if (isMobile()) {
+    history.push('/result/mobile');
+  }
+
   const fetchUserInfo = async () => {
     try {
-      if (!userTokenCache) {
-        userTokenCache = await refreshTokens();
-      }
+      await refreshTokens();
       const msg = await queryCurrentUser();
       return msg.data;
     } catch (error) {
+      console.log('getInitialState error: ', error);
       history.push('/user/login');
     }
     return undefined;
   };
 
-  const invitationsCountRequest = await queryInvitations();
-  const invitationsCount =
-    invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
-
-  // get site config
-  const siteConfig = await getDefaultSiteConfigAPI();
-
-  let publishedCount = 0;
-  if (siteConfig?.id) {
-    const publishedCountRequest = await fetchPostsStorage(siteConfig?.id, {
-      page: 1,
-      limit: 1,
-      state: FetchPostsStorageParamsState.Published,
-    });
-    publishedCount = publishedCountRequest?.data?.meta?.totalItems || 0;
-  }
-
-  const state: GLOBAL.InitialState = {
+  let state: GLOBAL.InitialState = {
     fetchUserInfo,
-    invitationsCount,
-    publishedCount,
+    currentUser: undefined,
+    siteConfig: undefined,
+    allPostCount: 0,
+    publishingCount: 0,
+    invitationsCount: 0,
+    publishedCount: 0,
     localDraftCount: 0,
-    siteConfig,
+    publishingAlertFlag: false,
   };
 
-  if (history.location.pathname !== '/user/login') {
-    const currentUser = await fetchUserInfo();
-    if (currentUser) {
-      state.currentUser = currentUser;
-      // local draft count
-      state.localDraftCount = await dbPostsAllCount(currentUser!.id);
-    }
-  }
+  const currentUser = await fetchUserInfo();
+  if (currentUser) {
+    state.currentUser = currentUser;
 
-  if (isMobile()) {
-    history.push('/result/mobile');
+    // local draft count
+    state.localDraftCount = await dbDraftsAllCount(currentUser!.id);
+
+    const invitationsCountRequest = await queryInvitations();
+    state.invitationsCount =
+      invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
+
+    // get site config
+    state.siteConfig = await getDefaultSiteConfigAPI();
+
+    if (userHasSite(state)) {
+      // update post count
+      const newPostCount = (await fetchPostCount())?.data ?? {};
+      state = { ...state, ...newPostCount };
+    }
   }
 
   return state;
@@ -129,19 +138,25 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 // @ts-ignore
-export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+export const layout: RunTimeLayoutConfig = ({
+  initialState,
+  setInitialState,
+}: {
+  initialState: GLOBAL.InitialState;
+  setInitialState: (state: any) => GLOBAL.InitialState;
+}) => {
   return {
     disableContentMargin: false,
     siderWidth: 300,
     layout: 'side',
+    disableMobile: true,
     headerRender: () => false,
     headerContentRender: () => false,
     menuDataRender: (menuData) => {
       return menuData.map((menuDataItem) => {
         switch (menuDataItem.path as string) {
           case '/create': {
-            const hasSite = initialState?.siteConfig?.domain;
-            if (hasSite) {
+            if (userHasSite(initialState)) {
               return null;
             } else {
               return menuDataItem;
@@ -159,7 +174,35 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.localDraftCount || 0}
+              count={initialState?.localDraftCount}
+            />
+          );
+        }
+        case '/content/posts': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.allPostCount}
+              onAlert={initialState?.publishingAlertFlag}
+            />
+          );
+        }
+        case '/content/publishing': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.publishingCount}
+            />
+          );
+        }
+        case '/content/published': {
+          return (
+            <MenuItemWithBadge
+              path={menuItemProps.path as string}
+              dom={defaultDom}
+              count={initialState?.publishedCount}
             />
           );
         }
@@ -169,23 +212,14 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
             <MenuItemWithBadge
               path={menuItemProps.path as string}
               dom={defaultDom}
-              count={initialState?.invitationsCount || 0}
-            />
-          );
-        }
-        // 已发布文章
-        case '/content/published-posts': {
-          return (
-            <MenuItemWithBadge
-              path={menuItemProps.path as string}
-              dom={defaultDom}
-              count={initialState?.publishedCount || 0}
+              count={initialState?.invitationsCount}
             />
           );
         }
         // create post
         case '/content/drafts/edit': {
-          const _status = !(initialState?.siteConfig && initialState?.siteConfig?.domain);
+          const _status = !userHasSite(initialState);
+
           return (
             <Link
               to={menuItemProps.path as string}
@@ -208,10 +242,25 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     menuExtraRender: (menuItemProps) => (
       <CustomSiderMenu initialState={initialState} menuItemProps={menuItemProps} />
     ),
-    onPageChange: () => {
+    onPageChange: async () => {
+      /**
+       * 同步草稿数量
+       * 增加、更新、删除、页面切换
+       */
+      if (initialState?.currentUser?.id) {
+        const localDraftCount = await dbDraftsAllCount(initialState?.currentUser?.id);
+        await setInitialState((s: GLOBAL.InitialState) => ({
+          ...s,
+          localDraftCount: localDraftCount,
+        }));
+      }
+
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== '/user/login') {
+      if (
+        !initialState?.currentUser &&
+        !['/user/login', /^\/result.*$/].some((patten) => location.pathname.match(patten))
+      ) {
         history.push('/user/login');
       }
     },
@@ -222,3 +271,52 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     ],
   };
 };
+
+const ReactStartup = (root: any) => {
+  const { setInitialState } = useModel('@@initialState');
+
+  useEffect(() => {
+    const setCounts = (count: Partial<Record<keyof GLOBAL.InitialState, any>>) => {
+      setInitialState(
+        (prevData: GLOBAL.InitialState | undefined) =>
+          ({
+            ...prevData,
+            ...count,
+          } as GLOBAL.InitialState),
+      ).then(); // ignore void return value
+    };
+
+    // connect to Meta CMS backend with socket.io
+    const client = io(META_CMS_API, {
+      withCredentials: true,
+    });
+
+    client.on('connect', () => {
+      console.log('Socket.io has been connected to the backend successfully. Id:', client.id);
+    });
+
+    client.on(
+      RealTimeNotificationEvent.POST_COUNT_UPDATED,
+      (notification: { data: CMS.PostCount }) => {
+        setCounts({
+          ...notification.data,
+        });
+      },
+    );
+
+    client.on(
+      RealTimeNotificationEvent.INVITATION_COUNT_UPDATED,
+      (notification: { data: number }) => {
+        setCounts({
+          invitationsCount: notification.data,
+        });
+      },
+    );
+  }, [setInitialState]);
+
+  return root.children;
+};
+
+export function rootContainer(container: any) {
+  return React.createElement(ReactStartup, null, container);
+}

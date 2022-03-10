@@ -9,10 +9,10 @@ export class StoreDB extends Dexie {
   metadatas!: Table<Metadatas, number>;
   constructor() {
     super('StoreDB');
-    this.version(12)
+    this.version(14)
       .stores({
         posts:
-          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, userId ,createdAt, updatedAt',
+          '++id, cover, title, summary, content, hash, status, timestamp, delete, post, draft, tags, license, userId, sourceData ,createdAt, updatedAt',
         metadatas: '++id, postId, metadata, delete, createdAt, updatedAt',
       })
       .upgrade((tx: Transaction | any) => {
@@ -33,6 +33,7 @@ export class StoreDB extends Dexie {
           post.tags = post.tags || [];
           post.license = post.license || License;
           post.userId = post.userId || 0;
+          post.sourceData = post.sourceData || null;
           post.createdAt = post.createdAt || time;
           post.updatedAt = post.updatedAt || time;
         });
@@ -82,6 +83,15 @@ export const dbPostsDelete = async (id: number): Promise<void> => {
 };
 
 /**
+ * db posts delete current user
+ * @param userId
+ * @returns
+ */
+export const dbPostsDeleteCurrent = async (userId: number): Promise<number> => {
+  return await db.posts.where('userId').equals(userId).delete();
+};
+
+/**
  * db posts delete all
  * @returns
  */
@@ -111,20 +121,43 @@ export const dbPostsAllCount = async (userId: number): Promise<number> => {
 };
 
 /**
- * db posts where exist by id
- * @param id
+ * db drafts allcounter
+ * @param userId
  * @returns
  */
-export const dbPostsWhereExist = async (id: number): Promise<boolean> => {
-  // 草稿删除了 允许重新编辑
-  const result = await db.posts.filter((i) => !i.delete).toArray();
-  return result.some((post) => post.post && Number(post.post.id) === id);
+export const dbDraftsAllCount = async (userId: number): Promise<number> => {
+  return await db.posts.filter((i) => !i.delete && i.userId === userId && i.post == null).count();
 };
 
-export const dbPostsWhereByID = async (id: number): Promise<PostType.Posts | undefined> => {
-  // 草稿删除了 允许重新编辑
-  const result = await db.posts.filter((i) => !i.delete).toArray();
-  return result.find((post) => post.post && Number(post.post.id) === id);
+export const dbPostsWhereExistByTitle = async ({
+  title,
+  userId,
+}: {
+  title: string;
+  userId: number;
+}): Promise<boolean> => {
+  const result = await db.posts.filter((i) => !i.delete && i.userId === userId).toArray();
+  return result.some((post) => post.title === title);
+};
+
+/**
+ * dbPostsWhereExistByTitleAndId
+ * @param title
+ * @param userId
+ * @returns
+ */
+export const dbPostsWhereExistByTitleAndId = async ({
+  title,
+  id,
+  userId,
+}: {
+  title: string;
+  id: number;
+  userId: number;
+}): Promise<boolean> => {
+  // 草稿删除了，并且是自己的草稿，排除当前文章
+  const result = await db.posts.filter((i) => !i.delete && i.userId === userId).toArray();
+  return result.some((post) => post.id !== id && post.title === title);
 };
 
 // post data temp
@@ -142,6 +175,7 @@ export const PostTempData = (): PostType.Posts => ({
   tags: [],
   license: License,
   userId: 0,
+  sourceData: null,
   createdAt: moment().toISOString(),
   updatedAt: moment().toISOString(),
 });
@@ -172,6 +206,15 @@ export const dbMetadatasAdd = async (data: Metadatas): Promise<number> => {
  */
 export const dbMetadatasUpdateByPostId = async <T>(postId: number, data: T): Promise<number> => {
   return await db.metadatas.where('postId').equals(postId).modify(data);
+};
+
+/**
+ * db metadatas delete
+ * @param postId
+ * @returns
+ */
+export const dbMetadatasDelete = async (postId: number): Promise<number> => {
+  return await db.metadatas.where('postId').equals(postId).delete();
 };
 
 /**

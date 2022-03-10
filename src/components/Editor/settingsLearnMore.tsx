@@ -8,7 +8,7 @@ const SettingsLearnMore: React.FC = () => {
 
   return (
     <a
-      href="https://www.matataki.io/p/10753"
+      href={META_WIKI_EDITOR_LEARN}
       className={styles.learn}
       target="_blank"
       rel="noopener noreferrer"

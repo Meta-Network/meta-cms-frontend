@@ -18,12 +18,23 @@
 
 If yes, please describe the impact and migration path for existing applications:
 
-**Does this PR requires a change to the documentation?** (check one)
+**Does this PR require a change to the documentation?** (check one)
 
 - [ ] Yes
 - [ ] No
 
 If yes, please update the documentation accordingly.
+
+**Does this PR require a change to the environment variables configuration?** (check one)
+
+- [ ] Yes
+- [ ] No
+
+If yes, please describe the changes that need to be updated in the configuration (put your example environment variables in the code block below).
+
+```bash
+
+```
 
 ## Description
 
@@ -42,7 +53,7 @@ Fixes # (issue)
 **Desktop:**
 
 <!-- Please complete the following information -->
-<!-- Or paste your full system/browser infomation, e.g. the output of `uname -a`  -->
+<!-- Or paste your full system/browser information, e.g. the output of `uname -a`  -->
 <!-- Darwin MacPro 20.6.0 Darwin Kernel Version 20.6.0 ... arm64  -->
 
 - OS:

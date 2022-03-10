@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./constants.ts" />
+
 declare namespace CMS {
   type SourceStatusResponse = {
     id: number;
@@ -141,7 +144,7 @@ declare namespace CMS {
     titleInStorage: string;
     cover: string;
     summary: string;
-    platform: string;
+    platform: SyncPlatform;
     source: string;
     state: 'drafted' | 'pending';
     category: string;
@@ -163,6 +166,36 @@ declare namespace CMS {
     authorDigestSignatureMetadataStorageType: MetadataStorageType;
     serverVerificationMetadataRefer: string;
     serverVerificationMetadataStorageType: MetadataStorageType;
+  };
+
+  type PostStoragePublish = {
+    posts: Post[];
+    stateIds: number[];
+  };
+
+  // TODO： 暂时不知道怎么导入，先重复写一份
+  enum TaskCommonState {
+    TODO = 'TODO',
+    DOING = 'DOING',
+    SUCCESS = 'SUCCESS',
+    FAIL = 'FAIL',
+  }
+
+  enum PostAction {
+    CREATE = 'CREATE',
+    UPDATE = 'UPDATE',
+    DELETE = 'DELETE',
+  }
+
+  type FetchPostsStorageState = {
+    action: PostAction;
+    createdAt: Date;
+    id: number;
+    postTitle: string;
+    siteConfig: CMS.SiteConfiguration;
+    state: TaskCommonState;
+    taskWorkspace: string;
+    updatedAt: Date;
   };
 
   type ExistsPostsResponse = {
@@ -230,17 +263,164 @@ declare namespace CMS {
   };
   // 可能会有变动 暂时命名区分
   type PostStorageUpdateData = PostStoragePublishData;
+
+  // V1 pipeline
+  type PipelinesOrdersData = {
+    postOrder: {
+      id: string;
+      userId: 34;
+      serverVerificationId: string;
+      postMetadata: {
+        id: string;
+        title: string;
+        cover: string;
+        summary: string;
+        categories: string;
+        tags: string;
+        license: string;
+        authorPublicKey: string;
+        digest: string;
+        createdAt: Date;
+      };
+      createdAt: Date;
+      updatedAt: Date;
+      submitState: 'pending';
+      publishState: 'pending';
+      certificateStorageType: '';
+      certificateId: '';
+      certificateState: '';
+      postTaskId: '';
+      publishSiteOrderId: 0;
+      publishSiteTaskId: '';
+    };
+    serverVerification: {
+      '@context': 'https://metanetwork.online/ns/cms';
+      '@type': 'server-verification-sign';
+      '@version': '2.0.0';
+      signatureAlgorithm: 'curve25519';
+      publicKey: string;
+      nonce: string;
+      claim: string;
+      signature: string;
+      ts: number;
+      reference: [
+        {
+          refer: string;
+          rel: 'content';
+          body: {
+            '@context': 'https: //metanetwork.online/ns/cms';
+            '@type': 'author-post-digest';
+            '@version': '1.1.0';
+            algorithm: 'sha256';
+            categories: string;
+            content: string;
+            cover: string;
+            license: string;
+            summary: string;
+            tags: string;
+            title: string;
+            digest: string;
+            ts: number;
+          };
+        },
+        {
+          refer: string;
+          rel: 'request';
+          body: {
+            '@context': 'https://metanetwork.online/ns/cms';
+            '@type': 'author-digest-sign';
+            '@version': '1.0.0';
+            signatureAlgorithm: 'curve25519';
+            publicKey: string;
+            digest: string;
+            nonce: string;
+            claim: string;
+            signature: string;
+            ts: number;
+          };
+        },
+      ];
+    };
+  };
+
+  type PipelinesOrdersItem = {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: number;
+    submitState: PipelineOrderTaskCommonState;
+    publishState: PipelineOrderTaskCommonState;
+    serverVerificationId: string;
+    certificateStorageType: GatewayType;
+    certificateId: string;
+    certificateState: PipelineOrderTaskCommonState;
+    postTaskId: string;
+    publishSiteOrderId: number;
+    publishSiteTaskId: string;
+    postMetadata: {
+      id: string;
+      createdAt: Date;
+      title: string;
+      cover: string;
+      summary: string;
+      categories: string;
+      tags: string;
+      license: string;
+      authorPublicKey: string;
+      digest: string;
+    };
+  };
+  type PipelinesOrdersMine = {
+    items: PipelinesOrdersItem[];
+    meta: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+    links: {
+      first: string;
+      previous: string;
+      next: string;
+      last: string;
+    };
+  };
+
+  type Pagination = {
+    page: number;
+    limit: number;
+  };
+
+  type PostCount = {
+    allPostCount: number;
+    publishingCount: number;
+    publishedCount: number;
+    publishingAlertFlag: boolean;
+  };
+
+  type PipelinesSiteOrder = {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: number;
+    siteConfigId: number;
+    serverVerificationId: string;
+    publishSiteTaskId: string;
+    state: PipelineOrderTaskCommonState;
+  };
+
+  type PipelinesSiteOrdersPublishQueue = Record<'pending' | 'doing', PipelinesSiteOrder>;
 }
 
 declare namespace GLOBAL {
   type InitialState = {
-    currentUser?: GLOBAL.CurrentUser;
-    fetchUserInfo?: () => Promise<GLOBAL.CurrentUser | undefined>;
-    invitationsCount?: number;
-    publishedCount?: number;
-    localDraftCount?: number;
-    siteConfig?: CMS.SiteConfiguration;
-  };
+    currentUser: GLOBAL.CurrentUser | undefined;
+    siteConfig: CMS.SiteConfiguration | undefined;
+    fetchUserInfo: () => Promise<GLOBAL.CurrentUser | undefined>;
+    invitationsCount: number;
+    localDraftCount: number;
+  } & CMS.PostCount;
 
   type GeneralResponse<T> = {
     statusCode: number;
@@ -275,6 +455,7 @@ declare namespace GLOBAL {
 
   type VerificationCodeParams = {
     key: string;
+    hcaptchaToken?: string;
   };
 
   type EmailLoginParams = {
@@ -325,11 +506,11 @@ declare namespace GLOBAL {
     state: 'info' | 'error' | 'success' | 'null';
   };
 
-  type StoreSetting = {
+  type StorageSetting = {
     storage: string;
     username: string;
     repos?: {
-      storeRepo: string;
+      storageRepo: string;
       publishRepo: string;
     };
   };
@@ -344,7 +525,16 @@ declare namespace GLOBAL {
     matataki: SourcePlatformStatusProperties;
   };
 
-  type StoreProvider = 'GitHub' | 'Gitee';
+  type StorageProvider = 'GitHub' | 'Gitee';
+
+  type InvitationsValidateProps = {
+    invitation: string;
+  };
+
+  type InvitationsValidateState = {
+    available: boolean;
+    exists: boolean;
+  };
 }
 
 declare namespace Storage {

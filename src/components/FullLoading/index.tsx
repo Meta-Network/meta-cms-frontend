@@ -6,10 +6,11 @@ import { LoadingOutlined, CloseOutlined } from '@ant-design/icons';
 
 interface Props {
   readonly loading: boolean;
+  readonly tip?: string;
   setLoading: (val: boolean) => void;
 }
 
-const FullLoading: React.FC<Props> = ({ loading, setLoading }) => {
+const FullLoading: React.FC<Props> = ({ loading, tip = 'Loading...', setLoading }) => {
   const intl = useIntl();
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -17,7 +18,7 @@ const FullLoading: React.FC<Props> = ({ loading, setLoading }) => {
     <>
       {loading ? (
         <div className={styles.wrapper}>
-          <Spin indicator={antIcon} tip="Loading..." />
+          <Spin indicator={antIcon} tip={tip} />
           <Tooltip
             title={intl.formatMessage({
               id: 'component.full.tip',

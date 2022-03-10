@@ -2,8 +2,8 @@ export default {
   'messages.table.noCoverExists': 'No cover image',
   'messages.domain.enterPrefixDomain':
     'Set a personalized domain name (web address visited by others)',
-  'messages.publish.currentStore': 'The currently selected storage service',
-  'messages.publish.noStoreSelected': 'No storage service selected',
+  'messages.publish.currentStorage': 'The currently selected storage service',
+  'messages.publish.noStorageSelected': 'No storage service selected',
   'messages.publish.success': 'Publish success',
   'messages.publish.waiting': 'Not publish',
   'messages.publish.publishing': 'Publishing',
@@ -12,7 +12,7 @@ export default {
   'messages.deployment.readyToStart': 'Ready to start...',
   'messages.deployment.validateSuccess': 'Information verification succeeded',
   'messages.deployment.validateFailed':
-    'Information verification failed, please check the following configuration',
+    'Information verification failed, please check the configuration',
   'messages.deployment.deploying': 'Publishing your Meta Space...',
   'messages.deployment.saveConfigSuccess': 'Successfully save Meta Space information settings',
   'messages.deployment.submitInfoSuccess': 'Submit Meta Space information successfully',
@@ -20,9 +20,9 @@ export default {
   'messages.deployment.submitConfigSuccess': 'Submit the Meta Space configuration successfully',
   'messages.deployment.submitConfigFailed':
     'Submit Meta Space configuration failed, reason: {reason}',
-  'messages.deployment.submitStoreSuccess':
+  'messages.deployment.submitStorageSuccess':
     'Submit the storage repository configuration successfully',
-  'messages.deployment.submitStoreFailed':
+  'messages.deployment.submitStorageFailed':
     'Failed to submit storage repository configuration, reason: {reason}',
   'messages.deployment.submitPublishSuccess': 'Submit the publish configuration successfully',
   'messages.deployment.submitPublishFailed':
@@ -40,20 +40,24 @@ export default {
   'messages.deployment.taskFailed.title': 'Publish failed',
   'messages.deployment.taskFinished.description':
     'Your Meta Space creation is complete and a new invitation code has been issued',
-  'messages.store.setRepoName':
-    'The submitted storage repository is named {storeRepo}, publish repository is {publishRepo}',
+  'messages.storage.setRepoName':
+    'The submitted storage repository is named {storageRepo}, publish repository is {publishRepo}',
   'messages.deployment.taskFailed.description':
     'Meta Space publish failed, please retry or contact us',
-  'messages.store.noRepoTokenReSelect':
+  'messages.storage.noRepoTokenReSelect':
     'Authorization failed, please rebind the storage repository service',
-  'messages.store.noRepoTokenFirstSelect':
+  'messages.storage.noRepoTokenFirstSelect':
     'Name verification failed, please bind storage service first',
-  'messages.store.repoNameCanNotBeEmpty': 'Please set the name of the storage repository',
-  'messages.store.repoNameAlreadyExists':
+  'messages.storage.repoNameCanNotBeEmpty': 'Please set the name of the storage repository',
+  'messages.storage.repoNameAlreadyExists':
     'The storage repository already exists, please set a new name',
-  'messages.store.form.repoName': 'Please set the name of the storage repository',
-  'messages.store.form.repoNameAvailable': 'This name is available!',
-  'messages.store.form.sameRepoName':
+  'messages.storage.repoNameLengthInvalid':
+    'The length of storage repository name should be { min }-{ max }',
+  'messages.storage.repoNameInvalid':
+    "Repository name can contain only letters, digits, '_', '-' and '.'",
+  'messages.storage.form.repoName': 'Please set the name of the storage repository',
+  'messages.storage.form.repoNameAvailable': 'This name is available!',
+  'messages.storage.form.sameRepoName':
     'The names of the repositories should not be the same, please set a new name',
   'messages.invitation.title': 'Invitation code management',
   'messages.invitation.description':
@@ -69,6 +73,7 @@ export default {
   'messages.invitation.inviteInfo': 'Invitation information',
   'messages.invitation.messageToInvitee': 'A paragraph to the other party',
   'messages.profile.updateSuccess': 'Update completed',
+  'messages.profile.updateFailed': 'Update failed',
   'messages.profile.avatar': 'Avatar',
   'messages.profile.personalInfo': 'Personal information',
   'messages.profile.editInfoHere': 'You can edit your personal information here',
@@ -78,16 +83,20 @@ export default {
   'messages.profile.form.pleaseEnterNickname': 'Please set your nickname',
   'messages.profile.form.bio': 'Personal profile',
   'messages.profile.form.pleaseEnterBio': 'Please set your profile',
+  'messages.profile.form.lengthMinAndMax': 'Length { min }-{ max }',
+  'messages.profile.uploadImageWait': 'Uploading image...please wait',
+  'messages.profile.updateUserInfoWait': 'Updating user information...please wait',
   'messages.site.submittingInfo': 'Submitting data, please wait for completion...',
   'messages.site.submitSuccess': 'Data submission completed',
+  'messages.site.submitFailed': 'Data submission failed, reason: {reason}',
   'messages.site.title': 'Meta Space information settings',
   'messages.site.description': 'Set your Meta Space information here',
-  'messages.storeSetting.bind': 'Bind',
-  'messages.storeSetting.alreadyBound': 'Bound',
-  'messages.storeSetting.notBound': 'Unbound',
-  'messages.storeSetting.unbind': 'Unbinding',
-  'messages.storeSetting.title': 'Storage repository configuration',
-  'messages.storeSetting.description': 'You can configure your Meta Space storage source here',
+  'messages.storageSetting.bind': 'Bind',
+  'messages.storageSetting.alreadyBound': 'Bound',
+  'messages.storageSetting.notBound': 'Unbound',
+  'messages.storageSetting.unbind': 'Unbinding',
+  'messages.storageSetting.title': 'Storage repository configuration',
+  'messages.storageSetting.description': 'You can configure your Meta Space storage source here',
   'messages.published.table.cover': 'Cover image',
   'messages.published.table.title': 'Title',
   'messages.published.table.category': 'Category',
@@ -123,21 +132,24 @@ export default {
     'Successfully submitted to the repository in bulk',
   'messages.syncCenter.discardPost': 'Removing article... please wait',
   'messages.syncCenter.discardPostSuccess': 'This article was successfully removed',
+  'messages.syncCenter.discardPostFail': 'Failed to remove this post',
   'messages.syncCenter.table.cover': 'Cover image',
   'messages.syncCenter.table.title': 'Title',
   'messages.syncCenter.table.platform': 'Source',
   'messages.syncCenter.table.createTime': 'Creation time',
   'messages.syncCenter.table.updateTime': 'Update time',
   'messages.syncCenter.table.actions': 'Actions',
-  'messages.syncCenter.title': 'Sync center',
-  'messages.syncCenter.description':
-    'Synchronize and manage articles obtained from data sources here',
+  'messages.syncCenter.table.actions.deletePopconfirmTitle':
+    'Are you sure you want to delete this post?',
   'messages.syncCenter.button.publishMultiPosts': 'Bulk submission',
   'messages.syncCenter.button.discardMultiPosts': 'Bulk removal',
   'messages.syncCenter.draftSavedTips': 'Whether to jump to edit?',
+  'messages.syncCenter.coverSavedLoading': 'Cover is being transferred',
   'messages.syncCenter.coverSavedSuccess': 'Cover transfer to IPFS successful',
+  'messages.syncCenter.coverSavedFail': 'Cover transfer failed',
   'messages.syncCenter.savedSuccess': 'Transfer successfully',
   'messages.syncCenter.savedFail': 'Transfer failed',
+  'messages.syncCenter.getContentLoading': 'Content being acquired',
   'messages.syncCenter.getContentSuccess': 'Obtained content successfully',
   'messages.syncCenter.getContentFail': 'Failed to obtain content',
   'messages.domain.updated': 'The domain name was successfully updated',
@@ -153,16 +165,6 @@ export default {
   'messages.domain.form.edit': 'Modify the deployment platform',
   'messages.domain.form.content': 'Domain name settings',
   'messages.domain.form.placeholder': 'Domain name of your Meta Space',
-  'messages.redeployment.taskStart': 'Start publishing Meta Space, please wait...',
-  'messages.redeployment.taskSuccess.title': 'mission completed',
-  'messages.redeployment.taskSuccess.description': 'Meta Space has been republished successfully',
-  'messages.redeployment.taskFailed.title': 'Task failed',
-  'messages.redeployment.taskFailed.description':
-    'Meta Space failed to publish, please try again or report to the development team',
-  'messages.redeployment.noSiteConfig': 'You have not created a Meta Space',
-  'messages.redeployment.button': 'Publish my Meta Space',
-  'messages.redeployment.uploadIPFS.fail': 'IPFS upload failed',
-  'messages.redeployment.noKey': 'No KEY',
   'messages.copy.success': 'Copied to clipboard',
   'messages.editor.noDefaultConfig': 'Get the default configuration failed',
   'messages.editor.success': 'Publish successful',
@@ -171,9 +173,21 @@ export default {
   'messages.editor.saveToDraftFail': 'Export draft failed',
   'messages.editor.draftUpdateFail': 'Draft update failed',
   'messages.editor.tip.id': 'Please edit the article first',
-  'messages.editor.tip.titleOrContent': 'Article or content cannot be empty',
   'messages.editor.tip.coverFormat': 'The cover image link is incorrect, please re-upload!',
   'messages.editor.tip.postExists': 'This submit will overrides the last version',
+  'messages.editor.verify.title.empty': 'Title cannot be empty',
+  'messages.editor.verify.title.length': 'Title length limit is { min }-{ max }',
+  'messages.editor.verify.content.empty': 'Content cannot be empty',
+  'messages.editor.verify.content.filterEmpty': 'Content cannot be empty after filtering',
+  'messages.editor.verify.content.invalidUrl': 'Invalid image link { message }, please edit.',
+  'messages.editor.verify.content.length': 'Content length limit is { min }-{ max }',
+  'messages.editor.verify.summary.length': 'Description length limit is { min }-{ max }',
+  'messages.editor.verify.cover.length': 'Cover url length limit is { min }-{ max }',
+  'messages.editor.verify.tag.length': 'Tags length limit is { min }-{ max }',
+  'messages.editor.verify.tag.singleLength': 'Single tag length limit is { max }',
+  'messages.editor.verify.tag.number': 'Up to { maxNumber } tags',
+  'messages.editor.verify.license.length': 'Protocol length limit is { min }-{ max }',
+  'messages.editor.verify.title.repeat': 'Title is repeated, please change',
   'messages.editor.upload.image.type': 'You can only upload {type} files!',
   'messages.editor.upload.image.size': 'The image must be smaller than {size}MB!',
   'messages.editor.upload.image.token.not': 'Token acquisition failed',
@@ -195,4 +209,44 @@ export default {
   'messages.dashboard.publishing': 'Publishing...',
   'messages.dashboard.submitted': 'Submitted',
   'messages.dashboard.settings': 'Settings',
+  'messages.dashboard.siteSettingStatus.item.modifyPersonalInformation':
+    'Personal information changed ',
+  'messages.dashboard.siteSettingStatus.item.modifyTemplateInformation':
+    'Meta Space template changed',
+  'messages.editor.notification.title': 'Notification',
+  'messages.editor.publish.notification.fail':
+    'We are very sorry that the article submission storage failed, please try again or send us feedback and Meta Team will do our best to improve it.',
+  'messages.editor.publish.tip':
+    'Please be patient as the article is being submitted and decentralised storage is taking a long time. Meta Team will further optimize the experience in the future.',
+  'messages.editor.uploadAllImages.notification': 'Images are being decentralised in storage.',
+  'messages.editor.uploadAllImages.success':
+    'The decentralised storage of images is complete, thanks for your patience.',
+  'messages.login.enterEmail': 'Please enter your email address',
+  'messages.login.enterValidEmail': 'Please enter a valid email address',
+  'messages.login.sendSuccessfully': 'Sent successfully',
+  'messages.login.sendFailed': 'Sending failed',
+  'messages.login.invalidEmailAddress': 'Invalid email address',
+  'messages.login.getEmailCodeMany':
+    'Too many times to get the verification code, please try again later',
+  'messages.login.getEmailCodeManySeconds':
+    'Too many times to get the verification code, please try again in { seconds }',
+  'messages.login.enterVerificationCode': 'Please enter the verification code',
+  'messages.login.loginSuccessful': 'Login successful',
+  'messages.login.wrongCaptchaCode': 'Wrong captcha code',
+  'messages.login.accountNotExist': 'Account does not exist, please register first',
+  'messages.login.codeHasExpired':
+    'Frequent operation verification code has expired, please re-acquire',
+  'messages.success': 'Success',
+  'messages.fail': 'Fail',
+  'messages.login.enterInvitationCode': 'Please enter the invitation code',
+  'messages.login.enterInvitationCodeError': 'The invitation code is incorrect',
+  'messages.login.enterInvitationCodeInvalid': 'The invitation code has expired',
+  'messages.login.enterUsername': 'Please enter your username',
+  'messages.login.cannotBeModified': 'Cannot be modified',
+  'messages.login.signUpSuccessfully': 'Registered successfully',
+  'messages.login.emailHasBeenSignUp': 'This email has already been registered.',
+  'messages.login.verificationFailed': 'Verification failed',
+  'messages.login.usernameExist': 'The username you have chosen already exists',
+  'messages.login.usernameRules':
+    'User name only allows lowercase, numbers, "-" and the length is { min }-{ max } and must be between  { min } and { max } characters.',
 };

@@ -4,19 +4,22 @@ import { Tooltip, Dropdown } from 'antd';
 import styles from './editorHeader.less';
 import { LeftOutlined, DownOutlined } from '@ant-design/icons';
 import Submit from '@/components/Submit/editor';
+import type { GatewayType } from '@/services/constants';
 import { DraftMode } from '@/services/constants';
 
 interface Props {
   readonly draftMode: DraftMode;
   readonly loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   settings: JSX.Element;
-  handlePublish: (gateway: boolean) => void;
+  handlePublish: (gateway: GatewayType) => void;
   // headerCloudDraftUpload: JSX.Element;
   // headerCloudDraftDownload: JSX.Element;
 }
 
 const EditorHeader: React.FC<Props> = ({
   loading,
+  setLoading,
   draftMode,
   handlePublish,
   // headerCloudDraftUpload,
@@ -67,7 +70,7 @@ const EditorHeader: React.FC<Props> = ({
           {/* {headerCloudDraftUpload} */}
           {/* {headerCloudDraftDownload} */}
         </span>
-        <span>
+        <span className={styles.action}>
           <Tooltip
             placement="left"
             title={intl.formatMessage({
@@ -80,6 +83,7 @@ const EditorHeader: React.FC<Props> = ({
               overlay={
                 <Submit
                   loading={loading}
+                  setLoading={setLoading}
                   handlePublish={handlePublish}
                   setDropdownVisible={setDropdownVisible}
                 />
@@ -89,7 +93,7 @@ const EditorHeader: React.FC<Props> = ({
             >
               <span className={styles.headerPublish}>
                 {intl.formatMessage({
-                  id: 'component.button.submit',
+                  id: 'component.button.publish',
                 })}
                 <DownOutlined className={styles.headerIconText} />
               </span>

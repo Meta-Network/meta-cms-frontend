@@ -1,18 +1,18 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { useIntl } from 'umi';
-import { Select } from 'antd';
+import { useIntl, useModel } from 'umi';
+import { message, Select } from 'antd';
 import styles from './settings.less';
 import { useMount } from 'ahooks';
-import { getDefaultSiteConfigAPI } from '@/helpers';
 import { spaceTagsAPI } from '@/services/api/space';
 import { storeGet, storeSet } from '@/utils/store';
 import { uniqBy } from 'lodash';
+import { editorRules } from '../../../config';
 
 const { Option } = Select;
 const KEY_META_CMS_HISTORY_TAGS = 'metaCmsHistoryTags';
 const HISTORY_TAGS_MAX = 10;
 const SPACE_TAGS_MAX = 20;
-const SELECT_TAGS_MAX = 10;
+const SELECT_TAGS_MAX = editorRules.tags.maxNumber;
 
 interface Props {
   readonly tags: string[];
@@ -39,6 +39,7 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
   const intl = useIntl();
   const [spaceTags, setSpaceTags] = useState<Space.Tags[]>([]);
   const [historyTags, setHistoryTags] = useState<string[]>([]);
+  const { initialState } = useModel('@@initialState');
 
   // tags list
   const tagsList = useMemo(() => {
@@ -61,17 +62,15 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
    * fetch space tags
    */
   const fetchTags = useCallback(async () => {
-    const resultDefaultSiteConfig = await getDefaultSiteConfigAPI();
-    if (!resultDefaultSiteConfig) {
+    if (!initialState?.siteConfig) {
       return;
     }
 
-    const resulSpaceTags = await spaceTagsAPI(resultDefaultSiteConfig.domain);
-
-    if (resulSpaceTags) {
-      setSpaceTags(resulSpaceTags);
-    }
-  }, []);
+    const resulSpaceTags = await spaceTagsAPI(
+      `${initialState.siteConfig?.metaSpacePrefix}.${META_SPACE_BASE_DOMAIN}`,
+    );
+    setSpaceTags(resulSpaceTags);
+  }, [initialState]);
 
   /**
    * fetch history tags
@@ -108,6 +107,22 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
    */
   const handleSelectChangeTags = useCallback(
     (val: string[]) => {
+      // 判断新添加的 tag 长度
+      if (val.length && val[val.length - 1].length > editorRules.tags.singleLength) {
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.tag.singleLength',
+            },
+            {
+              max: editorRules.tags.singleLength,
+            },
+          ),
+        );
+        return;
+      }
+
+      // 判断总个数
       if (val.length > SELECT_TAGS_MAX) {
         return;
       }
@@ -119,7 +134,7 @@ const SettingsTags: React.FC<Props> = ({ tags, handleChangeTags }) => {
         mergedHistoryTags(currentTag);
       }
     },
-    [tags, handleChangeTags, mergedHistoryTags],
+    [tags, handleChangeTags, mergedHistoryTags, intl],
   );
 
   useMount(() => {

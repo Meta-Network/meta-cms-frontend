@@ -1,5 +1,5 @@
 import SiteSettingFormItems from '@/components/SiteSettingFormItems';
-import { useIntl, useModel } from 'umi';
+import { useIntl } from 'umi';
 import { Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
@@ -16,7 +16,6 @@ export default () => {
   const intl = useIntl();
   const [defaultSiteConfig, setDefaultSiteConfig] = useState<CMS.SiteConfiguration>();
   const [faviconUrl, setFaviconUrl] = useState<string>('');
-  const { setSiteNeedToDeploy } = useModel('storage');
 
   const handleFinishing = async (values: GLOBAL.SiteSetting) => {
     if (faviconUrl) {
@@ -24,12 +23,12 @@ export default () => {
     }
 
     if (defaultSiteConfig?.id && defaultSiteConfig?.siteInfo?.id) {
-      const siteConfigRequest = updateSiteConfigSetting(defaultSiteConfig.id, {
+      const siteConfigResponse = updateSiteConfigSetting(defaultSiteConfig.id, {
         language: values.language,
         timezone: values.timezone,
       });
 
-      const siteInfoRequest = updateSiteInfoSetting(defaultSiteConfig.siteInfo.id, {
+      const siteInfoResponse = updateSiteInfoSetting(defaultSiteConfig.siteInfo.id, {
         title: values.title,
         subtitle: values.subtitle,
         description: values.description,
@@ -39,10 +38,22 @@ export default () => {
       });
 
       const done = message.loading(intl.formatMessage({ id: 'messages.site.submittingInfo' }), 0);
-      await Promise.all([siteConfigRequest, siteInfoRequest]);
+      let success = true;
+
+      const response = await Promise.all([siteConfigResponse, siteInfoResponse]);
+      response.forEach((res) => {
+        if (res.message !== 'Ok') {
+          message.error(
+            intl.formatMessage({ id: 'messages.site.submitFailed' }, { reason: res.message }),
+          );
+          success = false;
+        }
+      });
+
+      if (success) {
+        message.success(intl.formatMessage({ id: 'messages.site.submitSuccess' }));
+      }
       done();
-      message.success(intl.formatMessage({ id: 'messages.site.submitSuccess' }));
-      setSiteNeedToDeploy(true);
     }
   };
 
@@ -73,7 +84,7 @@ export default () => {
           onFinish={handleFinishing}
           requiredMark="optional"
         >
-          <SiteSettingFormItems faviconUrl={faviconUrl} setFavIconUrl={setFaviconUrl} />
+          <SiteSettingFormItems />
         </ProForm>
       </Card>
     </PageContainer>

@@ -11,18 +11,25 @@ export default defineConfig({
   },
   define: {
     META_NETWORK_API: process.env.META_NETWORK_API || 'https://meta-network-api.testenv.mttk.net',
-    META_NETWORK_FE: process.env.META_NETWORK_FE || 'https://metanetwork.online',
+    META_NETWORK_FE: process.env.META_NETWORK_FE || 'https://meta-network.mttk.net',
     META_UCENTER_API: process.env.META_UCENTER_API || 'https://ucenter-test-api.mttk.net',
     META_CMS_API: process.env.META_CMS_API || 'https://meta-cms-api-dev.mttk.net',
     META_STORAGE_API:
       process.env.META_STORAGE_API || 'https://fleek-storage.vercel.mttk.net/fleek/storage',
-    META_SPACE_BASE_DOMAIN: process.env.META_SPACE_BASE_DOMAIN || 'metaspaces.me',
+    META_SPACE_BASE_DOMAIN: process.env.META_SPACE_BASE_DOMAIN || 'metaspaces.life',
     META_SPACE_DEFAULT_FAVICON_URL:
       process.env.META_SPACE_DEFAULT_FAVICON_URL ||
       'https://storageapi.fleek.co/casimir-crystal-team-bucket/metanetwork/users/metaio-storage/favicon.ico',
     FLEEK_NAME: 'https://storageapi.fleek.co',
     META_NETWORK_DATA_VIEWER_URL:
       process.env.META_NETWORK_DATA_VIEWER_URL || 'https://meta-network-data-viewer.vercel.app',
+    META_GUN_PEERS: process.env.META_GUN_PEERS!.split(','),
+    META_WIKI: process.env.META_WIKI,
+    META_WIKI_EDITOR_LEARN: process.env.META_WIKI_EDITOR_LEARN,
+    ARWEAVE_VIEWBLOCK: process.env.ARWEAVE_VIEWBLOCK,
+    IPFS_FLEEK: process.env.IPFS_FLEEK,
+    MATATAKI_DEVELOPER: process.env.MATATAKI_DEVELOPER,
+    META_FEEDBACK: process.env.META_FEEDBACK,
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
@@ -32,10 +39,11 @@ export default defineConfig({
   },
   // https://umijs.org/zh-CN/plugins/plugin-locale
   locale: {
-    // default zh-CN
+    // default en-US
     default: 'en-US',
     antd: true,
-    baseNavigator: true,
+    baseNavigator: false,
+    useLocalStorage: true,
   },
   dynamicImport: {
     loading: '@ant-design/pro-layout/es/PageLoading',

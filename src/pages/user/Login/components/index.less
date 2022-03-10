@@ -1,0 +1,243 @@
+// Common
+.formEmailAction {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 70px;
+}
+.formEmailBtn {
+  height: 36px;
+  padding: 0 30px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 36px;
+  background-color: #1da1f2;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  &:disabled {
+    background-color: #9b9b9f;
+    cursor: not-allowed;
+  }
+  &:hover,
+  &:focus,
+  &:active {
+    color: #fff;
+    background-color: #1a91da;
+  }
+}
+.formEmailBtnText {
+  height: 36px;
+  color: #9b9b9f;
+  font-size: 14px;
+  line-height: 36px;
+  background-color: transparent;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.formEmail {
+  width: 346px;
+  margin-top: 40px !important;
+  :global {
+    .ant-form-item-explain.ant-form-item-explain-error {
+      text-align: left;
+    }
+  }
+}
+.formEmailItem {
+  width: 100%;
+
+  :global {
+    .form-input[type='text'],
+    .form-input-password {
+      border: none;
+      border-bottom: 1px solid #f1f1f1;
+      border-radius: 0;
+      transition: all 0.3s;
+    }
+    .form-input:focus,
+    .form-input-password {
+      box-shadow: none !important;
+    }
+    .form-input-password:hover,
+    .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover {
+      border-color: none !important;
+    }
+
+    .upload-avatar {
+      cursor: pointer;
+      .ant-upload-list {
+        display: none;
+      }
+    }
+    .ant-input {
+      padding-right: 0;
+      padding-left: 0;
+    }
+  }
+}
+
+// Email
+.buttonBack {
+  margin-bottom: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+.buttonMethods {
+  margin: 0;
+  padding: 0;
+  color: #333;
+  font-weight: 600;
+  font-size: 32px;
+}
+
+// Email Code
+.buttonCode {
+  position: absolute;
+  top: 0;
+  right: 0;
+  // color: #9b9b9f;
+  cursor: pointer;
+}
+
+// Email Login
+
+.formEmailCode {
+  position: relative;
+}
+
+// Email Register Code
+.formEmailRegisterCodeDescriptionTitle {
+  margin: 0 0 6px 0;
+  padding: 0;
+  color: #9b9b9f;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.formEmailRegisterCodeDescriptionText {
+  margin: 4px 0;
+  color: #9b9b9f;
+  font-size: 12px;
+  line-height: 1.4;
+  a {
+    color: #40a9ff;
+  }
+}
+
+// ToggleMode
+.toggleModeTitle {
+  width: 58%;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  color: #191919;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  @media screen and (max-width: 576px) {
+    width: 100%;
+  }
+}
+.toggleModeList {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 58%;
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  list-style: none;
+  @media screen and (max-width: 576px) {
+    margin: 0 auto;
+  }
+}
+.toggleModeItem {
+  display: inline-block;
+}
+.toggleModeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  line-height: 30px;
+  text-align: center;
+  background-color: #4a4a4a;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: #000;
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    fill: #fff;
+  }
+}
+
+// ToggleServers
+.toggleServersWrapper {
+  margin-top: 50px;
+  border-bottom: 1px solid rgba(141, 151, 165, 0.2);
+}
+.toggleServersHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 20px;
+  text-align: left;
+}
+.toggleServersHeadIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #fff;
+  font-size: 14px;
+  background-color: #c1c6cd;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.toggleServersLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 16px;
+  text-align: left;
+}
+.toggleServersTitle {
+  color: #61708b;
+  font-weight: 600;
+  font-size: 14px;
+}
+.toggleServersServer {
+  color: #232f32;
+  font-size: 14px;
+  line-height: 18px;
+  border-bottom: 1px dashed #542ddf;
+}
+.toggleServersDescription {
+  margin: 8px 0 0 0;
+  padding: 0;
+  color: #8d99a5;
+  font-size: 14px;
+  line-height: 18px;
+}
+.toggleServersEdit {
+  margin-left: 20px;
+
+  /* color: #542ddf; */
+  color: #b4b4b4;
+  font-size: 14px;
+  line-height: 18px;
+  white-space: nowrap;
+  cursor: not-allowed;
+}

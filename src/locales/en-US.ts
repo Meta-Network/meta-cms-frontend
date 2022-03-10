@@ -6,6 +6,9 @@ import setting from './en-US/setting';
 import messages from './en-US/messages';
 import component from './en-US/component';
 import timezones from './en-US/timezones';
+import login from './en-US/login';
+import manage from './en-US/manage';
+import result from './en-US/result';
 
 export default {
   ...menu,
@@ -16,4 +19,7 @@ export default {
   ...messages,
   ...component,
   ...timezones,
+  ...login,
+  ...manage,
+  ...result,
 };

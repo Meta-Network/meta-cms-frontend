@@ -1,18 +1,21 @@
 import { MatrixIcon } from '../../Icon/index';
-import { Tooltip } from 'antd';
-
-const feedbackLink = 'https://forms.gle/1HAZ8puQ9vhBSqMGA';
+import { useIntl } from 'umi';
 
 export default () => {
+  const intl = useIntl();
+
   return (
     <div
       onClick={() => {
-        window.open(feedbackLink, '_blank');
+        window.open(META_FEEDBACK, '_blank');
       }}
     >
-      <Tooltip placement="right" title="Feedback">
-        <MatrixIcon />
-      </Tooltip>
+      <MatrixIcon />
+      <span className={'only-in-tooltip'}>
+        {intl.formatMessage({
+          id: 'menu.feedback.feedback',
+        })}
+      </span>
     </div>
   );
 };

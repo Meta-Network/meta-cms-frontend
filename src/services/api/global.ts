@@ -17,6 +17,7 @@ export async function getGithubReposName(): Promise<string[]> {
       Authorization: `token ${token}`,
     },
     params: {
+      // TODO: fix this problem
       // max is 100, so user who has more than 100 repos, this doesn't work
       per_page: 100,
     },
@@ -27,7 +28,7 @@ export async function getGithubReposName(): Promise<string[]> {
 }
 
 /** 获取 GitHub 用户名 */
-export async function getUsernameOfStore(name: string): Promise<string> {
+export async function getUsernameOfStorage(name: string): Promise<string> {
   switch (name.toLowerCase()) {
     case 'github': {
       const token = (await getSocialAuthToken('github'))?.data?.token;

@@ -1,51 +1,22 @@
-import { useCallback, useMemo, useState } from 'react';
 import { useIntl, useModel } from 'umi';
-import { Typography, Button, Popconfirm, message, Space, Input, List, Dropdown } from 'antd';
-import { DeleteOutlined, CloudSyncOutlined } from '@ant-design/icons';
-import { dbPostsDeleteAll, dbMetadatasDeleteAll } from '@/db/db';
+import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { useCallback, useMemo, useState } from 'react';
+import { Button, Popconfirm, message, List } from 'antd';
 import {
-  fetchGunDraftsAndUpdateLocal,
-  deleteDraft,
-  twoWaySyncDrafts,
-  generateSeedAndPair,
-  getSeedAndPair,
-  saveSeedAndPair,
-} from '@/utils/gun';
+  dbPostsDeleteAll,
+  dbMetadatasDeleteAll,
+  dbMetadatasDelete,
+  dbPostsDeleteCurrent,
+  dbPostsAll,
+} from '@/db/db';
 import styles from './index.less';
-import type { KeyPair } from '@metaio/meta-signature-util';
-import { generateKeys } from '@metaio/meta-signature-util';
-import { useMount } from 'ahooks';
-
-const { Text } = Typography;
-
-interface ImportSeedAndPairComponentsState {
-  getSeedAndPairFn: () => void;
-}
-
-const ImportSeedAndPairComponents: React.FC<ImportSeedAndPairComponentsState> = ({
-  getSeedAndPairFn,
-}) => {
-  const [seedAndPairInput, setSeedAndPairInput] = useState('');
-  // handle import
-  const handleImport = useCallback(async () => {
-    await saveSeedAndPair(seedAndPairInput);
-    getSeedAndPairFn();
-
-    message.success('导入成功');
-  }, [seedAndPairInput, getSeedAndPairFn]);
-  return (
-    <Space>
-      <Input onChange={(e) => setSeedAndPairInput(e.target.value)} value={seedAndPairInput} />
-      <Button onClick={handleImport}>确定</Button>
-    </Space>
-  );
-};
 
 export default () => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
-  const [syncDraftsLoading, setSyncDraftsLoading] = useState<boolean>(false);
-  const [seedAndPair, setSeedAndPair] = useState<string>('');
+
+  const [deleteDraftLoading, setDeleteDraftLoading] = useState<boolean>(false);
+  const [deleteCacheLoading, setDeleteCacheLoading] = useState<boolean>(false);
 
   /**
    * handle delete all local draft
@@ -55,19 +26,24 @@ export default () => {
       return;
     }
 
-    // 删除本地所有文章 mettadata 数据
-    await dbPostsDeleteAll();
-    await dbMetadatasDeleteAll();
+    setDeleteDraftLoading(true);
 
-    // 删除用户的 gun 文章
-    const gunDraftsResult = await fetchGunDraftsAndUpdateLocal(initialState.currentUser);
+    // 删除当前用户的文章
+    const draftsResult = (await dbPostsAll(initialState.currentUser.id)) || [];
 
-    for (let i = 0; i < gunDraftsResult.length; i++) {
-      const ele = gunDraftsResult[i];
-      if (ele.key) {
-        await deleteDraft({ userId: initialState.currentUser.id, key: ele.key });
+    // 删除当前用户文章的 metadata 数据
+    for (let i = 0; i < draftsResult.length; i++) {
+      const ele = draftsResult[i];
+
+      if (ele.id) {
+        await dbMetadatasDelete(ele.id);
       }
     }
+
+    // 删除当前用户的所有草稿数据
+    await dbPostsDeleteCurrent(initialState.currentUser.id);
+
+    setDeleteDraftLoading(false);
 
     message.success(
       intl.formatMessage({
@@ -76,67 +52,43 @@ export default () => {
     );
   }, [intl, initialState]);
 
-  // two way sync drafts
-  const twoWaySyncDraftsFn = useCallback(async () => {
-    if (!initialState?.currentUser) {
-      return;
-    }
+  const clearCache = useCallback(async () => {
+    setDeleteCacheLoading(true);
+    // 清除 IndexedDB
+    // 删除本地所有文章 metadata 数据
+    await dbPostsDeleteAll();
+    await dbMetadatasDeleteAll();
+    // LocalStorage Cookies SessionStorage 因为里面存了一些别的数据，暂时不清理
 
-    setSyncDraftsLoading(true);
-    try {
-      await twoWaySyncDrafts(initialState.currentUser);
-    } catch (e) {
-      console.error('e', e);
-    } finally {
-      setSyncDraftsLoading(false);
-    }
-  }, [initialState]);
+    setDeleteCacheLoading(false);
 
-  // sync seed and pair
-  const getSeedAndPairFn = useCallback(() => {
-    const result = getSeedAndPair();
-    setSeedAndPair(result);
-  }, []);
-
-  // sync seed public key
-  const seedPublicKey = useMemo(() => {
-    const _seedAndPair = JSON.parse(seedAndPair || '[]');
-    if (!_seedAndPair.length) {
-      return '';
-    }
-    const seed = JSON.parse(_seedAndPair[0] || '[]');
-    const keys: KeyPair = generateKeys(seed);
-    return keys.public;
-  }, [seedAndPair]);
-
-  // generate seed pair fn
-  const generateSeedAndPairFn = useCallback(async () => {
-    await generateSeedAndPair();
-    getSeedAndPairFn();
-    message.success('生成成功');
-  }, [getSeedAndPairFn]);
+    message.success(
+      intl.formatMessage({
+        id: 'messages.success',
+      }),
+    );
+  }, [intl]);
 
   const list = useMemo(
     () => [
       {
         name: 'deleteDraft',
-        title: '删除本地草稿',
-        description: '删除本地所有草稿，包含本地其他用户的草稿。',
+        title: intl.formatMessage({
+          id: 'setting.deleteLocalDraft.title',
+        }),
+        description: intl.formatMessage({
+          id: 'setting.deleteLocalDraft.description',
+        }),
         icon: <DeleteOutlined />,
         actions: [
           <Popconfirm
+            key="deleteDraft-confirm"
             title={intl.formatMessage({
-              id: 'setting.deleteLocalDraft.all.tip',
+              id: 'setting.deleteLocalDraft.popconfirmTitle',
             })}
             onConfirm={handleDeleteAllLocalDraft}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
           >
-            <Button type="primary" danger key="deleteDraft-delete">
+            <Button type="primary" danger key="deleteDraft-delete" loading={deleteDraftLoading}>
               {intl.formatMessage({
                 id: 'component.button.delete',
               })}
@@ -145,64 +97,33 @@ export default () => {
         ],
       },
       {
-        name: 'syncDraft',
-        title: '草稿同步',
-        description: '可以复制 Seed & Pair 到其他需要同步的设备使用。',
-        icon: <CloudSyncOutlined />,
+        name: 'clearCache',
+        title: intl.formatMessage({
+          id: 'setting.deleteLocalCache.title',
+        }),
+        description: intl.formatMessage({
+          id: 'setting.deleteLocalCache.description',
+        }),
+        icon: <ExclamationCircleOutlined />,
         actions: [
-          <Text key="syncDraft-copy" copyable={{ text: seedAndPair }}>
-            {seedPublicKey.slice(0, 6)}****{seedPublicKey.slice(-4)}
-          </Text>,
-          <Dropdown
-            overlay={<ImportSeedAndPairComponents getSeedAndPairFn={getSeedAndPairFn} />}
-            trigger={['click']}
-          >
-            <Button key="syncDraft-import">导入</Button>
-          </Dropdown>,
           <Popconfirm
-            title={'您确定要双向同步草稿内容吗？'}
-            onConfirm={twoWaySyncDraftsFn}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
+            key="clearCache-confirm"
+            title={intl.formatMessage({
+              id: 'setting.deleteLocalCache.popconfirmTitle',
             })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
+            onConfirm={clearCache}
           >
-            <Button key="syncDraft-sync" loading={syncDraftsLoading}>
-              同步
+            <Button type="primary" danger key="clearCache-clear" loading={deleteCacheLoading}>
+              {intl.formatMessage({
+                id: 'component.button.delete',
+              })}
             </Button>
-          </Popconfirm>,
-          <Popconfirm
-            title={'您确定要重新生成 Seed & Pair 吗？'}
-            onConfirm={generateSeedAndPairFn}
-            okText={intl.formatMessage({
-              id: 'component.button.yes',
-            })}
-            cancelText={intl.formatMessage({
-              id: 'component.button.no',
-            })}
-          >
-            <Button key="syncDraft-sync">重新生成</Button>
           </Popconfirm>,
         ],
       },
     ],
-    [
-      handleDeleteAllLocalDraft,
-      twoWaySyncDraftsFn,
-      generateSeedAndPairFn,
-      getSeedAndPairFn,
-      intl,
-      seedAndPair,
-      seedPublicKey,
-      syncDraftsLoading,
-    ],
+    [handleDeleteAllLocalDraft, clearCache, intl, deleteDraftLoading, deleteCacheLoading],
   );
-
-  useMount(() => {
-    getSeedAndPairFn();
-  });
 
   return (
     <List

@@ -7,8 +7,11 @@ import { fetchTokenAPI } from '@/helpers';
 import { useIntl } from 'umi';
 import { message } from 'antd';
 import { useMount } from 'ahooks';
+import type { EventEmitter } from 'ahooks/lib/useEventEmitter';
+import { editorRules } from '../../../config';
+
 interface Props {
-  asyncContentToDB: (val: string) => void;
+  focus$: EventEmitter<string>;
 }
 
 interface UploadFormat {
@@ -23,7 +26,7 @@ interface UploadFormat {
 const e = React.createElement;
 let _TOKEN = '';
 
-const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB }) {
+const Editor: React.FC<Props> = React.memo(function Editor({ focus$ }) {
   const intl = useIntl();
   const vditorRef = createRef<HTMLDivElement>();
 
@@ -38,12 +41,9 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
 
     const vditor = new Vditor('vditor', {
       width: '100%',
-      height: _height - 206,
+      height: _height,
       cache: {
         enable: false,
-      },
-      after() {
-        // vditor.setValue('');
       },
       // _lutePath: `http://192.168.0.107:9090/lute.min.js?${new Date().getTime()}`,
       // _lutePath: 'src/js/lute/lute.min.js',
@@ -105,7 +105,7 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
       },
       counter: {
         enable: true,
-        type: 'text',
+        max: editorRules.content.max,
       },
       hint: {
         emojiPath: 'https://cdn.jsdelivr.net/npm/vditor@1.8.3/dist/images/emoji',
@@ -224,14 +224,17 @@ const Editor: React.FC<Props> = React.memo(function Editor({ asyncContentToDB })
           message.error(msg);
         },
       },
-      input(val: string) {
-        asyncContentToDB(val);
+      input() {
+        focus$.emit('editor-input');
+      },
+      after() {
+        // vditor.setValue('');
+        // console.log('edit after');
+
+        window.vditor = vditor;
       },
     });
-
-    // TODO: need modify
-    (window as any).vditor = vditor;
-  }, [asyncContentToDB, intl]);
+  }, [focus$, intl]);
 
   useMount(() => {
     init();
