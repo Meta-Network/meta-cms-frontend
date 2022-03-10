@@ -291,7 +291,7 @@ export const getPreviewImageLink = async (existList: string[]): Promise<string[]
        * 过滤条件
        *
        * 1. 有 src
-       * 2. 非法 url 和 url 正则检查
+       * 2. url 正则检查 和 非法 url
        * 3. src 不为 fleek (已上传)
        *      图片不存在（会在编辑器方法里面处理）
        * 4. 图片没有处理过
@@ -307,8 +307,8 @@ export const getPreviewImageLink = async (existList: string[]): Promise<string[]
 
           if (
             outerHTMLSrc &&
-            isValidUrl(outerHTMLSrc) &&
             urlReg.test(outerHTMLSrc) &&
+            isValidUrl(outerHTMLSrc) &&
             !outerHTMLSrc.includes(FLEEK_NAME) &&
             !existList.includes(outerHTMLSrc) &&
             outerHTMLSrc !== window.location.href
@@ -353,7 +353,10 @@ export const checkAllImageLink = async (): Promise<string[]> => {
     const list = imageLinkList.reduce((previousValue: string[], currentValue: HTMLImageElement) => {
       const outerHTMLSrc = parseImageSrc(currentValue.outerHTML);
 
-      if (!outerHTMLSrc || !isValidUrl(outerHTMLSrc) || !urlReg.test(outerHTMLSrc)) {
+      // 不存在 Src
+      // 正则检测 URL
+      // 有效 URL
+      if (!outerHTMLSrc || !urlReg.test(outerHTMLSrc) || !isValidUrl(outerHTMLSrc)) {
         previousValue.push(outerHTMLSrc);
       }
 
