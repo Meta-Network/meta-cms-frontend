@@ -23,6 +23,8 @@ import {
   renderFilteredContent,
   getPreviewImageLink,
   hasVditor,
+  checkAllImageLink,
+  convertInvalidUrlMessage,
 } from '@/utils/editor';
 import FullLoading from '@/components/FullLoading';
 import Settings from '@/components/Editor/settings';
@@ -267,6 +269,24 @@ const Edit: React.FC = () => {
           intl.formatMessage({
             id: 'messages.editor.verify.content.filterEmpty',
           }),
+        );
+        setPublishLoading(false);
+        return;
+      }
+
+      // 检查 xxxx.png 类型的图片格式，不让提交。
+      const checkAllImageLinkList = await checkAllImageLink();
+      if (checkAllImageLinkList.length) {
+        const msg = convertInvalidUrlMessage(checkAllImageLinkList);
+        message.warning(
+          intl.formatMessage(
+            {
+              id: 'messages.editor.verify.content.invalidUrl',
+            },
+            {
+              message: msg,
+            },
+          ),
         );
         setPublishLoading(false);
         return;
