@@ -108,6 +108,7 @@ export default {
   'messages.published.table.noIPFSSignature': 'No signature',
   'messages.published.title': 'Published articles',
   'messages.published.description': 'Published articles can be viewed here',
+  'messages.source.noBinding': 'Please bind to at least one content source',
   'messages.source.syncing': 'The articles is synchronizing, please wait...',
   'messages.source.syncSuccess': 'The articles synced successfully!',
   'messages.source.syncFailed':
@@ -121,6 +122,9 @@ export default {
     'You can sync articles from other platforms to your Meta Space here',
   'messages.syncCenter.noSiteConfig.title': 'No Meta Space information available',
   'messages.syncCenter.noSiteConfig.description': 'Please create Meta Space first',
+  'messages.syncCenter.noSourceBound.title': 'No source binding information available',
+  'messages.syncCenter.noSourceBound.description':
+    'Please make a source binding first in Content source page',
   'messages.syncCenter.taskInProgress.title': 'A task is already in progress',
   'messages.syncCenter.taskInProgress.description':
     'Please wait for other tasks to complete before proceeding with this action',
