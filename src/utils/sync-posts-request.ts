@@ -10,9 +10,11 @@ export default async (sources: CMS.SourceStatusResponse[]) => {
 
   sources.forEach((service: CMS.SourceStatusResponse) => {
     syncQueue.push(syncPostsByPlatform(service.platform));
+  });
+  await Promise.all(syncQueue);
+
+  sources.forEach((service: CMS.SourceStatusResponse) => {
     syncStates.push(waitUntilSyncFinish(service.platform));
   });
-
-  await Promise.all(syncQueue);
   await Promise.all(syncStates);
 };

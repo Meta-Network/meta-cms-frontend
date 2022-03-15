@@ -4,20 +4,20 @@ import {
   getSourceStatus,
   decryptMatatakiPost,
 } from '@/services/api/meta-cms';
-import { useIntl, useModel, history } from 'umi';
-import ProTable from '@ant-design/pro-table';
-import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Space, Tag, message, Typography, Popconfirm } from 'antd';
-import { useState, useCallback, useRef } from 'react';
-import syncPostsRequest from '../../utils/sync-posts-request';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import { dbPostsAdd, dbPostsWhereExistByTitle, PostTempData } from '@/db/db';
 import { assign, cloneDeep } from 'lodash';
+import { useState, useCallback, useRef } from 'react';
+import { useModel, useIntl, history } from 'umi';
+import { PageContainer } from '@ant-design/pro-layout';
+import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
+import { Button, Space, Tag, message, Typography, Popconfirm, notification } from 'antd';
+import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import { imageUploadByUrlAPI } from '@/helpers';
 import { fetchIpfs } from '@/services/api/global';
-import { OSS_MATATAKI, OSS_MATATAKI_FEUSE } from '../../../config';
-import PostsCover from '@/components/PostsCover';
+import ProTable from '@ant-design/pro-table';
 import PostsDate from '@/components/PostsDate';
+import PostsCover from '@/components/PostsCover';
+import syncPostsRequest from '../../utils/sync-posts-request';
+import { dbPostsAdd, dbPostsWhereExistByTitle, PostTempData } from '@/db/db';
 
 const { Link } = Typography;
 
@@ -216,28 +216,44 @@ export default () => {
     },
   ];
 
-  // handle sync
   const handleSync = useCallback(async () => {
     setSyncLoading(true);
     const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
 
-    const sourceStatusResult = await getSourceStatus();
-    if (sourceStatusResult.statusCode !== 200) {
-      done();
-      setSyncLoading(false);
-      message.success(intl.formatMessage({ id: 'messages.source.syncFailed' }));
-      return;
-    }
+    const sync = async () => {
+      if (initialState?.siteConfig?.status !== 'PUBLISHED') {
+        notification.warn({
+          message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
+          description: intl.formatMessage({
+            id: 'messages.syncCenter.noSiteConfig.description',
+          }),
+        });
+        return;
+      }
+      try {
+        const sourceStatusResult = await getSourceStatus();
+        if (sourceStatusResult.statusCode !== 200) {
+          message.error(intl.formatMessage({ id: 'messages.source.syncFailed' }));
+          return;
+        } else if (sourceStatusResult.data.length === 0) {
+          message.warn(intl.formatMessage({ id: 'messages.source.noBinding' }));
+          return;
+        }
 
-    await syncPostsRequest(sourceStatusResult.data);
-    done();
+        await syncPostsRequest(sourceStatusResult.data);
+        message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
+
+        if (actionRef.current?.reset) {
+          actionRef.current.reset();
+        }
+      } catch (e) {
+        message.error(intl.formatMessage({ id: 'messages.source.syncFailed' }));
+      }
+    };
+    await sync();
     setSyncLoading(false);
-    message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
-
-    if (actionRef.current?.reset) {
-      actionRef.current.reset();
-    }
-  }, [intl]);
+    done();
+  }, [intl, initialState]);
 
   return (
     <PageContainer

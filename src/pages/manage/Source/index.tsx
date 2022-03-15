@@ -1,6 +1,7 @@
+import { useModel } from '@@/plugin-model/useModel';
 import { useIntl } from 'umi';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, List, message, Spin, Tag } from 'antd';
+import { Button, List, message, notification, Spin, Tag } from 'antd';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
 import { getSourceStatus } from '@/services/api/meta-cms';
 import syncPostsRequest from '@/utils/sync-posts-request';
@@ -19,6 +20,7 @@ const status: GLOBAL.SourcePlatformStatus = {
 
 export default () => {
   const intl = useIntl();
+  const { initialState } = useModel('@@initialState');
   const [pageLoading, setPageLoading] = useState<boolean>(true);
   const [syncLoading, setSyncLoading] = useState<boolean>(false);
   const [unbindLoading, setUnbindLoading] = useState<boolean>(false);
@@ -70,12 +72,17 @@ export default () => {
       sync: (
         <Button
           loading={syncLoading}
+          key="matataki_sync"
           onClick={async () => {
             setSyncLoading(true);
             const done = message.loading(intl.formatMessage({ id: 'messages.source.syncing' }), 0);
-            await syncPostsRequest((await getSourceStatus()).data);
+            try {
+              await syncPostsRequest([{ platform: 'matataki' } as CMS.SourceStatusResponse]);
+              message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
+            } catch {
+              message.error(intl.formatMessage({ id: 'messages.source.syncFailed' }));
+            }
             done();
-            message.success(intl.formatMessage({ id: 'messages.source.syncSuccess' }));
             setSyncLoading(false);
           }}
           type="primary"
@@ -85,6 +92,7 @@ export default () => {
       ),
       bind: (
         <Button
+          key="matataki_bind"
           onClick={() => {
             window.location.href = MATATAKI_DEVELOPER;
           }}
@@ -96,6 +104,7 @@ export default () => {
       unbind: (
         <Button
           loading={unbindLoading}
+          key="matataki_unbind"
           onClick={async () => {
             setUnbindLoading(true);
             const done = message.loading(
@@ -126,10 +135,32 @@ export default () => {
     },
   };
 
-  const getActions = (platform: GLOBAL.SourcePlatformStatusProperties) =>
-    platform.active
-      ? [actionsOnPage[platform.name].sync, actionsOnPage[platform.name].unbind]
-      : [actionsOnPage[platform.name].bind];
+  const getActions = (platform: GLOBAL.SourcePlatformStatusProperties) => {
+    if (platform.active) {
+      return [actionsOnPage[platform.name].sync, actionsOnPage[platform.name].unbind];
+    } else {
+      if (initialState?.siteConfig?.status === 'PUBLISHED') {
+        return [actionsOnPage[platform.name].bind];
+      } else {
+        return [
+          <Button
+            key={`${platform.name}_bind_disabled`}
+            onClick={() => {
+              notification.warn({
+                message: intl.formatMessage({ id: 'messages.syncCenter.noSiteConfig.title' }),
+                description: intl.formatMessage({
+                  id: 'messages.syncCenter.noSiteConfig.description',
+                }),
+              });
+            }}
+            type="primary"
+          >
+            {intl.formatMessage({ id: 'component.button.bind' })}
+          </Button>,
+        ];
+      }
+    }
+  };
 
   const sourcePlatformsInformation = [
     {
