@@ -79,6 +79,8 @@ export default () => {
     },
     {
       dataIndex: 'action',
+      width: 140,
+      fixed: 'right',
       title: intl.formatMessage({ id: 'posts.table.action' }),
       render: (_, record) =>
         record.publishState === PipelineOrderTaskCommonState.FAILED ? (
@@ -130,6 +132,7 @@ export default () => {
           pageSize: 10,
           showSizeChanger: false,
         }}
+        scroll={{ x: 1300 }}
         search={false}
         options={false}
         size="middle"

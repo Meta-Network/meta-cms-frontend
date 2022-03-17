@@ -103,10 +103,10 @@ export default () => {
       render: () => <PostsStorage />,
     },
     {
+      dataIndex: 'action',
       title: intl.formatMessage({ id: 'posts.drafts.table.action' }),
-      dataIndex: 'status',
-      key: 'status',
       width: 180,
+      fixed: 'right',
       render: (_, record: GunType.GunDraft) => (
         <Space>
           {record.status === 'pending' && (
@@ -185,6 +185,7 @@ export default () => {
           pageSize: 10,
           showSizeChanger: false,
         }}
+        scroll={{ x: 1000 }}
         search={false}
         options={false}
         size="middle"

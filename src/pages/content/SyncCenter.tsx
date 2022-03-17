@@ -182,6 +182,7 @@ export default () => {
       dataIndex: 'action',
       title: intl.formatMessage({ id: 'messages.syncCenter.table.actions' }),
       width: 180,
+      fixed: 'right',
       render: (_, record) => (
         <Space>
           <Button
@@ -294,6 +295,7 @@ export default () => {
           pageSize: 10,
           showSizeChanger: false,
         }}
+        scroll={{ x: 1000 }}
         search={false}
         options={false}
         size="middle"
