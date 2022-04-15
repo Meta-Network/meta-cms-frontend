@@ -16,7 +16,7 @@ import MenuItemWithBadge from './components/menu/MenuItemWithBadge';
 import MenuLanguageSwitch from './components/menu/MenuLanguageSwitch';
 import MenuFeedbackButton from './components/menu/MenuFeedbackButton';
 import { RealTimeNotificationEvent } from './services/constants';
-import { queryCurrentUser, queryInvitations, refreshTokens } from './services/api/meta-ucenter';
+import { queryCurrentUser, refreshTokens } from './services/api/meta-ucenter';
 import type { SiderMenuProps } from '@ant-design/pro-layout/lib/components/SiderMenu/SiderMenu';
 
 const { Text } = Typography;
@@ -106,7 +106,6 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
     siteConfig: undefined,
     allPostCount: 0,
     publishingCount: 0,
-    invitationsCount: 0,
     publishedCount: 0,
     localDraftCount: 0,
     publishingAlertFlag: false,
@@ -118,10 +117,6 @@ export async function getInitialState(): Promise<GLOBAL.InitialState> {
 
     // local draft count
     state.localDraftCount = await dbDraftsAllCount(currentUser!.id);
-
-    const invitationsCountRequest = await queryInvitations();
-    state.invitationsCount =
-      invitationsCountRequest?.data?.filter((e) => e.invitee_user_id === 0)?.length || 0;
 
     // get site config
     state.siteConfig = await getDefaultSiteConfigAPI();
@@ -206,16 +201,6 @@ export const layout: RunTimeLayoutConfig = ({
             />
           );
         }
-        // 邀请码数量
-        case '/invitation': {
-          return (
-            <MenuItemWithBadge
-              path={menuItemProps.path as string}
-              dom={defaultDom}
-              count={initialState?.invitationsCount}
-            />
-          );
-        }
         // create post
         case '/content/drafts/edit': {
           const _status = !userHasSite(initialState);
@@ -235,6 +220,7 @@ export const layout: RunTimeLayoutConfig = ({
           );
         }
         default: {
+          // @ts-ignore
           return <Link to={menuItemProps.path as string}>{defaultDom}</Link>;
         }
       }
@@ -300,15 +286,6 @@ const ReactStartup = (root: any) => {
       (notification: { data: CMS.PostCount }) => {
         setCounts({
           ...notification.data,
-        });
-      },
-    );
-
-    client.on(
-      RealTimeNotificationEvent.INVITATION_COUNT_UPDATED,
-      (notification: { data: number }) => {
-        setCounts({
-          invitationsCount: notification.data,
         });
       },
     );

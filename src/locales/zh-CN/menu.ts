@@ -14,7 +14,6 @@ export default {
   'menu.manage.siteSetting': '信息',
   'menu.manage.storageSetting': '存储',
   'menu.manage.domainSetting': '域名',
-  'menu.invitation': '邀请码',
   'menu.user.profile': '个人中心',
   'menu.user.logout': '退出登录',
   'menu.moreInfo.contactUs': '联络我们',

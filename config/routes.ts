@@ -106,12 +106,6 @@
     ],
   },
   {
-    path: '/invitation',
-    name: 'invitation',
-    icon: 'apartment',
-    component: './Invitation',
-  },
-  {
     path: '/settings',
     name: 'settings',
     icon: 'setting',
