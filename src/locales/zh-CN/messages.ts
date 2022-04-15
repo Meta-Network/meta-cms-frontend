@@ -42,17 +42,9 @@ export default {
   'messages.storage.form.repoName': '请设定存储仓库的名称',
   'messages.storage.form.repoNameAvailable': '可以使用该名称！',
   'messages.storage.form.sameRepoName': '仓库名称不可以重复，请重新设定名称',
-  'messages.invitation.title': '邀请码管理',
-  'messages.invitation.description':
-    '在这里管理你拥有的邀请码\n你可以在下方编辑邀请信息，定制发送后对方会接受的信息',
   'messages.info.updateSuccess': '信息更新完成',
   'messages.info.updateFailed': '信息更新失败',
   'messages.info.copySuccess': '复制成功',
-  'messages.invitation.editInfoHere': '可以在此处编辑信息',
-  'messages.invitation.inviteeLabel': '受邀人',
-  'messages.invitation.inviteeName': '受邀人的称呼',
-  'messages.invitation.inviteInfo': '邀请信息',
-  'messages.invitation.messageToInvitee': '一段写给对方的话',
   'messages.profile.updateSuccess': '更新成功',
   'messages.profile.updateFailed': '更新失败',
   'messages.profile.avatar': '头像',
@@ -189,8 +181,6 @@ export default {
   'messages.dashboard.siteSettingStatus.item.modifyTemplateInformation':
     '修改了 Meta Space 模板信息',
 
-  'messages.invitation.inviteMessage':
-    'Hi，Meta Network原住民正在邀请您来做邻居，快去 https://home.metanetwork.online，通过您的邀请码来入驻吧！',
   'messages.editor.notification.title': '通知',
   'messages.editor.publish.notification.fail':
     '非常抱歉，提交文章存储失败，请再次尝试或向我们反馈，Meta Team 将会全力改进。',
@@ -212,12 +202,9 @@ export default {
   'messages.login.codeHasExpired': '频繁操作验证码已失效，请重新获取',
   'messages.success': '成功',
   'messages.fail': '失败',
-  'messages.login.enterInvitationCode': '请输入邀请码',
-  'messages.login.enterInvitationCodeError': '邀请码不正确',
-  'messages.login.enterInvitationCodeInvalid': '邀请码已失效',
   'messages.login.enterUsername': '请输入用户名',
   'messages.login.cannotBeModified': '不可修改',
-  'messages.login.signUpSuccessfully': '注册成功',
+  'messages.login.signUpSuccessfully': '注册成功, 请设置用户名',
   'messages.login.emailHasBeenSignUp': '邮箱已注册',
   'messages.login.verificationFailed': '验证失败',
   'messages.login.usernameExist': '用户名已存在',

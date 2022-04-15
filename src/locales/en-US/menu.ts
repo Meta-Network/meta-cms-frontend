@@ -15,7 +15,6 @@ export default {
   'menu.manage.storageSetting': 'Storage',
   'menu.manage.domainSetting': 'Domain',
   'menu.localDraft': 'Local draft',
-  'menu.invitation': 'Invitation code',
   'menu.user.profile': 'Personal center',
   'menu.user.logout': 'Sign out',
   'menu.moreInfo.contactUs': 'Contact us',

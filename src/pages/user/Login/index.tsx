@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Image } from 'antd';
 import { history, useModel } from 'umi';
 import { useSpring, animated } from 'react-spring';
-import Email from './components/Email';
+import Email from './components/Wallet';
 import LogoAuth from '../../../assets/svg/login_auth.svg';
 import styles from './index.less';
 

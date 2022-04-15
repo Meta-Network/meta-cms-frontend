@@ -1,12 +1,12 @@
 import { Menu } from 'antd';
 import { useCallback } from 'react';
 import { history, useIntl, useModel } from 'umi';
-import { outLogin } from '@/services/api/meta-ucenter';
+import { logoutAccount } from '@/services/api/meta-ucenter';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 
 const logout = async () => {
-  await outLogin();
+  await logoutAccount();
   if (window.location.pathname !== '/user/login') {
     history.push('/user/login');
   }
