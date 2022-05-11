@@ -75,7 +75,7 @@ export default () => {
     } else {
       message.error(intl.formatMessage({ id: 'messages.fail' }));
     }
-  }, []);
+  }, [intl]);
 
   return (
     <PageContainer

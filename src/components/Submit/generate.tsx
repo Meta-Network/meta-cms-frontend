@@ -54,12 +54,17 @@ const GenerateKey: React.FC<Props> = ({
       }
       onCancel={() => setVisibleSignatureGenerate(false)}
       footer={[
-        <Button onClick={() => setVisibleSignatureGenerate(false)}>
+        <Button onClick={() => setVisibleSignatureGenerate(false)} key="cancel">
           {intl.formatMessage({
             id: 'component.button.cancel',
           })}
         </Button>,
-        <Button type="primary" loading={signatureLoading} onClick={handleGeneratePublicKey}>
+        <Button
+          type="primary"
+          loading={signatureLoading}
+          onClick={handleGeneratePublicKey}
+          key="generate"
+        >
           {publicKey
             ? intl.formatMessage({
                 id: 'component.button.regenerate',

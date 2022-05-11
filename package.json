@@ -99,7 +99,7 @@
     "@types/store": "^2.0.2",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.9.0",
-    "@umijs/fabric": "latest",
+    "@umijs/fabric": "^2.10.2",
     "@umijs/openapi": "^1.1.14",
     "@umijs/plugin-blocks": "^2.0.5",
     "@umijs/plugin-esbuild": "^1.0.1",

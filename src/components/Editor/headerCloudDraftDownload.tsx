@@ -48,13 +48,17 @@ const HeaderCloudDraftDownload: React.FC = () => {
         }
         onCancel={() => setCloudDraftDownloadVisible(false)}
         footer={[
-          <Button onClick={() => window.open(`https://${META_SPACE_BASE_DOMAIN}`, '_blank')}>
+          <Button
+            onClick={() => window.open(`https://${META_SPACE_BASE_DOMAIN}`, '_blank')}
+            key="button"
+          >
             查看云端内容
           </Button>,
           <Button
             type="primary"
             loading={cloudDraftDownloadLoading}
             onClick={handleCloudDraftDownload}
+            key="download"
           >
             下载
           </Button>,
