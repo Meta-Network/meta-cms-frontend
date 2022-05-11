@@ -49,8 +49,15 @@ const HeaderCloudDraftUpload: React.FC = () => {
         }
         onCancel={() => setCloudDraftUploadVisible(false)}
         footer={[
-          <Button onClick={() => setCloudDraftUploadVisible(false)}>取消</Button>,
-          <Button type="primary" loading={cloudDraftUploadLoading} onClick={handleCloudDraftUpload}>
+          <Button onClick={() => setCloudDraftUploadVisible(false)} key="close">
+            取消
+          </Button>,
+          <Button
+            type="primary"
+            loading={cloudDraftUploadLoading}
+            onClick={handleCloudDraftUpload}
+            key="upload"
+          >
             上传
           </Button>,
         ]}

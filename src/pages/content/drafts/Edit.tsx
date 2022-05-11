@@ -45,6 +45,7 @@ import type {
   AuthorPostDigestMetadata,
   AuthorPostSignatureMetadata,
 } from '@metaio/meta-signature-util-v2';
+import useEditorSubmit from '@/hooks/useEditorSubmit';
 
 const keyUploadAllImagesMessage = 'keyUploadAllImagesMessage';
 
@@ -66,6 +67,8 @@ const Edit: React.FC = () => {
   const [publishLoading, setPublishLoading] = useState<boolean>(false);
 
   const { initialState } = useModel('@@initialState');
+
+  const { validate } = useEditorSubmit();
 
   // 原文链接
   const settingsOriginalLinkHash = useMemo(() => {
@@ -240,36 +243,25 @@ const Edit: React.FC = () => {
       const _title = trim(title);
       // 内容不能为空
       const _content = trim(content);
-
-      if (!_title) {
-        message.warning(
-          intl.formatMessage({
-            id: 'messages.editor.verify.title.empty',
-          }),
-        );
-        setPublishLoading(false);
-        return;
-      }
-
-      // 内容不能为空
-      if (!_content) {
-        message.warning(
-          intl.formatMessage({
-            id: 'messages.editor.verify.content.empty',
-          }),
-        );
-        setPublishLoading(false);
-        return;
-      }
-
       // 过滤后的内容不能为空
       const _contentXssFilter = trim(await renderFilteredContent());
-      if (!_contentXssFilter) {
-        message.warning(
-          intl.formatMessage({
-            id: 'messages.editor.verify.content.filterEmpty',
-          }),
-        );
+      // summary 长度判断
+      const summary = await generateSummary();
+
+      const tagsStr = tags.join();
+
+      const validateResult = await validate({
+        title: _title,
+        content: _content,
+        contentXssFilter: _contentXssFilter,
+        summary: summary,
+        cover: cover,
+        tags: tags,
+        tagsStr: tagsStr,
+        license: license,
+      });
+
+      if (!validateResult) {
         setPublishLoading(false);
         return;
       }
@@ -285,75 +277,6 @@ const Edit: React.FC = () => {
             },
             {
               message: msg,
-            },
-          ),
-        );
-        setPublishLoading(false);
-        return;
-      }
-
-      // title 长度判断
-      if (_title.length < editorRules.title.min || _title.length > editorRules.title.max) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.title.length',
-            },
-            {
-              min: editorRules.title.min,
-              max: editorRules.title.max,
-            },
-          ),
-        );
-        setPublishLoading(false);
-        return;
-      }
-
-      // content 长度判断
-      if (_content.length < editorRules.content.min || _content.length > editorRules.content.max) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.content.length',
-            },
-            {
-              min: editorRules.content.min,
-              max: editorRules.content.max,
-            },
-          ),
-        );
-        setPublishLoading(false);
-        return;
-      }
-
-      // summary 长度判断
-      const summary = await generateSummary();
-      if (summary.length < editorRules.summary.min || summary.length > editorRules.summary.max) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.summary.length',
-            },
-            {
-              min: editorRules.summary.min,
-              max: editorRules.summary.max,
-            },
-          ),
-        );
-        setPublishLoading(false);
-        return;
-      }
-
-      // 封面长度判断
-      if (cover.length < editorRules.cover.min || cover.length > editorRules.cover.max) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.cover.length',
-            },
-            {
-              min: editorRules.cover.min,
-              max: editorRules.cover.max,
             },
           ),
         );
@@ -384,80 +307,6 @@ const Edit: React.FC = () => {
         return;
       }
 
-      // tags 长度 个数 判断
-      if (tags.length > editorRules.tags.maxNumber) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.tag.number',
-            },
-            {
-              maxNumber: editorRules.tags.maxNumber,
-            },
-          ),
-        );
-
-        setPublishLoading(false);
-        return;
-      }
-
-      // tag 单个个数长度判断
-      const tagsFilter = tags.filter((i) => i.length > editorRules.tags.singleLength);
-      if (tagsFilter.length) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.tag.singleLength',
-            },
-            {
-              max: editorRules.tags.singleLength,
-            },
-          ),
-        );
-
-        setPublishLoading(false);
-        return;
-      }
-
-      const tagsStr = tags.join();
-      if (tagsStr.length < editorRules.tags.min || tagsStr.length > editorRules.tags.max) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.tag.length',
-            },
-            {
-              min: editorRules.tags.min,
-              max: editorRules.tags.max,
-            },
-          ),
-        );
-
-        setPublishLoading(false);
-        return;
-      }
-
-      // categories 长度判断
-      // 暂无
-
-      // license 长度判断
-      if (license.length < editorRules.license.min || license.length > editorRules.license.max) {
-        message.warning(
-          intl.formatMessage(
-            {
-              id: 'messages.editor.verify.license.length',
-            },
-            {
-              min: editorRules.license.min,
-              max: editorRules.license.max,
-            },
-          ),
-        );
-
-        setPublishLoading(false);
-        return;
-      }
-
       // check title
       const checkTitleResult = await checkTitle({
         titleValue: trim(title),
@@ -477,7 +326,18 @@ const Edit: React.FC = () => {
 
       pipelinesPostOrdersFn(gatewayType);
     },
-    [title, cover, content, pipelinesPostOrdersFn, checkTitle, initialState, license, tags, intl],
+    [
+      title,
+      cover,
+      content,
+      pipelinesPostOrdersFn,
+      checkTitle,
+      initialState,
+      license,
+      tags,
+      intl,
+      validate,
+    ],
   );
 
   /**

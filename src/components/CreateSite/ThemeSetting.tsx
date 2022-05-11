@@ -50,11 +50,11 @@ export default () => {
               cover={<Image src={item.previewImage} />}
               className={themeSetting === index + 1 ? styles.selectedTheme : ''}
               actions={[
-                <a target="_blank" href={item.previewSite} rel="noopener noreferrer">
+                <a target="_blank" href={item.previewSite} rel="noopener noreferrer" key="preview">
                   <ArrowRightOutlined />
                   <FormattedMessage id="component.button.preview" />
                 </a>,
-                <span onClick={() => setThemeSetting(index + 1)} className="clickable">
+                <span onClick={() => setThemeSetting(index + 1)} className="clickable" key="select">
                   <CheckOutlined key="check" />
                   <FormattedMessage id="component.button.select" />
                 </span>,

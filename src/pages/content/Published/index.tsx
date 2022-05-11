@@ -93,6 +93,7 @@ export default () => {
           }
           return { success: false };
         }}
+        scroll={{ x: 1100 }}
         rowKey={(record) => record.id}
         pagination={{
           pageSize: 10,

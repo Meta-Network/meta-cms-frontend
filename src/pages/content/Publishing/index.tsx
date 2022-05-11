@@ -75,7 +75,7 @@ export default () => {
     } else {
       message.error(intl.formatMessage({ id: 'messages.fail' }));
     }
-  }, []);
+  }, [intl]);
 
   return (
     <PageContainer
@@ -123,6 +123,7 @@ export default () => {
           pageSize: 10,
           showSizeChanger: false,
         }}
+        scroll={{ x: 1100 }}
         search={false}
         options={false}
         size="middle"
