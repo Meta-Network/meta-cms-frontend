@@ -1,5 +1,5 @@
 declare namespace LoginType {
-  type EmailMode = 'login' | 'register';
+  type WalletMode = 'login' | 'register';
   type UsersMeUsernameState = {
     username: string;
   };

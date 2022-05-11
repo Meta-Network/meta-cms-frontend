@@ -38,8 +38,7 @@ export default {
     'Encountered some problems when publishing, please follow the prompts to modify the settings and resubmit',
   'messages.deployment.taskFinished.title': 'Publish successful',
   'messages.deployment.taskFailed.title': 'Publish failed',
-  'messages.deployment.taskFinished.description':
-    'Your Meta Space creation is complete and a new invitation code has been issued',
+  'messages.deployment.taskFinished.description': 'Your Meta Space creation is complete',
   'messages.storage.setRepoName':
     'The submitted storage repository is named {storageRepo}, publish repository is {publishRepo}',
   'messages.deployment.taskFailed.description':
@@ -59,19 +58,9 @@ export default {
   'messages.storage.form.repoNameAvailable': 'This name is available!',
   'messages.storage.form.sameRepoName':
     'The names of the repositories should not be the same, please set a new name',
-  'messages.invitation.title': 'Invitation code management',
-  'messages.invitation.description':
-    'Manage the invitation codes you have here.\nYou can edit the invitation information below to customize the information that the other party will accept after sending.',
-  'messages.invitation.inviteMessage':
-    'Hi, Meta Network Natives are inviting you to be their neighbors!，visit https://home.metanetwork.online，join us with your invitation code! ',
   'messages.info.updateSuccess': 'Information update completed',
   'messages.info.updateFailed': 'Information update failed',
   'messages.info.copySuccess': 'Copy successfully',
-  'messages.invitation.editInfoHere': 'You can edit the information here',
-  'messages.invitation.inviteeLabel': 'Invited people',
-  'messages.invitation.inviteeName': 'The name of the invitee',
-  'messages.invitation.inviteInfo': 'Invitation information',
-  'messages.invitation.messageToInvitee': 'A paragraph to the other party',
   'messages.profile.updateSuccess': 'Update completed',
   'messages.profile.updateFailed': 'Update failed',
   'messages.profile.avatar': 'Avatar',
@@ -242,12 +231,9 @@ export default {
     'Frequent operation verification code has expired, please re-acquire',
   'messages.success': 'Success',
   'messages.fail': 'Fail',
-  'messages.login.enterInvitationCode': 'Please enter the invitation code',
-  'messages.login.enterInvitationCodeError': 'The invitation code is incorrect',
-  'messages.login.enterInvitationCodeInvalid': 'The invitation code has expired',
   'messages.login.enterUsername': 'Please enter your username',
   'messages.login.cannotBeModified': 'Cannot be modified',
-  'messages.login.signUpSuccessfully': 'Registered successfully',
+  'messages.login.signUpSuccessfully': 'Registered successfully, please set your username',
   'messages.login.emailHasBeenSignUp': 'This email has already been registered.',
   'messages.login.verificationFailed': 'Verification failed',
   'messages.login.usernameExist': 'The username you have chosen already exists',

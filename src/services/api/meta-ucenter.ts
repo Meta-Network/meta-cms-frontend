@@ -1,4 +1,5 @@
 import { extendWithErrorHandler } from '@/services/api/base-request';
+import type { Wallet } from 'use-wallet/dist/cjs/types';
 
 const request = extendWithErrorHandler({
   credentials: 'include',
@@ -7,6 +8,51 @@ const request = extendWithErrorHandler({
     'Content-Type': 'application/json',
   },
 });
+
+async function service(wallet: Wallet, action: 'login' | 'signup') {
+  const walletAccount = wallet.account;
+  const {
+    data: { code },
+  } = await request<GLOBAL.GeneralResponse<{ code: string }>>(
+    '/accounts/metamask/verification-code',
+    {
+      method: 'POST',
+      data: {
+        key: walletAccount,
+        hcaptchaToken: 'not-required',
+      },
+    },
+  );
+  const message = `\x19Ethereum Signed Message:\n Code Length: ${code.length}; Code: ${code}`;
+  const signature = await wallet.ethereum.request({
+    method: 'personal_sign',
+    params: [message, walletAccount],
+  });
+
+  return request<GLOBAL.GeneralResponse<{ user: GLOBAL.CurrentUser }>>(
+    `/accounts/metamask/${action}`,
+    {
+      method: 'POST',
+      data: {
+        account: walletAccount,
+        signature,
+        hcaptchaToken: 'not-required',
+      },
+    },
+  );
+}
+
+export async function signup(
+  wallet: Wallet,
+): Promise<GLOBAL.GeneralResponse<{ user: GLOBAL.CurrentUser }>> {
+  return await service(wallet, 'signup');
+}
+
+export async function login(
+  wallet: Wallet,
+): Promise<GLOBAL.GeneralResponse<{ user: GLOBAL.CurrentUser }>> {
+  return await service(wallet, 'login');
+}
 
 export async function webauthnLogin(body: any) {
   return request<GLOBAL.GeneralResponse<{ user: GLOBAL.CurrentUser }>>('/accounts/webauthn/login', {
@@ -71,23 +117,8 @@ export async function queryMyAccounts() {
   });
 }
 
-/** 获取当前用户所有的邀请码 GET /invitations/mine */
-export async function queryInvitations() {
-  return request<GLOBAL.GeneralResponse<GLOBAL.Invitation[]>>('/invitations/mine', {
-    method: 'GET',
-  });
-}
-
-/** 更新邀请码的信息 PATCH /invitations/mine */
-export async function updateInvitation(signature: string, body: GLOBAL.InvitationInfo) {
-  return request<GLOBAL.GeneralResponse<GLOBAL.Invitation>>(`/invitations/${signature}/message`, {
-    method: 'PATCH',
-    data: body,
-  });
-}
-
 /** 退出登录接口 DELETE /accounts/tokens */
-export async function outLogin() {
+export async function logoutAccount() {
   return request<GLOBAL.GeneralResponse<null>>('/accounts/tokens', {
     method: 'DELETE',
   });
@@ -138,18 +169,6 @@ export async function requestStorageToken() {
 }
 
 /**
- * 验证邀请码的可用性
- * @param data
- * @returns
- */
-export const invitationsValidate = (data: GLOBAL.InvitationsValidateProps) => {
-  return request<GLOBAL.GeneralResponse<GLOBAL.InvitationsValidateState>>('/invitations/validate', {
-    method: 'POST',
-    data,
-  });
-};
-
-/**
  * 验证用户名是否存在
  * @param data
  * @returns
@@ -165,42 +184,11 @@ export const usersUsernameValidate = (data: LoginType.UsersMeUsernameState) => {
 };
 
 /**
- * 验证邮箱是否存在
- * @param data
- * @returns
- */
-export const accountsEmailVerify = (data: LoginType.AccountsEmailVerifyData) => {
-  return request<GLOBAL.GeneralResponse<LoginType.AccountsEmailVerify>>(
-    '/accounts/email/is-exists',
-    {
-      method: 'POST',
-      data,
-    },
-  );
-};
-
-/**
- * 注册
- * @param signature 邀请码
- * @param data
- * @returns
- */
-export const accountsEmailSignup = (signature: string, data: GLOBAL.EmailLoginParams) => {
-  return request<GLOBAL.GeneralResponse<LoginType.AccountsEmailSignupResult>>(
-    `/accounts/email/signup/${signature}`,
-    {
-      method: 'POST',
-      data,
-    },
-  );
-};
-
-/**
  * 更新用户的用户名
  * @param data
  * @returns
  */
-export const usersMeUsername = (data: LoginType.UsersMeUsernameState) => {
+export const setUsername = (data: LoginType.UsersMeUsernameState) => {
   return request<GLOBAL.GeneralResponse<string>>('/users/me/username', {
     method: 'PUT',
     data,
