@@ -62,7 +62,7 @@
     "base64-url": "^2.3.3",
     "class-validator": "^0.13.2",
     "classnames": "^2.2.6",
-    "dexie": "^3.0.3",
+    "dexie": "^3.2.2",
     "dexie-react-hooks": "^1.0.7",
     "gun": "^0.2020.1235",
     "is-mobile": "^3.0.0",
