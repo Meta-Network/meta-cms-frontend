@@ -8,6 +8,7 @@ export default {
   'editor.header.settings.tags': '标签',
   'editor.upload.cover.description': '添加封面',
   'editor.title': '标题',
+  'editor.filename': '文件名',
   'editor.edit.placeholder': '现在就开始编辑吧！',
   'editor.edit.tool.upload': '上传图片',
   'editor.edit.tool.emoji.setEmoji': '设置常用表情',

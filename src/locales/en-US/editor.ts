@@ -10,6 +10,7 @@ export default {
   'editor.header.settings.tags': 'Tags',
   'editor.upload.cover.description': 'Add cover',
   'editor.title': 'Title',
+  'editor.filename': 'Filename',
   'editor.edit.placeholder': 'Start editing now!',
   'editor.edit.tool.upload': 'Upload image',
   'editor.edit.tool.emoji.setEmoji': 'Set common emoticons',

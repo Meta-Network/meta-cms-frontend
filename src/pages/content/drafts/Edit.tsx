@@ -616,12 +616,18 @@ const Edit: React.FC = () => {
         <UploadImage cover={cover} asyncCoverToDB={asyncCoverToDB} />
         <Input
           type="text"
-          placeholder={intl.formatMessage({
-            id: 'editor.title',
-          })}
+          placeholder={intl.formatMessage({ id: 'editor.title' })}
           className={styles.title}
           maxLength={editorRules.title.max}
           value={title}
+          onChange={(e) => handleChangeTitle(e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder={intl.formatMessage({ id: 'editor.filename' })}
+          className={styles.filename}
+          maxLength={editorRules.title.max}
+          value={`${title}.md`}
           onChange={(e) => handleChangeTitle(e.target.value)}
         />
         <Editor focus$={focus$} />
