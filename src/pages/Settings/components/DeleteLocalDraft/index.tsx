@@ -1,14 +1,14 @@
-import { useIntl, useModel } from 'umi';
-import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { useCallback, useMemo, useState } from 'react';
-import { Button, Popconfirm, message, List } from 'antd';
 import {
-  dbPostsDeleteAll,
-  dbMetadatasDeleteAll,
   dbMetadatasDelete,
-  dbPostsDeleteCurrent,
+  dbMetadatasDeleteAll,
   dbPostsAll,
+  dbPostsDeleteAll,
+  dbPostsDeleteCurrent,
 } from '@/db/db';
+import { DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, List, message, Popconfirm } from 'antd';
+import { useCallback, useMemo, useState } from 'react';
+import { useIntl, useModel } from 'umi';
 import styles from './index.less';
 
 export default () => {

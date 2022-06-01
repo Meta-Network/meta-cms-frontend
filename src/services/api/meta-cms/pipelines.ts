@@ -1,9 +1,9 @@
-import request from './request';
 import type { GatewayType } from '@/services/constants';
 import type {
   AuthorPostDigestMetadata,
   AuthorPostSignatureMetadata,
 } from '@metaio/meta-signature-util-v2';
+import request from './request';
 
 type PipelinesOrdersPayload = {
   certificateStorageType: GatewayType;

@@ -1,16 +1,16 @@
-import { userHasSite } from '@/utils';
-import ProCard from '@ant-design/pro-card';
-import { Affix, Steps, Card } from 'antd';
-import { useIntl, FormattedMessage, useModel, Redirect } from 'umi';
-import { PageContainer } from '@ant-design/pro-layout';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { useEffect, useMemo } from 'react';
-import Deploy from '@/components/CreateSite/Deploy';
 import AnchoredTitle from '@/components/AnchoredTitle';
+import Deploy from '@/components/CreateSite/Deploy';
+import DomainSetting from '@/components/CreateSite/DomainSetting';
 import SiteSetting from '@/components/CreateSite/SiteSetting';
 import StorageSetting from '@/components/CreateSite/StorageSetting';
-import DomainSetting from '@/components/CreateSite/DomainSetting';
 import FormattedDescription from '@/components/FormattedDescription';
+import { userHasSite } from '@/utils';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import ProCard from '@ant-design/pro-card';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Affix, Card, Steps } from 'antd';
+import { useEffect, useMemo } from 'react';
+import { FormattedMessage, Redirect, useIntl, useModel } from 'umi';
 import styles from './CreateSite.less';
 
 const { Step } = Steps;

@@ -1,5 +1,5 @@
 import { Alert } from 'antd';
-import { useModel, FormattedMessage } from 'umi';
+import { FormattedMessage, useModel } from 'umi';
 import FormattedDescription from '../FormattedDescription';
 
 export default () => {

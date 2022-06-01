@@ -1,10 +1,10 @@
+import { FinishIcon } from '@/components/Icon';
+import { PublishingTipStepStateType } from '@/services/constants';
+import { Image, Modal, Spin, Typography } from 'antd';
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
-import { Modal, Spin, Typography, Image } from 'antd';
 import { NavLink, useIntl } from 'umi';
 import styles from './index.less';
-import { PublishingTipStepStateType } from '@/services/constants';
-import { FinishIcon } from '@/components/Icon';
 
 const { Link } = Typography;
 

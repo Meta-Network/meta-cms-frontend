@@ -1,16 +1,15 @@
+import FormattedDescription from '@/components/FormattedDescription';
 import SiteSettingFormItems from '@/components/SiteSettingFormItems';
-import { useIntl } from 'umi';
-import { Card } from 'antd';
-import { PageContainer } from '@ant-design/pro-layout';
 import {
   getDefaultSiteConfig,
-  updateSiteInfoSetting,
   updateSiteConfigSetting,
+  updateSiteInfoSetting,
 } from '@/services/api/meta-cms';
-import { message } from 'antd';
 import ProForm from '@ant-design/pro-form';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Card, message } from 'antd';
 import { useState } from 'react';
-import FormattedDescription from '@/components/FormattedDescription';
+import { useIntl } from 'umi';
 
 export default () => {
   const intl = useIntl();

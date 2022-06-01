@@ -2,9 +2,9 @@ import { getUsernameOfStorage } from '@/services/api/global';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { GridContent, PageContainer } from '@ant-design/pro-layout';
-import { useIntl } from 'umi';
+import { Button, List, Spin, Tag } from 'antd';
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { Spin, Button, List, Tag } from 'antd';
+import { useIntl } from 'umi';
 import styles from './index.less';
 
 export default () => {

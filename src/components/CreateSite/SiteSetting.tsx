@@ -1,9 +1,10 @@
-import { message } from 'antd';
 import ProForm from '@ant-design/pro-form';
-import { getLocale, useModel, useIntl } from 'umi';
+import { message } from 'antd';
+import { getLocale, useIntl, useModel } from 'umi';
 import SiteSettingFormItems from '../SiteSettingFormItems';
-// @ts-ignore
-import moment from 'moment'; // eslint-disable-line @typescript-eslint/no-unused-vars
+// @ts-expect-error
+// eslint-disable-next-line prettier/prettier,@typescript-eslint/no-unused-vars
+import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 
 export default () => {

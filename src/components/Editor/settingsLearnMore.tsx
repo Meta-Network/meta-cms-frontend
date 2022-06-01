@@ -1,7 +1,7 @@
-import React from 'react';
 import { ShareAltOutlined } from '@ant-design/icons';
-import styles from './settings.less';
+import React from 'react';
 import { useIntl } from 'umi';
+import styles from './settings.less';
 
 const SettingsLearnMore: React.FC = () => {
   const intl = useIntl();

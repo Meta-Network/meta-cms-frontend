@@ -1,13 +1,13 @@
+import { fetchTokenAPI } from '@/helpers';
 import React, { createRef, useCallback, useEffect } from 'react';
 import Vditor from 'vditor';
-import { fetchTokenAPI } from '@/helpers';
 // 目前在 document 内导入
 // import '~vditor/src/assets/scss/index';
 // import '~vditor/dist/index.css';
-import { useIntl } from 'umi';
-import { message } from 'antd';
 import { useMount } from 'ahooks';
 import type { EventEmitter } from 'ahooks/lib/useEventEmitter';
+import { message } from 'antd';
+import { useIntl } from 'umi';
 import { editorRules } from '../../../config';
 
 interface Props {

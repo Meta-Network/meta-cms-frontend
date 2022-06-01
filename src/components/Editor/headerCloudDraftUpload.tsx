@@ -1,8 +1,8 @@
-import React, { Fragment, useCallback, useState } from 'react';
-import { Tooltip, Modal, message, Button, Space } from 'antd';
-import styles from './editorHeader.less';
-import { CloudUploadOutlined } from '@ant-design/icons';
 import { sleep } from '@/utils';
+import { CloudUploadOutlined } from '@ant-design/icons';
+import { Button, message, Modal, Space, Tooltip } from 'antd';
+import React, { Fragment, useCallback, useState } from 'react';
+import styles from './editorHeader.less';
 
 const HeaderCloudDraftUpload: React.FC = () => {
   const [cloudDraftUploadVisible, setCloudDraftUploadVisible] = useState<boolean>(false);

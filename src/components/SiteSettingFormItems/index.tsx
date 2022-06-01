@@ -1,6 +1,6 @@
+import { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { useIntl } from 'umi';
 import { siteInfoRules } from '../../../config';
-import { ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 
 export default () => {
   const intl = useIntl();

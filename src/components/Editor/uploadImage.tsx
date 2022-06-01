@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
-import { Upload, message } from 'antd';
-import { PlusOutlined, DeleteOutlined, FileImageOutlined } from '@ant-design/icons';
-import { useIntl } from 'umi';
-import styles from './uploadImage.less';
-import { UploadImageSize } from '../../../config/index';
 import { fetchTokenAPI } from '@/helpers';
+import { DeleteOutlined, FileImageOutlined, PlusOutlined } from '@ant-design/icons';
+import { message, Upload } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { useIntl } from 'umi';
+import { UploadImageSize } from '../../../config/index';
+import styles from './uploadImage.less';
 
 const keyUploadAvatar = 'keyUploadAvatar';
 

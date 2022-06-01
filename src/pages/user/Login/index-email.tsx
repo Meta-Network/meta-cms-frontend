@@ -1,10 +1,10 @@
+import Footer from '@/components/Footer';
+import { emailGetVerificationCode, emailLogin } from '@/services/api/meta-ucenter';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import ProForm, { ProFormCaptcha, ProFormText } from '@ant-design/pro-form';
 import { Alert, message } from 'antd';
 import React, { useState } from 'react';
-import ProForm, { ProFormCaptcha, ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
-import Footer from '@/components/Footer';
-import { emailLogin, emailGetVerificationCode } from '@/services/api/meta-ucenter';
+import { FormattedMessage, history, Link, SelectLang, useIntl, useModel } from 'umi';
 
 import styles from './index.less';
 

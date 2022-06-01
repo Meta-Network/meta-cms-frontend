@@ -1,10 +1,10 @@
+import FormattedDescription from '@/components/FormattedDescription';
 import { getDefaultSiteConfig } from '@/services/api/meta-cms';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
+import { PageContainer } from '@ant-design/pro-layout';
 import { Card, Form } from 'antd';
 import { useEffect } from 'react';
 import { useIntl } from 'umi';
-import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { PageContainer } from '@ant-design/pro-layout';
-import FormattedDescription from '@/components/FormattedDescription';
 
 const platformsAliases = {
   GITHUB: 'GitHub',

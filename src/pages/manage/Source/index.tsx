@@ -1,12 +1,12 @@
-import { useModel } from '@@/plugin-model/useModel';
-import { useIntl } from 'umi';
-import { useCallback, useEffect, useState } from 'react';
-import { Button, List, message, notification, Spin, Tag } from 'antd';
-import { GridContent, PageContainer } from '@ant-design/pro-layout';
-import { getSourceStatus } from '@/services/api/meta-cms';
-import syncPostsRequest from '@/utils/sync-posts-request';
 import FormattedDescription from '@/components/FormattedDescription';
+import { getSourceStatus } from '@/services/api/meta-cms';
 import { deleteSourcePlatformToken } from '@/services/api/meta-ucenter';
+import syncPostsRequest from '@/utils/sync-posts-request';
+import { useModel } from '@@/plugin-model/useModel';
+import { GridContent, PageContainer } from '@ant-design/pro-layout';
+import { Button, List, message, notification, Spin, Tag } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
+import { useIntl } from 'umi';
 import styles from './index.less';
 
 /* The default status for every platform */

@@ -1,21 +1,21 @@
-import type { FC } from 'react';
-import { useCallback, useState, useEffect } from 'react';
-import { Card, Form, Button, Checkbox, Radio, Space, message } from 'antd';
-import styles from './submit.less';
-import { verifySeedAndKey } from '@/utils/editor';
 import {
   getDefaultSiteConfigAPI,
   getPublisherSettingAPI,
   getStorageSettingAPI,
 } from '@/helpers/index';
-import { useMount } from 'ahooks';
-import { KEY_META_CMS_GATEWAY_CHECKED, STORAGE_PLATFORM } from '../../../config/index';
+import { GatewayType } from '@/services/constants';
+import { verifySeedAndKey } from '@/utils/editor';
 import { storeGet, storeSet } from '@/utils/store';
+import { useMount } from 'ahooks';
+import { Button, Card, Checkbox, Form, message, Radio, Space } from 'antd';
+import type { FC } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useIntl } from 'umi';
+import { KEY_META_CMS_GATEWAY_CHECKED, STORAGE_PLATFORM } from '../../../config/index';
 import GenerateKey from './generate';
 import Seed from './seed';
 import Storage from './storage';
-import { GatewayType } from '@/services/constants';
+import styles from './submit.less';
 
 interface Props {
   readonly loading: boolean;

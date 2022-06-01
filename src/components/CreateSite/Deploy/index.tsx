@@ -10,10 +10,10 @@ import {
   updateSiteStorageSetting,
   waitUntilSitePublished,
 } from '@/services/api/meta-cms';
-import { useIntl, useModel } from 'umi';
+import { Button, Card, message, notification } from 'antd';
 import { useEffect, useState } from 'react';
+import { useIntl, useModel } from 'umi';
 import generateTaggedInfo from './generateTaggedInfo';
-import { message, Button, Card, notification } from 'antd';
 import styles from './index.less';
 
 export default () => {

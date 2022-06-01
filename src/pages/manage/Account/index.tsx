@@ -8,11 +8,11 @@ import {
   ScanOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Button, List, Tooltip } from 'antd';
 import Paragraph from 'antd/es/typography/Paragraph';
 import React, { useEffect, useState } from 'react';
 import { useIntl } from 'umi';
-import { Button, List, Tooltip } from 'antd';
-import { PageContainer } from '@ant-design/pro-layout';
 import styles from './index.less';
 
 export default () => {

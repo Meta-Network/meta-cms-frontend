@@ -1,9 +1,9 @@
 import React, { Fragment, useCallback, useState } from 'react';
 
-import { Modal, Input, Button, Space, message } from 'antd';
-import { KeyOutlined } from '@ant-design/icons';
-import { useIntl } from 'umi';
 import { generateSeedAndKey } from '@/utils/editor';
+import { KeyOutlined } from '@ant-design/icons';
+import { Button, Input, message, Modal, Space } from 'antd';
+import { useIntl } from 'umi';
 
 interface Props {
   readonly publicKey: string;

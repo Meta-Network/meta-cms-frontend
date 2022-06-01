@@ -1,9 +1,9 @@
 import { getThemeTemplates } from '@/services/api/meta-cms';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
-import { useIntl, useModel } from 'umi';
 import { ArrowRightOutlined, CheckOutlined } from '@ant-design/icons';
-import { Typography, Image, Card, List, message } from 'antd';
+import { Card, Image, List, message, Typography } from 'antd';
 import { useEffect, useState } from 'react';
+import { useIntl, useModel } from 'umi';
 import styles from './ThemeSetting.less';
 
 const { Paragraph } = Typography;

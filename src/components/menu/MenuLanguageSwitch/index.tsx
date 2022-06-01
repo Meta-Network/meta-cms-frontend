@@ -1,7 +1,7 @@
-import { setLocale } from 'umi';
-import { useState } from 'react';
 import { GlobalOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, Typography } from 'antd';
+import { useState } from 'react';
+import { setLocale } from 'umi';
 import style from './index.less';
 
 const languages = [

@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Button, Tooltip } from 'antd';
-import { history, useIntl } from 'umi';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import { UseWalletProvider } from 'use-wallet';
-import WalletLogin from './WalletLogin';
-import WalletRegister from './WalletRegister';
-import ToggleServers from './ToggleServers';
 import { storeGet } from '@/utils/store';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Tooltip } from 'antd';
+import { useEffect, useState } from 'react';
+import { history, useIntl } from 'umi';
+import { UseWalletProvider } from 'use-wallet';
 import { KEY_IS_LOGIN } from '../../../../../config';
 import styles from './index.less';
+import ToggleServers from './ToggleServers';
+import WalletLogin from './WalletLogin';
+import WalletRegister from './WalletRegister';
 
 const Wallet = () => {
   const intl = useIntl();

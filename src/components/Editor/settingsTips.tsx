@@ -1,7 +1,7 @@
-import type { FC } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import styles from './settings.less';
+import type { FC } from 'react';
 import { useIntl } from 'umi';
+import styles from './settings.less';
 
 // interface Props {}
 

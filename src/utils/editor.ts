@@ -1,30 +1,30 @@
+import type {
+  AuthorPostDigestMetadata,
+  AuthorPostSignatureMetadata,
+  BaseSignatureMetadata,
+  KeyPair,
+} from '@metaio/meta-signature-util-v2';
+import {
+  authorPostDigest,
+  authorPostDigestSign,
+  authorPublishMetaSpaceRequest,
+  generateKeys,
+  generateSeed,
+} from '@metaio/meta-signature-util-v2';
 import { assign, isEmpty } from 'lodash';
 import moment from 'moment';
 import request from 'umi-request';
+import { isValidUrl, sleep } from '.';
 import {
-  generateSeed,
-  generateKeys,
-  authorPublishMetaSpaceRequest,
-  authorPostDigest,
-  authorPostDigestSign,
-} from '@metaio/meta-signature-util-v2';
-import type {
-  KeyPair,
-  BaseSignatureMetadata,
-  AuthorPostDigestMetadata,
-  AuthorPostSignatureMetadata,
-} from '@metaio/meta-signature-util-v2';
-import { storeGet, storeSet } from './store';
-import {
-  KEY_META_CMS_METADATA_SEED,
-  KEY_META_CMS_METADATA_PUBLIC_KEYS,
-  GITHUB_URL,
   editorRules,
+  GITHUB_URL,
+  KEY_META_CMS_METADATA_PUBLIC_KEYS,
+  KEY_META_CMS_METADATA_SEED,
 } from '../../config';
 import { uploadToIpfsAPI } from '../helpers';
-import { isValidUrl, sleep } from '.';
-import { xssSummary } from './xss';
 import { urlReg } from './reg';
+import { storeGet, storeSet } from './store';
+import { xssSummary } from './xss';
 
 type VerifySeedAndKeyReturnState = { seed: string[]; publicKey: string } | false;
 type PublishMetaSpaceRequestState = {

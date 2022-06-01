@@ -1,9 +1,9 @@
-import { Menu } from 'antd';
-import { useCallback } from 'react';
-import { history, useIntl, useModel } from 'umi';
 import { logoutAccount } from '@/services/api/meta-ucenter';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { Menu } from 'antd';
 import type { MenuInfo } from 'rc-menu/lib/interface';
+import { useCallback } from 'react';
+import { history, useIntl, useModel } from 'umi';
 
 const logout = async () => {
   await logoutAccount();

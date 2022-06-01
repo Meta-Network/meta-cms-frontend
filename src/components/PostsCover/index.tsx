@@ -1,5 +1,5 @@
-import type { FC } from 'react';
 import { Image } from 'antd';
+import type { FC } from 'react';
 import { useIntl } from 'umi';
 import styles from './index.less';
 

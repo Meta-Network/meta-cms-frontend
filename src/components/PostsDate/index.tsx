@@ -1,6 +1,6 @@
-import type { FC } from 'react';
 import { Typography } from 'antd';
 import moment from 'moment';
+import type { FC } from 'react';
 const { Text } = Typography;
 
 interface Props {

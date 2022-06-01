@@ -1,11 +1,11 @@
-import React, { Fragment, useCallback, useState } from 'react';
-import { history, useIntl } from 'umi';
-import { Tooltip, Dropdown } from 'antd';
-import styles from './editorHeader.less';
-import { LeftOutlined, DownOutlined } from '@ant-design/icons';
 import Submit from '@/components/Submit/editor';
 import type { GatewayType } from '@/services/constants';
 import { DraftMode } from '@/services/constants';
+import { DownOutlined, LeftOutlined } from '@ant-design/icons';
+import { Dropdown, Tooltip } from 'antd';
+import React, { Fragment, useCallback, useState } from 'react';
+import { history, useIntl } from 'umi';
+import styles from './editorHeader.less';
 
 interface Props {
   readonly draftMode: DraftMode;

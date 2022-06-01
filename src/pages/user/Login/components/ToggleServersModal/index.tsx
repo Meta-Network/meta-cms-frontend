@@ -1,5 +1,5 @@
-import React from 'react';
 import { Button } from 'antd';
+import React from 'react';
 import { useIntl } from 'umi';
 import CustomModal from '../../../../../components/CustomModal';
 import styles from './index.less';

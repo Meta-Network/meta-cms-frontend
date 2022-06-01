@@ -1,5 +1,5 @@
-import { MatrixIcon } from '../../Icon/index';
 import { useIntl } from 'umi';
+import { MatrixIcon } from '../../Icon/index';
 
 export default () => {
   const intl = useIntl();

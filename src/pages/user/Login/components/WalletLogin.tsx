@@ -1,12 +1,12 @@
 import { ConnectWallet } from '@/components/ConnectWallet';
-import React, { useEffect, useState } from 'react';
-import { Form, message } from 'antd';
-import { history, useModel, useIntl } from 'umi';
 import { login } from '@/services/api/meta-ucenter';
 import { storeSet } from '@/utils/store';
+import { Form, message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { history, useIntl, useModel } from 'umi';
+import { useWallet } from 'use-wallet';
 import { KEY_IS_LOGIN } from '../../../../../config';
 import styles from './index.less';
-import { useWallet } from 'use-wallet';
 
 interface Props {
   setWalletModeFn: (value: LoginType.WalletMode) => void;

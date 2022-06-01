@@ -1,5 +1,5 @@
-import request from './request';
 import type { FetchPostsStorageParamsState } from '@/services/constants';
+import request from './request';
 
 /**
  *  获取当前用户的用户文章数据 GET /v1/pipelines/post-orders/mine/count

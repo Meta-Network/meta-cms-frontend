@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
 import { ExclamationOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
+import React, { useMemo, useState } from 'react';
 import { useIntl } from 'umi';
-import ToggleServersModal from './ToggleServersModal';
 import styles from './index.less';
+import ToggleServersModal from './ToggleServersModal';
 
 const ToggleServers: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);

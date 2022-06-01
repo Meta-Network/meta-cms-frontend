@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Drawer } from 'antd';
-import { useIntl } from 'umi';
 import { ColumnsIcon } from '@/components/Icon/index';
+import { Drawer } from 'antd';
+import React, { useState } from 'react';
+import { useIntl } from 'umi';
 import styles from './settings.less';
 
 const Settings: React.FC = ({ children }) => {

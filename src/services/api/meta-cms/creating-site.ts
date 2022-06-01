@@ -1,6 +1,6 @@
-import request from './request';
-import { sleep } from '@/utils';
 import { getDefaultSiteConfig } from '@/services/api/meta-cms/information-and-validation';
+import { sleep } from '@/utils';
+import request from './request';
 
 /** 获取主题模板 GET /theme/template */
 export async function getThemeTemplates(type: 'HEXO' | 'ALL') {

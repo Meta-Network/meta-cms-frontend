@@ -1,13 +1,12 @@
+import { GatewayType, PipelineOrderTaskCommonState } from '@/services/constants';
+import { hashSlice } from '@/utils';
+import { StopOutlined, WarningFilled } from '@ant-design/icons';
+import { Space, Typography } from 'antd';
 import type { FC } from 'react';
 import { useMemo } from 'react';
-import { Space, Typography } from 'antd';
 import { useIntl } from 'umi';
-import { StopOutlined, WarningFilled } from '@ant-design/icons';
 import { ShareIcon } from '../Icon';
 import styles from './index.less';
-import { GatewayType } from '@/services/constants';
-import { PipelineOrderTaskCommonState } from '@/services/constants';
-import { hashSlice } from '@/utils';
 
 const { Text, Link } = Typography;
 

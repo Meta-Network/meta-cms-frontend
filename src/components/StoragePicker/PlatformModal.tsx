@@ -1,9 +1,9 @@
-import { Button, Modal } from 'antd';
-import { useIntl, FormattedMessage } from 'umi';
-import Icon, { GithubOutlined } from '@ant-design/icons';
 import { requestSocialAuth } from '@/services/api/meta-ucenter';
-import FormattedDescription from '../FormattedDescription';
+import Icon, { GithubOutlined } from '@ant-design/icons';
+import { Button, Modal } from 'antd';
+import { FormattedMessage, useIntl } from 'umi';
 import { ReactComponent as GiteeIcon } from '../../../public/icons/custom/gitee-colored.svg';
+import FormattedDescription from '../FormattedDescription';
 
 export default ({
   name,

@@ -1,17 +1,17 @@
 /* eslint-disable */
-import { UserOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
-import { startAssertion, startAttestation } from '@simplewebauthn/browser';
-import { Alert, message } from 'antd';
-import React, { useState } from 'react';
-import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import {
   webauthnGetAssertion,
   webauthnGetAttestation,
   webauthnLogin,
   webauthnSignup,
 } from '@/services/api/meta-ucenter';
+import { UserOutlined } from '@ant-design/icons';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
+import { startAuthentication, startRegistration } from '@simplewebauthn/browser';
+import { Alert, message } from 'antd';
+import React, { useState } from 'react';
+import { FormattedMessage, history, Link, SelectLang, useIntl, useModel } from 'umi';
 
 import styles from './index.less';
 
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
       // 登录
       const options = await webauthnGetAssertion(values.account);
       console.log(options);
-      const assertion = await startAssertion(options.data);
+      const assertion = await startAuthentication(options.data);
       console.log(assertion);
 
       const result = await webauthnLogin({ account: values.account, credential: assertion });
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
     try {
       // 登录
       const options = await webauthnGetAttestation(values.account);
-      const attestation = await startAttestation(options.data);
+      const attestation = await startRegistration(options.data);
 
       const result = await webauthnSignup(
         { account: values.account, credential: attestation },

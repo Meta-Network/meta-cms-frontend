@@ -1,7 +1,7 @@
+import { ArrowRightOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Input, Typography } from 'antd';
 import type { FC } from 'react';
 import { useState } from 'react';
-import { Input, Typography } from 'antd';
-import { EyeOutlined, ArrowRightOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useIntl } from 'umi';
 import styles from './submit.less';
 

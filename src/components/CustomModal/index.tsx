@@ -1,5 +1,5 @@
-import React from 'react';
 import { Modal } from 'antd';
+import React from 'react';
 // import { isBrowser, isMobile } from 'react-device-detect';
 import { CloseModalIcon } from '../Icon/index';
 import styles from './index.less';

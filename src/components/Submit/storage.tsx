@@ -1,10 +1,10 @@
-import type { FC } from 'react';
 import { generateStorageLink } from '@/utils/editor';
 import { Typography } from 'antd';
+import type { FC } from 'react';
 import { useIntl } from 'umi';
 
-import styles from './submit.less';
 import { STORAGE_PLATFORM } from '../../../config/index';
+import styles from './submit.less';
 
 interface Props {
   readonly storagePublicSetting: CMS.StoragePlatformSetting | undefined;

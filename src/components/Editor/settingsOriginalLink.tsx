@@ -1,7 +1,7 @@
+import { Dropdown, Menu, Typography } from 'antd';
 import React from 'react';
-import { Typography, Menu, Dropdown } from 'antd';
-import styles from './settings.less';
 import { useIntl } from 'umi';
+import styles from './settings.less';
 
 const { Text, Link } = Typography;
 

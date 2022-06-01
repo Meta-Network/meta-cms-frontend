@@ -1,13 +1,13 @@
 import { ConnectWallet } from '@/components/ConnectWallet';
-import React, { useState, useCallback, useEffect } from 'react';
-import { Form, Input, message, Button } from 'antd';
-import { trim } from 'lodash';
-import { history, useModel, useIntl } from 'umi';
-import { useWallet } from 'use-wallet';
-import styles from './index.less';
-import { KEY_IS_LOGIN, rules } from '../../../../../config';
-import { storeSet } from '@/utils/store';
 import { setUsername, signup, usersUsernameValidate } from '@/services/api/meta-ucenter';
+import { storeSet } from '@/utils/store';
+import { Button, Form, Input, message } from 'antd';
+import { trim } from 'lodash';
+import React, { useCallback, useEffect, useState } from 'react';
+import { history, useIntl, useModel } from 'umi';
+import { useWallet } from 'use-wallet';
+import { KEY_IS_LOGIN, rules } from '../../../../../config';
+import styles from './index.less';
 
 interface Props {
   setWalletModeFn: (value: LoginType.WalletMode) => void;

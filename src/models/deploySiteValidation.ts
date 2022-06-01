@@ -1,7 +1,7 @@
-import { useModel } from 'umi';
-import { useEffect, useMemo, useState } from 'react';
 import { getGithubReposName } from '@/services/api/global';
 import { isDomainForbidden } from '@/services/api/meta-cms';
+import { useEffect, useMemo, useState } from 'react';
+import { useModel } from 'umi';
 
 export default (): any => {
   const [domainSettingValidation, setDomainSettingValidation] = useState<boolean>(false);

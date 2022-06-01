@@ -1,8 +1,8 @@
-import { Link } from 'umi';
+import { WarningFilled } from '@ant-design/icons';
 import { Badge } from 'antd';
 import type { ReactNode } from 'react';
+import { Link } from 'umi';
 import styles from './index.less';
-import { WarningFilled } from '@ant-design/icons';
 
 export default ({
   path,

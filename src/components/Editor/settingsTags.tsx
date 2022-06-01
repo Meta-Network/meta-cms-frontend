@@ -1,12 +1,12 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useIntl, useModel } from 'umi';
-import { message, Select } from 'antd';
-import styles from './settings.less';
-import { useMount } from 'ahooks';
 import { spaceTagsAPI } from '@/services/api/space';
 import { storeGet, storeSet } from '@/utils/store';
+import { useMount } from 'ahooks';
+import { message, Select } from 'antd';
 import { uniqBy } from 'lodash';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useIntl, useModel } from 'umi';
 import { editorRules } from '../../../config';
+import styles from './settings.less';
 
 const { Option } = Select;
 const KEY_META_CMS_HISTORY_TAGS = 'metaCmsHistoryTags';

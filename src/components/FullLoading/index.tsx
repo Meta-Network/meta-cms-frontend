@@ -1,8 +1,8 @@
-import React from 'react';
+import { CloseOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Spin, Tooltip } from 'antd';
+import React from 'react';
 import { useIntl } from 'umi';
 import styles from './index.less';
-import { LoadingOutlined, CloseOutlined } from '@ant-design/icons';
 
 interface Props {
   readonly loading: boolean;

@@ -1,8 +1,8 @@
-import { getUsernameOfStorage } from '@/services/api/global';
-import { useModel, useIntl, FormattedMessage } from 'umi';
-import { useEffect, useState } from 'react';
-import { Card, List, Avatar, message } from 'antd';
 import PlatformModal from '@/components/StoragePicker/PlatformModal';
+import { getUsernameOfStorage } from '@/services/api/global';
+import { Avatar, Card, List, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { FormattedMessage, useIntl, useModel } from 'umi';
 import styles from './index.less';
 
 export default () => {

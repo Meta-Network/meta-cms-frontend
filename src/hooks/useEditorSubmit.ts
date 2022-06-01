@@ -1,13 +1,13 @@
+import { message } from 'antd';
 import type { ValidationError } from 'class-validator';
 import {
-  validateOrReject,
-  Length,
   ArrayMaxSize,
   IsArray,
-  MaxLength,
   IsNotEmpty,
+  Length,
+  MaxLength,
+  validateOrReject,
 } from 'class-validator';
-import { message } from 'antd';
 import { useIntl } from 'umi';
 import { editorRules } from '../../config';
 

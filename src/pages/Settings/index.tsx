@@ -1,7 +1,7 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import { Card } from 'antd';
-import DeleteLocalDraft from './components/DeleteLocalDraft/index';
 import { useIntl } from 'umi';
+import DeleteLocalDraft from './components/DeleteLocalDraft/index';
 
 export default () => {
   const intl = useIntl();

@@ -1,5 +1,5 @@
-import styles from './index.less';
 import { FormattedMessage } from 'umi';
+import styles from './index.less';
 
 /**
  * Format i18n message with custom `text-description` style.

@@ -1,5 +1,5 @@
-import type { FC } from 'react';
 import { Tag } from 'antd';
+import type { FC } from 'react';
 import { useIntl } from 'umi';
 
 const PostsStorage: FC = () => {

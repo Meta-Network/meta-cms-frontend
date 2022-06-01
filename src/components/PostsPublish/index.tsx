@@ -1,10 +1,10 @@
-import type { FC } from 'react';
-import { Space, Typography } from 'antd';
-import { useIntl } from 'umi';
+import { PipelineOrderTaskCommonState } from '@/services/constants';
 import { WarningFilled } from '@ant-design/icons';
+import { Space, Typography } from 'antd';
+import type { FC } from 'react';
+import { useIntl } from 'umi';
 import { PublishIcon } from '../Icon';
 import styles from './index.less';
-import { PipelineOrderTaskCommonState } from '@/services/constants';
 
 const { Text } = Typography;
 

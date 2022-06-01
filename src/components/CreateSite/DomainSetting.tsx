@@ -1,8 +1,8 @@
+import { isDomainForbidden } from '@/services/api/meta-cms';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { message } from 'antd';
 import { useState } from 'react';
 import { useIntl, useModel } from 'umi';
-import ProForm, { ProFormText } from '@ant-design/pro-form';
-import { isDomainForbidden } from '@/services/api/meta-cms';
 
 export default () => {
   const intl = useIntl();

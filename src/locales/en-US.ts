@@ -1,14 +1,14 @@
-import menu from './en-US/menu';
-import guide from './en-US/guide';
-import posts from './en-US/posts';
-import editor from './en-US/editor';
-import setting from './en-US/setting';
-import messages from './en-US/messages';
 import component from './en-US/component';
-import timezones from './en-US/timezones';
+import editor from './en-US/editor';
+import guide from './en-US/guide';
 import login from './en-US/login';
 import manage from './en-US/manage';
+import menu from './en-US/menu';
+import messages from './en-US/messages';
+import posts from './en-US/posts';
 import result from './en-US/result';
+import setting from './en-US/setting';
+import timezones from './en-US/timezones';
 
 export default {
   ...menu,

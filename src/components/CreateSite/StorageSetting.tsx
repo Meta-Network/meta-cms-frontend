@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useIntl, useModel } from 'umi';
-import type { SetStateAction, Dispatch } from 'react';
-import { useCallback, useEffect, useState } from 'react';
-import { getGithubReposName } from '@/services/api/global';
 import StoragePicker from '@/components/StoragePicker';
+import { getGithubReposName } from '@/services/api/global';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { Divider, message } from 'antd';
-import { siteStorageRepoRules } from '../../../config';
-import FormattedDescription from '../FormattedDescription';
 import type { StoreValue } from 'antd/es/form/interface';
 import type { RuleObject } from 'antd/lib/form';
 import { inRange } from 'lodash';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useIntl, useModel } from 'umi';
+import { siteStorageRepoRules } from '../../../config';
+import FormattedDescription from '../FormattedDescription';
 
 export default () => {
   const intl = useIntl();

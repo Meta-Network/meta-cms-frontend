@@ -1,8 +1,8 @@
 import type { Table, Transaction } from 'dexie';
 import Dexie from 'dexie';
-import type { Metadatas, MetadataTempDataState } from './Metadatas';
 import moment from 'moment';
 import { License } from '../../config';
+import type { Metadatas, MetadataTempDataState } from './Metadatas';
 
 export class StoreDB extends Dexie {
   posts!: Table<PostType.Posts, number>;

@@ -1,16 +1,16 @@
-import type { FC } from 'react';
-import { Fragment, useState, useMemo, useCallback } from 'react';
-import { Tooltip, Radio, Checkbox, Modal, Space, Typography } from 'antd';
-import { QuestionCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import styles from './settings.less';
+import useCreativeCommons from '@/hooks/useCreativeCommons';
 import {
   creativeCommonsLicenseGenerator,
-  licenseDetailLink,
   extractLicense,
+  licenseDetailLink,
 } from '@/utils/creative-commons';
+import { InfoCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useMount } from 'ahooks';
-import useCreativeCommons from '@/hooks/useCreativeCommons';
+import { Checkbox, Modal, Radio, Space, Tooltip, Typography } from 'antd';
+import type { FC } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { useIntl } from 'umi';
+import styles from './settings.less';
 
 const { Link } = Typography;
 

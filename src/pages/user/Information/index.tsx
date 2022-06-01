@@ -1,16 +1,16 @@
+import FormattedDescription from '@/components/FormattedDescription';
+import useUser from '@/hooks/useUser';
 import { uploadFileToIpfs } from '@/services/api/global';
-import { useModel, useIntl } from 'umi';
+import { updateUserInfo } from '@/services/api/meta-ucenter';
+import { UploadOutlined } from '@ant-design/icons';
+import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Button, Card, message, Upload } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import React, { useState } from 'react';
-import { Button, Upload, message, Card } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-layout';
-import FormattedDescription from '@/components/FormattedDescription';
-import { updateUserInfo } from '@/services/api/meta-ucenter';
-import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-import styles from './index.less';
+import { useIntl, useModel } from 'umi';
 import { rules } from '../../../../config/index';
-import useUser from '@/hooks/useUser';
+import styles from './index.less';
 
 const BaseView: React.FC = () => {
   const intl = useIntl();

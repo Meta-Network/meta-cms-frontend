@@ -1,5 +1,5 @@
-import { useIntl } from 'umi';
 import { List } from 'antd';
+import { useIntl } from 'umi';
 
 export default () => {
   const intl = useIntl();

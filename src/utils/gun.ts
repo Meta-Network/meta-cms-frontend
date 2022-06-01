@@ -1,17 +1,17 @@
-import { assign, cloneDeep } from 'lodash';
-import moment from 'moment';
+import { dbPostsAdd, dbPostsAll, dbPostsGet, dbPostsUpdate } from '@/db/db';
+import type { KeyPair } from '@metaio/meta-signature-util-v2';
+import { generateKeys, generateSeed } from '@metaio/meta-signature-util-v2';
 import Gun from 'gun';
 import 'gun/sea';
-import { dbPostsUpdate, dbPostsAdd, dbPostsAll, dbPostsGet } from '@/db/db';
+import { assign, cloneDeep } from 'lodash';
+import moment from 'moment';
 import {
   KEY_GUN_ROOT,
   KEY_GUN_ROOT_DRAFT,
-  KEY_META_CMS_GUN_SEED,
   KEY_META_CMS_GUN_PAIR,
+  KEY_META_CMS_GUN_SEED,
 } from '../../config';
 import { storeGet, storeSet } from './store';
-import { generateSeed, generateKeys } from '@metaio/meta-signature-util-v2';
-import type { KeyPair } from '@metaio/meta-signature-util-v2';
 
 /**
  * 用到 Gun.js 的地方

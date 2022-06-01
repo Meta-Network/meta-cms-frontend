@@ -1,12 +1,12 @@
-import { PageHeader, Tabs } from 'antd';
-import { FormattedMessage } from 'umi';
-import { PageContainer } from '@ant-design/pro-layout';
-import FormattedDescription from '@/components/FormattedDescription';
 import SiteSettingStatus from '@/components/dashboard/SiteSettingStatus';
 import SubmittedPostsTable from '@/components/dashboard/SubmmitedPostsTable';
-import { useCallback, useState } from 'react';
+import FormattedDescription from '@/components/FormattedDescription';
 import { getDefaultSiteConfigAPI } from '@/helpers';
+import { PageContainer } from '@ant-design/pro-layout';
 import { useMount } from 'ahooks';
+import { PageHeader, Tabs } from 'antd';
+import { useCallback, useState } from 'react';
+import { FormattedMessage } from 'umi';
 
 enum SiteStatus {
   /** SiteConfig generated */

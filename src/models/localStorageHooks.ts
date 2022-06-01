@@ -1,6 +1,6 @@
-import { useModel } from 'umi';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useModel } from 'umi';
 
 export default () => {
   const username = useModel('@@initialState').initialState?.currentUser?.username as string;

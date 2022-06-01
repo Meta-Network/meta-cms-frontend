@@ -1,8 +1,8 @@
-import type { FC } from 'react';
-import { Space, Typography } from 'antd';
-import { useIntl } from 'umi';
-import { ClockCircleOutlined, WarningFilled, CheckCircleFilled } from '@ant-design/icons';
 import { PipelineOrderTaskCommonState } from '@/services/constants';
+import { CheckCircleFilled, ClockCircleOutlined, WarningFilled } from '@ant-design/icons';
+import { Space, Typography } from 'antd';
+import type { FC } from 'react';
+import { useIntl } from 'umi';
 const { Text } = Typography;
 
 interface Props {

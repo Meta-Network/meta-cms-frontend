@@ -1,19 +1,19 @@
+import {
+  LinkOutlined,
+  MediumOutlined,
+  QuestionOutlined,
+  TwitterOutlined,
+  YoutubeOutlined,
+} from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import { Fragment, useState } from 'react';
 import { FormattedMessage } from 'umi';
 import {
-  TwitterOutlined,
-  MediumOutlined,
-  LinkOutlined,
-  QuestionOutlined,
-  YoutubeOutlined,
-} from '@ant-design/icons';
-import {
-  TelegramIcon,
   DiscordIcon,
   ElementIcon,
   MetaLogoIcon,
   MetaWikiIcon,
+  TelegramIcon,
 } from '../../Icon/index';
 import style from './index.less';
 
